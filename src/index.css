@@ -1,0 +1,488 @@
+/* Premium Nirnor-Inspired Editorial Minimalist Design System */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+:root {
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Nirnor Light Stark Contrast Color Palette */
+  --bg-deep: #fafafa;
+  --bg-dark: #f4f4f6;
+  --bg-card: rgba(255, 255, 255, 0.9);
+  --bg-card-hover: #ffffff;
+  
+  --border-subtle: #eaeaea;
+  --border-glow: #1a1a1a;
+  --border-glow-focus: #000000;
+
+  --accent-purple: #1a1a1a; /* Stark Charcoal Black as primary accent */
+  --accent-purple-glow: rgba(26, 26, 26, 0.05);
+  --accent-blue: #0969da;
+  --accent-blue-glow: rgba(9, 105, 218, 0.06);
+  --accent-teal: #087f5b;
+  --accent-green: #1a1a1a;
+  --accent-green-glow: rgba(26, 26, 26, 0.05);
+  --accent-yellow: #a66908;
+  --accent-danger: #cf222e;
+
+  --text-primary: #1a1a1a;
+  --text-secondary: #57606a;
+  --text-muted: #8c959f;
+  
+  --sidebar-width: 250px;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-deep);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  text-transform: uppercase;
+}
+
+/* Custom Minimalist Scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #1a1a1a;
+}
+
+/* Layout Framework */
+.app-container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  background: #ffffff;
+  padding: 0;
+  gap: 0;
+}
+
+.main-content {
+  flex: 1;
+  padding: 3rem 4rem 3rem 3rem;
+  overflow-y: auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg-deep);
+}
+
+/* Nirnor Glass Cards (Stark Border Style) */
+.glass-card {
+  background: #ffffff;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0px; /* Sharp corners for modern architectural design */
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.015);
+}
+
+.glass-card:hover {
+  background: #ffffff;
+  border-color: var(--border-glow);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.04);
+  transform: none; /* Avoid float animations, keep it flat and solid */
+}
+
+.glass-input {
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  border-radius: 0px;
+  color: var(--text-primary);
+  padding: 0.75rem 1.2rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+  border-color: var(--border-glow-focus);
+  box-shadow: none;
+  background: #ffffff;
+}
+
+/* Stark Premium Editorial Buttons */
+.btn-primary {
+  background: #1a1a1a;
+  color: #ffffff;
+  border: 1px solid #1a1a1a;
+  border-radius: 0px; /* Sharp corners */
+  padding: 0.8rem 1.8rem;
+  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  box-shadow: none;
+}
+
+.btn-primary:hover {
+  background: #ffffff;
+  color: #1a1a1a;
+  border-color: #1a1a1a;
+}
+
+.btn-primary:active {
+  background: #eaeaea;
+}
+
+.btn-secondary {
+  background: #ffffff;
+  border: 1px solid #d9d9d9;
+  color: var(--text-primary);
+  border-radius: 0px;
+  padding: 0.8rem 1.8rem;
+  font-weight: 600;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.btn-secondary:hover {
+  background: #1a1a1a;
+  color: #ffffff;
+  border-color: #1a1a1a;
+}
+
+/* Editorial Minimalist Badges */
+.badge {
+  padding: 0.25rem 0.6rem;
+  border-radius: 0px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: 0.05em;
+  display: inline-flex;
+  align-items: center;
+  text-transform: uppercase;
+}
+
+.badge-basic {
+  background: transparent;
+  color: #0f766e;
+  border: 1px solid #0f766e;
+}
+
+.badge-intermediate {
+  background: transparent;
+  color: #a66908;
+  border: 1px solid #a66908;
+}
+
+.badge-advanced {
+  background: transparent;
+  color: #cf222e;
+  border: 1px solid #cf222e;
+}
+
+/* Animations */
+@keyframes underlineSlide {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hover-underline:hover::after {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: #1a1a1a;
+  animation: underlineSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transform-origin: left;
+}
+
+/* Clean Editor Frame */
+.editor-frame {
+  background: #0f0e15;
+  border-radius: 0px;
+  border: 1px solid #1a1a1a;
+}
+
+.editor-tabs {
+  background: #161520;
+  border-bottom: 1px solid #232232;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.code-editor-textarea {
+  background: transparent;
+  color: #e2e8f0;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  width: 100%;
+  resize: none;
+  border: none;
+  outline: none;
+  tab-size: 4;
+}
+
+/* Stark Console */
+.terminal-frame {
+  background: #ffffff;
+  border: 1px solid #1a1a1a;
+  border-radius: 0px;
+  overflow: hidden;
+}
+
+.terminal-header {
+  background: #f4f4f6;
+  height: 38px;
+  padding: 0 1rem;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.terminal-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 0%; /* Square dots for minimal aesthetics */
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.terminal-dot-red { background: #cf222e; }
+.terminal-dot-yellow { background: #a66908; }
+.terminal-dot-green { background: #1a1a1a; }
+
+.console-container {
+  background: #ffffff;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  padding: 1.2rem;
+  color: #1a1a1a;
+  overflow-y: auto;
+}
+
+.console-stdout {
+  color: #0969da;
+}
+
+.console-error {
+  color: #cf222e;
+}
+
+.console-success {
+  color: #1a1a1a;
+  font-weight: 600;
+}
+
+.console-prompt {
+  color: #8c959f;
+  margin-right: 0.5rem;
+  user-select: none;
+}
+
+/* Next Recommended Problem & Success Overlay */
+.slide-up-toast {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #ffffff;
+  border: 2px solid #1a1a1a;
+  border-radius: 0px;
+  padding: 1rem 2rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  animation: fadeInUp 0.40s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 30px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Sidebar Desktop/Mobile visibility toggle */
+.sidebar-desktop {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+}
+
+.sidebar-mobile {
+  display: none;
+}
+
+/* ============================================
+   MOBILE RESPONSIVE DESIGN (≤ 768px)
+   ============================================ */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-width: 100%;
+  }
+
+  body {
+    overflow: auto;
+  }
+
+  .sidebar-desktop {
+    display: none !important;
+  }
+
+  .sidebar-mobile {
+    display: block !important;
+  }
+
+  /* Switch from horizontal to vertical layout */
+  .app-container {
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile browsers */
+  }
+
+  /* Sidebar → Bottom Tab Bar */
+  .app-container > aside {
+    width: 100% !important;
+    height: auto !important;
+    padding: 0 !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border-subtle) !important;
+    order: 2; /* Push to bottom */
+    flex-shrink: 0 !important;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    background: #ffffff !important;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
+  }
+
+  /* Main content fills remaining space above bottom bar */
+  .main-content {
+    padding: 1.25rem 1rem 5.5rem 1rem !important;
+    height: auto !important;
+    min-height: 0;
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Grid layouts become single column */
+  .main-content > div > div[style*="grid"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Glass cards: reduce padding on mobile */
+  .glass-card {
+    padding: 1rem !important;
+  }
+
+  /* Editor frame stays intact but narrower */
+  .editor-frame {
+    min-width: 0 !important;
+  }
+
+  /* DocsViewer: chapter nav full width on mobile */
+  .docs-chapter-nav {
+    width: 100% !important;
+    flex-shrink: 1 !important;
+  }
+
+  .docs-content-viewer {
+    padding: 1.25rem 1rem !important;
+  }
+
+  /* Sandbox: snippet sidebar full width on mobile */
+  .sandbox-snippets {
+    width: 100% !important;
+    flex-shrink: 1 !important;
+  }
+
+  /* Buttons: slightly smaller on mobile */
+  .btn-primary,
+  .btn-secondary {
+    padding: 0.65rem 1.2rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.05em;
+  }
+
+  /* Toast notification: full width on mobile */
+  .slide-up-toast {
+    left: 1rem;
+    right: 1rem;
+    bottom: 5rem;
+    transform: none;
+    width: auto;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
