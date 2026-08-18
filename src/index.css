@@ -262,7 +262,15 @@ h1, h2, h3, h4, h5, h6 {
   border: none;
   outline: none;
   tab-size: 4;
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0;
 }
+
+code, pre, .console-container, .glass-input {
+  font-variant-ligatures: none;
+  font-feature-settings: "calt" 0, "liga" 0;
+}
+
 
 /* Stark Console */
 .terminal-frame {

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect } from 'react';
 import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle } from 'lucide-react';
 import type { Problem } from '../data/problems';
 
@@ -6,12 +6,36 @@ interface ProblemListProps {
   problems: Problem[];
   solvedIds: string[];
   onSelectProblem: (problem: Problem) => void;
+  selectedDifficulty: string;
+  setSelectedDifficulty: (difficulty: string) => void;
+  selectedType: string;
+  setSelectedType: (type: string) => void;
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+  initialScrollPos?: number;
 }
 
-export default function ProblemList({ problems, solvedIds, onSelectProblem }: ProblemListProps) {
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
-  const [selectedType, setSelectedType] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+export default function ProblemList({
+  problems,
+  solvedIds,
+  onSelectProblem,
+  selectedDifficulty,
+  setSelectedDifficulty,
+  selectedType,
+  setSelectedType,
+  searchQuery,
+  setSearchQuery,
+  initialScrollPos,
+}: ProblemListProps) {
+  // Restore scroll position when returning to problem list
+  useLayoutEffect(() => {
+    if (initialScrollPos && initialScrollPos > 0) {
+      const mainEl = document.querySelector('.main-content');
+      if (mainEl) {
+        mainEl.scrollTop = initialScrollPos;
+      }
+    }
+  }, [initialScrollPos]);
 
   // Filter logic
   const filteredProblems = problems.filter((problem) => {

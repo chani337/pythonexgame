@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Play, FileCode, RefreshCw } from 'lucide-react';
 import type { RunResponse } from '../hooks/usePyodide';
 
@@ -100,6 +100,53 @@ export default function Sandbox({
   const [stdout, setStdout] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [activeSnippetIdx, setActiveSnippetIdx] = useState<number | null>(0);
+
+  // Line numbers scroll sync
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleScroll = () => {
+    if (lineNumbersRef.current && textareaRef.current) {
+      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const target = e.currentTarget;
+      const start = target.selectionStart;
+      const end = target.selectionEnd;
+
+      if (e.shiftKey) {
+        // Unindent
+        const lines = code.split('\n');
+        let currentPos = 0;
+        for (let i = 0; i < lines.length; i++) {
+          const lineLen = lines[i].length + 1;
+          if (currentPos + lineLen > start) {
+            if (lines[i].startsWith('    ')) {
+              lines[i] = lines[i].substring(4);
+              setCode(lines.join('\n'));
+              setTimeout(() => {
+                target.selectionStart = Math.max(0, start - 4);
+                target.selectionEnd = Math.max(0, end - 4);
+              }, 0);
+            }
+            break;
+          }
+          currentPos += lineLen;
+        }
+      } else {
+        // Indent 4 spaces
+        const newCode = code.substring(0, start) + '    ' + code.substring(end);
+        setCode(newCode);
+        setTimeout(() => {
+          target.selectionStart = target.selectionEnd = start + 4;
+        }, 0);
+      }
+    }
+  };
 
   // Sync active snippet tab highlighting when code changes from external source (like DocsViewer)
   useEffect(() => {
@@ -222,8 +269,9 @@ export default function Sandbox({
 
             {/* Editor Workspace */}
             <div style={{ display: 'flex', flex: 1, minHeight: 0, position: 'relative', background: 'transparent' }}>
-              {/* Line Numbers */}
+              {/* Synchronized Line Numbers */}
               <div
+                ref={lineNumbersRef}
                 style={{
                   padding: '1rem 0.5rem 1rem 1rem',
                   textAlign: 'right',
@@ -233,6 +281,9 @@ export default function Sandbox({
                   lineHeight: '1.6',
                   userSelect: 'none',
                   borderRight: '1px solid #1e1b2e',
+                  overflow: 'hidden',
+                  flexShrink: 0,
+                  pointerEvents: 'none',
                 }}
               >
                 {lineNumbers.map((num) => (
@@ -242,8 +293,11 @@ export default function Sandbox({
 
               {/* Textarea Code Area */}
               <textarea
+                ref={textareaRef}
                 value={code}
                 onChange={(e) => setCode(e.target.value)}
+                onScroll={handleScroll}
+                onKeyDown={handleKeyDown}
                 placeholder="여기에 파이썬 코드를 작성해 보세요..."
                 className="code-editor-textarea"
                 style={{
@@ -255,6 +309,9 @@ export default function Sandbox({
                   background: 'transparent',
                   boxShadow: 'none',
                   overflowY: 'auto',
+                  whiteSpace: 'pre',
+                  wordBreak: 'normal',
+                  overflowWrap: 'normal',
                 }}
                 disabled={isPyodideLoading}
               />

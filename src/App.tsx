@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Sidebar from './components/Sidebar';
 import Dashboard from './components/Dashboard';
 import ProblemList from './components/ProblemList';
@@ -12,6 +12,12 @@ import { usePyodide } from './hooks/usePyodide';
 export default function App() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
+
+  // Filter states lifted up to preserve active view & difficulty
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
+  const [selectedType, setSelectedType] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const listScrollPosRef = useRef<number>(0);
 
   // States with LocalStorage fallback
   const [solvedIds, setSolvedIds] = useState<string[]>(() => {
@@ -105,6 +111,10 @@ print("변환 리스트:", result)
   };
 
   const handleSelectProblem = (problem: Problem) => {
+    const mainEl = document.querySelector('.main-content');
+    if (mainEl) {
+      listScrollPosRef.current = mainEl.scrollTop;
+    }
     setSelectedProblem(problem);
     setCurrentView('workspace');
   };
@@ -112,6 +122,65 @@ print("변환 리스트:", result)
   const handleBackToProblems = () => {
     setSelectedProblem(null);
     setCurrentView('problems');
+  };
+
+  // Next / Previous problem handlers
+  const handleNextProblem = () => {
+    if (!selectedProblem) return;
+
+    // 1. Check current filtered list
+    const filtered = problems.filter((problem) => {
+      const matchesDifficulty = selectedDifficulty === 'all' || problem.difficulty === selectedDifficulty;
+      const matchesType = selectedType === 'all' || problem.type === selectedType;
+      const matchesSearch =
+        problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        problem.category.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesDifficulty && matchesType && matchesSearch;
+    });
+
+    const filterIndex = filtered.findIndex((p) => p.id === selectedProblem.id);
+    if (filterIndex !== -1 && filterIndex < filtered.length - 1) {
+      setSelectedProblem(filtered[filterIndex + 1]);
+      return;
+    }
+
+    // 2. Fallback to global problems list
+    const globalIndex = problems.findIndex((p) => p.id === selectedProblem.id);
+    if (globalIndex !== -1 && globalIndex < problems.length - 1) {
+      setSelectedProblem(problems[globalIndex + 1]);
+      return;
+    }
+
+    // 3. Loop back to first problem if at the very end
+    if (problems.length > 0) {
+      setSelectedProblem(problems[0]);
+    } else {
+      handleBackToProblems();
+    }
+  };
+
+  const handlePrevProblem = () => {
+    if (!selectedProblem) return;
+
+    const filtered = problems.filter((problem) => {
+      const matchesDifficulty = selectedDifficulty === 'all' || problem.difficulty === selectedDifficulty;
+      const matchesType = selectedType === 'all' || problem.type === selectedType;
+      const matchesSearch =
+        problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        problem.category.toLowerCase().includes(searchQuery.toLowerCase());
+      return matchesDifficulty && matchesType && matchesSearch;
+    });
+
+    const filterIndex = filtered.findIndex((p) => p.id === selectedProblem.id);
+    if (filterIndex > 0) {
+      setSelectedProblem(filtered[filterIndex - 1]);
+      return;
+    }
+
+    const globalIndex = problems.findIndex((p) => p.id === selectedProblem.id);
+    if (globalIndex > 0) {
+      setSelectedProblem(problems[globalIndex - 1]);
+    }
   };
 
   return (
@@ -134,6 +203,8 @@ print("변환 리스트:", result)
           <ProblemWorkspace
             problem={selectedProblem}
             onBack={handleBackToProblems}
+            onNextProblem={handleNextProblem}
+            onPrevProblem={handlePrevProblem}
             runPythonCode={runCode}
             isPyodideLoading={isPyodideLoading}
             onMarkSolved={handleMarkSolved}
@@ -152,6 +223,13 @@ print("변환 리스트:", result)
             problems={problems}
             solvedIds={solvedIds}
             onSelectProblem={handleSelectProblem}
+            selectedDifficulty={selectedDifficulty}
+            setSelectedDifficulty={setSelectedDifficulty}
+            selectedType={selectedType}
+            setSelectedType={setSelectedType}
+            searchQuery={searchQuery}
+            setSearchQuery={setSearchQuery}
+            initialScrollPos={listScrollPosRef.current}
           />
         ) : currentView === 'sandbox' ? (
           <Sandbox
@@ -177,3 +255,4 @@ print("변환 리스트:", result)
     </div>
   );
 }
+

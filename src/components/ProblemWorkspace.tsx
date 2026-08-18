@@ -1,5 +1,5 @@
-import { useState, useEffect, Fragment } from 'react';
-import { ChevronLeft, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { useState, useEffect, useRef, Fragment } from 'react';
+import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import confetti from 'canvas-confetti';
@@ -7,6 +7,8 @@ import confetti from 'canvas-confetti';
 interface ProblemWorkspaceProps {
   problem: Problem;
   onBack: () => void;
+  onNextProblem?: () => void;
+  onPrevProblem?: () => void;
   runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onMarkSolved: (problemId: string) => void;
@@ -15,6 +17,8 @@ interface ProblemWorkspaceProps {
 export default function ProblemWorkspace({
   problem,
   onBack,
+  onNextProblem,
+  onPrevProblem,
   runPythonCode,
   isPyodideLoading,
   onMarkSolved,
@@ -30,9 +34,89 @@ export default function ProblemWorkspace({
   const [hasTested, setHasTested] = useState<boolean>(false);
   const [workspaceSuccess, setWorkspaceSuccess] = useState<boolean>(false);
 
+  // Synchronized scrolling for line numbers
+  const lineNumbersRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleScroll = () => {
+    if (lineNumbersRef.current && textareaRef.current) {
+      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Tab') {
+      e.preventDefault();
+      const target = e.currentTarget;
+      const start = target.selectionStart;
+      const end = target.selectionEnd;
+
+      if (e.shiftKey) {
+        // Unindent
+        const lines = code.split('\n');
+        let currentPos = 0;
+        for (let i = 0; i < lines.length; i++) {
+          const lineLen = lines[i].length + 1;
+          if (currentPos + lineLen > start) {
+            if (lines[i].startsWith('    ')) {
+              lines[i] = lines[i].substring(4);
+              setCode(lines.join('\n'));
+              setTimeout(() => {
+                target.selectionStart = Math.max(0, start - 4);
+                target.selectionEnd = Math.max(0, end - 4);
+              }, 0);
+            }
+            break;
+          }
+          currentPos += lineLen;
+        }
+      } else {
+        // Indent 4 spaces
+        const newCode = code.substring(0, start) + '    ' + code.substring(end);
+        setCode(newCode);
+        setTimeout(() => {
+          target.selectionStart = target.selectionEnd = start + 4;
+        }, 0);
+      }
+    }
+  };
+
   // Line numbering for the textarea
   const lineCount = code.split('\n').length;
   const lineNumbers = Array.from({ length: Math.max(lineCount, 10) }, (_, i) => i + 1);
+
+  // Helper to safely render inline code backticks & operators
+  const renderFormattedText = (text: string) => {
+    if (!text) return null;
+    const parts = text.split(/(`[^`]+`|\*\*[^*]+\*\*)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('`') && part.endsWith('`')) {
+        return (
+          <code
+            key={i}
+            style={{
+              fontFamily: 'var(--font-mono)',
+              background: '#eef2ff',
+              padding: '0.15rem 0.4rem',
+              borderRadius: '2px',
+              fontSize: '0.84em',
+              color: '#0969da',
+              fontWeight: '600',
+              border: '1px solid #d0d7de',
+              fontVariantLigatures: 'none',
+              fontFeatureSettings: '"calt" 0, "liga" 0',
+            }}
+          >
+            {part.slice(1, -1)}
+          </code>
+        );
+      }
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} style={{ fontWeight: '700', color: '#1a1a1a' }}>{part.slice(2, -2)}</strong>;
+      }
+      return part;
+    });
+  };
 
   // Reset workspace state when problem changes
   useEffect(() => {
@@ -154,6 +238,48 @@ export default function ProblemWorkspace({
           <ChevronLeft size={15} />
           목록으로 돌아가기
         </button>
+
+        {/* Quick Prev / Next Navigation */}
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {onPrevProblem && (
+            <button
+              onClick={onPrevProblem}
+              style={{
+                background: '#ffffff',
+                border: '1px solid var(--border-subtle)',
+                color: '#1a1a1a',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.78rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.2rem',
+              }}
+            >
+              <ChevronLeft size={14} /> 이전 문제
+            </button>
+          )}
+          {onNextProblem && (
+            <button
+              onClick={onNextProblem}
+              style={{
+                background: '#1a1a1a',
+                border: '1px solid #1a1a1a',
+                color: '#ffffff',
+                padding: '0.35rem 0.75rem',
+                fontSize: '0.78rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.2rem',
+              }}
+            >
+              다음 문제 <ChevronRight size={14} />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Main Grid: Description | Editor */}
@@ -199,9 +325,9 @@ export default function ProblemWorkspace({
             <h3 style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '0.05em' }}>
               문제 설명
             </h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
-              {problem.description}
-            </p>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
+              {renderFormattedText(problem.description)}
+            </div>
           </div>
 
           {/* Constraints/Conditions */}
@@ -211,7 +337,7 @@ export default function ProblemWorkspace({
             </h3>
             <ul style={{ paddingLeft: '1.2rem', fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
               {problem.constraints.map((c, i) => (
-                <li key={i}>{c}</li>
+                <li key={i}>{renderFormattedText(c)}</li>
               ))}
             </ul>
           </div>
@@ -292,8 +418,9 @@ export default function ProblemWorkspace({
 
               {/* Editor Workspace */}
               <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'transparent' }}>
-                {/* Line Numbers */}
+                {/* Synchronized Line Numbers */}
                 <div
+                  ref={lineNumbersRef}
                   style={{
                     padding: '1rem 0.5rem 1rem 1rem',
                     textAlign: 'right',
@@ -303,6 +430,9 @@ export default function ProblemWorkspace({
                     lineHeight: '1.6',
                     userSelect: 'none',
                     borderRight: '1px solid #1e1b2e',
+                    overflow: 'hidden',
+                    flexShrink: 0,
+                    pointerEvents: 'none',
                   }}
                 >
                   {lineNumbers.map((num) => (
@@ -312,8 +442,11 @@ export default function ProblemWorkspace({
 
                 {/* Textarea Code Area */}
                 <textarea
+                  ref={textareaRef}
                   value={code}
                   onChange={(e) => setCode(e.target.value)}
+                  onScroll={handleScroll}
+                  onKeyDown={handleKeyDown}
                   placeholder="여기에 파이썬 코드를 작성하세요..."
                   className="code-editor-textarea"
                   style={{
@@ -325,6 +458,9 @@ export default function ProblemWorkspace({
                     background: 'transparent',
                     boxShadow: 'none',
                     overflowY: 'auto',
+                    whiteSpace: 'pre',
+                    wordBreak: 'normal',
+                    overflowWrap: 'normal',
                   }}
                   disabled={isPyodideLoading}
                 />
@@ -579,18 +715,36 @@ export default function ProblemWorkspace({
               해당 문제가 성공적으로 해결되었습니다.
             </span>
           </div>
-          <button
-            onClick={onBack}
-            className="btn-primary"
-            style={{
-              padding: '0.5rem 1rem',
-              fontSize: '0.75rem',
-            }}
-          >
-            Next Problem
-          </button>
+          <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {onNextProblem && (
+              <button
+                onClick={onNextProblem}
+                className="btn-primary"
+                style={{
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.75rem',
+                }}
+              >
+                다음 문제 풀기
+              </button>
+            )}
+            <button
+              onClick={onBack}
+              className="btn-secondary"
+              style={{
+                padding: '0.5rem 1rem',
+                fontSize: '0.75rem',
+                background: '#ffffff',
+                color: '#1a1a1a',
+                borderColor: '#1a1a1a',
+              }}
+            >
+              목록으로
+            </button>
+          </div>
         </div>
       )}
     </div>
   );
 }
+
