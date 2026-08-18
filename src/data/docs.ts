@@ -110,18 +110,6 @@ export const docChapters: DocChapter[] = [
     ]
   },
   {
-    "id": "7_matplotlib_txt",
-    "filename": "Matplotlib.txt",
-    "title": "Matplotlib 시각화 기초",
-    "cells": [
-      {
-        "id": "7_matplotlib_txt_cell_0",
-        "type": "markdown",
-        "content": "# 파이썬 Matplotlib 기초\n\n```python\nimport matplotlib.pyplot as plt\n\nx = [1, 2, 3, 4]\ny = [10, 20, 30, 40]\n\nplt.plot(x, y)\nplt.title(\"선 그래프 예제\")\nplt.show()\n```"
-      }
-    ]
-  },
-  {
     "id": "8_numpy_txt",
     "filename": "NumPy.txt",
     "title": "NumPy 수치계산 기초",
@@ -146,14 +134,14 @@ export const docChapters: DocChapter[] = [
     ]
   },
   {
-    "id": "10_algorithm_patterns",
-    "filename": "10. 알고리즘 패턴 총정리.ipynb",
-    "title": "알고리즘 패턴 대백과",
+    "id": "7_matplotlib_txt",
+    "filename": "Matplotlib.txt",
+    "title": "Matplotlib 시각화 기초",
     "cells": [
       {
-        "id": "10_algorithm_patterns_cell_0",
+        "id": "7_matplotlib_txt_cell_0",
         "type": "markdown",
-        "content": "# 🚀 파이썬 코딩테스트 핵심 알고리즘 8가지 패턴 대백과\n\n알고리즘 문제 풀이에 꼭 필요한 **8가지 핵심 알고리즘 문제 유형과 파이썬 실전 풀이 코드** 총정리 가이드입니다.\n\n---\n\n## 1. 완전 탐색 & 콤비네이션 (Brute Force & Combinatorics)\n\n모든 가능한 경우의 수를 하나씩 탐색하는 방법입니다.\n\n### 💡 핵심 모듈: `itertools`\n- `permutations(arr, r)`: 순열 (순서 고려)\n- `combinations(arr, r)`: 조합 (순서 무관)\n\n```python\nimport itertools\n\ndata = ['A', 'B', 'C']\nprint(\"순열:\", list(itertools.permutations(data, 2)))\nprint(\"조합:\", list(itertools.combinations(data, 2)))\n```\n\n---\n\n## 2. 투 포인터 (Two Pointers) & 슬라이딩 윈도우\n\n1차원 배열에서 두 개의 인덱스(포인터)를 움직이며 조건에 맞는 구간을 탐색합니다. 시간 복잡도를 `O(N^2)`에서 `O(N)`으로 단축시킵니다.\n\n```python\ndef two_sum(arr, target):\n    left, right = 0, len(arr) - 1\n    while left < right:\n        current_sum = arr[left] + arr[right]\n        if current_sum == target:\n            return (arr[left], arr[right])\n        elif current_sum < target:\n            left += 1\n        else:\n            right -= 1\n    return None\n\nnumbers = [1, 3, 5, 7, 9, 11]\nprint(\"합이 12가 되는 쌍:\", two_sum(numbers, 12))\n```\n\n---\n\n## 3. 그리디 알고리즘 (Greedy)\n\n매 순간 가장 최선의 선택을 하여 전체 최적해를 구하는 탐욕법입니다.\n\n```python\ndef min_coins(change):\n    coins = [500, 100, 50, 10]\n    count = 0\n    for coin in coins:\n        count += change // coin\n        change %= coin\n    return count\n\nprint(\"1260원 거스름돈 동전 수:\", min_coins(1260))\n```\n\n---\n\n## 4. 이진 탐색 (Binary Search)\n\n정렬된 배열에서 탐색 범위를 절반씩 줄여가며 `O(log N)` 시간에 원하는 데이터를 찾습니다.\n\n```python\nimport bisect\n\narr = [10, 20, 30, 40, 50, 60, 70]\nidx = bisect.bisect_left(arr, 30)\nprint(\"30의 인덱스:\", idx)\n```\n\n---\n\n## 5. DFS & BFS (깊이 우선 / 너비 우선 탐색)\n\n그래프 및 2차원 미로 격자 탐색의 핵심입니다.\n- **DFS**: 한 경로를 끝까지 탐색 (재귀/스택)\n- **BFS**: 시작점에서 넓게 탐색하며 최단거리 탐색 (`collections.deque` 사용)\n\n```python\nfrom collections import deque\n\ndef bfs(graph, start):\n    visited = set([start])\n    queue = deque([start])\n    result = []\n    while queue:\n        node = queue.popleft()\n        result.append(node)\n        for neighbor in graph[node]:\n            if neighbor not in visited:\n                visited.add(neighbor)\n                queue.append(neighbor)\n    return result\n\ngraph = {'A': ['B', 'C'], 'B': ['A', 'D'], 'C': ['A'], 'D': ['B']}\nprint(\"BFS 순회:\", bfs(graph, 'A'))\n```\n\n---\n\n## 6. 동적 계획법 (Dynamic Programming / DP)\n\n작은 하위 문제 계산 결과를 메모아이제이션(Memoization) 테이블에 저장하여 중복 계산을 방지합니다.\n\n```python\ndef fibo_dp(n):\n    dp = [0] * (n + 1)\n    dp[1], dp[2] = 1, 1\n    for i in range(3, n + 1):\n        dp[i] = dp[i-1] + dp[i-2]\n    return dp[n]\n\nprint(\"피보나치 50번째 항:\", fibo_dp(50))\n```\n\n---\n\n## 7. 핵심 자료구조: 스택, 큐, 힙 (Heap)\n\n- **Stack**: `append()`, `pop()`\n- **Queue**: `collections.deque` (`popleft()`)\n- **Heap**: `import heapq` (`heappush()`, `heappop()`)\n\n```python\nimport heapq\n\nheap = []\nheapq.heappush(heap, 40)\nheapq.heappush(heap, 10)\nheapq.heappush(heap, 30)\nprint(\"최소 힙 최소값:\", heapq.heappop(heap))\n```\n\n---\n\n## 8. 파이썬 실전 다중 조건 정렬 (Custom Sorting)\n\n```python\nstudents = [(\"김철수\", 90, 85), (\"이영희\", 90, 95), (\"박민수\", 80, 100)]\nsorted_students = sorted(students, key=lambda x: (-x[1], -x[2]))\nprint(\"정렬 결과:\", sorted_students)\n```\n\n---\n\n## 💡 핵심 요약\n\n| 알고리즘 종류 | 주요 용도 | 파이썬 키워드 |\n|---|---|---|\n| 완전 탐색 | 경우의 수 검사 | `itertools` |\n| 투 포인터 | 연속 구간 탐색 | `left, right` |\n| 그리디 | 동전, 회의실 배정 | `sort()` |\n| 이진 탐색 | 대용량 검색 | `bisect` |\n| DFS / BFS | 그래프, 미로 최단거리 | `deque` |\n| DP | 피보나치, 배낭 문제 | `dp = [0] * (N + 1)` |\n| 힙 (Heap) | 우선순위 큐 | `heapq` |"
+        "content": "# 파이썬 Matplotlib 기초\n\n```python\nimport matplotlib.pyplot as plt\n\nx = [1, 2, 3, 4]\ny = [10, 20, 30, 40]\n\nplt.plot(x, y)\nplt.title(\"선 그래프 예제\")\nplt.show()\n```"
       }
     ]
   }
