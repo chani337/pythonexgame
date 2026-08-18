@@ -117,8 +117,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', userId)
         .single();
 
-      if (error && error.code === 'PGRST116') {
-        // Create profile if missing
+      if (error || !data) {
+        // Upsert profile if missing or error
         const newProf = {
           id: userId,
           email: userEmail,
@@ -127,23 +127,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           last_solved_date: null,
           sandbox_runs: 0,
         };
-        await supabase.from('profiles').insert(newProf);
+        await supabase.from('profiles').upsert(newProf, { onConflict: 'id' });
         setProfile(newProf);
-      } else if (data) {
+      } else {
         setProfile(data);
-        // Merge offline local storage progress into Supabase if present
         mergeLocalStorageProgress(userId);
       }
     } catch (err) {
       console.error('Fetch profile error:', err);
     } finally {
       setLoading(false);
+      refreshLeaderboard();
     }
   };
 
   const mergeLocalStorageProgress = async (userId: string) => {
     try {
-      const savedSolved = localStorage.getItem('pyquests_solved_ids');
+      const savedSolved = localStorage.getItem(`pyquests_solved_ids_${userId}`) || localStorage.getItem('pyquests_solved_ids');
       if (savedSolved) {
         const solvedIds: string[] = JSON.parse(savedSolved);
         if (solvedIds.length > 0) {
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       let formatted: LeaderboardUser[] = [];
 
-      if (!profErr && profData && profData.length > 0) {
+      if (!profErr && profData) {
         const solvedCounts: Record<string, number> = {};
         if (solvedData) {
           solvedData.forEach((row) => {
@@ -192,7 +192,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (solvedErr) console.warn('Supabase solved RLS warning:', solvedErr);
       }
 
-      // Guarantee current logged-in user is ALWAYS displayed on the leaderboard (unless master admin)
+      // Always filter out Master Admin account (chani7873@daum.net) from public leaderboard
+      formatted = formatted.filter((u) => u.email?.toLowerCase() !== 'chani7873@daum.net');
+
+      // Guarantee current logged-in non-admin user is ALWAYS displayed on the leaderboard
       if (user && user.email?.toLowerCase() !== 'chani7873@daum.net') {
         const userKey = `pyquests_solved_ids_${user.id}`;
         const savedLocal = localStorage.getItem(userKey);
@@ -214,7 +217,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Exclude Master Admin account (chani7873@daum.net) so real learners compete fairly on the leaderboard
+      // Final filter out Master Admin just in case
       formatted = formatted.filter((u) => u.email?.toLowerCase() !== 'chani7873@daum.net');
 
       // Sort by solved_count DESC, then streak DESC
