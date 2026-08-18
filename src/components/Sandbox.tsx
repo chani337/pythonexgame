@@ -31,6 +31,172 @@ print("변환 리스트:", result)
 `
   },
   {
+    name: '완전 탐색 & 조합 (Brute Force)',
+    desc: 'itertools 활용한 순열과 조합',
+    code: `# 파이썬 완전 탐색 (itertools) 예제
+import itertools
+
+data = ['A', 'B', 'C', 'D']
+
+# 4개 중 2개를 순서대로 선택하는 순열
+perms = list(itertools.permutations(data, 2))
+print("순열 (Permutations):", perms)
+
+# 4개 중 2개를 순서 없이 선택하는 조합
+combs = list(itertools.combinations(data, 2))
+print("조합 (Combinations):", combs)
+`
+  },
+  {
+    name: '투 포인터 (Two Pointers)',
+    desc: '양 끝 인덱스로 목표 합 탐색',
+    code: `# 투 포인터 알고리즘 예제
+def two_sum(arr, target):
+    left, right = 0, len(arr) - 1
+    while left < right:
+        curr = arr[left] + arr[right]
+        if curr == target:
+            return (arr[left], arr[right])
+        elif curr < target:
+            left += 1
+        else:
+            right -= 1
+    return None
+
+numbers = [1, 3, 5, 7, 9, 11, 15]
+target = 16
+print(f"합이 {target}이 되는 쌍:", two_sum(numbers, target))
+`
+  },
+  {
+    name: '그리디 알고리즘 (Greedy)',
+    desc: '거스름돈 최소 동전 개수 계산',
+    code: `# 그리디 (탐욕법) 거스름돈 예제
+def min_coins(change):
+    coins = [500, 100, 50, 10]
+    count = 0
+    coin_details = {}
+    for coin in coins:
+        num = change // coin
+        if num > 0:
+            coin_details[f"{coin}원"] = num
+        count += num
+        change %= coin
+    return count, coin_details
+
+total_change = 1260
+count, details = min_coins(total_change)
+print(f"{total_change}원 거스름돈 동전 수:", count)
+print("동전 구성:", details)
+`
+  },
+  {
+    name: '이진 탐색 (Binary Search)',
+    desc: 'bisect 모듈 활용한 O(log N) 탐색',
+    code: `# 이진 탐색 (Binary Search) 예제
+import bisect
+
+arr = [10, 20, 30, 40, 50, 60, 70, 80, 90]
+target = 40
+
+# bisect_left: target 이상이 처음 나오는 위치
+idx = bisect.bisect_left(arr, target)
+print(f"{target}의 인덱스:", idx)
+print("원소 포함 여부:", idx < len(arr) and arr[idx] == target)
+`
+  },
+  {
+    name: 'BFS 너비 우선 탐색 (Graph)',
+    desc: 'collections.deque 활용한 그래프 순회',
+    code: `# BFS 너비 우선 탐색 예제
+from collections import deque
+
+def bfs(graph, start):
+    visited = set([start])
+    queue = deque([start])
+    order = []
+    
+    while queue:
+        node = queue.popleft()
+        order.append(node)
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)
+    return order
+
+graph = {
+    'A': ['B', 'C'],
+    'B': ['A', 'D', 'E'],
+    'C': ['A', 'F'],
+    'D': ['B'],
+    'E': ['B'],
+    'F': ['C']
+}
+
+print("BFS 방문 순서:", bfs(graph, 'A'))
+`
+  },
+  {
+    name: '동적 계획법 (DP)',
+    desc: '바텀업 메모아이제이션 피보나치',
+    code: `# 동적 계획법 (Dynamic Programming) 예제
+def fibonacci_dp(n):
+    if n <= 0: return 0
+    if n == 1: return 1
+    
+    dp = [0] * (n + 1)
+    dp[1] = 1
+    
+    for i in range(2, n + 1):
+        dp[i] = dp[i-1] + dp[i-2]
+        
+    return dp[n]
+
+n = 50
+print(f"{n}번째 피보나치 수:", fibonacci_dp(n))
+`
+  },
+  {
+    name: '우선순위 큐 & 힙 (Heap)',
+    desc: 'heapq를 이용한 실시간 최소값 정렬',
+    code: `# 우선순위 큐 (heapq) 예제
+import heapq
+
+heap = []
+scores = [45, 12, 89, 32, 67, 5]
+
+for score in scores:
+    heapq.heappush(heap, score)
+
+print("원본 점수들:", scores)
+print("최소 힙에서 작은 순서대로 추출:")
+sorted_result = [heapq.heappop(heap) for _ in range(len(heap))]
+print("정렬 결과:", sorted_result)
+`
+  },
+  {
+    name: '다중 조건 정렬 (Custom Sort)',
+    desc: 'lambda 키를 이용한 다차원 요가 정렬',
+    code: `# 다중 조건 정렬 예제
+students = [
+    ("김철수", 90, 85),
+    ("이영희", 90, 95),
+    ("박민수", 80, 100),
+    ("정수진", 90, 85)
+]
+
+# 1순위: 국어 점수 내림차순 (-x[1])
+# 2순위: 수학 점수 내림차순 (-x[2])
+# 3순위: 이름 오름차순 (x[0])
+sorted_students = sorted(students, key=lambda x: (-x[1], -x[2], x[0]))
+
+print("=== 학생 성적 정렬 결과 ===")
+for s in sorted_students:
+    print(f"이름: {s[0]}, 국어: {s[1]}점, 수학: {s[2]}점")
+`
+  },
+  {
     name: '버블 정렬 (Bubble Sort)',
     desc: '간단한 정렬 알고리즘 구현',
     code: `def bubble_sort(arr):
