@@ -27,5 +27,7 @@ dist-ssr
 diag_*
 extracted_text_raw.txt
 build_out*.log
-check_dict_docs.cjs
-
+# Environment Variables
+.env
+.env.*
+!.env.example
