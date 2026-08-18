@@ -33,6 +33,7 @@ interface AuthContextType {
   refreshLeaderboard: () => Promise<void>;
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
+  signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   syncSolvedToSupabase: (problemId: string) => Promise<void>;
   syncStatsToSupabase: (streak: number, lastSolvedDate: string, sandboxRuns: number) => Promise<void>;
@@ -215,6 +216,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: res.error };
   };
 
+  const signInWithGoogle = async () => {
+    if (!isSupabaseConfigured) {
+      return { error: { message: 'Supabase URL과 Anon Key가 .env 파일에 설정되지 않았습니다.' } };
+    }
+    const res = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: window.location.origin,
+      },
+    });
+    return { error: res.error };
+  };
+
   const signOut = async () => {
     if (isSupabaseConfigured) {
       await supabase.auth.signOut();
@@ -268,6 +282,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         refreshLeaderboard,
         signUp,
         signIn,
+        signInWithGoogle,
         signOut,
         syncSolvedToSupabase,
         syncStatsToSupabase,
