@@ -216,7 +216,7 @@ export default function Dashboard({
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
-          {onUnlockAll && (
+          {isMasterAdmin && onUnlockAll && (
             <button
               onClick={() => {
                 if (window.confirm(isMasterAdmin ? 'chani7873@daum.net 계정에 모든 문제(90개 이상) 해결 완료 및 뱃지 전체 해금을 적용하시겠습니까?' : '모든 문제(90개 이상)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?')) {
