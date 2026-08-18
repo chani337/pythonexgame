@@ -64,9 +64,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const updateLeaderboardState = (newList: LeaderboardUser[]) => {
-    setLeaderboard(newList);
     if (newList.length > 0) {
+      setLeaderboard(newList);
       localStorage.setItem('pyquests_cached_leaderboard', JSON.stringify(newList));
+    } else {
+      // If new computed list is empty, keep cached leaderboard so UI never wipes on scroll/refresh
+      const cached = localStorage.getItem('pyquests_cached_leaderboard');
+      if (cached) {
+        try {
+          const parsed = JSON.parse(cached);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setLeaderboard(parsed);
+          }
+        } catch (e) {
+          console.error('Cache restore error:', e);
+        }
+      }
     }
   };
 
@@ -198,27 +211,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from('user_solved_problems')
         .select('user_id, problem_id');
 
-      let formatted: LeaderboardUser[] = [];
+      const solvedCounts: Record<string, number> = {};
+      if (solvedData) {
+        solvedData.forEach((row) => {
+          solvedCounts[row.user_id] = (solvedCounts[row.user_id] || 0) + 1;
+        });
+      }
+
+      const userMap: Record<string, LeaderboardUser> = {};
 
       if (!profErr && profData) {
-        const solvedCounts: Record<string, number> = {};
-        if (solvedData) {
-          solvedData.forEach((row) => {
-            solvedCounts[row.user_id] = (solvedCounts[row.user_id] || 0) + 1;
-          });
-        }
-
-        formatted = profData.map((item: any) => ({
-          id: item.id,
-          display_name: item.display_name || item.email?.split('@')[0] || '익명 러너',
-          email: item.email || '',
-          streak: item.streak || 0,
-          solved_count: solvedCounts[item.id] || 0,
-        }));
+        profData.forEach((item: any) => {
+          userMap[item.id] = {
+            id: item.id,
+            display_name: item.display_name || item.email?.split('@')[0] || '익명 러너',
+            email: item.email || '',
+            streak: item.streak || 0,
+            solved_count: solvedCounts[item.id] || 0,
+          };
+        });
       } else {
         if (profErr) console.warn('Supabase profiles RLS warning:', profErr);
         if (solvedErr) console.warn('Supabase solved RLS warning:', solvedErr);
       }
+
+      // Include any user_id from user_solved_problems even if profile table row was not created yet
+      Object.keys(solvedCounts).forEach((uid) => {
+        if (!userMap[uid]) {
+          userMap[uid] = {
+            id: uid,
+            display_name: '러너_' + uid.slice(0, 5),
+            email: '',
+            streak: 0,
+            solved_count: solvedCounts[uid],
+          };
+        }
+      });
+
+      let formatted = Object.values(userMap);
 
       // Always filter out Master Admin account (chani7873@daum.net) from public leaderboard
       formatted = formatted.filter((u) => u.email?.toLowerCase() !== 'chani7873@daum.net');
