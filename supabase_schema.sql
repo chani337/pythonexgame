@@ -12,18 +12,8 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Enable RLS for profiles
-ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies for Profiles
-CREATE POLICY "Public profiles are viewable by everyone" 
-  ON public.profiles FOR SELECT USING (true);
-
-CREATE POLICY "Users can insert their own profile" 
-  ON public.profiles FOR INSERT WITH CHECK (auth.uid() = id);
-
-CREATE POLICY "Users can update their own profile" 
-  ON public.profiles FOR UPDATE USING (auth.uid() = id);
+-- Disable RLS on profiles so public leaderboard can query easily
+ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
 
 -- 2. User Solved Problems Table
 CREATE TABLE IF NOT EXISTS public.user_solved_problems (
@@ -34,18 +24,8 @@ CREATE TABLE IF NOT EXISTS public.user_solved_problems (
   CONSTRAINT unique_user_problem UNIQUE (user_id, problem_id)
 );
 
--- Enable RLS for user_solved_problems
-ALTER TABLE public.user_solved_problems ENABLE ROW LEVEL SECURITY;
-
--- RLS Policies for user_solved_problems
-CREATE POLICY "Users can view all solved problem records" 
-  ON public.user_solved_problems FOR SELECT USING (true);
-
-CREATE POLICY "Users can insert their own solved problems" 
-  ON public.user_solved_problems FOR INSERT WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can delete their own solved problems" 
-  ON public.user_solved_problems FOR DELETE USING (auth.uid() = user_id);
+-- Disable RLS on user_solved_problems so public leaderboard can query easily
+ALTER TABLE public.user_solved_problems DISABLE ROW LEVEL SECURITY;
 
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
