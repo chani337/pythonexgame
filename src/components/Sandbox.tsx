@@ -367,13 +367,28 @@ export default function Sandbox({
       </div>
 
       {/* Main Workspace split */}
-      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, flexWrap: 'wrap', alignItems: 'stretch', minHeight: 0 }}>
-        {/* Left Side: Snippets Manager */}
-        <div className="glass-card sandbox-snippets" style={{ width: '280px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', flexShrink: 0, borderRadius: '0px' }}>
+      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, alignItems: 'flex-start', minHeight: 0 }}>
+        {/* Left Side: Snippets Manager (Sticky & Internal Scrollable) */}
+        <div
+          className="glass-card sandbox-snippets"
+          style={{
+            width: '280px',
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+            flexShrink: 0,
+            borderRadius: '0px',
+            position: 'sticky',
+            top: '20px',
+            maxHeight: 'calc(100vh - 120px)',
+            overflow: 'hidden',
+          }}
+        >
           <h3 style={{ fontSize: '0.9rem', fontWeight: '700', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem', letterSpacing: '0.05em' }}>
             💡 파이썬 코드 예제
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
             {SNIPPETS.map((snippet, idx) => (
               <button
                 key={idx}

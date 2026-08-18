@@ -288,13 +288,28 @@ export default function DocsViewer({
       </div>
 
       {/* Main split layout */}
-      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, flexWrap: 'wrap', alignItems: 'stretch', minHeight: 0 }}>
-        {/* Left Side: Chapter Navigation */}
-        <div className="glass-card docs-chapter-nav" style={{ width: '260px', padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem', flexShrink: 0, borderRadius: '0px' }}>
+      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, alignItems: 'flex-start', minHeight: 0 }}>
+        {/* Left Side: Chapter Navigation (Sticky & Internal Scrollable) */}
+        <div
+          className="glass-card docs-chapter-nav"
+          style={{
+            width: '260px',
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+            flexShrink: 0,
+            borderRadius: '0px',
+            position: 'sticky',
+            top: '20px',
+            maxHeight: 'calc(100vh - 120px)',
+            overflow: 'hidden',
+          }}
+        >
           <h3 style={{ fontSize: '0.9rem', fontWeight: '700', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem', letterSpacing: '0.05em' }}>
             📚 학습 목차
           </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
             {docChapters.map((chapter, idx) => (
               <button
                 key={chapter.id}
