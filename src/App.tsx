@@ -43,25 +43,29 @@ function MainApp() {
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  // Fetch solved problem IDs from Supabase when user logs in
+  // Fetch solved problem IDs from Supabase when user logs in or reset on logout
   useEffect(() => {
     if (user) {
       fetchUserSolvedIds().then((remoteSolvedIds) => {
-        if (remoteSolvedIds && remoteSolvedIds.length > 0) {
-          setSolvedIds((prev) => Array.from(new Set([...prev, ...remoteSolvedIds])));
-        }
+        setSolvedIds(remoteSolvedIds || []);
       });
+    } else {
+      // When logged out, reset to empty state so next user gets a fresh start
+      setSolvedIds([]);
+      setStreak(0);
+      setLastSolvedDate(null);
+      setSandboxRunCount(0);
     }
   }, [user]);
 
   // Sync profile stats when logged in
   useEffect(() => {
-    if (profile) {
-      if (profile.streak && profile.streak > streak) setStreak(profile.streak);
-      if (profile.last_solved_date) setLastSolvedDate(profile.last_solved_date);
-      if (profile.sandbox_runs) setSandboxRunCount(profile.sandbox_runs);
+    if (user && profile) {
+      setStreak(profile.streak || 0);
+      setLastSolvedDate(profile.last_solved_date || null);
+      setSandboxRunCount(profile.sandbox_runs || 0);
     }
-  }, [profile]);
+  }, [user, profile]);
 
   // Sandbox Code state shared with DocsViewer
   const [sandboxCode, setSandboxCode] = useState<string>(() => {
