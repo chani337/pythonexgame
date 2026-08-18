@@ -7,6 +7,7 @@ import Sandbox from './components/Sandbox';
 import DocsViewer from './components/DocsViewer';
 import AuthModal from './components/AuthModal';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { supabase } from './lib/supabase';
 import { problems } from './data/problems';
 import type { Problem } from './data/problems';
 import { usePyodide } from './hooks/usePyodide';
@@ -134,6 +135,29 @@ print("변환 리스트:", result)
     syncStatsToSupabase(newStreak, today, sandboxRunCount);
   };
 
+  const handleUnlockAllProblems = async () => {
+    const allIds = problems.map((p) => p.id);
+    setSolvedIds(allIds);
+    setStreak(30);
+    setSandboxRunCount(50);
+    const today = new Date().toISOString().split('T')[0];
+    setLastSolvedDate(today);
+
+    // Batch sync to Supabase if logged in
+    if (user) {
+      try {
+        const records = allIds.map((pid) => ({
+          user_id: user.id,
+          problem_id: pid,
+        }));
+        await supabase.from('user_solved_problems').upsert(records, { onConflict: 'user_id,problem_id' });
+        await syncStatsToSupabase(30, today, 50);
+      } catch (err) {
+        console.error('Unlock all sync error:', err);
+      }
+    }
+  };
+
   const handleIncrementSandboxRuns = () => {
     const newCount = sandboxRunCount + 1;
     setSandboxRunCount(newCount);
@@ -252,6 +276,7 @@ print("변환 리스트:", result)
             onNavigateToProblems={() => setCurrentView('problems')}
             onSelectProblem={handleSelectProblem}
             sandboxRunCount={sandboxRunCount}
+            onUnlockAll={handleUnlockAllProblems}
           />
         ) : currentView === 'problems' ? (
           <ProblemList

@@ -10,6 +10,7 @@ interface DashboardProps {
   onNavigateToProblems: () => void;
   onSelectProblem: (problem: Problem) => void;
   sandboxRunCount: number;
+  onUnlockAll?: () => void;
 }
 
 export default function Dashboard({
@@ -19,6 +20,7 @@ export default function Dashboard({
   onNavigateToProblems,
   onSelectProblem,
   sandboxRunCount,
+  onUnlockAll,
 }: DashboardProps) {
   // Stats calculations
   const totalCount = problems.length;
@@ -194,11 +196,36 @@ export default function Dashboard({
             실제 파이썬 런타임을 브라우저에서 실행하며 코딩 실력을 키워 보세요.
           </p>
         </div>
-        <button className="btn-primary" onClick={onNavigateToProblems}>
-          <BookOpen size={15} />
-          학습 시작하기
-          <ChevronRight size={14} />
-        </button>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {onUnlockAll && (
+            <button
+              onClick={() => {
+                if (window.confirm('모든 문제(90개 이상)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?')) {
+                  onUnlockAll();
+                }
+              }}
+              style={{
+                background: '#ffffff',
+                border: '1px solid #1a1a1a',
+                color: '#1a1a1a',
+                padding: '0.7rem 1rem',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+              }}
+            >
+              ⚡ 모든 문제 풀기 & 뱃지 전체 해금
+            </button>
+          )}
+          <button className="btn-primary" onClick={onNavigateToProblems}>
+            <BookOpen size={15} />
+            학습 시작하기
+            <ChevronRight size={14} />
+          </button>
+        </div>
       </div>
 
       {/* Stats Cards Grid */}
