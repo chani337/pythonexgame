@@ -117,7 +117,7 @@ export default function AuthModal() {
             {isSignUp ? 'PyQuests 계정 생성' : 'PyQuests 로그인'}
           </h2>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
-            Supabase 데이터베이스 연동으로 언제 어디서나 진도와 스크릭이 보존됩니다.
+            클라우드 계정 연동으로 언제 어디서나 학습 진도와 스트릭이 안전하게 보존됩니다.
           </p>
         </div>
 
@@ -134,9 +134,9 @@ export default function AuthModal() {
             }}
           >
             <div style={{ fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.35rem', marginBottom: '0.2rem' }}>
-              <Database size={14} /> Supabase 키 미설정 안내
+              <Database size={14} /> 클라우드 DB 연결 안내
             </div>
-            실제 Supabase 클라우드 DB에 연결하시려면 프로젝트의 <code>.env</code> 파일 또는 Vercel 환경변수에 <code>VITE_SUPABASE_URL</code>과 <code>VITE_SUPABASE_ANON_KEY</code>를 입력해 주세요. (미입력 시 오프라인 로컬 저장소 모드로 작동합니다)
+            온라인 클라우드 DB 서버에 실시간 동기화하시려면 프로젝트 <code>.env</code> 또는 Vercel 환경변수에 API 접속 정보를 입력해 주세요. (미입력 시 오프라인 저장소 모드로 작동합니다)
           </div>
         )}
 

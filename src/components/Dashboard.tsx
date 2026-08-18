@@ -536,7 +536,7 @@ function LeaderboardWidget() {
 
       {!isConfigured ? (
         <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '1rem', background: '#f4f4f6' }}>
-          Supabase가 연결되면 전체 러너들의 실시간 문제 해결 및 스트릭 랭킹이 여기에 표시됩니다.
+          클라우드 데이터베이스 연동 시 전체 러너들의 실시간 문제 해결 및 스트릭 랭킹이 여기에 표시됩니다.
         </div>
       ) : leaderboard.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

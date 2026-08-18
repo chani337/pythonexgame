@@ -309,7 +309,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signUp = async (email: string, password: string, displayName: string) => {
     if (!isSupabaseConfigured) {
-      return { error: { message: 'Supabase URL과 Anon Key가 .env 파일에 설정되지 않았습니다.' } };
+      return { error: { message: '클라우드 데이터베이스 접속 정보가 설정되지 않았습니다.' } };
     }
     const res = await supabase.auth.signUp({
       email,
@@ -337,7 +337,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signIn = async (email: string, password: string) => {
     if (!isSupabaseConfigured) {
-      return { error: { message: 'Supabase URL과 Anon Key가 .env 파일에 설정되지 않았습니다.' } };
+      return { error: { message: '클라우드 데이터베이스 접속 정보가 설정되지 않았습니다.' } };
     }
     const res = await supabase.auth.signInWithPassword({ email, password });
     if (!res.error) {
@@ -348,7 +348,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signInWithGoogle = async () => {
     if (!isSupabaseConfigured) {
-      return { error: { message: 'Supabase URL과 Anon Key가 .env 파일에 설정되지 않았습니다.' } };
+      return { error: { message: '클라우드 데이터베이스 접속 정보가 설정되지 않았습니다.' } };
     }
     const res = await supabase.auth.signInWithOAuth({
       provider: 'google',
