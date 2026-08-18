@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { LayoutDashboard, BookOpen, Terminal, GraduationCap, Menu, X } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Terminal, GraduationCap, Menu, X, UserCheck, LogIn, LogOut } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarProps {
   currentView: string;
@@ -18,6 +19,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const progressPercent = Math.round((solvedCount / totalCount) * 100) || 0;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, profile, setAuthModalOpen, signOut } = useAuth();
 
   const menuItems = [
     { id: 'dashboard', name: '대시보드', icon: LayoutDashboard },
@@ -40,7 +42,7 @@ export default function Sidebar({
         flexShrink: 0,
       }}
     >
-      {/* === DESKTOP SIDEBAR (hidden on mobile via CSS) === */}
+      {/* === DESKTOP SIDEBAR === */}
       <div className="sidebar-desktop">
         {/* Brand Title */}
         <div>
@@ -137,8 +139,68 @@ export default function Sidebar({
           </nav>
         </div>
 
-        {/* Progress & Streak Indicators */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+        {/* User Account & Progress Indicators */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          {/* User Account Card */}
+          <div
+            style={{
+              background: '#f4f4f6',
+              border: '1px solid var(--border-subtle)',
+              padding: '0.85rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.5rem',
+            }}
+          >
+            {user ? (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontSize: '0.78rem', fontWeight: '700', color: '#1a1a1a' }}>
+                  <UserCheck size={14} color="#0969da" />
+                  <span>{profile?.display_name || user.email?.split('@')[0]}</span>
+                </div>
+                <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '0.1rem' }}>
+                  {user.email}
+                </div>
+                <button
+                  onClick={() => signOut()}
+                  style={{
+                    marginTop: '0.5rem',
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#cf222e',
+                    fontSize: '0.7rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.2rem',
+                    padding: 0,
+                  }}
+                >
+                  <LogOut size={12} /> 로그아웃
+                </button>
+              </div>
+            ) : (
+              <div>
+                <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', display: 'block', marginBottom: '0.4rem' }}>
+                  계정을 연결하고 클라우드 동기화를 켜세요.
+                </span>
+                <button
+                  onClick={() => setAuthModalOpen(true)}
+                  className="btn-primary"
+                  style={{
+                    width: '100%',
+                    padding: '0.45rem 0.75rem',
+                    fontSize: '0.75rem',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <LogIn size={13} /> 로그인 / 회원가입
+                </button>
+              </div>
+            )}
+          </div>
+
           {streak > 0 && (
             <div
               style={{

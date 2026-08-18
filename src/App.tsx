@@ -5,13 +5,17 @@ import ProblemList from './components/ProblemList';
 import ProblemWorkspace from './components/ProblemWorkspace';
 import Sandbox from './components/Sandbox';
 import DocsViewer from './components/DocsViewer';
+import AuthModal from './components/AuthModal';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { problems } from './data/problems';
 import type { Problem } from './data/problems';
 import { usePyodide } from './hooks/usePyodide';
 
-export default function App() {
+function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
+
+  const { user, profile, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
@@ -38,6 +42,26 @@ export default function App() {
     const saved = localStorage.getItem('pyquests_sandbox_runs');
     return saved ? parseInt(saved, 10) : 0;
   });
+
+  // Fetch solved problem IDs from Supabase when user logs in
+  useEffect(() => {
+    if (user) {
+      fetchUserSolvedIds().then((remoteSolvedIds) => {
+        if (remoteSolvedIds && remoteSolvedIds.length > 0) {
+          setSolvedIds((prev) => Array.from(new Set([...prev, ...remoteSolvedIds])));
+        }
+      });
+    }
+  }, [user]);
+
+  // Sync profile stats when logged in
+  useEffect(() => {
+    if (profile) {
+      if (profile.streak && profile.streak > streak) setStreak(profile.streak);
+      if (profile.last_solved_date) setLastSolvedDate(profile.last_solved_date);
+      if (profile.sandbox_runs) setSandboxRunCount(profile.sandbox_runs);
+    }
+  }, [profile]);
 
   // Sandbox Code state shared with DocsViewer
   const [sandboxCode, setSandboxCode] = useState<string>(() => {
@@ -75,39 +99,43 @@ print("변환 리스트:", result)
 
   // Mark a problem as solved and compute the streak
   const handleMarkSolved = (problemId: string) => {
-    if (solvedIds.includes(problemId)) return; // Already solved
-
-    const newSolvedIds = [...solvedIds, problemId];
-    setSolvedIds(newSolvedIds);
-
-    // Calculate streak
+    let newStreak = streak;
     const today = new Date().toISOString().split('T')[0];
-    
-    if (!lastSolvedDate) {
-      // First problem solved ever
-      setStreak(1);
-    } else {
-      const lastDate = new Date(lastSolvedDate);
-      const currentDate = new Date(today);
-      const diffTime = Math.abs(currentDate.getTime() - lastDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      if (diffDays === 1) {
-        // Solved consecutive day
-        setStreak((prev) => prev + 1);
-      } else if (diffDays > 1) {
-        // Streak broken
-        setStreak(1);
+    if (!solvedIds.includes(problemId)) {
+      const newSolvedIds = [...solvedIds, problemId];
+      setSolvedIds(newSolvedIds);
+
+      if (!lastSolvedDate) {
+        newStreak = 1;
+      } else {
+        const lastDate = new Date(lastSolvedDate);
+        const currentDate = new Date(today);
+        const diffTime = Math.abs(currentDate.getTime() - lastDate.getTime());
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        if (diffDays === 1) {
+          newStreak = streak + 1;
+        } else if (diffDays > 1) {
+          newStreak = 1;
+        }
       }
-      // If diffDays === 0, solved another problem on the same day, streak stays the same
+      setStreak(newStreak);
+      setLastSolvedDate(today);
+      localStorage.setItem('pyquests_last_solved_date', today);
     }
 
-    setLastSolvedDate(today);
-    localStorage.setItem('pyquests_last_solved_date', today);
+    // Sync to Supabase
+    syncSolvedToSupabase(problemId);
+    syncStatsToSupabase(newStreak, today, sandboxRunCount);
   };
 
   const handleIncrementSandboxRuns = () => {
-    setSandboxRunCount((prev) => prev + 1);
+    const newCount = sandboxRunCount + 1;
+    setSandboxRunCount(newCount);
+    if (lastSolvedDate) {
+      syncStatsToSupabase(streak, lastSolvedDate, newCount);
+    }
   };
 
   const handleSelectProblem = (problem: Problem) => {
@@ -185,6 +213,9 @@ print("변환 리스트:", result)
 
   return (
     <div className="app-container">
+      {/* Auth Login/Signup Modal */}
+      <AuthModal />
+
       {/* Navigation Sidebar */}
       <Sidebar
         currentView={selectedProblem ? 'problems' : currentView}
@@ -255,4 +286,13 @@ print("변환 리스트:", result)
     </div>
   );
 }
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
+  );
+}
+
 

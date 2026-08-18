@@ -1,5 +1,7 @@
 import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight } from 'lucide-react';
 import type { Problem } from '../data/problems';
+import { useAuth } from '../contexts/AuthContext';
+
 
 interface DashboardProps {
   problems: Problem[];
@@ -453,6 +455,89 @@ export default function Dashboard({
           ))}
         </div>
       </div>
+
+      {/* Global Leaderboard Section */}
+      <LeaderboardWidget />
     </div>
   );
 }
+
+function LeaderboardWidget() {
+  const { leaderboard, isConfigured, setAuthModalOpen, user } = useAuth();
+
+  return (
+    <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '0px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        <h3 style={{ fontSize: '0.95rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem', letterSpacing: '0.05em' }}>
+          🔥 글로벌 명예의 전당 (실시간 랭킹)
+        </h3>
+        {!user && (
+          <button
+            onClick={() => setAuthModalOpen(true)}
+            style={{
+              background: 'transparent',
+              border: 'none',
+              color: '#0969da',
+              fontSize: '0.75rem',
+              fontWeight: '700',
+              cursor: 'pointer',
+            }}
+          >
+            내 순위 등록하기 (로그인)
+          </button>
+        )}
+      </div>
+
+      {!isConfigured ? (
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '1rem', background: '#f4f4f6' }}>
+          Supabase가 연결되면 전체 러너들의 실시간 문제 해결 및 스트릭 랭킹이 여기에 표시됩니다.
+        </div>
+      ) : leaderboard.length > 0 ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+          {leaderboard.map((item, index) => (
+            <div
+              key={item.id || index}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '0.75rem 1rem',
+                background: item.id === user?.id ? '#f4fbf7' : '#ffffff',
+                border: item.id === user?.id ? '1px solid #1a1a1a' : '1px solid var(--border-subtle)',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontWeight: '800',
+                    fontSize: '0.9rem',
+                    color: index === 0 ? '#a66908' : index === 1 ? '#57606a' : index === 2 ? '#8c959f' : 'var(--text-muted)',
+                    minWidth: '24px',
+                  }}
+                >
+                  #{index + 1}
+                </span>
+                <div>
+                  <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#1a1a1a' }}>
+                    {item.display_name} {item.id === user?.id && <span style={{ fontSize: '0.7rem', color: '#0969da' }}>(나)</span>}
+                  </span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.78rem' }}>
+                <span style={{ color: '#a66908', fontWeight: '600' }}>🔥 {item.streak}일 연속</span>
+                <span style={{ color: '#1a1a1a', fontWeight: '700' }}>{item.solved_count}문제 클리어</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '1rem', textAlign: 'center' }}>
+          아직 랭킹 정보가 없습니다. 첫 번째로 문제를 풀고 1위에 도전해보세요!
+        </div>
+      )}
+    </div>
+  );
+}
+
