@@ -48,7 +48,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
-  const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>([]);
+
+  // Initialize leaderboard state with persistent local cache to guarantee 0ms instant display on refresh
+  const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>(() => {
+    const cached = localStorage.getItem('pyquests_cached_leaderboard');
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {
+        console.error('Leaderboard cache parse error:', e);
+      }
+    }
+    return [];
+  });
+
+  const updateLeaderboardState = (newList: LeaderboardUser[]) => {
+    setLeaderboard(newList);
+    if (newList.length > 0) {
+      localStorage.setItem('pyquests_cached_leaderboard', JSON.stringify(newList));
+    }
+  };
 
   // Fetch initial session & user profile
   useEffect(() => {
@@ -61,6 +81,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        localStorage.setItem('pyquests_last_user_id', session.user.id);
+        if (session.user.email) {
+          localStorage.setItem('pyquests_last_user_email', session.user.email);
+        }
         fetchProfile(session.user.id, session.user.email || '');
       } else {
         setLoading(false);
@@ -71,6 +95,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        localStorage.setItem('pyquests_last_user_id', session.user.id);
+        if (session.user.email) {
+          localStorage.setItem('pyquests_last_user_email', session.user.email);
+        }
         fetchProfile(session.user.id, session.user.email || '');
       } else {
         setProfile(null);
@@ -195,22 +223,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Always filter out Master Admin account (chani7873@daum.net) from public leaderboard
       formatted = formatted.filter((u) => u.email?.toLowerCase() !== 'chani7873@daum.net');
 
-      // Guarantee current logged-in non-admin user is ALWAYS displayed on the leaderboard
-      if (user && user.email?.toLowerCase() !== 'chani7873@daum.net') {
-        const userKey = `pyquests_solved_ids_${user.id}`;
-        const savedLocal = localStorage.getItem(userKey);
-        const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
-        const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${user.id}`) || '0', 10);
+      // Guarantee active logged-in user is ALWAYS displayed on the leaderboard (recovering from session or cache)
+      const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id');
+      const activeUserEmail = user?.email || localStorage.getItem('pyquests_last_user_email');
 
-        const existingIndex = formatted.findIndex((u) => u.id === user.id);
+      if (activeUserId && activeUserEmail && activeUserEmail.toLowerCase() !== 'chani7873@daum.net') {
+        const userKey = `pyquests_solved_ids_${activeUserId}`;
+        const savedLocal = localStorage.getItem(userKey) || localStorage.getItem('pyquests_solved_ids');
+        const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
+        const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || localStorage.getItem('pyquests_streak') || '0', 10);
+
+        const existingIndex = formatted.findIndex((u) => u.id === activeUserId || u.email === activeUserEmail);
         if (existingIndex !== -1) {
           formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count, localSolvedCount);
           formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak, userStreak);
         } else {
           formatted.push({
-            id: user.id,
-            display_name: profile?.display_name || user.email?.split('@')[0] || '나',
-            email: user.email || '',
+            id: activeUserId,
+            display_name: profile?.display_name || activeUserEmail.split('@')[0] || '나',
+            email: activeUserEmail,
             streak: userStreak,
             solved_count: localSolvedCount,
           });
@@ -223,7 +254,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Sort by solved_count DESC, then streak DESC
       formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
 
-      setLeaderboard(formatted.slice(0, 10));
+      updateLeaderboardState(formatted.slice(0, 10));
     } catch (err) {
       console.error('Leaderboard error:', err);
     }
