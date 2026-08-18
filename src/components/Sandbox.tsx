@@ -367,8 +367,8 @@ export default function Sandbox({
       </div>
 
       {/* Main Workspace split */}
-      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, alignItems: 'flex-start', minHeight: 0 }}>
-        {/* Left Side: Snippets Manager (Sticky & Internal Scrollable) */}
+      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px' }}>
+        {/* Left Side: Snippets Manager (Fixed Independent Pane) */}
         <div
           className="glass-card sandbox-snippets"
           style={{
@@ -379,9 +379,7 @@ export default function Sandbox({
             gap: '0.75rem',
             flexShrink: 0,
             borderRadius: '0px',
-            position: 'sticky',
-            top: '20px',
-            maxHeight: 'calc(100vh - 120px)',
+            height: '100%',
             overflow: 'hidden',
           }}
         >

@@ -288,8 +288,8 @@ export default function DocsViewer({
       </div>
 
       {/* Main split layout */}
-      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, alignItems: 'flex-start', minHeight: 0 }}>
-        {/* Left Side: Chapter Navigation (Sticky & Internal Scrollable) */}
+      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px' }}>
+        {/* Left Side: Chapter Navigation (Fixed Independent Pane) */}
         <div
           className="glass-card docs-chapter-nav"
           style={{
@@ -300,9 +300,7 @@ export default function DocsViewer({
             gap: '0.75rem',
             flexShrink: 0,
             borderRadius: '0px',
-            position: 'sticky',
-            top: '20px',
-            maxHeight: 'calc(100vh - 120px)',
+            height: '100%',
             overflow: 'hidden',
           }}
         >
@@ -354,12 +352,13 @@ export default function DocsViewer({
           </div>
         </div>
 
-        {/* Right Side: Chapter Document Viewer */}
+        {/* Right Side: Chapter Document Viewer (Independent Internal Scroll) */}
         <div
           className="glass-card docs-content-viewer"
           style={{
             flex: 1,
             padding: '2.5rem 3rem',
+            height: '100%',
             overflowY: 'auto',
             borderRadius: '0px',
             background: '#ffffff',
