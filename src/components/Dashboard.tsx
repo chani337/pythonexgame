@@ -207,7 +207,7 @@ export default function Dashboard({
               letterSpacing: '0.02em',
             }}
           >
-            {isMasterAdmin ? '안녕하세요, 차니 마스터님! 👑🐍' : '안녕하세요, 러너님! 🐍'}
+            {isMasterAdmin ? '안녕하세요, 차니 마스터님! 👑' : '안녕하세요, 러너님!'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: '580px', lineHeight: '1.6' }}>
             {isMasterAdmin

@@ -2382,5 +2382,237 @@ export const problems: Problem[] = [
       }
     ],
     "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "numpy_q1",
+    "title": "NumPy 실전 1. 점수 평균 계산하기",
+    "category": "NumPy",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "NumPy 라이브러리를 사용하여 점수 리스트 `[80, 90, 75, 95, 100]`의 배열을 만들고 평균을 출력하세요.",
+    "constraints": [
+      "`import numpy as np`를 사용하세요.",
+      "`np.array()`로 배열을 생성하세요.",
+      "`.mean()` 메서드를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "88.0"
+      }
+    ],
+    "initialCode": "import numpy as np\n\nscores = np.array([80, 90, 75, 95, 100])\n# 평균을 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "88.0"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "numpy_q2",
+    "title": "NumPy 실전 2. 20 이상 조건 필터링",
+    "category": "NumPy",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "NumPy 배열 `[10, 15, 20, 25, 30]`에서 20 이상인 값들만 조건 필터링하여 출력하세요.",
+    "constraints": [
+      "`import numpy as np`를 사용하세요.",
+      "조건식 `arr[arr >= 20]`을 활용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "[20 25 30]"
+      }
+    ],
+    "initialCode": "import numpy as np\n\narr = np.array([10, 15, 20, 25, 30])\n# 20 이상인 값만 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "[20 25 30]"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pandas_q1",
+    "title": "Pandas 실전 1. 데이터프레임 평균 구하기",
+    "category": "Pandas",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "Pandas `DataFrame`에서 `\"점수\"` 열의 평균을 계산하여 출력하세요.",
+    "constraints": [
+      "`import pandas as pd`를 사용하세요.",
+      "`df[\"점수\"].mean()`을 활용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "86.0"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndata = {\"점수\": [80, 95, 70, 100, 85]}\ndf = pd.DataFrame(data)\n# 점수 열의 평균을 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "86.0"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pandas_q2",
+    "title": "Pandas 실전 2. 90점 이상 필터링",
+    "category": "Pandas",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "학생 데이터프레임에서 점수가 90점 이상인 데이터의 `\"이름\"` 열을 출력하세요.",
+    "constraints": [
+      "`import pandas as pd`를 사용하세요.",
+      "`df[df[\"점수\"] >= 90][\"이름\"]` 형태를 활용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "0    김철수\n2    박민수\nName: 이름, dtype: object"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndata = {\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"점수\": [90, 85, 100]\n}\ndf = pd.DataFrame(data)\n# 90점 이상인 학생의 이름만 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "0    김철수\n2    박민수\nName: 이름, dtype: object"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "lambda_q1",
+    "title": "응용 1. lambda와 map으로 리스트 제곱하기",
+    "category": "함수",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "리스트 `[1, 2, 3, 4, 5]`의 각 숫자를 `map()`과 `lambda` 함수를 이용해 제곱한 새 리스트를 출력하세요.",
+    "constraints": [
+      "`lambda x: x ** 2`를 활용하세요.",
+      "`list(map(...))` 형태로 리스트로 변환하여 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "[1, 4, 9, 16, 25]"
+      }
+    ],
+    "initialCode": "numbers = [1, 2, 3, 4, 5]\n# map과 lambda를 사용해 제곱 리스트를 만들어 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "[1, 4, 9, 16, 25]"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "algorithm_q1",
+    "title": "알고리즘 1. 회문(Palindrome) 판별하기",
+    "category": "문자열",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "단어가 거꾸로 읽어도 같은 회문(Palindrome)인지 판별하는 함수 `is_palindrome(word)`를 작성하고, `\"kayak\"`과 `\"python\"`에 대해 실행한 결과를 각각 출력하세요.",
+    "constraints": [
+      "슬라이싱 `word[::-1]`을 활용하세요.",
+      "`True` 또는 `False`를 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "True\nFalse"
+      }
+    ],
+    "initialCode": "def is_palindrome(word):\n    return word == word[::-1]\n\nprint(is_palindrome(\"kayak\"))\nprint(is_palindrome(\"python\"))\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "True\nFalse"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "algorithm_q2",
+    "title": "알고리즘 2. 피보나치 수열 10번째 항 구하기",
+    "category": "함수",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "피보나치 수열(1, 1, 2, 3, 5, 8, 13, 21, 34, 55...)의 10번째 항의 값을 출력하는 코드를 작성하세요.",
+    "constraints": [
+      "반복문 또는 재귀함수를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "55"
+      }
+    ],
+    "initialCode": "def fibonacci(n):\n    a, b = 1, 1\n    for _ in range(n - 1):\n        a, b = b, a + b\n    return a\n\nprint(fibonacci(10))\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "55"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "algorithm_q3",
+    "title": "알고리즘 3. 팩토리얼(Factorial) 구하기",
+    "category": "반복문",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "5! (5 × 4 × 3 × 2 × 1)의 값을 계산하여 출력하세요.",
+    "constraints": [
+      "`math.factorial` 또는 반복문을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "120"
+      }
+    ],
+    "initialCode": "import math\nprint(math.factorial(5))\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "120"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "algorithm_q4",
+    "title": "응용 2. 리스트 중복 제거 후 오름차순 정렬",
+    "category": "리스트",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "리스트 `[4, 2, 8, 2, 4, 9, 1, 8]`에서 중복된 원소를 제거하고 오름차순으로 정렬한 리스트를 출력하세요.",
+    "constraints": [
+      "`set()`과 `sorted()`를 활용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "[1, 2, 4, 8, 9]"
+      }
+    ],
+    "initialCode": "numbers = [4, 2, 8, 2, 4, 9, 1, 8]\n# 중복을 제거하고 정렬하여 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "[1, 2, 4, 8, 9]"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
   }
 ];
