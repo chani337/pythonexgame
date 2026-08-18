@@ -81,9 +81,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  // Fetch leaderboard on mount
+  // Fetch initial leaderboard & subscribe to Realtime DB changes
   useEffect(() => {
+    if (!isSupabaseConfigured) return;
+
     refreshLeaderboard();
+
+    // Periodic 15-second auto refresh
+    const intervalId = setInterval(() => {
+      refreshLeaderboard();
+    }, 15000);
+
+    // Supabase Realtime WebSocket subscription
+    const channel = supabase
+      .channel('public:realtime_leaderboard')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
+        refreshLeaderboard();
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_solved_problems' }, () => {
+        refreshLeaderboard();
+      })
+      .subscribe();
+
+    return () => {
+      clearInterval(intervalId);
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const fetchProfile = async (userId: string, userEmail: string) => {
