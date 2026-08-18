@@ -47,8 +47,14 @@ function MainApp() {
   // Fetch solved problem IDs from Supabase when user logs in or reset on logout
   useEffect(() => {
     if (user) {
+      const localKey = `pyquests_solved_ids_${user.id}`;
+      const savedLocal = localStorage.getItem(localKey);
+      const localSolved: string[] = savedLocal ? JSON.parse(savedLocal) : [];
+
       fetchUserSolvedIds().then((remoteSolvedIds) => {
-        setSolvedIds(remoteSolvedIds || []);
+        const merged = Array.from(new Set([...localSolved, ...(remoteSolvedIds || [])]));
+        setSolvedIds(merged);
+        localStorage.setItem(localKey, JSON.stringify(merged));
       });
     } else {
       // When logged out, reset to empty state so next user gets a fresh start
@@ -89,18 +95,21 @@ print("변환 리스트:", result)
   // Pyodide in-browser runtime
   const { loading: isPyodideLoading, runCode } = usePyodide();
 
-  // Save changes to localStorage
+  // Save changes to localStorage scoped to user
   useEffect(() => {
-    localStorage.setItem('pyquests_solved_ids', JSON.stringify(solvedIds));
-  }, [solvedIds]);
+    const storageKey = user ? `pyquests_solved_ids_${user.id}` : 'pyquests_solved_ids_guest';
+    localStorage.setItem(storageKey, JSON.stringify(solvedIds));
+  }, [solvedIds, user]);
 
   useEffect(() => {
-    localStorage.setItem('pyquests_streak', streak.toString());
-  }, [streak]);
+    const storageKey = user ? `pyquests_streak_${user.id}` : 'pyquests_streak_guest';
+    localStorage.setItem(storageKey, streak.toString());
+  }, [streak, user]);
 
   useEffect(() => {
-    localStorage.setItem('pyquests_sandbox_runs', sandboxRunCount.toString());
-  }, [sandboxRunCount]);
+    const storageKey = user ? `pyquests_sandbox_runs_${user.id}` : 'pyquests_sandbox_runs_guest';
+    localStorage.setItem(storageKey, sandboxRunCount.toString());
+  }, [sandboxRunCount, user]);
 
   // Mark a problem as solved and compute the streak
   const handleMarkSolved = (problemId: string) => {

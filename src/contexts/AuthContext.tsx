@@ -261,9 +261,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  const ensureProfileExists = async (userId: string, userEmail: string) => {
+    if (!isSupabaseConfigured) return;
+    try {
+      await supabase.from('profiles').upsert({
+        id: userId,
+        email: userEmail,
+        display_name: userEmail.split('@')[0],
+      }, { onConflict: 'id' });
+    } catch (err) {
+      console.error('Ensure profile error:', err);
+    }
+  };
+
   const syncSolvedToSupabase = async (problemId: string) => {
     if (!isSupabaseConfigured || !user) return;
     try {
+      await ensureProfileExists(user.id, user.email || '');
       await supabase.from('user_solved_problems').upsert(
         { user_id: user.id, problem_id: problemId },
         { onConflict: 'user_id,problem_id' }
@@ -277,12 +291,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const syncStatsToSupabase = async (streak: number, lastSolvedDate: string, sandboxRuns: number) => {
     if (!isSupabaseConfigured || !user) return;
     try {
-      await supabase.from('profiles').update({
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        email: user.email || '',
+        display_name: profile?.display_name || user.email?.split('@')[0] || '러너',
         streak,
         last_solved_date: lastSolvedDate,
         sandbox_runs: sandboxRuns,
         updated_at: new Date().toISOString(),
-      }).eq('id', user.id);
+      }, { onConflict: 'id' });
 
       setProfile((prev) => prev ? { ...prev, streak, last_solved_date: lastSolvedDate, sandbox_runs: sandboxRuns } : null);
       refreshLeaderboard();
