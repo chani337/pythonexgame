@@ -166,12 +166,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .from('profiles')
         .select('id, display_name, email, streak');
 
-      const { data: solvedData } = await supabase
+      const { data: solvedData, error: solvedErr } = await supabase
         .from('user_solved_problems')
         .select('user_id, problem_id');
 
-      if (!profErr && profData) {
-        // Map user_id to count of solved problems
+      let formatted: LeaderboardUser[] = [];
+
+      if (!profErr && profData && profData.length > 0) {
         const solvedCounts: Record<string, number> = {};
         if (solvedData) {
           solvedData.forEach((row) => {
@@ -179,21 +180,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
 
-        const formatted: LeaderboardUser[] = profData.map((item: any) => ({
+        formatted = profData.map((item: any) => ({
           id: item.id,
           display_name: item.display_name || item.email?.split('@')[0] || '익명 러너',
           email: item.email || '',
           streak: item.streak || 0,
           solved_count: solvedCounts[item.id] || 0,
         }));
-
-        // Sort by solved_count DESC, then streak DESC
-        formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
-
-        // Filter out zero-activity accounts unless no active users exist
-        const activeUsers = formatted.filter((u) => u.solved_count > 0 || u.streak > 0).slice(0, 10);
-        setLeaderboard(activeUsers.length > 0 ? activeUsers : formatted.slice(0, 10));
+      } else {
+        if (profErr) console.warn('Supabase profiles RLS warning:', profErr);
+        if (solvedErr) console.warn('Supabase solved RLS warning:', solvedErr);
       }
+
+      // Guarantee current logged-in user is ALWAYS displayed on the leaderboard
+      if (user) {
+        const userKey = `pyquests_solved_ids_${user.id}`;
+        const savedLocal = localStorage.getItem(userKey);
+        const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
+        const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${user.id}`) || '0', 10);
+
+        const existingIndex = formatted.findIndex((u) => u.id === user.id);
+        if (existingIndex !== -1) {
+          formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count, localSolvedCount);
+          formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak, userStreak);
+        } else {
+          formatted.push({
+            id: user.id,
+            display_name: profile?.display_name || user.email?.split('@')[0] || '나',
+            email: user.email || '',
+            streak: userStreak,
+            solved_count: localSolvedCount,
+          });
+        }
+      }
+
+      // Sort by solved_count DESC, then streak DESC
+      formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
+
+      setLeaderboard(formatted.slice(0, 10));
     } catch (err) {
       console.error('Leaderboard error:', err);
     }
