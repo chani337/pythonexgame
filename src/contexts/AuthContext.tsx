@@ -192,8 +192,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (solvedErr) console.warn('Supabase solved RLS warning:', solvedErr);
       }
 
-      // Guarantee current logged-in user is ALWAYS displayed on the leaderboard
-      if (user) {
+      // Guarantee current logged-in user is ALWAYS displayed on the leaderboard (unless master admin)
+      if (user && user.email?.toLowerCase() !== 'chani7873@daum.net') {
         const userKey = `pyquests_solved_ids_${user.id}`;
         const savedLocal = localStorage.getItem(userKey);
         const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
@@ -213,6 +213,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         }
       }
+
+      // Exclude Master Admin account (chani7873@daum.net) so real learners compete fairly on the leaderboard
+      formatted = formatted.filter((u) => u.email?.toLowerCase() !== 'chani7873@daum.net');
 
       // Sort by solved_count DESC, then streak DESC
       formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
