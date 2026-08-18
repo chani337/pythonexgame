@@ -162,21 +162,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const refreshLeaderboard = async () => {
     if (!isSupabaseConfigured) return;
     try {
-      const { data, error } = await supabase
+      const { data: profData, error: profErr } = await supabase
         .from('profiles')
-        .select('id, display_name, email, streak, user_solved_problems(count)')
-        .order('streak', { ascending: false })
-        .limit(10);
+        .select('id, display_name, email, streak');
 
-      if (!error && data) {
-        const formatted: LeaderboardUser[] = data.map((item: any) => ({
+      const { data: solvedData } = await supabase
+        .from('user_solved_problems')
+        .select('user_id, problem_id');
+
+      if (!profErr && profData) {
+        // Map user_id to count of solved problems
+        const solvedCounts: Record<string, number> = {};
+        if (solvedData) {
+          solvedData.forEach((row) => {
+            solvedCounts[row.user_id] = (solvedCounts[row.user_id] || 0) + 1;
+          });
+        }
+
+        const formatted: LeaderboardUser[] = profData.map((item: any) => ({
           id: item.id,
           display_name: item.display_name || item.email?.split('@')[0] || '익명 러너',
           email: item.email || '',
           streak: item.streak || 0,
-          solved_count: item.user_solved_problems?.[0]?.count || 0,
+          solved_count: solvedCounts[item.id] || 0,
         }));
-        setLeaderboard(formatted);
+
+        // Sort by solved_count DESC, then streak DESC
+        formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
+
+        // Filter out zero-activity accounts unless no active users exist
+        const activeUsers = formatted.filter((u) => u.solved_count > 0 || u.streak > 0).slice(0, 10);
+        setLeaderboard(activeUsers.length > 0 ? activeUsers : formatted.slice(0, 10));
       }
     } catch (err) {
       console.error('Leaderboard error:', err);

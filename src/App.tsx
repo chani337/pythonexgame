@@ -16,7 +16,7 @@ function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
 
-  const { user, profile, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds } = useAuth();
+  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
@@ -26,27 +26,32 @@ function MainApp() {
 
   // States with LocalStorage fallback
   const [solvedIds, setSolvedIds] = useState<string[]>(() => {
-    const saved = localStorage.getItem('pyquests_solved_ids');
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
+    const saved = localStorage.getItem(`pyquests_solved_ids_${lastId}`) || localStorage.getItem('pyquests_solved_ids');
     return saved ? JSON.parse(saved) : [];
   });
 
   const [streak, setStreak] = useState<number>(() => {
-    const saved = localStorage.getItem('pyquests_streak');
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
+    const saved = localStorage.getItem(`pyquests_streak_${lastId}`) || localStorage.getItem('pyquests_streak');
     return saved ? parseInt(saved, 10) : 0;
   });
 
   const [lastSolvedDate, setLastSolvedDate] = useState<string | null>(() => {
-    return localStorage.getItem('pyquests_last_solved_date');
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
+    return localStorage.getItem(`pyquests_last_solved_date_${lastId}`) || localStorage.getItem('pyquests_last_solved_date');
   });
 
   const [sandboxRunCount, setSandboxRunCount] = useState<number>(() => {
-    const saved = localStorage.getItem('pyquests_sandbox_runs');
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
+    const saved = localStorage.getItem(`pyquests_sandbox_runs_${lastId}`) || localStorage.getItem('pyquests_sandbox_runs');
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  // Fetch solved problem IDs from Supabase when user logs in or reset on logout
+  // Fetch solved problem IDs from Supabase when user logs in
   useEffect(() => {
     if (user) {
+      localStorage.setItem('pyquests_last_user_id', user.id);
       const localKey = `pyquests_solved_ids_${user.id}`;
       const savedLocal = localStorage.getItem(localKey);
       const localSolved: string[] = savedLocal ? JSON.parse(savedLocal) : [];
@@ -56,14 +61,15 @@ function MainApp() {
         setSolvedIds(merged);
         localStorage.setItem(localKey, JSON.stringify(merged));
       });
-    } else {
-      // When logged out, reset to empty state so next user gets a fresh start
+    } else if (!isAuthLoading) {
+      // Reset only when auth check finishes and user is confirmed logged out
+      localStorage.removeItem('pyquests_last_user_id');
       setSolvedIds([]);
       setStreak(0);
       setLastSolvedDate(null);
       setSandboxRunCount(0);
     }
-  }, [user]);
+  }, [user, isAuthLoading]);
 
   // Sync profile stats when logged in
   useEffect(() => {
