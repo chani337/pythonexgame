@@ -22,6 +22,9 @@ export default function Dashboard({
   sandboxRunCount,
   onUnlockAll,
 }: DashboardProps) {
+  const { user } = useAuth();
+  const isMasterAdmin = user?.email?.toLowerCase() === 'chani7873@daum.net';
+
   // Stats calculations
   const totalCount = problems.length;
   const solvedCount = solvedIds.length;
@@ -169,8 +172,8 @@ export default function Dashboard({
         style={{
           padding: '2.5rem',
           borderRadius: '0px',
-          background: '#ffffff',
-          border: '1px solid var(--border-subtle)',
+          background: isMasterAdmin ? 'linear-gradient(135deg, #fffcf0 0%, #f4f4f6 100%)' : '#ffffff',
+          border: isMasterAdmin ? '1px solid #a66908' : '1px solid var(--border-subtle)',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center',
@@ -179,6 +182,21 @@ export default function Dashboard({
         }}
       >
         <div>
+          {isMasterAdmin && (
+             <span
+              style={{
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: '#a66908',
+                display: 'block',
+                marginBottom: '0.5rem',
+              }}
+            >
+              👑 MASTER ADMIN ACCOUNT
+            </span>
+          )}
           <h2
             style={{
               fontSize: '1.6rem',
@@ -189,25 +207,26 @@ export default function Dashboard({
               letterSpacing: '0.02em',
             }}
           >
-            안녕하세요, 러너님! 🐍
+            {isMasterAdmin ? '안녕하세요, 차니 마스터님! 👑🐍' : '안녕하세요, 러너님! 🐍'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: '580px', lineHeight: '1.6' }}>
-            기초부터 차근차근 고급 개념까지! PyQuests의 인터랙티브 코딩 플랫폼을 통해
-            실제 파이썬 런타임을 브라우저에서 실행하며 코딩 실력을 키워 보세요.
+            {isMasterAdmin
+              ? 'chani7873@daum.net 관리자 전용 모드입니다. 아래 버튼을 눌러 모든 문제 클리어 및 뱃지 전체 해금을 1초 만에 실행하실 수 있습니다.'
+              : '기초부터 차근차근 고급 개념까지! PyQuests의 인터랙티브 코딩 플랫폼을 통해 실제 파이썬 런타임을 브라우저에서 실행하며 코딩 실력을 키워 보세요.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           {onUnlockAll && (
             <button
               onClick={() => {
-                if (window.confirm('모든 문제(90개 이상)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?')) {
+                if (window.confirm(isMasterAdmin ? 'chani7873@daum.net 계정에 모든 문제(90개 이상) 해결 완료 및 뱃지 전체 해금을 적용하시겠습니까?' : '모든 문제(90개 이상)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?')) {
                   onUnlockAll();
                 }
               }}
               style={{
-                background: '#ffffff',
+                background: isMasterAdmin ? '#1a1a1a' : '#ffffff',
                 border: '1px solid #1a1a1a',
-                color: '#1a1a1a',
+                color: isMasterAdmin ? '#ffffff' : '#1a1a1a',
                 padding: '0.7rem 1rem',
                 fontSize: '0.8rem',
                 fontWeight: '700',
@@ -217,7 +236,7 @@ export default function Dashboard({
                 gap: '0.4rem',
               }}
             >
-              ⚡ 모든 문제 풀기 & 뱃지 전체 해금
+              {isMasterAdmin ? '👑 마스터 모드: 모든 문제 풀기 & 뱃지 해금' : '⚡ 모든 문제 풀기 & 뱃지 전체 해금'}
             </button>
           )}
           <button className="btn-primary" onClick={onNavigateToProblems}>
