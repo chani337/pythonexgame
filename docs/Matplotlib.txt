@@ -1,0 +1,389 @@
+# 파이썬 Matplotlib 기초
+
+## 1. Matplotlib란?
+
+Matplotlib는 **데이터를 그래프로 시각화할 수 있게 도와주는 파이썬 라이브러리**입니다.  
+숫자나 표 형태의 데이터를 **눈으로 보기 쉽게 그래프나 차트로 표현**할 때 사용합니다.
+
+쉽게 말하면 Matplotlib는  
+**데이터를 그림으로 보여주는 도구**입니다.
+
+예를 들어,
+
+- 학생 점수를 막대그래프로 보기
+- 월별 매출을 선그래프로 보기
+- 과일 판매량을 그래프로 표현하기
+- 데이터의 패턴을 시각적으로 확인하기
+
+같은 경우에 자주 사용합니다.
+
+Matplotlib는 보통 `plt`라는 이름으로 불러와서 사용합니다.
+
+---
+
+## 2. Matplotlib 불러오기
+
+```python
+import matplotlib.pyplot as plt
+```
+
+### 설명
+
+- `matplotlib.pyplot`은 그래프를 그릴 때 자주 사용하는 기능이 모여 있는 부분입니다.
+- `as plt`는 앞으로 `matplotlib.pyplot`을 `plt`라고 짧게 부르겠다는 뜻입니다.
+
+---
+
+## 3. 그래프를 그리는 기본 흐름
+
+Matplotlib는 보통 아래 순서로 사용합니다.
+
+1. 라이브러리 불러오기
+2. 데이터 준비하기
+3. 그래프 그리기
+4. 그래프 보여주기
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4]
+y = [10, 20, 30, 40]
+
+plt.plot(x, y)
+plt.show()
+```
+
+---
+
+## 4. 선 그래프 그리기
+
+선 그래프는 **값의 변화 흐름**을 볼 때 자주 사용합니다.
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4]
+y = [10, 20, 30, 40]
+
+plt.plot(x, y)
+plt.show()
+```
+
+### 설명
+
+- `plot()`은 선 그래프를 그리는 함수입니다.
+- `show()`는 그래프를 화면에 보여주는 함수입니다.
+
+---
+
+## 5. 막대 그래프 그리기
+
+막대 그래프는 **항목별 크기 비교**를 할 때 자주 사용합니다.
+
+```python
+import matplotlib.pyplot as plt
+
+fruit = ["사과", "바나나", "포도"]
+count = [5, 8, 3]
+
+plt.bar(fruit, count)
+plt.show()
+```
+
+---
+
+## 6. 제목과 축 이름 넣기
+
+그래프에는 제목과 축 이름을 넣으면 더 보기 쉬워집니다.
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4]
+y = [10, 20, 30, 40]
+
+plt.plot(x, y)
+plt.title("선 그래프 예제")
+plt.xlabel("x축")
+plt.ylabel("y축")
+plt.show()
+```
+
+---
+
+## 7. 한글이 깨질 때
+
+그래프에서 한글이 깨질 수 있습니다.  
+이때는 한글 폰트 설정이 필요할 수 있습니다.
+
+Windows 환경에서는 보통 아래처럼 설정합니다.
+
+```python
+import matplotlib.pyplot as plt
+
+plt.rcParams["font.family"] = "Malgun Gothic"
+plt.rcParams["axes.unicode_minus"] = False
+```
+
+### 설명
+
+- `"Malgun Gothic"`은 윈도우에서 자주 사용하는 한글 폰트입니다.
+- `axes.unicode_minus = False`는 마이너스 기호가 깨지는 문제를 막기 위한 설정입니다.
+
+---
+
+## 8. 산점도 그리기
+
+산점도는 **값들의 분포나 관계**를 볼 때 사용합니다.
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4, 5]
+y = [2, 4, 5, 4, 6]
+
+plt.scatter(x, y)
+plt.show()
+```
+
+---
+
+## 9. 파이 차트 그리기
+
+파이 차트는 **전체에서 각 항목이 차지하는 비율**을 볼 때 사용합니다.
+
+```python
+import matplotlib.pyplot as plt
+
+labels = ["사과", "바나나", "포도"]
+sizes = [30, 50, 20]
+
+plt.pie(sizes, labels=labels)
+plt.show()
+```
+
+---
+
+## 10. 그래프 크기 조절하기
+
+그래프가 너무 작거나 크면 `figure()`를 사용해서 크기를 조절할 수 있습니다.
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4]
+y = [10, 20, 30, 40]
+
+plt.figure(figsize=(8, 4))
+plt.plot(x, y)
+plt.show()
+```
+
+### 설명
+
+- `figsize=(가로, 세로)` 형식으로 크기를 조절합니다.
+
+---
+
+## 11. 값 여러 개를 한 그래프에 그리기
+
+한 그래프에 여러 개의 데이터를 함께 표시할 수도 있습니다.
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4]
+y1 = [10, 20, 30, 40]
+y2 = [15, 25, 35, 45]
+
+plt.plot(x, y1)
+plt.plot(x, y2)
+plt.show()
+```
+
+---
+
+## 12. 범례 넣기
+
+그래프가 여러 개일 때는 어떤 선이 무엇을 의미하는지 알려주는 **범례**를 넣을 수 있습니다.
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4]
+y1 = [10, 20, 30, 40]
+y2 = [15, 25, 35, 45]
+
+plt.plot(x, y1, label="A반")
+plt.plot(x, y2, label="B반")
+plt.legend()
+plt.show()
+```
+
+---
+
+## 13. 실습 예제 1: 점수 선 그래프
+
+```python
+import matplotlib.pyplot as plt
+
+score = [70, 80, 90, 85, 95]
+
+plt.plot(score)
+plt.title("학생 점수 변화")
+plt.show()
+```
+
+---
+
+## 14. 실습 예제 2: 과일 판매량 막대그래프
+
+```python
+import matplotlib.pyplot as plt
+
+fruit = ["사과", "바나나", "포도"]
+count = [10, 7, 5]
+
+plt.bar(fruit, count)
+plt.title("과일 판매량")
+plt.show()
+```
+
+---
+
+## 15. 실습 예제 3: 공부 시간과 점수 산점도
+
+```python
+import matplotlib.pyplot as plt
+
+study_time = [1, 2, 3, 4, 5]
+score = [50, 60, 70, 80, 90]
+
+plt.scatter(study_time, score)
+plt.title("공부 시간과 점수")
+plt.xlabel("공부 시간")
+plt.ylabel("점수")
+plt.show()
+```
+
+---
+
+## 16. 그래프 저장하기
+
+그린 그래프는 이미지 파일로 저장할 수도 있습니다.
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3, 4]
+y = [10, 20, 30, 40]
+
+plt.plot(x, y)
+plt.savefig("graph.png")
+plt.show()
+```
+
+### 설명
+
+- `savefig()`는 그래프를 파일로 저장하는 함수입니다.
+- 보통 `show()` 전에 작성합니다.
+
+---
+
+## 17. 자주 하는 실수
+
+### 1) `show()`를 쓰지 않는 경우
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3]
+y = [10, 20, 30]
+
+plt.plot(x, y)
+```
+
+환경에 따라 그래프가 바로 안 보일 수 있습니다.  
+그래프를 확실히 출력하려면 `plt.show()`를 쓰는 것이 좋습니다.
+
+### 2) x축과 y축 길이가 다른 경우
+
+```python
+import matplotlib.pyplot as plt
+
+x = [1, 2, 3]
+y = [10, 20]
+
+plt.plot(x, y)
+plt.show()
+```
+
+이 경우 데이터 개수가 맞지 않아 오류가 날 수 있습니다.
+
+### 3) 한글 폰트 설정을 하지 않는 경우
+
+한글 제목이나 축 이름을 넣었는데 글자가 깨질 수 있습니다.  
+이때는 폰트 설정이 필요할 수 있습니다.
+
+### 4) `savefig()`를 `show()` 뒤에 쓰는 경우
+
+환경에 따라 빈 이미지가 저장될 수 있으므로  
+보통 `savefig()`를 먼저 쓰고 `show()`를 나중에 쓰는 편이 안전합니다.
+
+---
+
+## 18. 한 번에 정리하는 Matplotlib 예제
+
+```python
+import matplotlib.pyplot as plt
+
+# 한글 폰트 설정
+plt.rcParams["font.family"] = "Malgun Gothic"
+plt.rcParams["axes.unicode_minus"] = False
+
+# 데이터 준비
+fruit = ["사과", "바나나", "포도"]
+count = [10, 7, 5]
+
+# 그래프 크기 설정
+plt.figure(figsize=(8, 4))
+
+# 막대 그래프 그리기
+plt.bar(fruit, count)
+
+# 제목과 축 이름 설정
+plt.title("과일 판매량")
+plt.xlabel("과일 이름")
+plt.ylabel("판매 개수")
+
+# 그래프 저장
+plt.savefig("fruit_graph.png")
+
+# 그래프 출력
+plt.show()
+```
+
+---
+
+## 19. 핵심 정리
+
+- Matplotlib는 그래프를 그리기 위한 라이브러리
+- 보통 `import matplotlib.pyplot as plt`로 불러옴
+- `plot()`은 선 그래프, `bar()`는 막대 그래프, `scatter()`는 산점도
+- `title()`, `xlabel()`, `ylabel()`로 그래프 설명을 넣을 수 있음
+- `show()`로 그래프를 화면에 출력함
+- `savefig()`로 그래프를 파일로 저장할 수 있음
+
+---
+
+## 20. 마무리
+
+Matplotlib는 앞으로 배우게 될
+
+- 데이터 시각화
+- 실데이터분석
+- Pandas 그래프 확인
+- 머신러닝 결과 해석
+
+에서 매우 중요한 역할을 합니다.  
+특히 **숫자 데이터를 눈으로 확인하는 경험**을 만드는 데 꼭 필요한 도구입니다.

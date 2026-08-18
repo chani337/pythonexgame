@@ -1,0 +1,453 @@
+# 파이썬 NumPy 최종 정리
+
+## 1. NumPy란?
+
+NumPy는 **숫자 데이터를 빠르고 편리하게 다루기 위한 파이썬 라이브러리**입니다.  
+특히 **배열(Array)** 을 사용해서 여러 개의 숫자를 한꺼번에 계산할 때 많이 사용합니다.
+
+쉽게 말하면 NumPy는  
+**숫자 계산을 더 쉽게, 더 빠르게 할 수 있게 도와주는 도구**입니다.
+
+예를 들어,
+
+- 학생 점수 여러 개 계산하기
+- 키와 몸무게 데이터 다루기
+- 평균, 합계 구하기
+- 데이터 분석과 인공지능 실습
+
+같은 경우에 자주 사용합니다.
+
+NumPy는 보통 `np`라는 이름으로 불러와서 사용합니다.
+
+---
+
+## 2. NumPy 불러오기
+
+```python
+import numpy as np
+```
+
+### 설명
+
+- `numpy`는 라이브러리 이름입니다.
+- `as np`는 앞으로 `numpy`를 `np`라고 짧게 부르겠다는 뜻입니다.
+
+---
+
+## 3. 배열(Array)이란?
+
+배열은 **여러 개의 값을 한 번에 저장하는 자료구조**입니다.  
+리스트와 비슷하게 생겼지만, **숫자 계산에 더 강한 구조**입니다.
+
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4, 5])
+print(arr)
+```
+
+### 실행 결과
+
+```python
+[1 2 3 4 5]
+```
+
+---
+
+## 4. 리스트와 NumPy 배열의 차이
+
+파이썬 리스트도 여러 값을 저장할 수 있지만,  
+NumPy 배열은 **숫자 계산을 한 번에 처리**할 수 있다는 점이 중요합니다.
+
+```python
+import numpy as np
+
+list1 = [1, 2, 3]
+arr1 = np.array([1, 2, 3])
+
+print(arr1 + 10)
+```
+
+### 실행 결과
+
+```python
+[11 12 13]
+```
+
+리스트는 이런 식의 계산이 바로 되지 않지만,  
+NumPy 배열은 각 값에 한 번에 계산을 적용할 수 있습니다.
+
+---
+
+## 5. NumPy 배열 만들기
+
+### 1차원 배열
+
+```python
+import numpy as np
+
+arr = np.array([10, 20, 30])
+print(arr)
+```
+
+### 실행 결과
+
+```python
+[10 20 30]
+```
+
+### 2차원 배열
+
+```python
+import numpy as np
+
+arr2 = np.array([[1, 2, 3], [4, 5, 6]])
+print(arr2)
+```
+
+### 실행 결과
+
+```python
+[[1 2 3]
+ [4 5 6]]
+```
+
+---
+
+## 6. 배열의 위치 번호(인덱스)
+
+NumPy 배열도 리스트처럼 인덱스를 사용해서 값을 꺼낼 수 있습니다.
+
+```python
+import numpy as np
+
+arr = np.array([10, 20, 30])
+
+print(arr[0])
+print(arr[1])
+print(arr[2])
+```
+
+### 실행 결과
+
+```python
+10
+20
+30
+```
+
+---
+
+## 7. 배열의 크기와 모양 확인하기
+
+NumPy에서는 배열의 크기와 모양을 자주 확인합니다.
+
+```python
+import numpy as np
+
+arr = np.array([[1, 2, 3], [4, 5, 6]])
+
+print(arr.shape)
+print(arr.size)
+```
+
+### 실행 결과
+
+```python
+(2, 3)
+6
+```
+
+### 설명
+
+- `shape` : 배열의 행과 열 구조
+- `size` : 전체 원소 개수
+
+---
+
+## 8. NumPy의 기본 계산
+
+NumPy 배열은 같은 크기의 배열끼리 계산할 수 있습니다.
+
+```python
+import numpy as np
+
+a = np.array([1, 2, 3])
+b = np.array([4, 5, 6])
+
+print(a + b)
+print(a - b)
+print(a * b)
+```
+
+### 실행 결과
+
+```python
+[5 7 9]
+[-3 -3 -3]
+[ 4 10 18]
+```
+
+---
+
+## 9. 배열 전체에 한 번에 계산하기
+
+배열의 모든 값에 같은 계산을 한 번에 적용할 수 있습니다.
+
+```python
+import numpy as np
+
+arr = np.array([1, 2, 3, 4])
+
+print(arr + 10)
+print(arr * 2)
+```
+
+### 실행 결과
+
+```python
+[11 12 13 14]
+[2 4 6 8]
+```
+
+---
+
+## 10. 자주 쓰는 배열 생성 함수
+
+### 0으로 채우기
+
+```python
+import numpy as np
+
+print(np.zeros(5))
+```
+
+### 실행 결과
+
+```python
+[0. 0. 0. 0. 0.]
+```
+
+### 1로 채우기
+
+```python
+import numpy as np
+
+print(np.ones(5))
+```
+
+### 실행 결과
+
+```python
+[1. 1. 1. 1. 1.]
+```
+
+### 연속된 숫자 만들기
+
+```python
+import numpy as np
+
+print(np.arange(1, 6))
+```
+
+### 실행 결과
+
+```python
+[1 2 3 4 5]
+```
+
+---
+
+## 11. 평균, 합계, 최대값, 최소값 구하기
+
+NumPy는 숫자 데이터의 통계 계산도 쉽게 할 수 있습니다.
+
+```python
+import numpy as np
+
+arr = np.array([10, 20, 30, 40, 50])
+
+print(arr.sum())
+print(arr.mean())
+print(arr.max())
+print(arr.min())
+```
+
+### 실행 결과
+
+```python
+150
+30.0
+50
+10
+```
+
+---
+
+## 12. 조건에 맞는 값 찾기
+
+NumPy는 조건을 사용해서 원하는 값만 찾을 수 있습니다.
+
+```python
+import numpy as np
+
+arr = np.array([10, 15, 20, 25, 30])
+
+print(arr[arr >= 20])
+```
+
+### 실행 결과
+
+```python
+[20 25 30]
+```
+
+---
+
+## 13. 실습 예제 1: 점수 평균 구하기
+
+```python
+import numpy as np
+
+scores = np.array([80, 90, 75, 95, 100])
+
+print(scores.mean())
+```
+
+### 실행 결과
+
+```python
+88.0
+```
+
+---
+
+## 14. 실습 예제 2: 모든 값에 5 더하기
+
+```python
+import numpy as np
+
+numbers = np.array([1, 2, 3, 4, 5])
+
+print(numbers + 5)
+```
+
+### 실행 결과
+
+```python
+[ 6  7  8  9 10]
+```
+
+---
+
+## 15. 실습 예제 3: 짝수만 출력하기
+
+```python
+import numpy as np
+
+numbers = np.array([1, 2, 3, 4, 5, 6])
+
+print(numbers[numbers % 2 == 0])
+```
+
+### 실행 결과
+
+```python
+[2 4 6]
+```
+
+---
+
+## 16. 자주 하는 실수
+
+### 1) NumPy를 불러오지 않고 사용하는 경우
+
+```python
+arr = np.array([1, 2, 3])
+```
+
+이렇게 쓰면 오류가 날 수 있습니다.  
+먼저 NumPy를 불러와야 합니다.
+
+```python
+import numpy as np
+```
+
+### 2) 리스트와 배열을 같은 것으로 생각하는 경우
+
+리스트와 NumPy 배열은 비슷해 보여도 다릅니다.  
+특히 **숫자 계산 방식**에서 차이가 큽니다.
+
+### 3) 배열의 모양을 생각하지 않고 계산하는 경우
+
+배열끼리 계산할 때는 보통 **크기나 형태가 맞아야** 합니다.
+
+```python
+import numpy as np
+
+a = np.array([1, 2, 3])
+b = np.array([1, 2])
+
+print(a + b)
+```
+
+이 경우 오류가 날 수 있습니다.
+
+---
+
+## 17. 한 번에 정리하는 NumPy 예제
+
+```python
+import numpy as np
+
+# 배열 생성
+arr = np.array([10, 20, 30, 40, 50])
+
+# 배열 출력
+print(arr)
+
+# 전체에 계산 적용
+print(arr + 5)
+
+# 합계와 평균
+print(arr.sum())
+print(arr.mean())
+
+# 조건에 맞는 값만 출력
+print(arr[arr >= 30])
+```
+
+### 실행 결과
+
+```python
+[10 20 30 40 50]
+[15 25 35 45 55]
+150
+30.0
+[30 40 50]
+```
+
+---
+
+## 18. 핵심 정리
+
+- NumPy는 숫자 데이터를 다루기 위한 파이썬 라이브러리
+- 보통 `import numpy as np`로 불러옴
+- `np.array()`로 배열을 만들 수 있음
+- 배열은 여러 값을 한 번에 계산하기 좋음
+- `sum()`, `mean()`, `max()`, `min()` 등을 자주 사용함
+- 조건을 이용해서 원하는 값만 선택할 수 있음
+
+---
+
+## 19. 마무리
+
+NumPy는 앞으로 배우게 될
+
+- 데이터 분석
+- Pandas
+- 머신러닝
+- 인공지능 실습
+
+의 기초가 되는 중요한 라이브러리입니다.  
+특히 **여러 숫자를 한 번에 계산하는 경험**을 익히는 데 매우 중요!!
