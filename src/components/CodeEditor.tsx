@@ -101,7 +101,7 @@ export default function CodeEditor({
         autocompletion: true,
         closeBrackets: true,
       }}
-      style={{ height: '100%', fontSize }}
+      style={{ height: '100%', width: '100%', minWidth: 0, fontSize }}
     />
   );
 }

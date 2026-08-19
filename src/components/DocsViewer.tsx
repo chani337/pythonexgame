@@ -280,6 +280,7 @@ export default function DocsViewer({
                     <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8' }}>Python 예제 코드</span>
                   </div>
                   <pre
+                    className="docs-code-block"
                     style={{
                       padding: '1.25rem',
                       margin: 0,
@@ -603,6 +604,7 @@ export default function DocsViewer({
               </span>
             </div>
             <pre
+              className="docs-code-block"
               style={{
                 padding: '1.25rem',
                 margin: 0,
@@ -1046,7 +1048,7 @@ export default function DocsViewer({
       </div>
 
       {/* Category Tabs */}
-      <div style={{ display: 'flex', gap: '0.5rem' }}>
+      <div className="docs-category-tabs" style={{ display: 'flex', gap: '0.5rem' }}>
         <button
           onClick={() => {
             setSelectedCategory('python');
