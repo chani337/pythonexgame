@@ -258,13 +258,14 @@ print("변환 리스트:", result)
     if (mainEl) {
       listScrollPosRef.current = mainEl.scrollTop;
     }
+    // Deliberately leave currentView untouched (e.g. 'docs' or 'problems') so
+    // that going back returns to wherever the problem was opened from, rather
+    // than always dropping back to the full problem list.
     setSelectedProblem(problem);
-    setCurrentView('workspace');
   };
 
   const handleBackToProblems = () => {
     setSelectedProblem(null);
-    setCurrentView('problems');
   };
 
   // Next / Previous problem handlers
@@ -354,6 +355,7 @@ print("변환 리스트:", result)
             isBookmarked={reviewIds.includes(selectedProblem.id)}
             onToggleReview={handleToggleReview}
             onWrongAttempt={handleWrongAttempt}
+            backLabel={currentView === 'docs' ? '학습가이드로 돌아가기' : '목록으로 돌아가기'}
           />
         ) : currentView === 'dashboard' ? (
           <Dashboard

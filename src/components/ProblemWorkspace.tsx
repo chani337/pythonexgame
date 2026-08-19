@@ -16,6 +16,7 @@ interface ProblemWorkspaceProps {
   isBookmarked?: boolean;
   onToggleReview?: (problemId: string) => void;
   onWrongAttempt?: (problemId: string) => void;
+  backLabel?: string;
 }
 
 export default function ProblemWorkspace({
@@ -30,6 +31,7 @@ export default function ProblemWorkspace({
   isBookmarked,
   onToggleReview,
   onWrongAttempt,
+  backLabel = '목록으로 돌아가기',
 }: ProblemWorkspaceProps) {
   const problemLanguage = problem.language || 'python';
   const editorFileLabel =
@@ -331,7 +333,7 @@ export default function ProblemWorkspace({
           onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
         >
           <ChevronLeft size={15} />
-          목록으로 돌아가기
+          {backLabel}
         </button>
 
         {/* Quick Prev / Next Navigation */}

@@ -45,8 +45,17 @@ export default function DocsViewer({
   problems,
   onSelectProblem,
 }: DocsViewerProps) {
-  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java' | 'js'>('python');
-  const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(0);
+  // Remember the last-viewed category/chapter so returning here (e.g. via a
+  // related-problem's "back" button, which unmounts this component) restores
+  // where the reader left off instead of resetting to Python chapter 1.
+  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java' | 'js'>(() => {
+    const saved = localStorage.getItem('pyquests_docs_last_category');
+    return saved === 'sql' || saved === 'java' || saved === 'js' || saved === 'python' ? saved : 'python';
+  });
+  const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(() => {
+    const saved = localStorage.getItem('pyquests_docs_last_chapter_idx');
+    return saved !== null ? JSON.parse(saved) : 0;
+  });
   const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean }>>({});
   const [isTocOpen, setIsTocOpen] = useState<boolean>(() => {
     const saved = localStorage.getItem('pyquests_docs_toc_open');
@@ -411,6 +420,14 @@ export default function DocsViewer({
   useEffect(() => {
     localStorage.setItem('pyquests_docs_toc_open', JSON.stringify(isTocOpen));
   }, [isTocOpen]);
+
+  useEffect(() => {
+    localStorage.setItem('pyquests_docs_last_category', selectedCategory);
+  }, [selectedCategory]);
+
+  useEffect(() => {
+    localStorage.setItem('pyquests_docs_last_chapter_idx', JSON.stringify(selectedChapterIdx));
+  }, [selectedChapterIdx]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
