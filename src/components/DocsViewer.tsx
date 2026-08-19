@@ -428,7 +428,7 @@ except Exception as e:
                   cursor: 'pointer',
                 }}
               >
-                🐍 파이썬
+                파이썬
               </button>
               <button
                 onClick={() => {
@@ -446,7 +446,7 @@ except Exception as e:
                   cursor: 'pointer',
                 }}
               >
-                🐬 SQL
+                SQL
               </button>
             </div>
 
@@ -690,7 +690,7 @@ except Exception as e:
             }}
           >
             {isTocOpen ? <PanelLeftClose size={15} /> : <PanelLeftOpen size={15} />}
-            {isTocOpen ? '학습 목차 접기' : '📚 학습 목차 열기'}
+            {isTocOpen ? '학습 목차 접기' : '학습 목차 열기'}
           </button>
         </div>
       </div>
@@ -719,7 +719,7 @@ except Exception as e:
             transition: 'all 0.2s ease',
           }}
         >
-          🐍 파이썬 (Python)
+          파이썬 (Python)
         </button>
         <button
           onClick={() => {
@@ -743,7 +743,7 @@ except Exception as e:
             transition: 'all 0.2s ease',
           }}
         >
-          🐬 SQL 데이터베이스 (Database)
+          SQL 데이터베이스 (Database)
         </button>
       </div>
 
@@ -768,7 +768,7 @@ except Exception as e:
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: '700', letterSpacing: '0.05em' }}>
-                📚 {selectedCategory === 'python' ? '파이썬' : 'SQL'} 학습 목차
+                {selectedCategory === 'python' ? '파이썬' : 'SQL'} 학습 목차
               </h3>
               <button
                 onClick={() => setIsTocOpen(false)}
