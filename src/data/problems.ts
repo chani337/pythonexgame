@@ -3536,8 +3536,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "자바에서 정수를 저장하는 기본 자료형은?",
-    "quizOptions": ["int","String","boolean","void"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["String","int","boolean","void"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "java_quiz_intro_2",
@@ -3550,8 +3550,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "문자열을 저장하는 참조 자료형은?",
-    "quizOptions": ["String","str","char","text"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["str","char","String","text"],
+    "correctAnswerIndex": 2
   },
   {
     "id": "java_fill_intro_1",
@@ -3578,8 +3578,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "자바에서 5 / 2 (둘 다 int)의 결과는?",
-    "quizOptions": ["2","2.5","3","2.0"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["2.5","3","2.0","2"],
+    "correctAnswerIndex": 3
   },
   {
     "id": "java_quiz_operator_2",
@@ -3620,8 +3620,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "switch문에서 일치하는 case가 없을 때 실행되는 키워드는?",
-    "quizOptions": ["default","else","break","case"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["else","break","case","default"],
+    "correctAnswerIndex": 3
   },
   {
     "id": "java_quiz_conditional_2",
@@ -3662,8 +3662,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "배열의 길이를 구할 때 사용하는 것은?",
-    "quizOptions": [".length",".length()",".size()",".count()"],
-    "correctAnswerIndex": 0
+    "quizOptions": [".length()",".size()",".length",".count()"],
+    "correctAnswerIndex": 2
   },
   {
     "id": "java_quiz_array_2",
@@ -3676,8 +3676,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "배열의 인덱스는 몇 번부터 시작하는가?",
-    "quizOptions": ["0","1","-1","2"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["1","-1","2","0"],
+    "correctAnswerIndex": 3
   },
   {
     "id": "java_fill_array_1",
@@ -3704,8 +3704,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "조건을 나중에 검사해 최소 1번 실행이 보장되는 반복문은?",
-    "quizOptions": ["do-while","while","for","switch"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["while","for","switch","do-while"],
+    "correctAnswerIndex": 3
   },
   {
     "id": "java_quiz_loop_2",
@@ -3760,8 +3760,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "같은 이름, 다른 매개변수로 메서드를 여러 개 정의하는 것은?",
-    "quizOptions": ["오버로딩","오버라이딩","상속","캡슐화"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["오버라이딩","오버로딩","상속","캡슐화"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "java_fill_method_1",
@@ -3788,8 +3788,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "크기가 자유롭게 변하는 리스트를 제공하는 클래스는?",
-    "quizOptions": ["ArrayList","Array","List[]","Vector[]"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["Array","ArrayList","List[]","Vector[]"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "java_quiz_collection_2",
@@ -3802,8 +3802,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "키-값 쌍으로 저장하는 컬렉션은?",
-    "quizOptions": ["HashMap","ArrayList","HashSet","LinkedList"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["ArrayList","HashSet","HashMap","LinkedList"],
+    "correctAnswerIndex": 2
   },
   {
     "id": "java_fill_collection_1",
@@ -3844,8 +3844,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "예외 발생 여부와 상관없이 항상 실행되는 블록은?",
-    "quizOptions": ["finally","try","catch","throws"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["try","finally","catch","throws"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "java_fill_exception_1",
@@ -3872,8 +3872,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "객체를 생성할 때 사용하는 키워드는?",
-    "quizOptions": ["new","create","make","object"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["create","new","make","object"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "java_quiz_class_2",
@@ -3886,8 +3886,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "필드를 외부에서 직접 접근하지 못하게 막는 접근제어자는?",
-    "quizOptions": ["private","public","protected","final"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["public","protected","private","final"],
+    "correctAnswerIndex": 2
   },
   {
     "id": "java_fill_class_1",
@@ -3928,8 +3928,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "부모의 메서드를 자식이 같은 형태로 재정의하는 것은?",
-    "quizOptions": ["오버라이딩","오버로딩","캡슐화","인터페이스"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["오버로딩","오버라이딩","캡슐화","인터페이스"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "java_fill_inherit_1",
@@ -3956,8 +3956,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "클래스가 인터페이스를 구현할 때 사용하는 키워드는?",
-    "quizOptions": ["implements","extends","interface","abstract"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["extends","interface","implements","abstract"],
+    "correctAnswerIndex": 2
   },
   {
     "id": "java_quiz_interface_2",
@@ -3970,8 +3970,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "미완성 메서드를 포함할 수 있는 클래스를 선언하는 키워드는?",
-    "quizOptions": ["abstract","interface","final","static"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["interface","final","static","abstract"],
+    "correctAnswerIndex": 3
   },
   {
     "id": "java_fill_interface_1",
@@ -4012,8 +4012,8 @@ export const problems: Problem[] = [
     "constraints": ["보기 중 정답 하나를 선택하세요."],
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "문자열을 정수로 변환하는 메서드는?",
-    "quizOptions": ["Integer.parseInt()","String.toInt()","(int)str","Integer.valueOf()"],
-    "correctAnswerIndex": 0
+    "quizOptions": ["String.toInt()","Integer.parseInt()","(int)str","Integer.valueOf()"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "java_fill_string_1",
@@ -4521,13 +4521,8 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "자바스크립트에서 재할당이 불가능한 변수를 선언하는 키워드는?",
-    "quizOptions": [
-      "const",
-      "let",
-      "var",
-      "static"
-    ],
-    "correctAnswerIndex": 0
+    "quizOptions": ["let","const","var","static"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "js_quiz_2",
@@ -4547,13 +4542,8 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "자료형까지 정확히 같아야 true가 되는 비교 연산자는?",
-    "quizOptions": [
-      "===",
-      "==",
-      "=",
-      "!="
-    ],
-    "correctAnswerIndex": 0
+    "quizOptions": ["==","=","===","!="],
+    "correctAnswerIndex": 2
   },
   {
     "id": "js_quiz_3",
@@ -4573,13 +4563,8 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "typeof \"안녕\"의 결과는?",
-    "quizOptions": [
-      "\"string\"",
-      "\"str\"",
-      "\"text\"",
-      "\"object\""
-    ],
-    "correctAnswerIndex": 0
+    "quizOptions": ["\"str\"","\"text\"","\"object\"","\"string\""],
+    "correctAnswerIndex": 3
   },
   {
     "id": "js_quiz_4",
@@ -4599,12 +4584,7 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "배열의 맨 뒤에 값을 추가하는 메서드는?",
-    "quizOptions": [
-      "push()",
-      "pop()",
-      "shift()",
-      "unshift()"
-    ],
+    "quizOptions": ["push()","pop()","shift()","unshift()"],
     "correctAnswerIndex": 0
   },
   {
@@ -4625,13 +4605,8 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "자바스크립트 삼항 연산자의 올바른 형태는?",
-    "quizOptions": [
-      "조건 ? 값1 : 값2",
-      "값1 if 조건 else 값2",
-      "조건 ? 값1 , 값2",
-      "if 조건 then 값1 else 값2"
-    ],
-    "correctAnswerIndex": 0
+    "quizOptions": ["값1 if 조건 else 값2","조건 ? 값1 : 값2","조건 ? 값1 , 값2","if 조건 then 값1 else 값2"],
+    "correctAnswerIndex": 1
   },
   {
     "id": "js_quiz_6",
@@ -4651,13 +4626,8 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "다음 중 falsy(거짓 취급) 값이 아닌 것은?",
-    "quizOptions": [
-      "\"0\" (문자열)",
-      "0",
-      "\"\"",
-      "null"
-    ],
-    "correctAnswerIndex": 0
+    "quizOptions": ["0","\"\"","\"0\" (문자열)","null"],
+    "correctAnswerIndex": 2
   },
   {
     "id": "js_quiz_7",
@@ -4677,13 +4647,8 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "객체를 JSON 문자열로 변환하는 메서드는?",
-    "quizOptions": [
-      "JSON.stringify()",
-      "JSON.parse()",
-      "JSON.toText()",
-      "Object.toString()"
-    ],
-    "correctAnswerIndex": 0
+    "quizOptions": ["JSON.parse()","JSON.toText()","Object.toString()","JSON.stringify()"],
+    "correctAnswerIndex": 3
   },
   {
     "id": "js_quiz_8",
@@ -4703,12 +4668,7 @@ export const problems: Problem[] = [
       }
     ],
     "quizQuestion": "배열의 모든 요소를 순서대로 계산해 하나의 값으로 합칠 때 사용하는 메서드는?",
-    "quizOptions": [
-      "reduce()",
-      "map()",
-      "filter()",
-      "find()"
-    ],
+    "quizOptions": ["reduce()","map()","filter()","find()"],
     "correctAnswerIndex": 0
   },
   {
