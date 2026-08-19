@@ -130,6 +130,42 @@ export const docChapters: DocChapter[] = [
     ]
   },
   {
+    "id": "7_________ipynb",
+    "filename": "7. 예외 처리 정리.ipynb",
+    "title": "예외 처리 정리",
+    "cells": [
+      {
+        "id": "7_________ipynb_cell_0",
+        "type": "markdown",
+        "content": "# 파이썬 예외 처리 정리\n\n## 1. 예외 처리란?\n\n프로그램을 실행하다 보면 문법(Syntax)은 올바르지만 **실행 중에 예상치 못한 오류(Exception)**가 발생할 수 있습니다.\n\n예를 들어,\n- 어떤 숫자를 `0`으로 나누려고 할 때 (`ZeroDivisionError`)\n- 숫자로 바꿀 수 없는 문자열을 `int()`로 바꿀 때 (`ValueError`)\n- 리스트에 없는 인덱스 번호로 접근할 때 (`IndexError`)\n\n이런 오류가 발생해도 **프로그램이 멈추지 않고 안전하게 계속 실행되도록 예외를 처리하는 구문**이 바로 `try ~ except` 문입니다.\n\n---\n\n## 2. try ~ except 기본 구조\n\n```python\ntry:\n    오류가 발생할 가능성이 있는 코드\nexcept:\n    오류가 발생했을 때 실행할 코드\n```\n\n### 예시\n\n```python\ntry:\n    result = 10 / 0\nexcept:\n    print(\"0으로 나눌 수 없습니다!\")\n```\n\n### 실행 결과\n\n```text\n0으로 나눌 수 없습니다!\n```\n\n---\n\n## 3. 특정 예외 종류별 처리하기\n\n어떤 종류의 에러가 발생했는지 명시하면, 상황에 맞게 다른 메시지를 보여줄 수 있습니다.\n\n```python\ntry:\n    num = int(\"파이썬\")  # ValueError 발생!\nexcept ZeroDivisionError:\n    print(\"0으로 나눌 수 없습니다.\")\nexcept ValueError:\n    print(\"숫자 형식이 아닌 문자열입니다!\")\n```\n\n### 실행 결과\n\n```text\n숫자 형식이 아닌 문자열입니다!\n```\n\n### 대표적인 예외 종류\n\n| 예외 이름 | 원인 | 예시 |\n|---|---|---|\n| `ZeroDivisionError` | 0으로 나누려고 할 때 | `10 / 0` |\n| `ValueError` | 잘못된 값을 전달했을 때 | `int(\"abc\")` |\n| `IndexError` | 리스트 범위를 벗어난 인덱스 참조 | `a = [1,2]; a[5]` |\n| `KeyError` | 딕셔너리에 없는 키 참조 | `d = {}; d[\"a\"]` |\n| `TypeError` | 연산이 불가능한 자료형 조합 | `'hello' + 5` |\n\n---\n\n## 4. else 및 finally 블록\n\n- `else`: 오류가 발생하지 않았을 때만 실행되는 코드\n- `finally`: 오류 발생 여부와 상관없이 **무조건 마지막에 실행**되는 코드\n\n```python\ntry:\n    num = 10\n    result = 100 / num\nexcept ZeroDivisionError:\n    print(\"0은 입력할 수 없습니다.\")\nelse:\n    print(f\"계산 성공! 결과: {result}\")\nfinally:\n    print(\"작업이 완료되었습니다.\")\n```\n\n---\n\n## 5. raise 구문으로 직접 예외 발생시키기\n\n특정 조건에서 의도적으로 에러를 발생시킬 때 `raise`를 사용합니다.\n\n```python\nage = -5\n\ntry:\n    if age < 0:\n        raise ValueError(\"나이는 음수가 될 수 없습니다!\")\nexcept ValueError as e:\n    print(f\"에러 발생: {e}\")\n```\n\n---\n\n## 핵심 정리\n\n- `try`: 에러가 날 수 있는 코드 작성\n- `except`: 에러 발생 시 대처 코드 작성\n- `else`: 에러 없이 정상 실행되었을 때만 수행\n- `finally`: 에러 여부와 무관하게 항상 수행\n- `raise`: 개발자가 직접 예외 던지기"
+      }
+    ]
+  },
+  {
+    "id": "8_________ipynb",
+    "filename": "8. 클래스와 객체 정리.ipynb",
+    "title": "클래스와 객체 정리",
+    "cells": [
+      {
+        "id": "8_________ipynb_cell_0",
+        "type": "markdown",
+        "content": "# 파이썬 클래스와 객체 정리\n\n## 1. 클래스(Class)와 객체(Object)란?\n\n- **클래스(Class)**: 객체를 만들기 위한 **설계도** 또는 **틀** (예: 붕어빵 틀, 자동차 설계도)\n- **객체(Object) / 인스턴스(Instance)**: 클래스라는 틀에서 만들어진 **실체** (예: 붕어빵, 실제 도로를 달리는 자동차)\n\n하나의 클래스를 만들어두면, 동일한 구조를 가진 객체를 얼마든지 여러 개 만들어 쓸 수 있습니다.\n\n---\n\n## 2. 클래스의 기본 구조와 __init__() 생성자\n\n```python\nclass Person:\n    # 생성자 (객체가 생성될 때 자동으로 호출되는 초기화 메서드)\n    def __init__(self, name, age):\n        self.name = name  # 인스턴스 변수\n        self.age = age\n\n    # 인스턴스 메서드 (기능)\n    def introduce(self):\n        print(f\"안녕하세요, 제 이름은 {self.name}이고 나이는 {self.age}살입니다.\")\n```\n\n### `self`란 무엇인가요?\n`self`는 **\"자기 자신 인스턴스 객체\"**를 가리키는 변수입니다. 메서드를 정의할 때 첫 번째 매개변수로 반드시 `self`를 적어야 합니다.\n\n---\n\n## 3. 객체 생성 및 메서드 호출\n\n```python\n# Person 클래스로부터 객체(인스턴스) 생성\np1 = Person(\"홍길동\", 20)\np2 = Person(\"이순신\", 25)\n\n# 객체의 메서드 실행\np1.introduce()\np2.introduce()\n```\n\n### 실행 결과\n\n```text\n안녕하세요, 제 이름은 홍길동이고 나이는 20살입니다.\n안녕하세요, 제 이름은 이순신이고 나이는 25살입니다.\n```\n\n---\n\n## 4. 클래스 실습 예제: 은행 계좌 클래스\n\n```python\nclass BankAccount:\n    def __init__(self, owner, balance=0):\n        self.owner = owner\n        self.balance = balance\n\n    def deposit(self, amount):\n        self.balance += amount\n        print(f\"{amount}원 입금 완료. 현재 잔액: {self.balance}원\")\n\n    def withdraw(self, amount):\n        if self.balance >= amount:\n            self.balance -= amount\n            print(f\"{amount}원 출금 완료. 남은 잔액: {self.balance}원\")\n        else:\n            print(\"잔액이 부족합니다!\")\n\n# 실행 테스트\naccount = BankAccount(\"찬희\", 10000)\naccount.deposit(5000)\naccount.withdraw(3000)\n```\n\n### 실행 결과\n\n```text\n5000원 입금 완료. 현재 잔액: 15000원\n3000원 출금 완료. 남은 잔액: 12000원\n```\n\n---\n\n## 핵심 정리\n\n- `class`: 객체의 틀 정의\n- `__init__()`: 객체를 만들 때 초기 속성을 설정하는 생성자 함수\n- `self`: 객체 자기 자신을 가리키는 필수 첫 번째 인자\n- `인스턴스.속성`: 객체 안의 데이터 접근\n- `인스턴스.메서드()`: 객체 안의 기능 실행"
+      }
+    ]
+  },
+  {
+    "id": "9_________ipynb",
+    "filename": "9. 상속과 객체 지향 정리.ipynb",
+    "title": "상속과 객체 지향 정리",
+    "cells": [
+      {
+        "id": "9_________ipynb_cell_0",
+        "type": "markdown",
+        "content": "# 파이썬 상속과 객체 지향 정리\n\n## 1. 상속(Inheritance)이란?\n\n상속은 **기존 클래스(부모 클래스)의 모든 속성과 메서드를 그대로 물려받아, 새로운 클래스(자식 클래스)를 만드는 문법**입니다.\n\n코드의 **재사용성**을 높여주며 중복된 코드를 크게 줄일 수 있습니다.\n\n---\n\n## 2. 상속의 기본 형태\n\n```python\nclass 부모클래스:\n    # 부모 코드\n\nclass 자식클래스(부모클래스):\n    # 자식 전용 추가 코드\n```\n\n### 예시: 동물과 강아지 클래스\n\n```python\nclass Animal:\n    def __init__(self, name):\n        self.name = name\n\n    def eat(self):\n        print(f\"{self.name}이(가) 밥을 먹습니다.\")\n\n# Animal을 상속받는 Dog 자식 클래스\nclass Dog(Animal):\n    def bark(self):\n        print(f\"{self.name}이(가) 멍멍! 짖습니다.\")\n\n# 객체 생성 및 테스트\ndog = Dog(\"바둑이\")\ndog.eat()   # 부모 클래스의 메서드 사용\ndog.bark()  # 자식 클래스 전용 메서드 사용\n```\n\n### 실행 결과\n\n```text\n바둑이이(가) 밥을 먹습니다.\n바둑이이(가) 멍멍! 짖습니다.\n```\n\n---\n\n## 3. super() 함수와 메서드 오버라이딩 (Overriding)\n\n- **`super()`**: 부모 클래스의 생성자나 메서드를 호출할 때 사용\n- **메서드 오버라이딩**: 부모에게 물려받은 메서드를 자식 클래스에서 **새롭게 재정의**하여 사용하는 것\n\n```python\nclass Animal:\n    def speak(self):\n        print(\"소리를 냅니다.\")\n\nclass Cat(Animal):\n    # 부모의 speak() 메서드를 재정의 (오버라이딩)\n    def speak(self):\n        print(\"야옹~\")\n\nclass Dog(Animal):\n    def speak(self):\n        print(\"멍멍!\")\n\nanimals = [Cat(), Dog()]\nfor a in animals:\n    a.speak()\n```\n\n### 실행 결과\n\n```text\n야옹~\n멍멍!\n```\n\n---\n\n## 4. super()를 활용한 생성자 확장\n\n```python\nclass Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\nclass Student(Person):\n    def __init__(self, name, age, student_id):\n        super().__init__(name, age)  # 부모 생성자 호출\n        self.student_id = student_id\n\n    def show_info(self):\n        print(f\"이름: {self.name}, 나이: {self.age}, 학번: {self.student_id}\")\n\ns = Student(\"찬희\", 20, \"20240001\")\ns.show_info()\n```\n\n---\n\n## 핵심 정리\n\n- 상속: `class 자식클래스(부모클래스):`\n- `super()`: 부모 클래스의 메서드나 생성자를 불러올 때 사용\n- 메서드 오버라이딩: 부모의 메서드를 자식이 덮어써서 개조하여 사용\n- OOP 핵심 4 요소: **추상화**, **캡슐화**, **상속**, **다형성**"
+      }
+    ]
+  },
+  {
     "id": "NumPy_txt",
     "filename": "NumPy.txt",
     "title": "NumPy 수치계산 기초",
