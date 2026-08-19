@@ -45,6 +45,19 @@ export default function ProblemWorkspace({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Jupyter/Colab style cell execution shortcut: Ctrl+Enter, Cmd+Enter, or Shift+Enter
+    if ((e.ctrlKey || e.metaKey || e.shiftKey) && e.key === 'Enter') {
+      e.preventDefault();
+      if (problem.type === 'coding') {
+        handleRun();
+      } else if (problem.type === 'quiz') {
+        handleSubmitQuiz();
+      } else if (problem.type === 'fill') {
+        handleSubmitFill();
+      }
+      return;
+    }
+
     // Block paste keyboard shortcuts on Windows (Ctrl+V, Shift+Insert), macOS (Cmd+V), and Korean IME ('ㅍ')
     const key = e.key ? e.key.toLowerCase() : '';
     const codeKey = e.code || '';
@@ -555,15 +568,17 @@ export default function ProblemWorkspace({
                   className="btn-secondary"
                   style={{ padding: '0.6rem 1.2rem', fontSize: '0.78rem', background: '#0a080f', color: '#cbd5e1', borderColor: '#2e2d3d' }}
                   disabled={isRunning || isPyodideLoading}
+                  title="코드 실행 (Ctrl + Enter 또는 Shift + Enter)"
                 >
                   <Play size={14} />
-                  코드 실행
+                  코드 실행 <span style={{ fontSize: '0.68rem', opacity: 0.65, marginLeft: '0.2rem' }}>(Ctrl+Enter)</span>
                 </button>
                 <button
                   onClick={() => handleRun()}
                   className="btn-primary"
                   style={{ padding: '0.6rem 1.4rem', fontSize: '0.78rem', background: '#ffffff', color: '#000000', borderColor: '#ffffff' }}
                   disabled={isRunning || isPyodideLoading}
+                  title="제출하기 (Ctrl + Enter 또는 Shift + Enter)"
                 >
                   <Send size={14} />
                   제출하기

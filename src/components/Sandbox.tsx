@@ -278,6 +278,13 @@ export default function Sandbox({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Jupyter/Colab style cell execution shortcut: Ctrl+Enter, Cmd+Enter, or Shift+Enter
+    if ((e.ctrlKey || e.metaKey || e.shiftKey) && e.key === 'Enter') {
+      e.preventDefault();
+      handleRun();
+      return;
+    }
+
     // Block paste keyboard shortcuts on Windows (Ctrl+V, Shift+Insert), macOS (Cmd+V), and Korean IME ('ㅍ')
     const key = e.key ? e.key.toLowerCase() : '';
     const codeKey = e.code || '';
