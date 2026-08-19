@@ -272,11 +272,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Sort real DB & active local solvers by solved_count DESC, then streak DESC
       formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
 
-      // Show ONLY real registered users from database / session (no mock/fake fillers)
+      // Show ONLY Top 10 real registered users from database / session
       const combined = formatted;
 
-      // Show ALL users on the leaderboard without truncation
-      updateLeaderboardState(combined);
+      // Show TOP 10 users on the leaderboard
+      updateLeaderboardState(combined.slice(0, 10));
     } catch (err) {
       console.error('Leaderboard error:', err);
       updateLeaderboardState([]);
