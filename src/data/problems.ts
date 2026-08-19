@@ -82,7 +82,8 @@ export const problems: Problem[] = [
         "expected": "김철수"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "변수는 값에 이름을 붙여 저장하는 공간입니다. name = \"값\"처럼 = 기호로 오른쪽 값을 왼쪽 변수에 저장하고, print()로 그 값을 출력할 수 있습니다."
   },
   {
     "id": "basic_part1_q2",
@@ -109,7 +110,8 @@ export const problems: Problem[] = [
         "expected": "20"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열뿐 아니라 숫자도 변수에 그대로 저장할 수 있습니다. age = 20처럼 따옴표 없이 쓰면 정수(int)로 저장됩니다."
   },
   {
     "id": "basic_part1_q3",
@@ -137,7 +139,8 @@ export const problems: Problem[] = [
         "expected": "김철수\n20\n치킨"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "여러 정보를 각각 다른 변수에 저장해두면, 필요할 때 원하는 변수만 따로 출력하거나 계산에 활용할 수 있습니다."
   },
   {
     "id": "basic_part1_q4",
@@ -165,7 +168,8 @@ export const problems: Problem[] = [
         "expected": "한국대학교\n2"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "변수 이름은 저장하는 값의 의미를 잘 나타내도록 짓는 것이 좋습니다. school, grade처럼 이름만 봐도 어떤 값인지 알 수 있게 짓는 습관을 들이면 코드가 읽기 쉬워집니다."
   },
   {
     "id": "basic_part1_q5",
@@ -193,7 +197,8 @@ export const problems: Problem[] = [
         "expected": "20"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "같은 변수에 새 값을 다시 저장하면 이전 값은 사라지고 새 값으로 덮어씌워집니다. 변수는 \"고정된 값\"이 아니라 \"지금 어떤 값을 담고 있는 상자\"라고 생각하면 이해하기 쉽습니다."
   },
   {
     "id": "basic_part1_q6",
@@ -220,7 +225,8 @@ export const problems: Problem[] = [
         "expected": "키보드\n35000"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "이름(문자열)과 가격(숫자)처럼 서로 다른 자료형의 값도 각각 변수에 자유롭게 저장할 수 있습니다. 파이썬은 저장하는 값에 따라 자료형이 자동으로 정해집니다."
   },
   {
     "id": "basic_part1_q7",
@@ -247,7 +253,8 @@ export const problems: Problem[] = [
         "expected": "175.5\n68.2"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "숫자로 이루어진 값(키, 몸무게)도 변수에 저장해두면 이후 계산(BMI 등)에 그대로 활용할 수 있습니다."
   },
   {
     "id": "basic_part1_q8",
@@ -273,7 +280,8 @@ export const problems: Problem[] = [
         "expected": "100\n100"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "second = first처럼 쓰면 first에 들어있는 \"값\"이 second에 복사되어 저장됩니다. 이후 두 변수는 서로 다른 저장 공간에 같은 값을 각각 가지게 됩니다."
   },
   {
     "id": "basic_part1_q9",
@@ -301,7 +309,8 @@ export const problems: Problem[] = [
         "expected": "용사\n10\n100"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "연관된 여러 값(이름, 레벨, 체력)을 각각의 변수로 관리하면, 나중에 레벨업 등으로 특정 값만 바꾸고 싶을 때 그 변수만 수정하면 됩니다."
   },
   {
     "id": "basic_part1_q10",
@@ -329,7 +338,8 @@ export const problems: Problem[] = [
         "expected": "민수\n25\n광주\n게임"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "자기소개처럼 여러 항목을 다룰 때도 변수 하나당 값 하나씩 저장하는 원칙은 동일합니다. print()에 콤마로 여러 변수를 나열하면 한 줄에 이어서 출력할 수 있습니다."
   },
   {
     "id": "basic_part2_q1",
@@ -355,7 +365,8 @@ export const problems: Problem[] = [
         "expected": "Hello Python"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열은 따옴표(\" \" 또는 '')로 감싼 텍스트입니다. 변수에 저장한 뒤 print()로 출력하면 따옴표 없이 텍스트 내용만 화면에 나타납니다."
   },
   {
     "id": "basic_part2_q2",
@@ -381,7 +392,8 @@ export const problems: Problem[] = [
         "expected": "안녕하세요 민수"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열끼리는 + 연산자로 이어붙일 수 있습니다. 다만 이름과 인사말 사이에 공백이 필요하다면 \" \"처럼 공백 문자열도 함께 더해줘야 합니다."
   },
   {
     "id": "basic_part2_q3",
@@ -406,7 +418,8 @@ export const problems: Problem[] = [
         "expected": "파이썬!파이썬!파이썬!"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열에 * 숫자를 곱하면 그 문자열이 숫자만큼 반복된 새 문자열이 만들어집니다. 리스트에도 똑같이 적용되는 파이썬의 특징적인 문법입니다."
   },
   {
     "id": "basic_part2_q4",
@@ -432,7 +445,8 @@ export const problems: Problem[] = [
         "expected": "6"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "len(문자열)은 문자열에 포함된 글자 수를 반환하는 내장 함수입니다. 리스트나 튜플의 길이를 구할 때도 똑같이 len()을 사용합니다."
   },
   {
     "id": "basic_part2_q5",
@@ -457,7 +471,8 @@ export const problems: Problem[] = [
         "expected": "P"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열은 인덱싱을 지원해서 word[0]처럼 대괄호와 번호로 특정 위치의 글자 하나를 꺼낼 수 있습니다. 첫 번째 글자의 인덱스는 0부터 시작합니다."
   },
   {
     "id": "basic_part2_q6",
@@ -482,7 +497,8 @@ export const problems: Problem[] = [
         "expected": "o"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "인덱스로 -1을 사용하면 \"뒤에서 첫 번째\", 즉 마지막 글자를 바로 꺼낼 수 있습니다. 문자열의 길이를 몰라도 word[-1]로 항상 마지막 글자에 접근할 수 있어 편리합니다."
   },
   {
     "id": "basic_part2_q7",
@@ -507,7 +523,8 @@ export const problems: Problem[] = [
         "expected": "Pyt"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "슬라이싱 word[시작:끝]을 사용하면 문자열의 일부 구간을 잘라낼 수 있습니다. 끝 인덱스는 결과에 포함되지 않는다는 점에 주의해야 합니다 (예: word[0:3]은 0,1,2번째 글자)."
   },
   {
     "id": "basic_part2_q8",
@@ -532,7 +549,8 @@ export const problems: Problem[] = [
         "expected": "HELLO PYTHON"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열.upper()는 모든 알파벳을 대문자로 바꾼 새로운 문자열을 반환합니다. 원본 문자열은 바뀌지 않고, 결과를 변수에 저장하거나 바로 출력해서 사용합니다."
   },
   {
     "id": "basic_part2_q9",
@@ -557,7 +575,8 @@ export const problems: Problem[] = [
         "expected": "I like Python"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열.replace(찾을문자열, 바꿀문자열)은 문자열 안에서 특정 부분을 다른 문자열로 바꾼 새 문자열을 반환합니다. 원본에서 \"Java\"라는 부분만 정확히 찾아서 바꿔줍니다."
   },
   {
     "id": "basic_part2_q10",
@@ -582,7 +601,8 @@ export const problems: Problem[] = [
         "expected": "['사과', '바나나', '포도']"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열.split(구분자)는 지정한 구분자를 기준으로 문자열을 나누어 리스트로 만들어줍니다. 콤마(,)로 구분된 데이터를 다룰 때 자주 사용하는 방법입니다."
   },
   {
     "id": "basic_part3_q1",
@@ -607,7 +627,8 @@ export const problems: Problem[] = [
         "expected": "15"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "+ 연산자는 두 숫자를 더한 결과를 계산합니다. print() 안에 직접 계산식을 넣으면 그 결과가 바로 출력됩니다."
   },
   {
     "id": "basic_part3_q2",
@@ -633,7 +654,8 @@ export const problems: Problem[] = [
         "expected": "24\n16\n80\n5.0"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "파이썬의 기본 산술 연산자는 +(덧셈), -(뺄셈), *(곱셈), /(나눗셈)입니다. /로 나눈 결과는 나누어떨어지더라도 항상 실수(float)로 반환됩니다."
   },
   {
     "id": "basic_part3_q3",
@@ -658,7 +680,8 @@ export const problems: Problem[] = [
         "expected": "3"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "// 연산자는 나눗셈의 몫만 정수로 구합니다. 일반 나눗셈(/)과 달리 소수점 이하를 버린 정수 결과를 얻고 싶을 때 사용합니다."
   },
   {
     "id": "basic_part3_q4",
@@ -683,7 +706,8 @@ export const problems: Problem[] = [
         "expected": "2"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "% 연산자는 나눗셈의 나머지를 구합니다. 어떤 수가 짝수/홀수인지 판별하거나, 특정 주기로 반복되는 상황을 다룰 때 자주 활용됩니다."
   },
   {
     "id": "basic_part3_q5",
@@ -708,7 +732,8 @@ export const problems: Problem[] = [
         "expected": "25"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "** 연산자는 거듭제곱을 계산합니다. 5 ** 2는 5의 2제곱, 즉 5 * 5와 같은 결과입니다."
   },
   {
     "id": "basic_part3_q6",
@@ -733,7 +758,8 @@ export const problems: Problem[] = [
         "expected": "True"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "> 연산자는 왼쪽 값이 오른쪽 값보다 큰지 비교해서 True 또는 False를 반환합니다. 이런 비교 연산자의 결과는 항상 불리언(bool) 값입니다."
   },
   {
     "id": "basic_part3_q7",
@@ -760,7 +786,8 @@ export const problems: Problem[] = [
         "expected": "True"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "== 연산자는 두 값이 같은지 비교합니다. 값을 저장하는 대입 연산자 =와 헷갈리기 쉬우니 \"비교\"에는 반드시 등호 두 개(==)를 써야 합니다."
   },
   {
     "id": "basic_part3_q8",
@@ -786,7 +813,8 @@ export const problems: Problem[] = [
         "expected": "True"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "and 연산자는 앞뒤 두 조건이 모두 참일 때만 전체 결과가 True가 됩니다. \"20살 이상 그리고 30살 이하\"처럼 범위를 확인할 때 두 비교식을 and로 연결합니다."
   },
   {
     "id": "basic_part3_q9",
@@ -813,7 +841,8 @@ export const problems: Problem[] = [
         "expected": "True"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "or 연산자는 앞뒤 조건 중 하나라도 참이면 전체 결과가 True가 됩니다. \"둘 중 하나\"라는 상황을 표현할 때 사용합니다."
   },
   {
     "id": "basic_part3_q10",
@@ -838,7 +867,8 @@ export const problems: Problem[] = [
         "expected": "False"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "not 연산자는 True와 False를 서로 반대로 뒤집습니다. not True는 False가 되고, not False는 True가 됩니다."
   },
   {
     "id": "intermediate_part4_q1",
@@ -864,7 +894,8 @@ export const problems: Problem[] = [
         "expected": "성인입니다."
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "if 조건: 형태는 조건이 True일 때만 그 아래 들여쓴 코드를 실행합니다. 나이 >= 19처럼 비교 결과가 True인 경우에만 문자열이 출력됩니다."
   },
   {
     "id": "intermediate_part4_q2",
@@ -889,7 +920,8 @@ export const problems: Problem[] = [
         "expected": "양수입니다."
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "조건식 number > 0은 숫자가 0보다 큰지 판단합니다. if문의 조건 자리에는 이렇게 True/False로 판단되는 비교식이 들어갑니다."
   },
   {
     "id": "intermediate_part4_q3",
@@ -916,7 +948,8 @@ export const problems: Problem[] = [
         "expected": "홀수입니다."
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "if와 else를 함께 쓰면 조건이 참일 때와 거짓일 때 각각 다른 코드를 실행할 수 있습니다. number % 2 == 0으로 짝수 여부를 판단합니다."
   },
   {
     "id": "intermediate_part4_q4",
@@ -941,7 +974,8 @@ export const problems: Problem[] = [
         "expected": "합격"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "if score >= 60: ... else: ...처럼 조건 하나로 두 가지 경우를 모두 처리할 수 있습니다. else는 앞의 if 조건이 거짓일 때 실행됩니다."
   },
   {
     "id": "intermediate_part4_q5",
@@ -967,7 +1001,8 @@ export const problems: Problem[] = [
         "expected": "로그인 성공"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열끼리도 ==로 비교할 수 있습니다. 입력값과 저장된 값이 정확히 같은 문자열인지 확인해서 로그인 성공 여부를 판단하는 방식입니다."
   },
   {
     "id": "intermediate_part4_q6",
@@ -993,7 +1028,8 @@ export const problems: Problem[] = [
         "expected": "음수입니다."
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "if-elif-else를 사용하면 세 가지 이상의 경우를 순서대로 검사할 수 있습니다. 위에서부터 조건을 확인하다가 처음 참이 되는 조건의 코드만 실행됩니다."
   },
   {
     "id": "intermediate_part4_q7",
@@ -1022,7 +1058,8 @@ export const problems: Problem[] = [
         "expected": "B"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "여러 점수 구간을 나눌 때는 elif를 연속으로 사용합니다. 조건은 위에서부터 순서대로 검사되므로, 높은 점수 조건을 먼저 써야 올바르게 등급이 나뉩니다."
   },
   {
     "id": "intermediate_part4_q8",
@@ -1049,7 +1086,8 @@ export const problems: Problem[] = [
         "expected": "입장 불가"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "조건문은 나이 제한처럼 실제 서비스에서 흔히 쓰이는 \"자격 확인\" 로직을 표현하는 데 자주 사용됩니다. age >= 15라는 조건 하나로 입장 가능 여부를 판단할 수 있습니다."
   },
   {
     "id": "intermediate_part4_q9",
@@ -1076,7 +1114,8 @@ export const problems: Problem[] = [
         "expected": "무료 배송"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "숫자 비교 조건(amount >= 50000)의 결과에 따라 서로 다른 안내 메시지를 출력하는 전형적인 if-else 활용 문제입니다."
   },
   {
     "id": "intermediate_part4_q10",
@@ -1104,7 +1143,8 @@ export const problems: Problem[] = [
         "expected": "관리자 페이지 접속 가능"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "and 연산자로 여러 조건(로그인 상태, 관리자 여부)을 동시에 만족하는지 확인하고, 그 결과를 if문의 조건으로 사용해 여러 상태를 함께 판단할 수 있습니다."
   },
   {
     "id": "intermediate_part5_q1",
@@ -1129,7 +1169,8 @@ export const problems: Problem[] = [
         "expected": "['사과', '바나나', '포도']"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트는 [값1, 값2, 값3]처럼 대괄호로 여러 값을 순서대로 묶어 저장하는 자료구조입니다. 변수 하나로 여러 데이터를 함께 관리할 수 있습니다."
   },
   {
     "id": "intermediate_part5_q2",
@@ -1155,7 +1196,8 @@ export const problems: Problem[] = [
         "expected": "사과"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트도 문자열처럼 인덱싱을 지원해서 리스트[0]으로 첫 번째 요소에 접근할 수 있습니다. 인덱스는 0부터 시작합니다."
   },
   {
     "id": "intermediate_part5_q3",
@@ -1181,7 +1223,8 @@ export const problems: Problem[] = [
         "expected": "40"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트[-1]은 마지막 요소를 가리킵니다. 리스트의 길이를 몰라도 음수 인덱스로 뒤에서부터 요소에 접근할 수 있는 파이썬의 편리한 기능입니다."
   },
   {
     "id": "intermediate_part5_q4",
@@ -1206,7 +1249,8 @@ export const problems: Problem[] = [
         "expected": "[20, 30, 40]"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트도 슬라이싱 리스트[시작:끝]으로 일부 구간만 잘라낼 수 있습니다. 끝 인덱스에 해당하는 값은 결과에 포함되지 않습니다."
   },
   {
     "id": "intermediate_part5_q5",
@@ -1232,7 +1276,8 @@ export const problems: Problem[] = [
         "expected": "['사과', '바나나', '딸기']"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트.append(값)은 리스트의 맨 뒤에 새로운 값을 추가합니다. 리스트는 처음 만든 뒤에도 이렇게 계속 값을 추가할 수 있는 가변(mutable) 자료구조입니다."
   },
   {
     "id": "intermediate_part5_q6",
@@ -1258,7 +1303,8 @@ export const problems: Problem[] = [
         "expected": "['사과', '포도']"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트.remove(값)은 리스트에서 지정한 값과 처음 일치하는 요소를 찾아 삭제합니다. 인덱스가 아니라 값 자체로 삭제하고 싶을 때 사용합니다."
   },
   {
     "id": "intermediate_part5_q7",
@@ -1283,7 +1329,8 @@ export const problems: Problem[] = [
         "expected": "[10, 200, 30]"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트[인덱스] = 새값 형태로 특정 위치의 값을 직접 바꿀 수 있습니다. 리스트는 인덱스로 값을 읽는 것뿐 아니라 수정도 자유롭게 가능합니다."
   },
   {
     "id": "intermediate_part5_q8",
@@ -1309,7 +1356,8 @@ export const problems: Problem[] = [
         "expected": "5"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "len(리스트)는 리스트에 담긴 요소의 개수를 반환합니다. 문자열의 길이를 구할 때와 똑같은 함수를 사용합니다."
   },
   {
     "id": "intermediate_part5_q9",
@@ -1335,7 +1383,8 @@ export const problems: Problem[] = [
         "expected": "[1, 2, 3, 4, 5]"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트.sort()는 리스트 자체를 오름차순으로 정렬합니다. 원본 리스트가 직접 바뀐다는 점에서, 정렬된 새 리스트를 반환하는 sorted()와 차이가 있습니다."
   },
   {
     "id": "intermediate_part5_q10",
@@ -1361,7 +1410,8 @@ export const problems: Problem[] = [
         "expected": "True"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "in 연산자는 특정 값이 리스트 안에 존재하는지 확인해서 True 또는 False를 반환합니다. \"바나나\" in 리스트처럼 직관적으로 포함 여부를 검사할 수 있습니다."
   },
   {
     "id": "intermediate_part6_q1",
@@ -1386,7 +1436,8 @@ export const problems: Problem[] = [
         "expected": "('월요일', '화요일', '수요일')"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "튜플은 리스트와 비슷하지만 소괄호 (값1, 값2, 값3)로 만들며, 한 번 만들면 값을 변경할 수 없는(immutable) 자료구조입니다. 요일처럼 바뀌지 않는 고정된 데이터를 담기에 적합합니다."
   },
   {
     "id": "intermediate_part6_q2",
@@ -1411,7 +1462,8 @@ export const problems: Problem[] = [
         "expected": "10"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "튜플도 리스트처럼 인덱싱을 지원해서 튜플[0]으로 첫 번째 값을 꺼낼 수 있습니다."
   },
   {
     "id": "intermediate_part6_q3",
@@ -1436,7 +1488,8 @@ export const problems: Problem[] = [
         "expected": "40"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "튜플[-1]로 마지막 값을 바로 꺼낼 수 있습니다. 인덱싱과 슬라이싱 문법은 리스트, 문자열, 튜플 모두 동일하게 동작합니다."
   },
   {
     "id": "intermediate_part6_q4",
@@ -1461,7 +1514,8 @@ export const problems: Problem[] = [
         "expected": "(20, 30, 40)"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "튜플도 슬라이싱 튜플[시작:끝]을 지원합니다. 리스트와 사용법이 완전히 같지만, 결과로 나오는 것도 튜플이라는 점이 다릅니다."
   },
   {
     "id": "intermediate_part6_q5",
@@ -1487,7 +1541,8 @@ export const problems: Problem[] = [
         "expected": "5"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "len(튜플)로 튜플에 담긴 값의 개수를 구할 수 있습니다. 리스트, 문자열, 튜플 모두 len()으로 길이를 구하는 방식이 통일되어 있습니다."
   },
   {
     "id": "intermediate_part6_q6",
@@ -1513,7 +1568,8 @@ export const problems: Problem[] = [
         "expected": "True"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "in 연산자는 튜플에도 똑같이 사용할 수 있어서, 특정 값이 튜플 안에 있는지 True/False로 확인할 수 있습니다."
   },
   {
     "id": "intermediate_part6_q7",
@@ -1539,7 +1595,8 @@ export const problems: Problem[] = [
         "expected": "(1, 2, 3, 4, 5, 6)"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "튜플끼리는 + 연산자로 이어붙여 새로운 튜플을 만들 수 있습니다. 문자열이나 리스트를 +로 합칠 때와 같은 원리입니다."
   },
   {
     "id": "intermediate_part6_q8",
@@ -1564,7 +1621,8 @@ export const problems: Problem[] = [
         "expected": "('안녕', '안녕', '안녕')"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "튜플에 * 숫자를 곱하면 그 튜플이 반복된 새 튜플이 만들어집니다. 요소가 하나뿐인 튜플을 만들 때는 (\"안녕\",)처럼 값 뒤에 콤마를 꼭 붙여야 튜플로 인식됩니다."
   },
   {
     "id": "intermediate_part6_q9",
@@ -1591,7 +1649,8 @@ export const problems: Problem[] = [
         "expected": "민수\n25"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "튜플 언패킹(unpacking)을 사용하면 name, age = 튜플처럼 튜플 안의 값들을 한 번에 여러 변수에 나눠 담을 수 있습니다."
   },
   {
     "id": "intermediate_part6_q10",
@@ -1617,7 +1676,8 @@ export const problems: Problem[] = [
         "expected": "10\n20"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "좌표처럼 두 값이 항상 세트로 다뤄지는 데이터는 튜플로 묶어 저장하는 경우가 많습니다. x, y = point처럼 언패킹해서 각 값을 따로 활용할 수 있습니다."
   },
   {
     "id": "advanced_part7_q1",
@@ -1643,7 +1703,8 @@ export const problems: Problem[] = [
         "expected": "1\n2\n3\n4\n5"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "for i in range(1, 6):은 1부터 5까지(6은 포함되지 않음) i에 순서대로 값을 대입하며 반복합니다. range(시작, 끝)의 끝 숫자는 결과에 포함되지 않는다는 점이 핵심입니다."
   },
   {
     "id": "advanced_part7_q2",
@@ -1669,7 +1730,8 @@ export const problems: Problem[] = [
         "expected": "사과\n바나나\n포도"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "for 변수 in 리스트:를 사용하면 리스트의 각 요소를 처음부터 끝까지 하나씩 변수에 대입하며 반복할 수 있습니다. 인덱스 없이 값 자체를 바로 다룰 수 있어 편리합니다."
   },
   {
     "id": "advanced_part7_q3",
@@ -1694,7 +1756,8 @@ export const problems: Problem[] = [
         "expected": "2\n4\n6\n8\n10"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "range(1, 11)로 반복하면서 if number % 2 == 0으로 짝수인 경우만 걸러 출력합니다. 반복문과 조건문을 함께 쓰는 대표적인 패턴입니다."
   },
   {
     "id": "advanced_part7_q4",
@@ -1720,7 +1783,8 @@ export const problems: Problem[] = [
         "expected": "15"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "반복문 밖에서 합계를 담을 변수(total = 0)를 미리 만들고, 반복할 때마다 total += i로 값을 누적하는 것이 \"합계 구하기\"의 기본 패턴입니다."
   },
   {
     "id": "advanced_part7_q5",
@@ -1745,7 +1809,8 @@ export const problems: Problem[] = [
         "expected": "파이썬\n파이썬\n파이썬\n파이썬\n파이썬"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "range(5)처럼 시작값을 생략하면 0부터 시작해서 5번(0~4) 반복합니다. 반복 횟수만 필요하고 숫자 자체는 안 쓸 때 자주 쓰는 형태입니다."
   },
   {
     "id": "advanced_part7_q6",
@@ -1770,7 +1835,8 @@ export const problems: Problem[] = [
         "expected": "5\n4\n3\n2\n1"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "range(5, 0, -1)처럼 range에 세 번째 인자로 음수를 주면 감소하는 방향으로 반복합니다. (시작, 끝, 증감폭) 순서이며 끝 값은 포함되지 않습니다."
   },
   {
     "id": "advanced_part7_q7",
@@ -1795,7 +1861,8 @@ export const problems: Problem[] = [
         "expected": "2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n2 x 4 = 8\n2 x 5 = 10\n2 x 6 = 12\n2 x 7 = 14\n2 x 8 = 16\n2 x 9 = 18"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "중첩되지 않은 단순 반복으로도 구구단 한 단을 출력할 수 있습니다. range(1, 10)으로 1~9를 반복하며 2 * i를 계산해 출력합니다."
   },
   {
     "id": "advanced_part7_q8",
@@ -1820,7 +1887,8 @@ export const problems: Problem[] = [
         "expected": "3\n6\n9\n12\n15\n18"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "number % 3 == 0 조건으로 3으로 나누어떨어지는(배수인) 숫자만 골라낼 수 있습니다. 나머지가 0이라는 것은 그 수로 나누어떨어진다는 뜻입니다."
   },
   {
     "id": "advanced_part7_q9",
@@ -1846,7 +1914,8 @@ export const problems: Problem[] = [
         "expected": "1\n2\n3\n4\n5"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "while 조건:은 조건이 True인 동안 계속 반복합니다. for문과 달리 반복 횟수를 직접 세면서(count += 1 등) 언제 멈출지 조건으로 제어해야 합니다."
   },
   {
     "id": "advanced_part7_q10",
@@ -1873,7 +1942,8 @@ export const problems: Problem[] = [
         "expected": "100"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트를 for문으로 순회하며 total += number처럼 누적하면 합계를 구할 수 있습니다. 내장 함수 sum()으로도 같은 결과를 구할 수 있지만, 반복문으로 원리를 이해하는 것이 이 문제의 핵심입니다."
   },
   {
     "id": "advanced_part8_q1",
@@ -1899,7 +1969,8 @@ export const problems: Problem[] = [
         "expected": "안녕하세요"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "def 함수이름(): 으로 함수를 정의하고, 함수이름()으로 호출하면 그 안의 코드가 실행됩니다. 함수는 반복해서 쓸 코드를 이름 붙여 저장해두는 것과 같습니다."
   },
   {
     "id": "advanced_part8_q2",
@@ -1926,7 +1997,8 @@ export const problems: Problem[] = [
         "expected": "안녕하세요 민수"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "함수는 def 함수이름(매개변수):처럼 괄호 안에 매개변수를 받을 수 있습니다. 호출할 때 넘긴 값이 매개변수에 저장되어 함수 안에서 사용됩니다."
   },
   {
     "id": "advanced_part8_q3",
@@ -1954,7 +2026,8 @@ export const problems: Problem[] = [
         "expected": "30"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "return 값은 함수를 호출한 곳으로 결과값을 돌려줍니다. print()로 함수 안에서 직접 출력하는 것과 달리, return한 값은 변수에 저장하거나 다른 계산에 재활용할 수 있습니다."
   },
   {
     "id": "advanced_part8_q4",
@@ -1980,7 +2053,8 @@ export const problems: Problem[] = [
         "expected": "25"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "매개변수로 받은 값을 함수 안에서 계산(number ** 2)한 뒤 return으로 결과를 돌려주는 구조입니다. 함수를 호출한 코드에서 print(square(5))처럼 바로 결과를 출력할 수 있습니다."
   },
   {
     "id": "advanced_part8_q5",
@@ -2008,7 +2082,8 @@ export const problems: Problem[] = [
         "expected": "성인"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "함수 안에 if문을 넣으면, 조건에 따라 다른 값을 return할 수 있습니다. 나이를 받아 성인 여부를 \"판단해서 알려주는\" 역할을 함수가 대신합니다."
   },
   {
     "id": "advanced_part8_q6",
@@ -2036,7 +2111,8 @@ export const problems: Problem[] = [
         "expected": "짝수"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "함수는 여러 개의 return을 가질 수 있고, 조건에 따라 그중 하나만 실행되어 함수가 끝납니다. if 블록에서 return하면 그 아래 else는 실행되지 않고 바로 함수가 종료됩니다."
   },
   {
     "id": "advanced_part8_q7",
@@ -2062,7 +2138,8 @@ export const problems: Problem[] = [
         "expected": "20"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "두 값을 비교하는 조건문을 함수 안에 넣으면, 매번 다른 두 숫자를 넘겨도 같은 로직으로 큰 값을 구할 수 있습니다. 이것이 함수를 \"재사용 가능한 코드 뭉치\"라고 부르는 이유입니다."
   },
   {
     "id": "advanced_part8_q8",
@@ -2089,7 +2166,8 @@ export const problems: Problem[] = [
         "expected": "9000.0"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "매개변수로 받은 값에 계산식(price * 0.9)을 적용해 새로운 값을 만들고 return합니다. 원래 값을 바꾸는 게 아니라, 계산된 새로운 결과를 돌려준다는 점에 주의하세요."
   },
   {
     "id": "advanced_part8_q9",
@@ -2116,7 +2194,8 @@ export const problems: Problem[] = [
         "expected": "사과\n바나나\n포도"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "함수의 매개변수로 리스트를 통째로 넘길 수도 있습니다. 함수 안에서 for문으로 그 리스트를 순회하며 각 값을 출력하는 방식입니다."
   },
   {
     "id": "advanced_part8_q10",
@@ -2146,7 +2225,8 @@ export const problems: Problem[] = [
         "expected": "B"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "함수 안에 if-elif-else로 여러 등급을 나누는 로직을 넣고, 각 조건에 맞는 등급 문자열을 return하도록 만듭니다. 조건문과 함수를 함께 활용하는 문제입니다."
   },
   {
     "id": "advanced_part9_q1",
@@ -2541,7 +2621,8 @@ export const problems: Problem[] = [
         "expected": "[1, 4, 9, 16, 25]"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "lambda 매개변수: 식은 이름 없이 간단한 계산 하나만 수행하는 함수를 즉석에서 만드는 문법입니다. map(함수, 리스트)는 리스트의 모든 요소에 그 함수를 적용한 결과를 반환하며, list()로 감싸야 실제 리스트로 변환됩니다."
   },
   {
     "id": "algorithm_q1",
@@ -2567,7 +2648,8 @@ export const problems: Problem[] = [
         "expected": "True\nFalse"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열을 거꾸로 뒤집는 가장 간단한 방법은 슬라이싱 word[::-1]입니다. 원본과 뒤집은 문자열이 완전히 같으면 회문(palindrome)이라고 판단할 수 있습니다."
   },
   {
     "id": "algorithm_q2",
@@ -2592,7 +2674,8 @@ export const problems: Problem[] = [
         "expected": "55"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "피보나치 수열은 바로 앞 두 항을 더해 다음 항을 만듭니다. 반복문을 돌며 두 변수(a, b)에 현재 값과 다음 값을 계속 갱신해 나가면 n번째 항까지 구할 수 있습니다."
   },
   {
     "id": "algorithm_q3",
@@ -2617,7 +2700,8 @@ export const problems: Problem[] = [
         "expected": "120"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "팩토리얼(n!)은 1부터 n까지 모든 숫자를 곱한 값입니다. result = 1에서 시작해 반복문으로 result *= i를 누적하면 곱셈 결과를 구할 수 있습니다."
   },
   {
     "id": "algorithm_q4",
@@ -2642,7 +2726,8 @@ export const problems: Problem[] = [
         "expected": "[1, 2, 4, 8, 9]"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "set(리스트)로 감싸면 중복된 값이 자동으로 제거됩니다. 이후 sorted()로 감싸면 그 결과를 오름차순으로 정렬한 리스트로 만들 수 있습니다."
   },
   {
     "id": "py_exc_1",
@@ -2908,7 +2993,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"[2, 4, 6, 8, 10]"}],
     "initialCode": "# 리스트 컴프리헨션으로 작성하세요\n",
     "testCases": [{"input":"코드 실행","expected":"[2, 4, 6, 8, 10]"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "리스트 컴프리헨션 [식 for 변수 in range(...) if 조건]은 반복문과 조건문을 한 줄로 압축해서 새 리스트를 만드는 파이썬만의 문법입니다. for문 + if문 + append()를 한 줄로 표현한 것과 같습니다."
   },
   {
     "id": "py_ds_2",
@@ -2936,7 +3022,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"6"}],
     "initialCode": "matrix = [[1,2,3],[4,5,6],[7,8,9]]\n# 두 번째 행의 세 번째 값을 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"6"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "2차원 리스트는 리스트 안에 리스트가 들어있는 구조입니다. 리스트[행][열]처럼 대괄호를 두 번 사용해 원하는 위치의 값에 접근합니다."
   },
   {
     "id": "py_ds_4",
@@ -2964,7 +3051,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"[('민수', 90), ('영희', 85), ('철수', 70)]"}],
     "initialCode": "students = [(\"민수\", 90), (\"철수\", 70), (\"영희\", 85)]\n# 점수 기준 내림차순으로 정렬하여 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"[('민수', 90), ('영희', 85), ('철수', 70)]"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "sorted(리스트, key=함수)를 사용하면 리스트의 각 요소 중 어떤 기준으로 정렬할지 직접 지정할 수 있습니다. key=lambda x: x[1]은 \"각 튜플의 두 번째 값을 기준으로 정렬하라\"는 뜻이고, reverse=True를 추가하면 내림차순이 됩니다."
   },
   {
     "id": "py_ds_6",
@@ -2978,7 +3066,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"[3, 4]"}],
     "initialCode": "a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\n# 교집합을 정렬된 리스트로 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"[3, 4]"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "집합(set)끼리 &연산자를 사용하면 두 집합에 공통으로 들어있는 값, 즉 교집합을 구할 수 있습니다. 결과는 순서가 없는 set이라 sorted()로 감싸 정렬된 리스트로 바꿔줍니다."
   },
   {
     "id": "py_str_1",
@@ -2992,7 +3081,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"3.14"}],
     "initialCode": "pi = 3.14159265\n# 소수점 둘째 자리까지 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"3.14"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "f-string 안에서 {값:.2f}처럼 쓰면 소수점 아래 자릿수를 지정해서 반올림된 형태로 출력할 수 있습니다. .2f는 \"소수점 둘째 자리까지의 실수(float)\"라는 뜻입니다."
   },
   {
     "id": "py_str_2",
@@ -3006,7 +3096,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"007"}],
     "initialCode": "num = 7\n# 3자리로 0을 채워 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"007"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "f-string에서 {값:03d}처럼 쓰면 정수를 3자리로 만들면서 부족한 자리를 0으로 채워줍니다. zfill()이라는 문자열 메서드로도 같은 결과를 만들 수 있습니다."
   },
   {
     "id": "py_str_3",
@@ -3020,7 +3111,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"사과, 바나나, 포도"}],
     "initialCode": "fruits = [\"사과\", \"바나나\", \"포도\"]\n# join으로 연결하여 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"사과, 바나나, 포도"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "\"구분자\".join(리스트)는 리스트의 각 요소를 지정한 구분자로 이어붙여 하나의 문자열로 합쳐줍니다. split()과 정반대의 역할을 하는 메서드라고 생각하면 기억하기 쉽습니다."
   },
   {
     "id": "py_algo_1",
@@ -3034,7 +3126,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"120"}],
     "initialCode": "def factorial(n):\n    # 여기에 코드를 작성하세요\n    pass\n\nprint(factorial(5))\n",
     "testCases": [{"input":"코드 실행","expected":"120"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "재귀함수는 함수가 자기 자신을 다시 호출하는 함수입니다. factorial(n)은 n * factorial(n-1)로 정의되며, n이 1(또는 0)이 되면 더 이상 호출하지 않고 값을 반환하는 \"기저 조건\"이 반드시 필요합니다."
   },
   {
     "id": "py_algo_2",
@@ -3048,7 +3141,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"4"}],
     "initialCode": "def binary_search(arr, target):\n    # 여기에 코드를 작성하세요\n    pass\n\nnumbers = [1, 3, 5, 7, 9, 11, 13]\nprint(binary_search(numbers, 9))\n",
     "testCases": [{"input":"코드 실행","expected":"4"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "이진 탐색은 정렬된 리스트에서 중간값과 찾는 값을 비교해가며 검색 범위를 절반씩 줄여나가는 알고리즘입니다. 중간값보다 찾는 값이 크면 오른쪽 절반만, 작으면 왼쪽 절반만 다시 탐색합니다."
   },
   {
     "id": "py_algo_3",
@@ -3062,7 +3156,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"[1, 2, 3, 4, 5]"}],
     "initialCode": "numbers = [5, 2, 4, 1, 3]\n# 버블 정렬로 오름차순 정렬하여 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"[1, 2, 3, 4, 5]"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "버블 정렬은 인접한 두 값을 비교해서 순서가 잘못됐으면 서로 교환하는 과정을 리스트 전체에 반복하는 정렬 알고리즘입니다. 한 바퀴를 돌 때마다 가장 큰 값이 뒤쪽으로 \"떠오르듯\" 이동합니다."
   },
   {
     "id": "py_algo_4",
@@ -3076,7 +3171,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"9"}],
     "initialCode": "numbers = [4, 8, 2, 9, 5]\n# max()를 사용하지 않고 최댓값을 찾아 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"9"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "최댓값을 직접 구하려면, 첫 번째 값을 \"지금까지의 최댓값\"으로 임시 저장한 뒤 나머지 값들과 하나씩 비교하며 더 큰 값이 나올 때마다 최댓값을 갱신하면 됩니다."
   },
   {
     "id": "py_algo_5",
@@ -3090,7 +3186,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"12"}],
     "initialCode": "def gcd(a, b):\n    # 여기에 코드를 작성하세요\n    pass\n\nprint(gcd(24, 36))\n",
     "testCases": [{"input":"코드 실행","expected":"12"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "유클리드 호제법은 \"두 수의 최대공약수는, 큰 수를 작은 수로 나눈 나머지와 작은 수의 최대공약수와 같다\"는 원리를 이용합니다. 나머지가 0이 될 때까지 (b, a % b)로 계속 바꿔가며 재귀 또는 반복으로 구합니다."
   },
   {
     "id": "py_algo_6",
@@ -3104,7 +3201,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"2\n3\n5\n7\n11\n13\n17\n19"}],
     "initialCode": "def is_prime(n):\n    # 여기에 코드를 작성하세요\n    pass\n\nfor i in range(1, 21):\n    if is_prime(i):\n        print(i)\n",
     "testCases": [{"input":"코드 실행","expected":"2\n3\n5\n7\n11\n13\n17\n19"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "소수는 1과 자기 자신으로만 나누어떨어지는 2 이상의 자연수입니다. 2부터 n-1까지(또는 효율을 위해 제곱근까지)의 숫자로 나누어봐서 하나라도 나누어떨어지면 소수가 아니라고 판단합니다."
   },
   {
     "id": "sql_q1",
