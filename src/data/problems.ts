@@ -4086,7 +4086,8 @@ export const problems: Problem[] = [
         "expected": "김철수"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "const는 재할당하지 않을 값을 저장할 때 쓰는 변수 선언 키워드입니다. console.log()는 괄호 안의 값을 콘솔에 출력하는 함수로, 파이썬의 print()와 같은 역할을 합니다."
   },
   {
     "id": "js_q2",
@@ -4113,7 +4114,8 @@ export const problems: Problem[] = [
         "expected": "12"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "변수에 저장된 값끼리도 + 연산자로 계산할 수 있습니다. 숫자형 변수라면 문자열이 아닌 실제 덧셈이 수행됩니다."
   },
   {
     "id": "js_q3",
@@ -4139,7 +4141,8 @@ export const problems: Problem[] = [
         "expected": "파이팅! 파이팅! 파이팅! "
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열.repeat(n)은 그 문자열을 n번 이어붙인 새 문자열을 반환합니다. 반복문 없이 문자열을 여러 번 출력하고 싶을 때 유용합니다."
   },
   {
     "id": "js_q4",
@@ -4165,7 +4168,8 @@ export const problems: Problem[] = [
         "expected": "홀수"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "삼항 연산자(조건 ? 참일때값 : 거짓일때값)를 쓰면 if/else를 한 줄로 줄일 수 있습니다. number % 2 === 0은 2로 나눈 나머지가 0인지, 즉 짝수인지를 확인하는 조건입니다."
   },
   {
     "id": "js_q5",
@@ -4191,7 +4195,8 @@ export const problems: Problem[] = [
         "expected": "3"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "배열.length는 배열에 들어있는 요소의 개수를 나타내는 속성입니다. 함수처럼 괄호를 붙이지 않고 값 그대로 사용합니다."
   },
   {
     "id": "js_q6",
@@ -4217,7 +4222,8 @@ export const problems: Problem[] = [
         "expected": "40"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "자바스크립트 배열은 파이썬과 달리 음수 인덱스(arr[-1])를 지원하지 않습니다. 그래서 마지막 요소는 배열의 길이에서 1을 뺀 인덱스, 즉 numbers[numbers.length - 1]로 접근해야 합니다."
   },
   {
     "id": "js_q7",
@@ -4244,7 +4250,8 @@ export const problems: Problem[] = [
         "expected": "찬희님의 점수는 95점입니다."
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "템플릿 리터럴은 백틱(`)으로 문자열을 감싸고, 그 안에 ${변수}를 넣으면 변수의 값이 문자열 중간에 그대로 삽입됩니다. 문자열을 +로 이어붙이는 것보다 훨씬 읽기 좋습니다."
   },
   {
     "id": "js_q8",
@@ -4270,7 +4277,8 @@ export const problems: Problem[] = [
         "expected": "HELLO WORLD"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "문자열.toUpperCase()는 문자열의 모든 알파벳을 대문자로 바꾼 새 문자열을 반환합니다. 원본 문자열 자체는 바뀌지 않고, 새 문자열이 만들어집니다."
   },
   {
     "id": "js_q9",
@@ -4296,7 +4304,8 @@ export const problems: Problem[] = [
         "expected": "Hello World"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "템플릿 리터럴 안에서는 여러 변수를 동시에 넣을 수 있습니다. `${first} ${second}`처럼 사이에 원하는 문자(공백 등)를 그대로 넣어 자연스럽게 문장을 만들 수 있습니다."
   },
   {
     "id": "js_q10",
@@ -4322,7 +4331,8 @@ export const problems: Problem[] = [
         "expected": "미성년자"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "삼항 연산자로 조건에 따라 다른 문자열을 즉시 계산해서 사용할 수 있습니다. age >= 18은 age가 18 이상인지 비교하는 조건식입니다."
   },
   {
     "id": "js_q11",
@@ -4348,7 +4358,8 @@ export const problems: Problem[] = [
         "expected": "55"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "for (let i = 시작; 조건; i++) 형태의 for문은 초기값부터 조건을 만족하는 동안 반복하며 i를 하나씩 증가시킵니다. 반복마다 total += i로 누적해서 합계를 구합니다."
   },
   {
     "id": "js_q12",
@@ -4374,7 +4385,8 @@ export const problems: Problem[] = [
         "expected": "1, 4, 9, 16, 25"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "배열.map(콜백함수)는 배열의 각 요소에 콜백함수를 적용한 결과로 이루어진 새 배열을 반환합니다. join(\", \")은 배열의 각 요소를 지정한 구분자로 이어붙여 하나의 문자열로 만듭니다."
   },
   {
     "id": "js_q13",
@@ -4400,7 +4412,8 @@ export const problems: Problem[] = [
         "expected": "2, 4, 6, 8, 10"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "배열.filter(조건함수)는 조건함수가 true를 반환하는 요소만 모아서 새 배열을 반환합니다. n % 2 === 0으로 짝수만 골라낼 수 있습니다."
   },
   {
     "id": "js_q14",
@@ -4426,7 +4439,8 @@ export const problems: Problem[] = [
         "expected": "150"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "배열.reduce((누적값, 현재값) => 계산, 초기값)은 배열의 모든 요소를 순서대로 계산해 하나의 값으로 합칩니다. 여기서는 누적값에 현재값을 계속 더해 총합을 구합니다."
   },
   {
     "id": "js_q15",
@@ -4452,7 +4466,8 @@ export const problems: Problem[] = [
         "expected": "9"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "for...of문으로 배열의 모든 요소를 순회하면서, 지금까지 찾은 최댓값(max)보다 큰 값이 나올 때마다 max를 갱신하는 방식입니다. 함수는 마지막에 return으로 결과를 돌려줍니다."
   },
   {
     "id": "js_q16",
@@ -4479,7 +4494,8 @@ export const problems: Problem[] = [
         "expected": "0으로 나눌 수 없습니다."
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "throw new Error(\"메시지\")로 의도적으로 에러를 발생시키고, 이를 호출하는 쪽에서 try/catch로 감싸면 프로그램이 멈추지 않고 catch 블록에서 error.message로 에러 내용을 확인할 수 있습니다."
   },
   {
     "id": "js_q17",
@@ -4506,7 +4522,8 @@ export const problems: Problem[] = [
         "expected": "12000"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "class의 constructor는 new로 객체를 만들 때 자동으로 실행되며, this.속성 = 값으로 그 객체만의 데이터를 저장합니다. 메서드 안에서도 this로 객체 자신의 속성에 접근하고 수정할 수 있습니다."
   },
   {
     "id": "js_q18",
@@ -4532,7 +4549,8 @@ export const problems: Problem[] = [
         "expected": "완료"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "await는 Promise가 끝날 때까지 그 줄에서 기다렸다가 다음 줄로 진행합니다. wait(100)이 100ms 뒤에 resolve되는 Promise를 반환하므로, await wait(100) 다음 줄은 100ms 후에야 실행됩니다."
   },
   {
     "id": "js_quiz_1",
