@@ -35,8 +35,8 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
       setErrorMsg('사용하실 닉네임을 입력해 주세요.');
       return;
     }
-    if (trimmed.length > 15) {
-      setErrorMsg('닉네임은 최대 15자까지 입력 가능합니다.');
+    if (trimmed.length > 5) {
+      setErrorMsg('닉네임은 최대 5자까지만 입력 가능합니다.');
       return;
     }
 
@@ -192,8 +192,8 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
               type="text"
               value={displayName}
               onChange={(e) => setDisplayName(e.target.value)}
-              placeholder="변경할 닉네임 입력 (최대 15자)"
-              maxLength={15}
+              placeholder="변경할 닉네임 입력 (최대 5자)"
+              maxLength={5}
               style={{
                 width: '100%',
                 padding: '0.75rem 1rem',
@@ -208,7 +208,7 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
               }}
             />
             <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.35rem' }}>
-              <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{displayName.trim().length} / 15자</span>
+              <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{displayName.trim().length} / 5자</span>
             </div>
           </div>
 

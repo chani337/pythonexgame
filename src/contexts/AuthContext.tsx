@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
+import { isProfaneOrForbidden } from '../utils/profanityFilter';
 
 export interface UserProfile {
   id: string;
@@ -305,12 +306,34 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured) {
       return { error: { message: '클라우드 데이터베이스 접속 정보가 설정되지 않았습니다.' } };
     }
+    const cleanName = (displayName || email.split('@')[0]).trim();
+    if (cleanName.length > 5) {
+      return { error: { message: '닉네임은 최대 5자까지만 가능합니다.' } };
+    }
+    if (isProfaneOrForbidden(cleanName)) {
+      return { error: { message: '부적절하거나 비하/욕설 단어는 닉네임으로 사용할 수 없습니다.' } };
+    }
+
+    try {
+      // Check duplication in profiles table
+      const { data: dupData } = await supabase
+        .from('profiles')
+        .select('id')
+        .ilike('display_name', cleanName);
+
+      if (dupData && dupData.length > 0) {
+        return { error: { message: '이미 사용 중인 닉네임입니다.' } };
+      }
+    } catch (err) {
+      console.warn('Signup duplication check notice:', err);
+    }
+
     const res = await supabase.auth.signUp({
       email,
       password,
       options: {
         data: {
-          display_name: displayName,
+          display_name: cleanName,
         },
       },
     });
@@ -320,7 +343,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.from('profiles').upsert({
         id: res.data.user.id,
         email,
-        display_name: displayName || email.split('@')[0],
+        display_name: cleanName,
         streak: 0,
         sandbox_runs: 0,
       });
@@ -419,12 +442,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!cleanName) {
       return { error: { message: '닉네임을 입력해 주세요.' } };
     }
-    if (cleanName.length > 15) {
-      return { error: { message: '닉네임은 최대 15자까지 설정할 수 있습니다.' } };
+    if (cleanName.length > 5) {
+      return { error: { message: '닉네임은 최대 5자까지만 가능합니다.' } };
+    }
+    if (isProfaneOrForbidden(cleanName)) {
+      return { error: { message: '부적절하거나 비하/욕설 단어는 닉네임으로 사용할 수 없습니다.' } };
+    }
+
+    const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
+
+    // 1. Duplication check in Supabase profiles table
+    if (isSupabaseConfigured) {
+      try {
+        const { data: existing, error: dupErr } = await supabase
+          .from('profiles')
+          .select('id, display_name')
+          .ilike('display_name', cleanName);
+
+        if (!dupErr && existing) {
+          const otherUserMatch = existing.find((p) => p.id !== activeUserId);
+          if (otherUserMatch) {
+            return { error: { message: '이미 다른 러너가 사용 중인 닉네임입니다.' } };
+          }
+        }
+      } catch (err) {
+        console.warn('Duplication check warning:', err);
+      }
+    }
+
+    // 2. Duplication check in current cached leaderboard
+    const isDuplicateInLeaderboard = leaderboard.some(
+      (u) => u.id !== activeUserId && u.display_name.toLowerCase() === cleanName.toLowerCase()
+    );
+    if (isDuplicateInLeaderboard) {
+      return { error: { message: '이미 사용 중인 닉네임입니다.' } };
     }
 
     // Save to local storage for instant availability
-    const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
     localStorage.setItem(`pyquests_display_name_${activeUserId}`, cleanName);
     localStorage.setItem('pyquests_display_name', cleanName);
 

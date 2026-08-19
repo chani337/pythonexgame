@@ -203,14 +203,15 @@ export default function AuthModal() {
           {isSignUp && (
             <div>
               <label style={{ fontSize: '0.75rem', fontWeight: '600', color: '#1a1a1a', display: 'block', marginBottom: '0.3rem' }}>
-                닉네임
+                닉네임 (최대 5자)
               </label>
               <div style={{ position: 'relative' }}>
                 <User size={15} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: '#8c959f' }} />
                 <input
                   type="text"
                   required
-                  placeholder="사용하실 닉네임 입력..."
+                  maxLength={5}
+                  placeholder="사용하실 닉네임 입력 (최대 5자)..."
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   className="glass-input"
