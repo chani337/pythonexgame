@@ -394,8 +394,8 @@ export default function Sidebar({
             display: 'flex',
             justifyContent: 'space-around',
             alignItems: 'center',
-            padding: '0.5rem 0',
-            paddingBottom: 'env(safe-area-inset-bottom, 0.5rem)',
+            padding: '0.6rem 0',
+            paddingBottom: 'env(safe-area-inset-bottom, 0.6rem)',
           }}
         >
           {menuItems.map((item) => {
@@ -412,17 +412,17 @@ export default function Sidebar({
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '0.2rem',
+                  gap: '0.3rem',
                   background: 'transparent',
                   border: 'none',
                   cursor: 'pointer',
-                  padding: '0.4rem 0.8rem',
+                  padding: '0.35rem 0.6rem',
                   color: isActive ? '#1a1a1a' : 'var(--text-muted)',
                   transition: 'color 0.2s ease',
                 }}
               >
-                <IconComponent size={20} />
-                <span style={{ fontSize: '0.6rem', fontWeight: isActive ? '700' : '500', letterSpacing: '0.02em' }}>
+                <IconComponent size={25} />
+                <span style={{ fontSize: '0.7rem', fontWeight: isActive ? '700' : '500', letterSpacing: '0.02em' }}>
                   {item.name}
                 </span>
               </button>
@@ -435,16 +435,16 @@ export default function Sidebar({
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '0.2rem',
+              gap: '0.3rem',
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              padding: '0.4rem 0.8rem',
+              padding: '0.35rem 0.6rem',
               color: mobileMenuOpen ? '#1a1a1a' : 'var(--text-muted)',
             }}
           >
-            {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            <span style={{ fontSize: '0.6rem', fontWeight: '500' }}>더보기</span>
+            {mobileMenuOpen ? <X size={25} /> : <Menu size={25} />}
+            <span style={{ fontSize: '0.7rem', fontWeight: '500' }}>더보기</span>
           </button>
         </nav>
 
