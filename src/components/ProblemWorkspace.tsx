@@ -23,6 +23,16 @@ export default function ProblemWorkspace({
   isPyodideLoading,
   onMarkSolved,
 }: ProblemWorkspaceProps) {
+  const problemLanguage = problem.language || 'python';
+  const editorFileLabel =
+    problemLanguage === 'sql' ? 'query.sql (SQL 편집기)' :
+    problemLanguage === 'java' ? 'Main.java (자바 편집기)' :
+    'main.py (파이썬 편집기)';
+  const editorPlaceholder =
+    problemLanguage === 'sql' ? '여기에 SQL 쿼리를 직접 타이핑하여 작성하세요...' :
+    problemLanguage === 'java' ? '여기에 자바 코드를 직접 타이핑하여 작성하세요...' :
+    '여기에 파이썬 코드를 직접 타이핑하여 작성하세요...';
+
   const [code, setCode] = useState<string>(problem.initialCode || '');
   const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
   const [fillText, setFillText] = useState<string>('');
@@ -260,7 +270,7 @@ export default function ProblemWorkspace({
     if (!fillText.trim()) return;
     setHasTested(true);
     
-    const isCorrect = fillText.trim().toLowerCase() === problem.correctAnswerText?.toLowerCase();
+    const isCorrect = fillText.trim().toLowerCase() === problem.correctAnswerText?.trim().toLowerCase();
     
     if (isCorrect) {
       setWorkspaceSuccess(true);
@@ -498,7 +508,7 @@ export default function ProblemWorkspace({
               <div className="editor-tabs">
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
                   <FileCode size={14} style={{ color: '#8b5cf6' }} />
-                  <span style={{ fontWeight: '600', color: '#ffffff' }}>main.py (파이썬 편집기)</span>
+                  <span style={{ fontWeight: '600', color: '#ffffff' }}>{editorFileLabel}</span>
                 </div>
                 <button
                   onClick={() => setCode(problem.initialCode || '')}
@@ -574,7 +584,7 @@ export default function ProblemWorkspace({
                     e.preventDefault();
                     e.stopPropagation();
                   }}
-                  placeholder="여기에 파이썬 코드를 직접 타이핑하여 작성하세요..."
+                  placeholder={editorPlaceholder}
                   className="code-editor-textarea"
                   style={{
                     margin: '0px',

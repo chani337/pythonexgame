@@ -8,7 +8,7 @@ import DocsViewer from './components/DocsViewer';
 import AuthModal from './components/AuthModal';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
-import { problems } from './data/problems';
+import { problems, filterProblems } from './data/problems';
 import type { Problem } from './data/problems';
 import { usePyodide } from './hooks/usePyodide';
 
@@ -19,6 +19,7 @@ function MainApp() {
   const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
+  const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all');
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -239,13 +240,11 @@ print("변환 리스트:", result)
     if (!selectedProblem) return;
 
     // 1. Check current filtered list
-    const filtered = problems.filter((problem) => {
-      const matchesDifficulty = selectedDifficulty === 'all' || problem.difficulty === selectedDifficulty;
-      const matchesType = selectedType === 'all' || problem.type === selectedType;
-      const matchesSearch =
-        problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        problem.category.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesDifficulty && matchesType && matchesSearch;
+    const filtered = filterProblems(problems, {
+      language: selectedLanguage,
+      difficulty: selectedDifficulty,
+      type: selectedType,
+      search: searchQuery,
     });
 
     const filterIndex = filtered.findIndex((p) => p.id === selectedProblem.id);
@@ -272,13 +271,11 @@ print("변환 리스트:", result)
   const handlePrevProblem = () => {
     if (!selectedProblem) return;
 
-    const filtered = problems.filter((problem) => {
-      const matchesDifficulty = selectedDifficulty === 'all' || problem.difficulty === selectedDifficulty;
-      const matchesType = selectedType === 'all' || problem.type === selectedType;
-      const matchesSearch =
-        problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        problem.category.toLowerCase().includes(searchQuery.toLowerCase());
-      return matchesDifficulty && matchesType && matchesSearch;
+    const filtered = filterProblems(problems, {
+      language: selectedLanguage,
+      difficulty: selectedDifficulty,
+      type: selectedType,
+      search: searchQuery,
     });
 
     const filterIndex = filtered.findIndex((p) => p.id === selectedProblem.id);
@@ -337,6 +334,8 @@ print("변환 리스트:", result)
             problems={problems}
             solvedIds={solvedIds}
             onSelectProblem={handleSelectProblem}
+            selectedLanguage={selectedLanguage}
+            setSelectedLanguage={setSelectedLanguage}
             selectedDifficulty={selectedDifficulty}
             setSelectedDifficulty={setSelectedDifficulty}
             selectedType={selectedType}

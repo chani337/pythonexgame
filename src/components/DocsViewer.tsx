@@ -380,54 +380,10 @@ export default function DocsViewer({
       [cellId]: { stdout: '실행 중...', error: null, isRunning: true }
     }));
 
-    let executableCode = rawCode;
-    const trimmed = rawCode.trim().toUpperCase();
-    const isRawSql = trimmed.startsWith('SELECT') || trimmed.startsWith('CREATE') || trimmed.startsWith('INSERT') || trimmed.startsWith('UPDATE') || trimmed.startsWith('DELETE') || trimmed.startsWith('WITH');
-
-    if (isRawSql || selectedCategory === 'sql') {
-      const cleanSql = rawCode.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
-      executableCode = `import sqlite3
-conn = sqlite3.connect(':memory:')
-cursor = conn.cursor()
-cursor.executescript("""
-CREATE TABLE IF NOT EXISTS users (id INT, name TEXT, age INT, score INT, dept TEXT);
-DELETE FROM users;
-INSERT INTO users VALUES 
-  (1, '김철수', 20, 90, '개발팀'),
-  (2, '이영희', 25, 85, '기획팀'),
-  (3, '박민수', 22, 100, '개발팀'),
-  (4, '최수민', 28, 70, '디자인팀'),
-  (5, '정찬희', 24, 95, '개발팀');
-
-CREATE TABLE IF NOT EXISTS orders (order_id INT, user_id INT, product TEXT, price INT);
-DELETE FROM orders;
-INSERT INTO orders VALUES
-  (101, 1, '노트북', 1500000),
-  (102, 1, '마우스', 30000),
-  (103, 3, '키보드', 120000),
-  (104, 5, '모니터', 450000);
-""")
-
-query = """${cleanSql}"""
-try:
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    if cursor.description:
-        cols = [d[0] for d in cursor.description]
-        print(" | ".join(cols))
-        print("-" * 40)
-        for r in rows:
-            print(" | ".join(str(x) if x is not None else 'NULL' for x in r))
-    else:
-        conn.commit()
-        print("SQL 쿼리가 성공적으로 실행되었습니다.")
-except Exception as e:
-    print(f"SQL 실행 오류: {e}")
-`;
-    }
-
     try {
-      const res = await runPythonCode(executableCode);
+      // Raw SQL is auto-detected and routed through an in-memory sqlite3 harness
+      // inside usePyodide's runCode, so it can just be passed through as-is here.
+      const res = await runPythonCode(rawCode);
       setCodeOutputs(prev => ({
         ...prev,
         [cellId]: {

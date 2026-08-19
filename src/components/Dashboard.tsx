@@ -44,16 +44,33 @@ export default function Dashboard({
   // Determine next recommended problem
   const nextProblem = problems.find((p) => !solvedIds.includes(p.id));
 
+  // Scope badge counting to a single language so adding SQL/Java problems doesn't
+  // silently inflate Python-named badges (or vice versa). Problems without an
+  // explicit `language` field are treated as Python (the original 99 problems).
+  const problemsByLanguage = (lang: 'python' | 'sql' | 'java') =>
+    problems.filter((p) => (p.language || 'python') === lang);
+  const solvedIdsByLanguage = (lang: 'python' | 'sql' | 'java') => {
+    const ids = new Set(problemsByLanguage(lang).map((p) => p.id));
+    return solvedIds.filter((id) => ids.has(id));
+  };
+
+  const pythonSolvedIds = solvedIdsByLanguage('python');
+  const pythonAdvSolved = problemsByLanguage('python').filter(
+    (p) => p.difficulty === 'advanced' && solvedIds.includes(p.id)
+  );
+  const sqlSolvedCount = solvedIdsByLanguage('sql').length;
+  const javaSolvedCount = solvedIdsByLanguage('java').length;
+
   // Badge data
   const badges = [
     {
       id: 'novice',
       name: '파이썬 스타터',
-      description: '첫 번째 문제를 해결하세요.',
+      description: '파이썬 문제를 첫 번째로 해결하세요.',
       icon: '🌱',
       color: '#1a1a1a',
       shadow: 'none',
-      unlocked: solvedCount >= 1,
+      unlocked: pythonSolvedIds.length >= 1,
     },
     {
       id: 'operator_master',
@@ -62,7 +79,7 @@ export default function Dashboard({
       icon: '🔢',
       color: '#1a1a1a',
       shadow: 'none',
-      unlocked: solvedIds.filter(id => id.includes('part3')).length >= 5,
+      unlocked: pythonSolvedIds.filter(id => id.includes('part3')).length >= 5,
     },
     {
       id: 'conditional_master',
@@ -71,7 +88,7 @@ export default function Dashboard({
       icon: '🔄',
       color: '#1a1a1a',
       shadow: 'none',
-      unlocked: solvedIds.filter(id => id.includes('part4')).length >= 5,
+      unlocked: pythonSolvedIds.filter(id => id.includes('part4')).length >= 5,
     },
     {
       id: 'structure_master',
@@ -80,16 +97,34 @@ export default function Dashboard({
       icon: '🔍',
       color: '#1a1a1a',
       shadow: 'none',
-      unlocked: solvedIds.filter(id => id.includes('part5') || id.includes('part6') || id.includes('part9')).length >= 10,
+      unlocked: pythonSolvedIds.filter(id => id.includes('part5') || id.includes('part6') || id.includes('part9')).length >= 10,
     },
     {
       id: 'advanced_wizard',
       name: '파이썬 마스터',
-      description: '고급 단계 문제를 5개 이상 해결하세요.',
+      description: '파이썬 고급 단계 문제를 5개 이상 해결하세요.',
       icon: '🧙‍♂️',
       color: '#1a1a1a',
       shadow: 'none',
-      unlocked: advSolved.length >= 5,
+      unlocked: pythonAdvSolved.length >= 5,
+    },
+    {
+      id: 'sql_explorer',
+      name: 'SQL 탐험가',
+      description: 'SQL 문제를 5개 이상 해결하세요.',
+      icon: '🗄️',
+      color: '#1a1a1a',
+      shadow: 'none',
+      unlocked: sqlSolvedCount >= 5,
+    },
+    {
+      id: 'java_starter',
+      name: '자바 입문자',
+      description: 'Java 문제를 5개 이상 해결하세요.',
+      icon: '☕',
+      color: '#1a1a1a',
+      shadow: 'none',
+      unlocked: javaSolvedCount >= 5,
     },
     {
       id: 'sandbox_explorer',
@@ -221,7 +256,7 @@ export default function Dashboard({
           {isMasterAdmin && onUnlockAll && (
             <button
               onClick={() => {
-                if (window.confirm(isMasterAdmin ? 'chani7873@daum.net 계정에 모든 문제(90개 이상) 해결 완료 및 뱃지 전체 해금을 적용하시겠습니까?' : '모든 문제(90개 이상)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?')) {
+                if (window.confirm(isMasterAdmin ? `chani7873@daum.net 계정에 모든 문제(${totalCount}개) 해결 완료 및 뱃지 전체 해금을 적용하시겠습니까?` : `모든 문제(${totalCount}개)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?`)) {
                   onUnlockAll();
                 }
               }}

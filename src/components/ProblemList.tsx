@@ -1,11 +1,14 @@
 import { useLayoutEffect } from 'react';
 import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle } from 'lucide-react';
 import type { Problem } from '../data/problems';
+import { filterProblems } from '../data/problems';
 
 interface ProblemListProps {
   problems: Problem[];
   solvedIds: string[];
   onSelectProblem: (problem: Problem) => void;
+  selectedLanguage: string;
+  setSelectedLanguage: (language: string) => void;
   selectedDifficulty: string;
   setSelectedDifficulty: (difficulty: string) => void;
   selectedType: string;
@@ -19,6 +22,8 @@ export default function ProblemList({
   problems,
   solvedIds,
   onSelectProblem,
+  selectedLanguage,
+  setSelectedLanguage,
   selectedDifficulty,
   setSelectedDifficulty,
   selectedType,
@@ -37,14 +42,12 @@ export default function ProblemList({
     }
   }, [initialScrollPos]);
 
-  // Filter logic
-  const filteredProblems = problems.filter((problem) => {
-    const matchesDifficulty = selectedDifficulty === 'all' || problem.difficulty === selectedDifficulty;
-    const matchesType = selectedType === 'all' || problem.type === selectedType;
-    const matchesSearch =
-      problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      problem.category.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesDifficulty && matchesType && matchesSearch;
+  // Filter logic (shared with App.tsx's next/prev navigation via filterProblems)
+  const filteredProblems = filterProblems(problems, {
+    language: selectedLanguage,
+    difficulty: selectedDifficulty,
+    type: selectedType,
+    search: searchQuery,
   });
 
   const getProblemTypeLabel = (type: string) => {
@@ -60,15 +63,26 @@ export default function ProblemList({
     }
   };
 
+  const getLanguageLabel = (language?: string) => {
+    switch (language) {
+      case 'sql':
+        return { text: 'SQL', color: '#0969da', bg: '#ddf4ff' };
+      case 'java':
+        return { text: 'Java', color: '#b07219', bg: '#fbf1e0' };
+      default:
+        return { text: 'Python', color: '#1a7f37', bg: '#dafbe1' };
+    }
+  };
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1 }}>
       {/* Title Header */}
       <div>
         <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-          파이썬 학습 코스
+          코딩 문제 학습
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-          기초, 중급, 고급 단계별 다양한 문제를 해결하고 실전 역량을 강화하세요.
+          Python · SQL · Java, 기초부터 고급까지 다양한 문제를 해결하고 실전 역량을 강화하세요.
         </p>
       </div>
 
@@ -87,6 +101,34 @@ export default function ProblemList({
       >
         {/* Left Side: Buttons Filters */}
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          {/* Language Group */}
+          <div style={{ display: 'flex', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
+            {[
+              { id: 'all', name: '전체 언어' },
+              { id: 'python', name: 'Python' },
+              { id: 'sql', name: 'SQL' },
+              { id: 'java', name: 'Java' },
+            ].map((lang) => (
+              <button
+                key={lang.id}
+                onClick={() => setSelectedLanguage(lang.id)}
+                style={{
+                  padding: '0.4rem 0.85rem',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  borderRadius: '0px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  background: selectedLanguage === lang.id ? '#1a1a1a' : 'transparent',
+                  color: selectedLanguage === lang.id ? '#ffffff' : 'var(--text-secondary)',
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {lang.name}
+              </button>
+            ))}
+          </div>
+
           {/* Difficulty Group */}
           <div style={{ display: 'flex', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
             {[
@@ -193,6 +235,7 @@ export default function ProblemList({
             const isSolved = solvedIds.includes(problem.id);
             const typeInfo = getProblemTypeLabel(problem.type);
             const TypeIcon = typeInfo.icon;
+            const langInfo = getLanguageLabel(problem.language);
 
             // Set left border color based on difficulty
             let diffBorderColor = 'var(--border-subtle)';
@@ -246,7 +289,19 @@ export default function ProblemList({
 
                 {/* Problem Info */}
                 <div>
-                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem', flexWrap: 'wrap' }}>
+                    <span
+                      style={{
+                        fontSize: '0.68rem',
+                        fontWeight: '700',
+                        color: langInfo.color,
+                        background: langInfo.bg,
+                        padding: '0.15rem 0.45rem',
+                        letterSpacing: '0.03em',
+                      }}
+                    >
+                      {langInfo.text}
+                    </span>
                     <span className={`badge badge-${problem.difficulty}`}>
                       {problem.difficulty === 'basic' ? '기초' : problem.difficulty === 'intermediate' ? '중급' : '고급'}
                     </span>

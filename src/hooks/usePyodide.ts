@@ -97,10 +97,66 @@ export function usePyodide() {
 
     try {
       // Normalize mobile smart quotes, apostrophes, and non-breaking spaces
-      const normalizedCode = code
+      let normalizedCode = code
         .replace(/[\u201C\u201D]/g, '"')
         .replace(/[\u2018\u2019\u00B4\u02B9]/g, "'")
         .replace(/\u00A0/g, ' ');
+
+      // Raw SQL (SELECT/CREATE/INSERT/UPDATE/DELETE/WITH) is transparently routed through
+      // an in-memory sqlite3 database seeded with the same fixed users/orders tables used
+      // throughout the SQL docs and problems, so any caller can accept plain SQL as "code".
+      const trimmedForSqlCheck = normalizedCode.trim().toUpperCase();
+      const isRawSql =
+        trimmedForSqlCheck.startsWith('SELECT') ||
+        trimmedForSqlCheck.startsWith('CREATE') ||
+        trimmedForSqlCheck.startsWith('INSERT') ||
+        trimmedForSqlCheck.startsWith('UPDATE') ||
+        trimmedForSqlCheck.startsWith('DELETE') ||
+        trimmedForSqlCheck.startsWith('WITH');
+
+      if (isRawSql) {
+        const cleanSql = normalizedCode.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+        normalizedCode = `import sqlite3
+conn = sqlite3.connect(':memory:')
+cursor = conn.cursor()
+cursor.executescript("""
+CREATE TABLE IF NOT EXISTS users (id INT, name TEXT, age INT, score INT, dept TEXT);
+DELETE FROM users;
+INSERT INTO users VALUES
+  (1, '\uAE40\uCCA0\uC218', 20, 90, '\uAC1C\uBC1C\uD300'),
+  (2, '\uC774\uC601\uD76C', 25, 85, '\uAE30\uD68D\uD300'),
+  (3, '\uBC15\uBBFC\uC218', 22, 100, '\uAC1C\uBC1C\uD300'),
+  (4, '\uCD5C\uC218\uBBFC', 28, 70, '\uB514\uC790\uC778\uD300'),
+  (5, '\uC815\uCC2C\uD76C', 24, 95, '\uAC1C\uBC1C\uD300');
+
+CREATE TABLE IF NOT EXISTS orders (order_id INT, user_id INT, product TEXT, price INT);
+DELETE FROM orders;
+INSERT INTO orders VALUES
+  (101, 1, '\uB178\uD2B8\uBD81', 1500000),
+  (102, 1, '\uB9C8\uC6B0\uC2A4', 30000),
+  (103, 3, '\uD0A4\uBCF4\uB4DC', 120000),
+  (104, 5, '\uBAA8\uB2C8\uD130', 450000);
+""")
+
+query = """${cleanSql}"""
+try:
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    if cursor.description:
+        cols = [d[0] for d in cursor.description]
+        print(" | ".join(cols))
+        print("-" * 40)
+        for r in rows:
+            print(" | ".join(str(x) if x is not None else 'NULL' for x in r))
+    else:
+        conn.commit()
+        print("SQL \uCFFC\uB9AC\uAC00 \uC131\uACF5\uC801\uC73C\uB85C \uC2E4\uD589\uB418\uC5C8\uC2B5\uB2C8\uB2E4.")
+except Exception as e:
+    print(f"SQL \uC2E4\uD589 \uC624\uB958: {e}")
+`;
+        // sqlite3 is unvendored from Pyodide's standard library and must be loaded explicitly
+        try { await pyodide.loadPackage('sqlite3'); } catch (e) {}
+      }
 
       // Dynamically load numpy or pandas if used in code
       if (normalizedCode.includes('numpy') || normalizedCode.includes('np.')) {
