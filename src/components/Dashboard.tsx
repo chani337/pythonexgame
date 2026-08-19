@@ -249,7 +249,7 @@ export default function Dashboard({
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: '580px', lineHeight: '1.6' }}>
             {isMasterAdmin
               ? 'chani7873@daum.net 관리자 전용 모드입니다. 아래 버튼을 눌러 모든 문제 클리어 및 뱃지 전체 해금을 1초 만에 실행하실 수 있습니다.'
-              : '기초부터 차근차근 고급 개념까지! PyQuests의 인터랙티브 코딩 플랫폼을 통해 실제 파이썬 런타임을 브라우저에서 실행하며 코딩 실력을 키워 보세요.'}
+              : '기초부터 차근차근 고급 개념까지! PyQuests의 인터랙티브 코딩 플랫폼을 통해 Python·SQL·Java를 브라우저에서 직접 실행하며 코딩 실력을 키워 보세요.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>

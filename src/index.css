@@ -487,14 +487,23 @@ code, pre, .console-container, .glass-input {
     font-size: 0.88rem !important;
   }
 
-  /* DocsViewer: chapter nav full width on mobile */
+  /* DocsViewer: split pane stacks vertically on mobile instead of squeezing side-by-side */
+  .docs-main-split {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
   .docs-chapter-nav {
     width: 100% !important;
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
+    height: 340px !important;
   }
 
   .docs-content-viewer {
     padding: 1.25rem 1rem !important;
+    height: auto !important;
+    overflow-y: visible !important;
   }
 
   /* Sandbox: snippet sidebar full width on mobile */

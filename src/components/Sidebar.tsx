@@ -96,7 +96,7 @@ export default function Sidebar({
                     PyQuests
                   </h1>
                   <span style={{ fontSize: '0.62rem', color: 'var(--text-secondary)', display: 'block', marginTop: '1px', letterSpacing: '0.02em', whiteSpace: 'nowrap' }}>
-                    파이썬 코딩 마스터
+                    Python · SQL · Java 코딩 마스터
                   </span>
                 </div>
               )}

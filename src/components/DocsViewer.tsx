@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { docChapters } from '../data/docs';
 import type { RunResponse } from '../hooks/usePyodide';
-import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles, CheckCircle2, Circle, HelpCircle, X } from 'lucide-react';
+import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles, CheckCircle2, Circle, HelpCircle, X, Search } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { chapterQuizzes } from '../data/chapterQuizzes';
 
@@ -25,6 +25,7 @@ export default function DocsViewer({
   });
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
   const [fontSizeScale, setFontSizeScale] = useState<number>(100);
+  const [chapterSearchQuery, setChapterSearchQuery] = useState<string>('');
 
   const { user, syncReadChapterToSupabase, fetchUserReadChapterIds } = useAuth();
 
@@ -105,6 +106,18 @@ export default function DocsViewer({
     }
     return ch.category !== 'sql' && ch.category !== 'java';
   });
+
+  // Chapter TOC search: matches by title or cell content, but keeps each entry's
+  // original index within filteredChapters so selection stays correct after filtering.
+  const chapterEntries = filteredChapters.map((chapter, idx) => ({ chapter, idx }));
+  const searchedChapterEntries = (() => {
+    const q = chapterSearchQuery.trim().toLowerCase();
+    if (!q) return chapterEntries;
+    return chapterEntries.filter(({ chapter }) => {
+      if (chapter.title.toLowerCase().includes(q)) return true;
+      return chapter.cells.some((cell) => cell.content.toLowerCase().includes(q));
+    });
+  })();
 
   const activeChapter = filteredChapters[selectedChapterIdx] || filteredChapters[0] || docChapters[0];
   const readCountInCategory = filteredChapters.filter((ch) => readChapterIds.includes(ch.id)).length;
@@ -666,6 +679,7 @@ export default function DocsViewer({
                   setSelectedCategory('python');
                   setSelectedChapterIdx(0);
                   setCodeOutputs({});
+                  setChapterSearchQuery('');
                 }}
                 style={{
                   background: selectedCategory === 'python' ? '#38bdf8' : 'transparent',
@@ -684,6 +698,7 @@ export default function DocsViewer({
                   setSelectedCategory('sql');
                   setSelectedChapterIdx(0);
                   setCodeOutputs({});
+                  setChapterSearchQuery('');
                 }}
                 style={{
                   background: selectedCategory === 'sql' ? '#38bdf8' : 'transparent',
@@ -702,6 +717,7 @@ export default function DocsViewer({
                   setSelectedCategory('java');
                   setSelectedChapterIdx(0);
                   setCodeOutputs({});
+                  setChapterSearchQuery('');
                 }}
                 style={{
                   background: selectedCategory === 'java' ? '#38bdf8' : 'transparent',
@@ -929,6 +945,7 @@ export default function DocsViewer({
             setSelectedCategory('python');
             setSelectedChapterIdx(0);
             setCodeOutputs({});
+            setChapterSearchQuery('');
           }}
           style={{
             padding: '0.65rem 1.4rem',
@@ -953,6 +970,7 @@ export default function DocsViewer({
             setSelectedCategory('sql');
             setSelectedChapterIdx(0);
             setCodeOutputs({});
+            setChapterSearchQuery('');
           }}
           style={{
             padding: '0.65rem 1.4rem',
@@ -977,6 +995,7 @@ export default function DocsViewer({
             setSelectedCategory('java');
             setSelectedChapterIdx(0);
             setCodeOutputs({});
+            setChapterSearchQuery('');
           }}
           style={{
             padding: '0.65rem 1.4rem',
@@ -999,7 +1018,7 @@ export default function DocsViewer({
       </div>
 
       {/* Main split layout */}
-      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
+      <div className="docs-main-split" style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
         {/* Left Side: Chapter Navigation (Fixed Independent Pane) */}
         {isTocOpen && (
           <div
@@ -1037,6 +1056,32 @@ export default function DocsViewer({
                 <PanelLeftClose size={16} />
               </button>
             </div>
+            <div style={{ position: 'relative' }}>
+              <Search
+                size={13}
+                style={{
+                  position: 'absolute',
+                  left: '10px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  color: 'var(--text-muted)',
+                }}
+              />
+              <input
+                type="text"
+                value={chapterSearchQuery}
+                onChange={(e) => setChapterSearchQuery(e.target.value)}
+                placeholder="목차/내용 검색..."
+                className="glass-input"
+                style={{
+                  width: '100%',
+                  paddingLeft: '1.9rem',
+                  fontSize: '0.75rem',
+                  boxSizing: 'border-box',
+                  height: '32px',
+                }}
+              />
+            </div>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
                 <span>진행률</span>
@@ -1054,7 +1099,12 @@ export default function DocsViewer({
               </div>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
-              {filteredChapters.map((chapter, idx) => (
+              {searchedChapterEntries.length === 0 && (
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '0.75rem 0.25rem' }}>
+                  "{chapterSearchQuery}"에 대한 검색 결과가 없습니다.
+                </p>
+              )}
+              {searchedChapterEntries.map(({ chapter, idx }) => (
                 <button
                   key={chapter.id}
                   onClick={() => {
