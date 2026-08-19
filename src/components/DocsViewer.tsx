@@ -37,6 +37,23 @@ export default function DocsViewer({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isFocusMode]);
 
+  // Ctrl + Mouse Wheel Zoom Handler (like VS Code / Chrome)
+  useEffect(() => {
+    const handleGlobalWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault();
+        if (e.deltaY < 0) {
+          setFontSizeScale((prev) => Math.min(180, prev + 5));
+        } else if (e.deltaY > 0) {
+          setFontSizeScale((prev) => Math.max(70, prev - 5));
+        }
+      }
+    };
+
+    window.addEventListener('wheel', handleGlobalWheel, { passive: false });
+    return () => window.removeEventListener('wheel', handleGlobalWheel);
+  }, []);
+
   const toggleFocusMode = () => {
     const nextMode = !isFocusMode;
     setIsFocusMode(nextMode);
@@ -684,7 +701,8 @@ export default function DocsViewer({
             borderRadius: '0px',
             background: '#ffffff',
             minWidth: 0,
-            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            zoom: fontSizeScale / 100,
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1), zoom 0.2s ease',
           }}
         >
           {activeChapter.cells.map((cell) => {
