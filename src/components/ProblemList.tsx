@@ -1,5 +1,5 @@
-import { useLayoutEffect } from 'react';
-import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle } from 'lucide-react';
+import { useLayoutEffect, useEffect, useState } from 'react';
+import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle, ArrowUp } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { filterProblems } from '../data/problems';
 
@@ -41,6 +41,21 @@ export default function ProblemList({
       }
     }
   }, [initialScrollPos]);
+
+  // Show a "scroll to top" button once the long problem list has been scrolled past
+  const [showScrollTop, setShowScrollTop] = useState(false);
+  useEffect(() => {
+    const mainEl = document.querySelector('.main-content');
+    if (!mainEl) return;
+    const handleScroll = () => setShowScrollTop(mainEl.scrollTop > 400);
+    handleScroll();
+    mainEl.addEventListener('scroll', handleScroll);
+    return () => mainEl.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    document.querySelector('.main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   // Filter logic (shared with App.tsx's next/prev navigation via filterProblems)
   const filteredProblems = filterProblems(problems, {
@@ -397,6 +412,12 @@ export default function ProblemList({
         >
           검색 및 필터 조건에 부합하는 문제가 없습니다.
         </div>
+      )}
+
+      {showScrollTop && (
+        <button onClick={scrollToTop} className="scroll-top-btn" title="맨 위로">
+          <ArrowUp size={20} />
+        </button>
       )}
     </div>
   );

@@ -368,6 +368,41 @@ code, pre, .console-container, .glass-input {
   }
 }
 
+.scroll-top-btn {
+  position: fixed;
+  right: 2rem;
+  bottom: 2rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 0px;
+  background: #1a1a1a;
+  color: #ffffff;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  z-index: 200;
+  animation: scrollTopBtnIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  transition: background 0.2s ease;
+}
+
+.scroll-top-btn:hover {
+  background: #333333;
+}
+
+@keyframes scrollTopBtnIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);
@@ -539,6 +574,14 @@ code, pre, .console-container, .glass-input {
     bottom: 5rem;
     transform: none;
     width: auto;
+  }
+
+  /* Scroll-to-top button: clear the bottom tab bar */
+  .scroll-top-btn {
+    right: 1rem;
+    bottom: 5.5rem;
+    width: 40px;
+    height: 40px;
   }
 
   @keyframes fadeInUp {

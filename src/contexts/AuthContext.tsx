@@ -210,6 +210,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const ADMIN_EMAIL = 'chani7873@daum.net';
+
   const refreshLeaderboard = async () => {
     try {
       const userMap: Record<string, LeaderboardUser> = {};
@@ -260,29 +262,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
       }
 
-      let formatted = Object.values(userMap);
+      // Admin account is excluded from the public leaderboard (recovery/testing data shouldn't rank)
+      let formatted = Object.values(userMap).filter((u) => u.email?.toLowerCase() !== ADMIN_EMAIL);
 
       // Guarantee active logged-in user OR guest runner is ALWAYS displayed on the leaderboard
       const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
       const activeUserEmail = user?.email || localStorage.getItem('pyquests_last_user_email') || 'local@pyquests.local';
+      const isActiveUserAdmin = activeUserEmail?.toLowerCase() === ADMIN_EMAIL;
 
       const userKey = `pyquests_solved_ids_${activeUserId}`;
       const savedLocal = localStorage.getItem(userKey) || localStorage.getItem('pyquests_solved_ids');
       const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
       const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || localStorage.getItem('pyquests_streak') || '0', 10);
 
-      const existingIndex = formatted.findIndex((u) => u.id === activeUserId || (u.email && activeUserEmail && u.email.toLowerCase() === activeUserEmail.toLowerCase()));
-      if (existingIndex !== -1) {
-        formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count || 0, localSolvedCount);
-        formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak || 0, userStreak);
-      } else if (localSolvedCount > 0 || userStreak > 0 || user) {
-        formatted.push({
-          id: activeUserId,
-          display_name: profile?.display_name || (user?.email ? user.email.split('@')[0] : '나 (게스트 러너)'),
-          email: activeUserEmail,
-          streak: userStreak,
-          solved_count: localSolvedCount,
-        });
+      if (!isActiveUserAdmin) {
+        const existingIndex = formatted.findIndex((u) => u.id === activeUserId || (u.email && activeUserEmail && u.email.toLowerCase() === activeUserEmail.toLowerCase()));
+        if (existingIndex !== -1) {
+          formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count || 0, localSolvedCount);
+          formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak || 0, userStreak);
+        } else if (localSolvedCount > 0 || userStreak > 0 || user) {
+          formatted.push({
+            id: activeUserId,
+            display_name: profile?.display_name || (user?.email ? user.email.split('@')[0] : '나 (게스트 러너)'),
+            email: activeUserEmail,
+            streak: userStreak,
+            solved_count: localSolvedCount,
+          });
+        }
       }
 
       // Sort real DB & active local solvers by solved_count DESC, then streak DESC
