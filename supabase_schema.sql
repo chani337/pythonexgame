@@ -19,8 +19,8 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS solved_count INT DEFAULT 0;
 -- Disable RLS on profiles so public leaderboard can query all registered users easily
 ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
 
--- Grant SELECT to anon and authenticated roles
-GRANT SELECT ON public.profiles TO anon, authenticated;
+-- Grant ALL permissions to anon, authenticated, and service_role
+GRANT ALL ON public.profiles TO anon, authenticated, service_role, postgres;
 
 -- 2. User Solved Problems Table
 CREATE TABLE IF NOT EXISTS public.user_solved_problems (
@@ -34,8 +34,8 @@ CREATE TABLE IF NOT EXISTS public.user_solved_problems (
 -- Disable RLS on user_solved_problems so public leaderboard can query solved counts easily
 ALTER TABLE public.user_solved_problems DISABLE ROW LEVEL SECURITY;
 
--- Grant SELECT to anon and authenticated roles
-GRANT SELECT ON public.user_solved_problems TO anon, authenticated;
+-- Grant ALL permissions to anon, authenticated, and service_role
+GRANT ALL ON public.user_solved_problems TO anon, authenticated, service_role, postgres;
 
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()

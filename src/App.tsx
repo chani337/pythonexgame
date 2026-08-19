@@ -62,12 +62,19 @@ function MainApp() {
         localStorage.setItem(localKey, JSON.stringify(merged));
       });
     } else if (!isAuthLoading) {
-      // Reset only when auth check finishes and user is confirmed logged out
-      localStorage.removeItem('pyquests_last_user_id');
-      setSolvedIds([]);
-      setStreak(0);
-      setLastSolvedDate(null);
-      setSandboxRunCount(0);
+      // Load local guest progress when not logged in instead of resetting to 0
+      const guestSolved = localStorage.getItem('pyquests_solved_ids_guest') || localStorage.getItem('pyquests_solved_ids');
+      const guestSolvedList = guestSolved ? JSON.parse(guestSolved) : [];
+      setSolvedIds(guestSolvedList);
+
+      const guestStreak = localStorage.getItem('pyquests_streak_guest') || localStorage.getItem('pyquests_streak') || '0';
+      setStreak(parseInt(guestStreak, 10));
+
+      const guestLastDate = localStorage.getItem('pyquests_last_solved_date_guest') || localStorage.getItem('pyquests_last_solved_date');
+      setLastSolvedDate(guestLastDate);
+
+      const guestSandbox = localStorage.getItem('pyquests_sandbox_runs_guest') || localStorage.getItem('pyquests_sandbox_runs') || '0';
+      setSandboxRunCount(parseInt(guestSandbox, 10));
     }
   }, [user, isAuthLoading]);
 
