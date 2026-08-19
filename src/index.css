@@ -135,7 +135,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .glass-input:focus {
   border-color: var(--border-glow-focus);
-  box-shadow: none;
+  box-shadow: 0 0 0 3px rgba(26, 26, 26, 0.12);
   background: #ffffff;
 }
 

@@ -417,11 +417,26 @@ export default function Sandbox({
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1, height: '100%' }}>
       {/* Title Header */}
       <div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-          코드 샌드박스 플레이그라운드
-        </h2>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.25rem' }}>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', color: '#1a1a1a' }}>
+            코드 샌드박스 플레이그라운드
+          </h2>
+          <span
+            style={{
+              fontSize: '0.68rem',
+              fontWeight: '700',
+              color: '#1a7f37',
+              background: '#dafbe1',
+              padding: '0.2rem 0.55rem',
+              borderRadius: '0px',
+              letterSpacing: '0.02em',
+            }}
+          >
+            Python 전용
+          </span>
+        </div>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-          제약 없이 자유롭게 파이썬 코드를 작성하고 브라우저에서 실행해 보세요.
+          제약 없이 자유롭게 파이썬 코드를 작성하고 브라우저에서 실행해 보세요. (SQL·Java 실습은 "문제 학습"과 "학습 가이드"에서 이용하실 수 있어요.)
         </p>
       </div>
 
