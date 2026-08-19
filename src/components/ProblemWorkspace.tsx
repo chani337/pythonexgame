@@ -1,8 +1,10 @@
-import { useState, useEffect, useRef, Fragment } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import confetti from 'canvas-confetti';
+import CodeEditor from './CodeEditor';
+import type { EditorLanguage } from './CodeEditor';
 
 interface ProblemWorkspaceProps {
   problem: Problem;
@@ -60,122 +62,6 @@ export default function ProblemWorkspace({
   const [workspaceSuccess, setWorkspaceSuccess] = useState<boolean>(false);
   const [mobileTab, setMobileTab] = useState<'desc' | 'editor'>('desc');
   const [showExplanation, setShowExplanation] = useState<boolean>(false);
-
-  // Synchronized scrolling for line numbers
-  const lineNumbersRef = useRef<HTMLDivElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleScroll = () => {
-    if (lineNumbersRef.current && textareaRef.current) {
-      lineNumbersRef.current.scrollTop = textareaRef.current.scrollTop;
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    // Jupyter/Colab style cell execution shortcut: Ctrl+Enter, Cmd+Enter, or Shift+Enter
-    if ((e.ctrlKey || e.metaKey || e.shiftKey) && e.key === 'Enter') {
-      e.preventDefault();
-      if (problem.type === 'coding') {
-        handleRun();
-      } else if (problem.type === 'quiz') {
-        handleSubmitQuiz();
-      } else if (problem.type === 'fill') {
-        handleSubmitFill();
-      }
-      return;
-    }
-
-    // Block paste keyboard shortcuts on Windows (Ctrl+V, Shift+Insert), macOS (Cmd+V), and Korean IME ('ㅍ')
-    const key = e.key ? e.key.toLowerCase() : '';
-    const codeKey = e.code || '';
-    if (
-      ((e.ctrlKey || e.metaKey) && (key === 'v' || key === 'ㅍ' || codeKey === 'KeyV' || e.keyCode === 86)) ||
-      (e.shiftKey && (key === 'insert' || codeKey === 'Insert'))
-    ) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-
-    // Tab key -> 4 spaces indent
-    if (e.key === 'Tab') {
-      e.preventDefault();
-      const target = e.currentTarget;
-      const start = target.selectionStart;
-      const end = target.selectionEnd;
-
-      if (start === end) {
-        // Single cursor
-        if (e.shiftKey) {
-          // Unindent
-          const lineStart = code.lastIndexOf('\n', start - 1) + 1;
-          const lineText = code.substring(lineStart, start);
-          if (lineText.startsWith('    ')) {
-            const newCode = code.substring(0, lineStart) + code.substring(lineStart + 4);
-            setCode(newCode);
-            setTimeout(() => {
-              target.selectionStart = target.selectionEnd = Math.max(lineStart, start - 4);
-            }, 0);
-          } else {
-            const spaceMatch = lineText.match(/^ +/);
-            if (spaceMatch) {
-              const removeCount = Math.min(spaceMatch[0].length, 4);
-              const newCode = code.substring(0, lineStart) + code.substring(lineStart + removeCount);
-              setCode(newCode);
-              setTimeout(() => {
-                target.selectionStart = target.selectionEnd = Math.max(lineStart, start - removeCount);
-              }, 0);
-            }
-          }
-        } else {
-          // Indent 4 spaces
-          const newCode = code.substring(0, start) + '    ' + code.substring(end);
-          setCode(newCode);
-          setTimeout(() => {
-            target.selectionStart = target.selectionEnd = start + 4;
-          }, 0);
-        }
-      } else {
-        // Multi-line selection
-        const lineStart = code.lastIndexOf('\n', start - 1) + 1;
-        const selectedText = code.substring(lineStart, end);
-        const lines = selectedText.split('\n');
-
-        if (e.shiftKey) {
-          let charsRemoved = 0;
-          const unindentedLines = lines.map((line) => {
-            if (line.startsWith('    ')) {
-              charsRemoved += 4;
-              return line.substring(4);
-            }
-            const spaces = line.match(/^ +/)?.[0].length || 0;
-            const toRemove = Math.min(spaces, 4);
-            charsRemoved += toRemove;
-            return line.substring(toRemove);
-          });
-          const newCode = code.substring(0, lineStart) + unindentedLines.join('\n') + code.substring(end);
-          setCode(newCode);
-          setTimeout(() => {
-            target.selectionStart = Math.max(lineStart, start - 4);
-            target.selectionEnd = Math.max(start, end - charsRemoved);
-          }, 0);
-        } else {
-          const indentedLines = lines.map((line) => '    ' + line);
-          const addedLength = lines.length * 4;
-          const newCode = code.substring(0, lineStart) + indentedLines.join('\n') + code.substring(end);
-          setCode(newCode);
-          setTimeout(() => {
-            target.selectionStart = start + 4;
-            target.selectionEnd = end + addedLength;
-          }, 0);
-        }
-      }
-    }
-  };
-
-  // Line numbering for the textarea
-  const lineCount = code.split('\n').length;
-  const lineNumbers = Array.from({ length: Math.max(lineCount, 10) }, (_, i) => i + 1);
 
   // Helper to safely render inline code backticks & operators
   const renderFormattedText = (text: string) => {
@@ -585,75 +471,13 @@ export default function ProblemWorkspace({
 
               {/* Editor Workspace */}
               <div style={{ display: 'flex', flex: 1, minHeight: 0, overflow: 'hidden', position: 'relative', background: 'transparent' }}>
-                {/* Synchronized Line Numbers */}
-                <div
-                  ref={lineNumbersRef}
-                  style={{
-                    padding: '1rem 0.5rem 1rem 1rem',
-                    textAlign: 'right',
-                    color: '#4b5563',
-                    fontFamily: 'var(--font-mono)',
-                    fontSize: '0.85rem',
-                    lineHeight: '1.6',
-                    userSelect: 'none',
-                    borderRight: '1px solid #1e1b2e',
-                    overflow: 'hidden',
-                    flexShrink: 0,
-                    pointerEvents: 'none',
-                  }}
-                >
-                  {lineNumbers.map((num) => (
-                    <div key={num}>{num}</div>
-                  ))}
-                </div>
-
-                {/* Textarea Code Area */}
-                <textarea
-                  ref={textareaRef}
+                <CodeEditor
                   value={code}
-                  autoCapitalize="none"
-                  autoComplete="off"
-                  autoCorrect="off"
-                  spellCheck={false}
-                  onChange={(e) => {
-                    const nativeEvent = e.nativeEvent as any;
-                    if (nativeEvent?.inputType?.toLowerCase().includes('paste')) {
-                      return;
-                    }
-                    setCode(e.target.value);
-                  }}
-                  onScroll={handleScroll}
-                  onKeyDown={handleKeyDown}
-                  onBeforeInput={(e: any) => {
-                    if (e.nativeEvent?.inputType?.toLowerCase().includes('paste')) {
-                      e.preventDefault();
-                      e.stopPropagation();
-                    }
-                  }}
-                  onPaste={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
-                  onDrop={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                  }}
+                  onChange={setCode}
+                  language={problemLanguage as EditorLanguage}
                   placeholder={editorPlaceholder}
-                  className="code-editor-textarea"
-                  style={{
-                    margin: '0px',
-                    height: '100%',
-                    flex: 1,
-                    minHeight: 'auto',
-                    padding: '1rem',
-                    background: 'transparent',
-                    boxShadow: 'none',
-                    overflowY: 'auto',
-                    whiteSpace: 'pre',
-                    wordBreak: 'normal',
-                    overflowWrap: 'normal',
-                  }}
                   disabled={isRuntimeLoading}
+                  onSubmitShortcut={handleRun}
                 />
               </div>
 
