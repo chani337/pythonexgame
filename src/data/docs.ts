@@ -9,7 +9,7 @@ export interface DocChapter {
   id: string;
   filename: string;
   title: string;
-  category?: 'python' | 'sql';
+  category?: 'python' | 'sql' | 'java';
   cells: DocCell[];
 }
 
@@ -382,6 +382,163 @@ export const docChapters: DocChapter[] = [
         id: "SQL_14_INDEX_cell_0",
         type: "markdown",
         content: "# SQL 14. 인덱스(INDEX)와 성능 기초\n\n## 1. 인덱스란?\n\n인덱스(Index)는 책의 '찾아보기'처럼, 테이블에서 원하는 데이터를 빠르게 찾을 수 있도록 만든 별도의 자료구조입니다. 인덱스가 없으면 조건에 맞는 행을 찾기 위해 테이블 전체를 처음부터 끝까지 읽어야 합니다 (풀 테이블 스캔, Full Table Scan).\n\n---\n\n## 2. 인덱스 생성 (`CREATE INDEX`)\n\n```sql\nCREATE INDEX idx_users_name ON users(name);\n\n-- 인덱스 삭제\nDROP INDEX idx_users_name;\n```\n\n---\n\n## 3. 인덱스의 종류\n\n- **단일 열 인덱스**: 한 개의 열에 생성하는 기본 형태입니다.\n- **복합(다중 열) 인덱스**: 여러 열을 묶어서 생성합니다. 열의 순서가 중요하며, 맨 앞 열부터 조건에 사용해야 인덱스가 효과를 냅니다.\n- **UNIQUE 인덱스**: 값의 중복을 허용하지 않는 인덱스로, `PRIMARY KEY`와 `UNIQUE` 제약조건을 지정하면 자동으로 생성됩니다.\n\n```sql\nCREATE INDEX idx_users_dept_score ON users(dept, score);\nCREATE UNIQUE INDEX idx_users_email ON users(email);\n```\n\n---\n\n## 4. 인덱스의 장단점\n\n- **장점**: `WHERE`, `JOIN`, `ORDER BY`에서 조건/정렬 대상 열을 빠르게 찾아 조회 성능을 크게 향상시킵니다.\n- **단점**: 인덱스 자체도 저장 공간을 차지하며, `INSERT`/`UPDATE`/`DELETE` 시 인덱스도 함께 갱신해야 하므로 **쓰기 성능은 오히려 느려질 수 있습니다.** 따라서 조회가 잦고 변경이 적은 열에 선별적으로 생성하는 것이 좋습니다.\n\n---\n\n## 5. 인덱스가 잘 활용되지 않는 경우\n\n다음과 같은 경우에는 인덱스를 만들어도 사용되지 않거나 효과가 떨어질 수 있습니다.\n\n```sql\n-- 인덱스가 걸린 열을 가공하면 인덱스를 타지 못함\nSELECT * FROM users WHERE score + 1 = 91;\n\n-- LIKE에서 앞에 %가 오면 인덱스를 타지 못함\nSELECT * FROM users WHERE name LIKE '%철수';\n```\n\n---\n\n## 6. 실행계획 확인 (`EXPLAIN`)\n\n작성한 쿼리가 인덱스를 사용하는지, 풀 테이블 스캔을 하는지는 `EXPLAIN`으로 확인할 수 있습니다.\n\n```sql\nEXPLAIN SELECT * FROM users WHERE name = '김철수';\n```\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nCREATE INDEX idx_users_dept ON users(dept);\nSELECT * FROM users WHERE dept = '개발팀';\n```"
+      }
+    ]
+  },
+  // Java Chapters (12 Fundamentals to OOP)
+  {
+    id: "JAVA_1_INTRO_VARIABLE",
+    filename: "Java 1. 시작하기 & 변수와 자료형",
+    title: "Java 1. 시작하기 & 변수와 자료형",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_1_INTRO_VARIABLE_cell_0",
+        type: "markdown",
+        content: "# Java 1. 시작하기 & 변수와 자료형\n\n## 1. 자바(Java)란?\n\n자바는 **컴파일 후 JVM(Java Virtual Machine) 위에서 실행되는 객체지향 프로그래밍 언어**입니다. \"한 번 작성하면 어디서든 실행된다(Write Once, Run Anywhere)\"는 목표로 만들어져, 운영체제에 상관없이 동일하게 동작합니다.\n\n파이썬과 가장 큰 차이는 **정적 타입 언어**라는 점입니다. 변수를 사용하기 전에 반드시 자료형을 미리 선언해야 하며, 선언한 자료형과 다른 값은 저장할 수 없습니다.\n\n---\n\n## 2. 기본 프로그램 구조\n\n자바 코드는 반드시 **클래스(class)** 안에 작성하며, 프로그램은 `main` 메서드에서 시작합니다.\n\n```java\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"Hello, Java!\");\n    }\n}\n```\n\n- `public class Main`: 파일 이름과 동일한 이름의 클래스를 선언합니다 (`Main.java`).\n- `public static void main(String[] args)`: 프로그램이 실행되면 가장 먼저 호출되는 메서드입니다.\n- `System.out.println()`: 값을 출력하고 줄바꿈하는 명령입니다 (파이썬의 `print()`에 대응).\n\n---\n\n## 3. 변수 선언과 기본 자료형\n\n자바에서 변수를 선언할 때는 `자료형 변수명 = 값;` 형태로 작성하며, 문장의 끝에는 항상 **세미콜론(`;`)**을 붙입니다.\n\n```java\nint age = 20;\ndouble score = 95.5;\nboolean isAdult = true;\nchar grade = 'A';\nString name = \"찬희\";\n```\n\n| 자료형 | 의미 | 예시 |\n|---|---|---|\n| `int` | 정수 | `10` |\n| `double` | 실수 | `3.14` |\n| `boolean` | 참/거짓 | `true`, `false` |\n| `char` | 문자 1개 (작은따옴표) | `'A'` |\n| `String` | 문자열 (큰따옴표) | `\"Python\"` |\n\n> 파이썬은 `x = 10`만 쓰면 되지만, 자바는 `int x = 10;`처럼 **자료형을 항상 명시**해야 합니다. 이후 `x`에는 정수만 저장할 수 있습니다.\n\n---\n\n## 4. 형변환 (Type Casting)\n\n- **묵시적 형변환**: 작은 범위의 자료형이 큰 범위로 자동 변환됩니다 (`int` → `double`).\n- **명시적 형변환**: 큰 범위를 작은 범위로 바꿀 때는 직접 `(자료형)`을 붙여야 하며, 값 손실이 발생할 수 있습니다.\n\n```java\nint num = 10;\ndouble d = num;        // 묵시적 변환: 10.0\n\ndouble pi = 3.14;\nint truncated = (int) pi;  // 명시적 변환: 3 (소수점 버림)\n```\n\n---\n\n## 5. 상수 (`final`)\n\n한 번 저장하면 값을 바꿀 수 없는 변수는 `final` 키워드로 선언합니다.\n\n```java\nfinal double PI = 3.14159;\n// PI = 3.14; // 오류: final 변수는 재할당 불가\n```\n\n---\n\n## 6. 자주 하는 실수\n\n### 1) 세미콜론을 빼먹는 경우\n\n```java\nint age = 20  // 오류: 세미콜론 누락\n```\n\n### 2) 자료형과 다른 값을 저장하는 경우\n\n```java\nint age = \"스무살\"; // 오류: int에 String을 저장할 수 없음\n```\n\n### 3) String과 char를 헷갈리는 경우\n\n- `char`는 **작은따옴표**로 문자 1개만 (`'A'`)\n- `String`은 **큰따옴표**로 문자열 전체 (`\"Java\"`)\n\n---\n\n## 7. 핵심 정리\n\n- 자바는 **정적 타입 언어**: 변수의 자료형을 미리 선언해야 함\n- 모든 코드는 **클래스 안**에 작성, 실행은 `main` 메서드에서 시작\n- 문장 끝에는 항상 `;` 필요\n- 기본 자료형: `int`, `double`, `boolean`, `char` + 참조형 `String`\n- `final`은 값이 바뀌지 않는 상수 선언"
+      }
+    ]
+  },
+  {
+    id: "JAVA_2_OPERATOR",
+    filename: "Java 2. 연산자 정리",
+    title: "Java 2. 연산자 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_2_OPERATOR_cell_0",
+        type: "markdown",
+        content: "# Java 2. 연산자 정리\n\n## 1. 산술 연산자\n\n| 연산자 | 의미 | 예시 | 결과 |\n|---|---|---|---:|\n| `+` | 더하기 | `5 + 2` | `7` |\n| `-` | 빼기 | `5 - 2` | `3` |\n| `*` | 곱하기 | `5 * 2` | `10` |\n| `/` | 나누기 | `5 / 2` | `2` |\n| `%` | 나머지 | `5 % 2` | `1` |\n\n> 자바에서 `int` 끼리 나눗셈을 하면 **소수점이 버려진 정수** 결과가 나옵니다. 실수 결과를 원하면 둘 중 하나를 `double`로 만들어야 합니다.\n\n```java\nSystem.out.println(5 / 2);         // 2  (정수 나눗셈)\nSystem.out.println(5 / 2.0);       // 2.5 (실수 나눗셈)\n```\n\n---\n\n## 2. 증감 연산자\n\n변수의 값을 1씩 늘리거나 줄일 때 사용합니다.\n\n```java\nint x = 5;\nx++;              // x = x + 1과 동일, x는 6\nx--;              // x = x - 1과 동일, x는 5\n```\n\n---\n\n## 3. 비교 연산자\n\n| 연산자 | 의미 |\n|---|---|\n| `==` | 같다 |\n| `!=` | 다르다 |\n| `>`, `<` | 크다, 작다 |\n| `>=`, `<=` | 크거나 같다, 작거나 같다 |\n\n```java\nSystem.out.println(10 > 5);   // true\nSystem.out.println(10 == 5);  // false\n```\n\n> **주의**: 문자열끼리 내용이 같은지 비교할 때는 `==`가 아니라 `.equals()`를 사용해야 합니다. `==`는 두 문자열이 **같은 객체**인지만 비교합니다.\n\n```java\nString a = \"hello\";\nString b = new String(\"hello\");\nSystem.out.println(a == b);        // false (다른 객체)\nSystem.out.println(a.equals(b));   // true (내용이 같음)\n```\n\n---\n\n## 4. 논리 연산자\n\n| 연산자 | 의미 |\n|---|---|\n| `&&` | 그리고 (AND) |\n| `\\|\\|` | 또는 (OR) |\n| `!` | 부정 (NOT) |\n\n```java\nint age = 20;\nboolean hasTicket = true;\n\nSystem.out.println(age >= 18 && hasTicket);  // true\nSystem.out.println(age < 18 || hasTicket);   // true\n```\n\n---\n\n## 5. 삼항 연산자\n\n조건에 따라 두 값 중 하나를 선택하는 연산자입니다.\n\n```java\n조건 ? 참일_때_값 : 거짓일_때_값\n```\n\n```java\nint score = 85;\nString result = (score >= 60) ? \"합격\" : \"불합격\";\nSystem.out.println(result);  // 합격\n```\n\n---\n\n## 6. 핵심 정리\n\n- `int / int`는 정수 나눗셈 결과 (소수점 버림)\n- `++`, `--`로 값을 1씩 증가/감소\n- 문자열 내용 비교는 `==`가 아니라 `.equals()`\n- 논리 연산자는 `and`/`or`/`not`이 아니라 `&&`, `\\|\\|`, `!`\n- 삼항 연산자: `조건 ? 값1 : 값2` (파이썬의 `값1 if 조건 else 값2`와 순서가 다름)"
+      }
+    ]
+  },
+  {
+    id: "JAVA_3_CONDITIONAL",
+    filename: "Java 3. 조건문 정리",
+    title: "Java 3. 조건문 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_3_CONDITIONAL_cell_0",
+        type: "markdown",
+        content: "# Java 3. 조건문 정리\n\n## 1. if 문 기본 형태\n\n자바의 조건식은 항상 **소괄호 `()`**로 감싸고, 실행할 코드는 **중괄호 `{}`**로 감쌉니다. (파이썬과 달리 들여쓰기가 문법적으로 강제되지는 않지만, 가독성을 위해 반드시 지켜야 합니다.)\n\n```java\nint age = 20;\n\nif (age >= 20) {\n    System.out.println(\"성인입니다.\");\n}\n```\n\n---\n\n## 2. if ~ else\n\n```java\nint score = 55;\n\nif (score >= 60) {\n    System.out.println(\"합격입니다.\");\n} else {\n    System.out.println(\"불합격입니다.\");\n}\n```\n\n---\n\n## 3. if ~ else if ~ else\n\n```java\nint score = 85;\n\nif (score >= 90) {\n    System.out.println(\"A학점\");\n} else if (score >= 80) {\n    System.out.println(\"B학점\");\n} else if (score >= 70) {\n    System.out.println(\"C학점\");\n} else {\n    System.out.println(\"재시험 대상\");\n}\n```\n\n---\n\n## 4. switch 문\n\n하나의 변수 값에 따라 여러 경우로 나눠 처리할 때는 `switch`가 더 깔끔합니다. 각 `case`가 끝나면 `break`로 빠져나가야 하며, `break`를 빠뜨리면 다음 `case`까지 그대로 실행됩니다(폴스루, Fall-through).\n\n```java\nint day = 3;\n\nswitch (day) {\n    case 1:\n        System.out.println(\"월요일\");\n        break;\n    case 2:\n        System.out.println(\"화요일\");\n        break;\n    case 3:\n        System.out.println(\"수요일\");\n        break;\n    default:\n        System.out.println(\"알 수 없는 요일\");\n}\n```\n\n---\n\n## 5. 자주 하는 실수\n\n### 1) 조건식에 괄호를 빼먹는 경우\n\n```java\nif age >= 20 {  // 오류: 조건식은 반드시 () 로 감싸야 함\n```\n\n### 2) switch에서 break를 빠뜨리는 경우\n\n```java\nswitch (day) {\n    case 1:\n        System.out.println(\"월요일\");\n        // break 누락 → 아래 case 2도 함께 실행됨\n    case 2:\n        System.out.println(\"화요일\");\n        break;\n}\n```\n\n---\n\n## 6. 핵심 정리\n\n- 조건식은 `()`, 실행 블록은 `{}`로 감쌈\n- `if` / `else if` / `else`로 여러 조건 분기\n- `switch`는 한 변수의 여러 값을 비교할 때 유용\n- `switch`의 각 `case`는 `break`로 반드시 끊어줘야 함"
+      }
+    ]
+  },
+  {
+    id: "JAVA_4_ARRAY",
+    filename: "Java 4. 배열(Array) 정리",
+    title: "Java 4. 배열(Array) 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_4_ARRAY_cell_0",
+        type: "markdown",
+        content: "# Java 4. 배열(Array) 정리\n\n## 1. 배열이란?\n\n배열은 **같은 자료형의 값 여러 개를 하나의 변수에 순서대로 저장**하는 자료구조입니다. 파이썬의 리스트와 비슷하지만, 자바의 배열은 **크기가 고정**되어 있고 **한 가지 자료형만** 담을 수 있습니다.\n\n---\n\n## 2. 배열 선언과 초기화\n\n```java\n// 방법 1: 값을 바로 넣어서 생성\nint[] scores = {90, 85, 100};\n\n// 방법 2: 크기만 정해서 생성 (기본값 0으로 채워짐)\nint[] numbers = new int[5];\n\nString[] fruits = {\"사과\", \"바나나\", \"포도\"};\n```\n\n---\n\n## 3. 배열 요소 접근 (인덱스)\n\n파이썬과 마찬가지로 **인덱스는 0부터 시작**합니다.\n\n```java\nString[] fruits = {\"사과\", \"바나나\", \"포도\"};\n\nSystem.out.println(fruits[0]);  // 사과\nSystem.out.println(fruits[1]);  // 바나나\n\nfruits[2] = \"수박\";  // 값 변경\nSystem.out.println(fruits[2]);  // 수박\n```\n\n---\n\n## 4. 배열의 길이 (`length`)\n\n배열의 크기를 구할 때는 메서드가 아니라 **`.length` 속성**을 사용합니다 (괄호를 붙이지 않음에 주의).\n\n```java\nint[] numbers = {1, 2, 3, 4, 5};\nSystem.out.println(numbers.length);  // 5\n```\n\n---\n\n## 5. 배열과 반복문\n\n```java\nint[] scores = {90, 85, 100};\n\nfor (int i = 0; i < scores.length; i++) {\n    System.out.println(scores[i]);\n}\n```\n\n---\n\n## 6. 2차원 배열\n\n표(행/열) 형태의 데이터를 담을 때는 2차원 배열을 사용합니다.\n\n```java\nint[][] matrix = {\n    {1, 2, 3},\n    {4, 5, 6}\n};\n\nSystem.out.println(matrix[0][1]);  // 2\nSystem.out.println(matrix[1][2]);  // 6\n```\n\n---\n\n## 7. 자주 하는 실수\n\n### 1) 배열 범위를 벗어난 인덱스 접근\n\n```java\nint[] numbers = {1, 2, 3};\nSystem.out.println(numbers[3]);  // 오류: ArrayIndexOutOfBoundsException\n```\n\n크기가 3인 배열의 인덱스는 `0, 1, 2`까지만 존재합니다.\n\n### 2) length를 메서드처럼 괄호를 붙이는 경우\n\n```java\nnumbers.length();  // 오류: length는 속성이지 메서드가 아님\nnumbers.length;    // 올바른 사용\n```\n\n### 3) 배열의 크기를 나중에 바꾸려는 경우\n\n자바의 배열은 **한 번 만들면 크기를 바꿀 수 없습니다.** 크기가 변하는 목록이 필요하다면 다음 챕터에서 배울 `ArrayList`를 사용해야 합니다.\n\n---\n\n## 8. 핵심 정리\n\n- 배열은 같은 자료형의 값을 순서대로 저장, 인덱스는 0부터 시작\n- 크기가 고정되어 있어 나중에 늘리거나 줄일 수 없음\n- 길이 확인은 `.length` (괄호 없음)\n- 2차원 배열로 표 형태 데이터 표현 가능"
+      }
+    ]
+  },
+  {
+    id: "JAVA_5_LOOP",
+    filename: "Java 5. 반복문 정리",
+    title: "Java 5. 반복문 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_5_LOOP_cell_0",
+        type: "markdown",
+        content: "# Java 5. 반복문 정리\n\n## 1. for 문\n\n```java\nfor (초기값; 조건식; 증감식) {\n    실행할 코드\n}\n```\n\n```java\nfor (int i = 0; i < 5; i++) {\n    System.out.println(i);\n}\n// 0 1 2 3 4 출력\n```\n\n- **초기값**: 반복을 시작할 변수 설정 (`int i = 0`)\n- **조건식**: 참인 동안 반복 (`i < 5`)\n- **증감식**: 매 반복 후 실행 (`i++`)\n\n---\n\n## 2. while 문\n\n조건이 참인 동안 계속 반복합니다.\n\n```java\nint i = 0;\n\nwhile (i < 5) {\n    System.out.println(i);\n    i++;\n}\n```\n\n---\n\n## 3. do-while 문\n\n`while`과 달리 **조건을 확인하기 전에 코드를 최소 1번은 실행**합니다.\n\n```java\nint i = 0;\n\ndo {\n    System.out.println(i);\n    i++;\n} while (i < 5);\n```\n\n---\n\n## 4. 향상된 for문 (for-each)\n\n배열이나 컬렉션의 값을 처음부터 끝까지 하나씩 꺼낼 때는 인덱스 없이 더 간결하게 작성할 수 있습니다.\n\n```java\nString[] fruits = {\"사과\", \"바나나\", \"포도\"};\n\nfor (String fruit : fruits) {\n    System.out.println(fruit);\n}\n```\n\n> `for (자료형 변수 : 배열)` 형태로, \"배열 안의 값을 하나씩 변수에 담아 반복한다\"는 의미입니다. 파이썬의 `for fruit in fruits:`와 거의 동일한 역할을 합니다.\n\n---\n\n## 5. break와 continue\n\n- `break`: 반복문을 즉시 종료\n- `continue`: 이번 반복만 건너뛰고 다음 반복으로 이동\n\n```java\nfor (int i = 0; i < 10; i++) {\n    if (i == 5) {\n        break;  // i가 5가 되면 반복 종료\n    }\n    System.out.println(i);\n}\n\nfor (int i = 0; i < 5; i++) {\n    if (i == 2) {\n        continue;  // i가 2일 때만 건너뜀\n    }\n    System.out.println(i);\n}\n```\n\n---\n\n## 6. 자주 하는 실수\n\n### 1) 조건식만 쓰고 증감식을 빼먹는 경우\n\n```java\nint i = 0;\nwhile (i < 5) {\n    System.out.println(i);\n    // i++ 누락 → 무한 반복\n}\n```\n\n### 2) for문의 세미콜론 개수를 틀리는 경우\n\n`for`문 안의 세 부분은 **세미콜론 2개**로 구분합니다.\n\n```java\nfor (int i = 0, i < 5, i++)  // 오류: 쉼표가 아니라 세미콜론이어야 함\nfor (int i = 0; i < 5; i++)  // 올바른 형태\n```\n\n---\n\n## 7. 핵심 정리\n\n- `for`: 반복 횟수가 정해져 있을 때 유용\n- `while`: 조건이 참인 동안 반복\n- `do-while`: 최소 한 번은 실행이 보장됨\n- 향상된 `for-each`: 배열/컬렉션을 인덱스 없이 순회\n- `break`는 반복 종료, `continue`는 이번 반복만 건너뜀"
+      }
+    ]
+  },
+  {
+    id: "JAVA_6_METHOD",
+    filename: "Java 6. 메서드(함수) 정리",
+    title: "Java 6. 메서드(함수) 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_6_METHOD_cell_0",
+        type: "markdown",
+        content: "# Java 6. 메서드(함수) 정리\n\n## 1. 메서드란?\n\n메서드(Method)는 자바에서 **함수**를 부르는 이름입니다. 반복해서 사용할 코드를 이름 붙여 묶어두고, 필요할 때마다 호출해서 재사용합니다.\n\n---\n\n## 2. 메서드의 기본 형태\n\n```java\n접근제어자 반환타입 메서드이름(매개변수) {\n    실행할 코드\n    return 반환값;\n}\n```\n\n```java\npublic static int add(int a, int b) {\n    return a + b;\n}\n\npublic static void main(String[] args) {\n    int result = add(3, 5);\n    System.out.println(result);  // 8\n}\n```\n\n- **반환타입**: 메서드가 돌려주는 값의 자료형 (`int`, `String`, 없으면 `void`)\n- **매개변수**: 메서드가 입력받는 값 (자료형을 반드시 명시)\n- **`return`**: 값을 호출한 곳으로 돌려줌\n\n---\n\n## 3. 반환값이 없는 메서드 (`void`)\n\n값을 돌려주지 않고 동작만 수행하는 메서드는 반환타입을 `void`로 지정합니다.\n\n```java\npublic static void greet(String name) {\n    System.out.println(name + \"님, 안녕하세요!\");\n}\n\npublic static void main(String[] args) {\n    greet(\"찬희\");  // 찬희님, 안녕하세요!\n}\n```\n\n---\n\n## 4. 메서드 오버로딩 (Overloading)\n\n같은 이름의 메서드를 **매개변수의 개수나 자료형을 다르게** 하여 여러 개 만들 수 있습니다. 자바 컴파일러가 호출 시 전달된 인자를 보고 알맞은 메서드를 자동으로 선택합니다.\n\n```java\npublic static int add(int a, int b) {\n    return a + b;\n}\n\npublic static double add(double a, double b) {\n    return a + b;\n}\n\npublic static int add(int a, int b, int c) {\n    return a + b + c;\n}\n```\n\n---\n\n## 5. static의 의미\n\n`static`이 붙은 메서드는 **객체를 생성하지 않고도 클래스 이름으로 바로 호출**할 수 있습니다. 지금까지 사용한 `main` 메서드도 `static`이기 때문에 객체 생성 없이 프로그램 시작점으로 실행될 수 있는 것입니다. (클래스와 객체는 다음 챕터에서 자세히 다룹니다.)\n\n---\n\n## 6. 자주 하는 실수\n\n### 1) 반환타입과 실제 반환값의 자료형이 다른 경우\n\n```java\npublic static int getName() {\n    return \"찬희\";  // 오류: int를 반환해야 하는데 String을 반환함\n}\n```\n\n### 2) return 없이 값을 반환하려는 경우\n\n```java\npublic static int square(int x) {\n    x * x;  // 오류: return이 없으면 값이 반환되지 않음\n}\n```\n\n---\n\n## 7. 핵심 정리\n\n- 메서드 = 자바에서의 함수, 반환타입/매개변수의 자료형을 반드시 명시\n- 값을 반환하지 않으면 `void`\n- 같은 이름으로 매개변수만 다르게 여러 개 정의하는 것 = 오버로딩\n- `static` 메서드는 객체 생성 없이 호출 가능"
+      }
+    ]
+  },
+  {
+    id: "JAVA_7_COLLECTION",
+    filename: "Java 7. 컬렉션 프레임워크 기초",
+    title: "Java 7. 컬렉션 프레임워크 기초",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_7_COLLECTION_cell_0",
+        type: "markdown",
+        content: "# Java 7. 컬렉션 프레임워크 기초\n\n## 1. 배열의 한계\n\n앞서 배운 배열은 **크기가 고정**되어 있어서, 값을 나중에 추가하거나 삭제하기가 번거롭습니다. 자바는 이런 한계를 보완한 **컬렉션 프레임워크**를 `java.util` 패키지로 제공합니다.\n\n```java\nimport java.util.ArrayList;\nimport java.util.HashMap;\n```\n\n---\n\n## 2. ArrayList (크기가 변하는 리스트)\n\n`ArrayList`는 파이썬의 리스트처럼 **값을 자유롭게 추가/삭제**할 수 있는 자료구조입니다. `<자료형>`으로 담을 값의 타입을 지정합니다 (제네릭).\n\n```java\nimport java.util.ArrayList;\n\nArrayList<String> fruits = new ArrayList<>();\n\nfruits.add(\"사과\");\nfruits.add(\"바나나\");\nfruits.add(\"포도\");\n\nSystem.out.println(fruits.get(0));   // 사과\nSystem.out.println(fruits.size());   // 3\n\nfruits.remove(\"바나나\");\nSystem.out.println(fruits);          // [사과, 포도]\n```\n\n| 배열 (Array) | ArrayList |\n|---|---|\n| 크기 고정 | 크기 자유롭게 변경 |\n| `arr[0]`, `arr.length` | `.get(0)`, `.size()` |\n| 기본 자료형(`int` 등) 가능 | 객체 타입만 가능 (`Integer` 등) |\n\n---\n\n## 3. HashMap (Key-Value 저장)\n\n`HashMap`은 파이썬의 딕셔너리처럼 **키(Key)와 값(Value)을 짝지어 저장**하는 자료구조입니다.\n\n```java\nimport java.util.HashMap;\n\nHashMap<String, Integer> scores = new HashMap<>();\n\nscores.put(\"찬희\", 95);\nscores.put(\"민수\", 88);\n\nSystem.out.println(scores.get(\"찬희\"));       // 95\nSystem.out.println(scores.containsKey(\"민수\")); // true\n\nscores.remove(\"민수\");\n```\n\n---\n\n## 4. ArrayList와 반복문\n\n```java\nArrayList<String> fruits = new ArrayList<>();\nfruits.add(\"사과\");\nfruits.add(\"바나나\");\n\nfor (String fruit : fruits) {\n    System.out.println(fruit);\n}\n```\n\n---\n\n## 5. 자주 하는 실수\n\n### 1) ArrayList에 기본 자료형을 그대로 담으려는 경우\n\n```java\nArrayList<int> numbers = new ArrayList<>();  // 오류\nArrayList<Integer> numbers = new ArrayList<>();  // 올바른 예 (Wrapper 클래스 사용)\n```\n\n### 2) 배열처럼 대괄호로 접근하려는 경우\n\n```java\nfruits[0];       // 오류: ArrayList는 [] 로 접근하지 않음\nfruits.get(0);   // 올바른 사용\n```\n\n---\n\n## 6. 핵심 정리\n\n- `ArrayList`는 크기가 자유로운 리스트: `.add()`, `.get()`, `.remove()`, `.size()`\n- `HashMap`은 키-값 저장: `.put()`, `.get()`, `.containsKey()`, `.remove()`\n- 배열과 달리 `[]`가 아니라 메서드로 값에 접근함\n- 담을 자료형은 `<>` 안에 지정 (제네릭)"
+      }
+    ]
+  },
+  {
+    id: "JAVA_8_EXCEPTION",
+    filename: "Java 8. 예외 처리 정리",
+    title: "Java 8. 예외 처리 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_8_EXCEPTION_cell_0",
+        type: "markdown",
+        content: "# Java 8. 예외 처리 정리\n\n## 1. 예외(Exception)란?\n\n프로그램 실행 중 예상치 못한 문제가 발생하면 프로그램이 강제로 종료됩니다. 이런 상황(예외)을 미리 대비하여, 오류가 나도 프로그램이 멈추지 않고 적절히 대응하도록 만드는 것이 예외 처리입니다.\n\n```java\nint[] numbers = {1, 2, 3};\nSystem.out.println(numbers[5]);  // ArrayIndexOutOfBoundsException 발생\n```\n\n---\n\n## 2. try-catch 기본 구조\n\n```java\ntry {\n    실행할 코드 (오류가 발생할 수 있는 코드)\n} catch (예외타입 변수명) {\n    오류가 발생했을 때 실행할 코드\n}\n```\n\n```java\ntry {\n    int result = 10 / 0;\n} catch (ArithmeticException e) {\n    System.out.println(\"0으로 나눌 수 없습니다.\");\n}\n```\n\n---\n\n## 3. finally 블록\n\n예외 발생 여부와 상관없이 **항상 실행**되는 코드는 `finally`에 작성합니다. 파일이나 연결을 정리하는 마무리 작업에 주로 사용합니다.\n\n```java\ntry {\n    int result = 10 / 0;\n} catch (ArithmeticException e) {\n    System.out.println(\"오류 발생: \" + e.getMessage());\n} finally {\n    System.out.println(\"항상 실행됩니다.\");\n}\n```\n\n---\n\n## 4. 여러 개의 catch\n\n발생할 수 있는 예외 종류별로 `catch`를 여러 개 나열할 수 있습니다.\n\n```java\ntry {\n    int[] arr = new int[3];\n    arr[5] = 10;\n} catch (ArrayIndexOutOfBoundsException e) {\n    System.out.println(\"배열 범위를 벗어났습니다.\");\n} catch (Exception e) {\n    System.out.println(\"알 수 없는 오류: \" + e.getMessage());\n}\n```\n\n> 여러 `catch` 중에서는 **더 구체적인 예외를 먼저**, 가장 포괄적인 `Exception`은 마지막에 두어야 합니다.\n\n---\n\n## 5. Checked Exception vs Unchecked Exception\n\n- **Checked Exception**: 컴파일 시점에 처리 여부를 검사함 (예: `IOException`). `try-catch`로 처리하거나 메서드 선언부에 `throws`로 명시해야 합니다.\n- **Unchecked Exception**: 실행 중에만 발생 (예: `ArithmeticException`, `NullPointerException`, `ArrayIndexOutOfBoundsException`). 반드시 처리하지 않아도 컴파일은 되지만, 실행 중 발생하면 프로그램이 멈춥니다.\n\n```java\npublic static void readFile() throws IOException {\n    // 파일을 읽는 도중 오류가 발생할 수 있음을 명시\n}\n```\n\n---\n\n## 6. 예외를 직접 발생시키기 (`throw`)\n\n```java\npublic static void checkAge(int age) {\n    if (age < 0) {\n        throw new IllegalArgumentException(\"나이는 음수일 수 없습니다.\");\n    }\n    System.out.println(\"나이: \" + age);\n}\n```\n\n---\n\n## 7. 핵심 정리\n\n- `try`: 오류가 발생할 수 있는 코드 실행\n- `catch`: 예외가 발생했을 때 처리할 코드\n- `finally`: 예외 발생 여부와 상관없이 항상 실행\n- `throw`: 예외를 직접 발생시킴, `throws`: 메서드가 예외를 던질 수 있음을 선언\n- Checked는 반드시 처리 필요, Unchecked는 선택적"
+      }
+    ]
+  },
+  {
+    id: "JAVA_9_CLASS_OBJECT",
+    filename: "Java 9. 클래스와 객체 정리",
+    title: "Java 9. 클래스와 객체 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_9_CLASS_OBJECT_cell_0",
+        type: "markdown",
+        content: "# Java 9. 클래스와 객체 정리\n\n## 1. 클래스와 객체란?\n\n**클래스(Class)**는 객체를 만들기 위한 설계도이고, **객체(Object)**는 그 설계도로 실제로 만들어진 결과물입니다. 예를 들어 \"학생\"이라는 클래스(틀)로 \"찬희\", \"민수\" 같은 실제 학생 객체를 여러 개 만들 수 있습니다.\n\n---\n\n## 2. 클래스 정의하기\n\n클래스는 **필드(속성)**와 **메서드(기능)**로 구성됩니다.\n\n```java\npublic class Student {\n    // 필드 (속성)\n    String name;\n    int age;\n\n    // 메서드 (기능)\n    void introduce() {\n        System.out.println(\"안녕하세요, 저는 \" + name + \"입니다.\");\n    }\n}\n```\n\n---\n\n## 3. 객체 생성과 사용 (`new`)\n\n클래스로부터 객체를 만들 때는 `new` 키워드를 사용합니다.\n\n```java\nStudent s1 = new Student();\ns1.name = \"찬희\";\ns1.age = 20;\ns1.introduce();  // 안녕하세요, 저는 찬희입니다.\n\nStudent s2 = new Student();\ns2.name = \"민수\";\ns2.age = 22;\ns2.introduce();  // 안녕하세요, 저는 민수입니다.\n```\n\n---\n\n## 4. 생성자 (Constructor)\n\n생성자는 `new`로 객체를 만드는 순간, 필드 값을 한 번에 초기화해주는 특별한 메서드입니다. **클래스 이름과 동일**하며 반환타입이 없습니다.\n\n```java\npublic class Student {\n    String name;\n    int age;\n\n    // 생성자\n    Student(String name, int age) {\n        this.name = name;\n        this.age = age;\n    }\n\n    void introduce() {\n        System.out.println(\"안녕하세요, 저는 \" + name + \"입니다.\");\n    }\n}\n\nStudent s1 = new Student(\"찬희\", 20);\ns1.introduce();\n```\n\n> `this.name`은 \"이 객체의 name 필드\"를 의미합니다. 매개변수 `name`과 필드 `name`의 이름이 같을 때, 이를 구분하기 위해 사용합니다.\n\n---\n\n## 5. 접근 제어자 (private, public)\n\n필드를 외부에서 직접 바꾸지 못하게 막고, **메서드를 통해서만** 접근하도록 만드는 것이 객체지향의 중요한 원칙 중 하나입니다 (캡슐화).\n\n```java\npublic class Student {\n    private String name;  // 외부에서 직접 접근 불가\n\n    // getter: 값을 읽어옴\n    public String getName() {\n        return name;\n    }\n\n    // setter: 값을 안전하게 설정\n    public void setName(String name) {\n        this.name = name;\n    }\n}\n\nStudent s1 = new Student();\ns1.setName(\"찬희\");\nSystem.out.println(s1.getName());  // 찬희\n// s1.name = \"찬희\"; // 오류: private 필드는 직접 접근 불가\n```\n\n| 접근 제어자 | 범위 |\n|---|---|\n| `public` | 어디서든 접근 가능 |\n| `private` | 같은 클래스 안에서만 접근 가능 |\n\n---\n\n## 6. 자주 하는 실수\n\n### 1) 생성자에 반환타입을 붙이는 경우\n\n```java\nvoid Student(String name) {  // 오류: 생성자는 반환타입이 없어야 함\n```\n\n### 2) this를 빼먹어서 매개변수와 필드를 혼동하는 경우\n\n```java\nStudent(String name) {\n    name = name;  // 잘못됨: 매개변수 name에 매개변수 자신을 대입할 뿐\n    this.name = name;  // 올바름: 필드 name에 매개변수 값을 대입\n}\n```\n\n---\n\n## 7. 핵심 정리\n\n- 클래스 = 설계도, 객체 = 그 설계도로 만든 실체\n- 객체 생성은 `new 클래스이름()`\n- 생성자는 객체 생성 시 필드를 초기화하는 특별한 메서드\n- `this`는 현재 객체 자기 자신을 가리킴\n- `private` 필드 + `public` getter/setter로 데이터를 안전하게 캡슐화"
+      }
+    ]
+  },
+  {
+    id: "JAVA_10_INHERITANCE",
+    filename: "Java 10. 상속과 다형성 정리",
+    title: "Java 10. 상속과 다형성 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_10_INHERITANCE_cell_0",
+        type: "markdown",
+        content: "# Java 10. 상속과 다형성 정리\n\n## 1. 상속(Inheritance)이란?\n\n상속은 기존 클래스의 필드와 메서드를 **다른 클래스가 그대로 물려받는 것**입니다. 공통된 기능은 부모 클래스에 두고, 자식 클래스는 필요한 부분만 추가하거나 바꿔서 코드 중복을 줄입니다.\n\n```java\nclass Animal {\n    String name;\n\n    void eat() {\n        System.out.println(name + \"이(가) 먹이를 먹습니다.\");\n    }\n}\n\nclass Dog extends Animal {\n    void bark() {\n        System.out.println(name + \"이(가) 짖습니다.\");\n    }\n}\n\nDog d = new Dog();\nd.name = \"초코\";\nd.eat();   // 초코이(가) 먹이를 먹습니다. (부모의 메서드 사용)\nd.bark();  // 초코이(가) 짖습니다. (자식만의 메서드)\n```\n\n`Dog`는 `extends Animal`을 통해 `Animal`의 `name` 필드와 `eat()` 메서드를 그대로 물려받았습니다.\n\n---\n\n## 2. super 키워드\n\n`super`는 부모 클래스를 가리킵니다. 부모의 생성자를 호출하거나, 부모의 메서드를 명시적으로 사용할 때 사용합니다.\n\n```java\nclass Animal {\n    String name;\n\n    Animal(String name) {\n        this.name = name;\n    }\n}\n\nclass Dog extends Animal {\n    Dog(String name) {\n        super(name);  // 부모(Animal)의 생성자 호출\n    }\n}\n\nDog d = new Dog(\"초코\");\n```\n\n---\n\n## 3. 메서드 오버라이딩 (Overriding)\n\n자식 클래스에서 부모 클래스의 메서드를 **같은 이름/매개변수로 재정의**하여 다르게 동작하도록 만드는 것입니다. `@Override` 어노테이션을 붙여 표시하는 것이 관례입니다.\n\n```java\nclass Animal {\n    void makeSound() {\n        System.out.println(\"동물이 소리를 냅니다.\");\n    }\n}\n\nclass Dog extends Animal {\n    @Override\n    void makeSound() {\n        System.out.println(\"멍멍!\");\n    }\n}\n\nAnimal a = new Dog();\na.makeSound();  // 멍멍! (Dog의 makeSound가 실행됨)\n```\n\n> **오버로딩 vs 오버라이딩**: 오버로딩은 같은 클래스 안에서 매개변수를 다르게 하여 여러 개 만드는 것, 오버라이딩은 부모의 메서드를 자식이 같은 형태로 재정의하는 것입니다.\n\n---\n\n## 4. 다형성 (Polymorphism)\n\n부모 타입의 변수로 자식 객체를 가리킬 수 있는 성질입니다. 위 예시의 `Animal a = new Dog();`가 바로 다형성입니다. 실제로 어떤 메서드가 호출될지는 **객체의 실제 타입(Dog)**을 기준으로 결정됩니다.\n\n```java\nclass Cat extends Animal {\n    @Override\n    void makeSound() {\n        System.out.println(\"야옹!\");\n    }\n}\n\nAnimal[] animals = { new Dog(), new Cat() };\n\nfor (Animal a : animals) {\n    a.makeSound();  // 멍멍! 야옹! (각 객체의 실제 타입에 맞게 실행됨)\n}\n```\n\n다형성 덕분에 서로 다른 종류의 객체를 **같은 방식으로 다룰 수 있어** 코드가 훨씬 유연해집니다.\n\n---\n\n## 5. 핵심 정리\n\n- `extends`로 부모 클래스의 필드/메서드를 상속받음\n- `super`로 부모의 생성자/메서드에 접근\n- 오버라이딩: 부모 메서드를 자식이 재정의 (`@Override`)\n- 다형성: 부모 타입 변수로 자식 객체를 다루되, 실제로는 자식의 메서드가 실행됨"
+      }
+    ]
+  },
+  {
+    id: "JAVA_11_INTERFACE_ABSTRACT",
+    filename: "Java 11. 인터페이스와 추상 클래스 정리",
+    title: "Java 11. 인터페이스와 추상 클래스 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_11_INTERFACE_ABSTRACT_cell_0",
+        type: "markdown",
+        content: "# Java 11. 인터페이스와 추상 클래스 정리\n\n## 1. 추상 클래스(Abstract Class)\n\n추상 클래스는 **미완성 메서드(추상 메서드)를 포함할 수 있는 클래스**로, 그 자체로는 객체를 만들 수 없고 반드시 자식 클래스가 상속받아 미완성 부분을 완성해야 합니다.\n\n```java\nabstract class Animal {\n    String name;\n\n    // 추상 메서드: 실행 코드가 없음, 자식이 반드시 구현해야 함\n    abstract void makeSound();\n\n    // 일반 메서드는 그대로 상속 가능\n    void sleep() {\n        System.out.println(name + \"이(가) 잠을 잡니다.\");\n    }\n}\n\nclass Dog extends Animal {\n    @Override\n    void makeSound() {\n        System.out.println(\"멍멍!\");\n    }\n}\n\n// Animal a = new Animal(); // 오류: 추상 클래스는 객체 생성 불가\nAnimal a = new Dog();\na.makeSound();\n```\n\n---\n\n## 2. 인터페이스(Interface)\n\n인터페이스는 클래스가 **반드시 구현해야 할 메서드의 목록(규격)**만 정의합니다. 필드 없이 메서드 시그니처(이름, 매개변수, 반환타입)만 가지며, `implements`로 구현합니다.\n\n```java\ninterface Movable {\n    void move();\n}\n\nclass Car implements Movable {\n    @Override\n    public void move() {\n        System.out.println(\"자동차가 도로를 달립니다.\");\n    }\n}\n\nMovable m = new Car();\nm.move();  // 자동차가 도로를 달립니다.\n```\n\n---\n\n## 3. 여러 인터페이스 동시 구현\n\n자바 클래스는 **부모 클래스는 하나만** 상속(`extends`)할 수 있지만, **인터페이스는 여러 개를 동시에 구현**(`implements`)할 수 있습니다.\n\n```java\ninterface Movable {\n    void move();\n}\n\ninterface Soundable {\n    void makeSound();\n}\n\nclass Car implements Movable, Soundable {\n    public void move() {\n        System.out.println(\"달립니다.\");\n    }\n    public void makeSound() {\n        System.out.println(\"빵빵!\");\n    }\n}\n```\n\n---\n\n## 4. 추상 클래스 vs 인터페이스\n\n| 구분 | 추상 클래스 | 인터페이스 |\n|---|---|---|\n| 키워드 | `abstract class` | `interface` |\n| 상속/구현 | `extends` (1개만) | `implements` (여러 개 가능) |\n| 필드 | 일반 필드 가능 | 상수만 가능 (기본적으로 `public static final`) |\n| 일반 메서드 | 구현부를 가질 수 있음 | 기본적으로 없음(단, `default` 메서드는 예외) |\n| 용도 | \"이것은 ~이다\" 관계 (상속 계층) | \"이것을 할 수 있다\" 규격 (기능 명세) |\n\n---\n\n## 5. 핵심 정리\n\n- 추상 클래스: 미완성 메서드를 포함, 자식이 상속(`extends`)받아 완성\n- 인터페이스: 메서드 규격만 정의, 클래스가 구현(`implements`)\n- 클래스 상속은 1개만, 인터페이스 구현은 여러 개 가능\n- 둘 다 **직접 객체를 생성할 수 없음** — 반드시 구현한 자식/구현 클래스를 통해 사용"
+      }
+    ]
+  },
+  {
+    id: "JAVA_12_STRING_UTIL",
+    filename: "Java 12. 문자열과 유용한 클래스 정리",
+    title: "Java 12. 문자열과 유용한 클래스 정리",
+    category: "java",
+    cells: [
+      {
+        id: "JAVA_12_STRING_UTIL_cell_0",
+        type: "markdown",
+        content: "# Java 12. 문자열과 유용한 클래스 정리\n\n## 1. String의 주요 메서드\n\n| 메서드 | 기능 | 예시 |\n|---|---|---|\n| `length()` | 문자열 길이 | `\"Java\".length()` → `4` |\n| `charAt(i)` | i번째 문자 | `\"Java\".charAt(0)` → `'J'` |\n| `substring(a, b)` | 부분 문자열 (a이상 b미만) | `\"Java\".substring(0, 2)` → `\"Ja\"` |\n| `toUpperCase()` / `toLowerCase()` | 대/소문자 변환 | `\"java\".toUpperCase()` → `\"JAVA\"` |\n| `trim()` | 양쪽 공백 제거 | `\"  Java  \".trim()` → `\"Java\"` |\n| `split(구분자)` | 문자열 나누기 | `\"a,b,c\".split(\",\")` → `[\"a\",\"b\",\"c\"]` |\n| `equals(값)` | 내용이 같은지 비교 | `\"Java\".equals(\"Java\")` → `true` |\n\n```java\nString text = \"Hello Java\";\n\nSystem.out.println(text.length());          // 10\nSystem.out.println(text.substring(0, 5));    // Hello\nSystem.out.println(text.toUpperCase());      // HELLO JAVA\nSystem.out.println(text.replace(\"Java\", \"World\")); // Hello World\n```\n\n---\n\n## 2. 문자열 결합\n\n`+` 연산자로 문자열을 이어 붙일 수 있습니다.\n\n```java\nString first = \"안녕\";\nString second = \"하세요\";\nSystem.out.println(first + second);  // 안녕하세요\n\nint age = 20;\nSystem.out.println(\"나이: \" + age);  // 나이: 20 (숫자가 자동으로 문자열로 변환됨)\n```\n\n---\n\n## 3. StringBuilder (효율적인 문자열 조작)\n\n`String`은 한 번 만들어지면 값을 바꿀 수 없는(불변, immutable) 객체라서, `+`로 반복해서 이어 붙이면 매번 새로운 문자열 객체가 생성되어 비효율적입니다. 반복적으로 문자열을 조합할 때는 `StringBuilder`를 사용합니다.\n\n```java\nStringBuilder sb = new StringBuilder();\n\nsb.append(\"Hello\");\nsb.append(\" \");\nsb.append(\"Java\");\n\nSystem.out.println(sb.toString());  // Hello Java\n```\n\n---\n\n## 4. Wrapper 클래스와 오토박싱\n\n`int`, `double` 같은 기본 자료형을 **객체처럼 다뤄야 할 때**(예: `ArrayList`에 담을 때) 사용하는 클래스가 Wrapper 클래스입니다.\n\n| 기본 자료형 | Wrapper 클래스 |\n|---|---|\n| `int` | `Integer` |\n| `double` | `Double` |\n| `boolean` | `Boolean` |\n| `char` | `Character` |\n\n```java\nint num = 10;\nInteger boxed = num;       // 오토박싱: 기본형 → Wrapper 자동 변환\nint unboxed = boxed;       // 언박싱: Wrapper → 기본형 자동 변환\n\nString str = \"123\";\nint parsed = Integer.parseInt(str);  // 문자열 → 정수 변환\nSystem.out.println(parsed + 1);       // 124\n```\n\n---\n\n## 5. 자주 하는 실수\n\n### 1) 문자열 비교에 `==` 사용\n\n```java\nString a = new String(\"java\");\nString b = new String(\"java\");\nSystem.out.println(a == b);       // false\nSystem.out.println(a.equals(b));  // true (올바른 비교 방법)\n```\n\n### 2) substring의 끝 인덱스를 포함된다고 착각\n\n```java\n\"Java\".substring(0, 2);  // \"Ja\" (2번째 문자는 포함되지 않음)\n```\n\n---\n\n## 6. 핵심 정리\n\n- `String`은 불변 객체, 내용 비교는 `.equals()`\n- 반복적인 문자열 조합에는 `StringBuilder`가 효율적\n- 기본 자료형을 객체로 다뤄야 할 때 Wrapper 클래스(`Integer` 등) 사용\n- `Integer.parseInt()`로 문자열을 숫자로 변환 가능"
       }
     ]
   }

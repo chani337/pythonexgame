@@ -14,7 +14,7 @@ export default function DocsViewer({
   isPyodideLoading,
   onExportToSandbox,
 }: DocsViewerProps) {
-  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql'>('python');
+  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java'>('python');
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(0);
   const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean }>>({});
   const [isTocOpen, setIsTocOpen] = useState<boolean>(() => {
@@ -28,7 +28,10 @@ export default function DocsViewer({
     if (selectedCategory === 'sql') {
       return ch.category === 'sql';
     }
-    return ch.category !== 'sql';
+    if (selectedCategory === 'java') {
+      return ch.category === 'java';
+    }
+    return ch.category !== 'sql' && ch.category !== 'java';
   });
 
   const activeChapter = filteredChapters[selectedChapterIdx] || filteredChapters[0] || docChapters[0];
@@ -448,6 +451,24 @@ except Exception as e:
               >
                 SQL
               </button>
+              <button
+                onClick={() => {
+                  setSelectedCategory('java');
+                  setSelectedChapterIdx(0);
+                  setCodeOutputs({});
+                }}
+                style={{
+                  background: selectedCategory === 'java' ? '#38bdf8' : 'transparent',
+                  color: selectedCategory === 'java' ? '#000000' : '#cbd5e1',
+                  border: 'none',
+                  padding: '0.3rem 0.6rem',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                }}
+              >
+                JAVA
+              </button>
             </div>
 
             {/* Chapter Selection Dropdown */}
@@ -646,10 +667,12 @@ except Exception as e:
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-            {selectedCategory === 'python' ? '파이썬 학습 가이드' : 'SQL 데이터베이스 학습 가이드'}
+            {selectedCategory === 'python' ? '파이썬 학습 가이드' : selectedCategory === 'sql' ? 'SQL 데이터베이스 학습 가이드' : 'Java 학습 가이드'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.
+            {selectedCategory === 'java'
+              ? '자바 기초 문법부터 객체지향까지 핵심 파트별 문서를 열람해 보세요. (자바는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)'
+              : 'Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.'}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -745,6 +768,30 @@ except Exception as e:
         >
           SQL 데이터베이스 (Database)
         </button>
+        <button
+          onClick={() => {
+            setSelectedCategory('java');
+            setSelectedChapterIdx(0);
+            setCodeOutputs({});
+          }}
+          style={{
+            padding: '0.65rem 1.4rem',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            background: selectedCategory === 'java' ? '#b07219' : '#ffffff',
+            color: selectedCategory === 'java' ? '#ffffff' : 'var(--text-secondary)',
+            border: '1px solid #b07219',
+            borderRadius: '0px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            boxShadow: selectedCategory === 'java' ? '0 2px 8px rgba(176,114,25,0.2)' : 'none',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          자바 (Java)
+        </button>
       </div>
 
       {/* Main split layout */}
@@ -768,7 +815,7 @@ except Exception as e:
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: '700', letterSpacing: '0.05em' }}>
-                {selectedCategory === 'python' ? '파이썬' : 'SQL'} 학습 목차
+                {selectedCategory === 'python' ? '파이썬' : selectedCategory === 'sql' ? 'SQL' : 'Java'} 학습 목차
               </h3>
               <button
                 onClick={() => setIsTocOpen(false)}
