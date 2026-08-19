@@ -3700,7 +3700,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "자바에서 정수를 저장하는 기본 자료형은?",
     "quizOptions": ["String","int","boolean","void"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "int는 정수를 저장하는 자바의 기본 자료형(primitive type)입니다. String은 문자열, boolean은 참/거짓, void는 \"반환값 없음\"을 나타내는 키워드라 정수 저장과는 관련이 없습니다."
   },
   {
     "id": "java_quiz_intro_2",
@@ -3714,7 +3715,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "문자열을 저장하는 참조 자료형은?",
     "quizOptions": ["str","char","String","text"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": 2,
+    "solutionExplanation": "String은 문자열을 저장하는 참조 자료형(reference type)입니다. 자바는 소문자 str이나 text라는 자료형이 없고, char는 문자 \"하나\"만 저장하는 기본 자료형이라 문자열 전체를 담을 수 없습니다."
   },
   {
     "id": "java_fill_intro_1",
@@ -3728,7 +3730,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "자바 프로그램이 시작되는 메서드 이름은 _____이다.",
     "correctAnswerText": "main",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "자바 프로그램은 항상 public static void main(String[] args) 메서드에서 실행이 시작됩니다. main은 자바 실행 환경(JVM)이 프로그램을 시작할 때 자동으로 찾아 호출하는 정해진 이름입니다."
   },
   {
     "id": "java_quiz_operator_1",
@@ -3742,7 +3745,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "자바에서 5 / 2 (둘 다 int)의 결과는?",
     "quizOptions": ["2.5","3","2.0","2"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": 3,
+    "solutionExplanation": "자바에서 정수(int)끼리 나누면 소수점이 버려지고 정수 결과만 남습니다. 5 / 2는 실제로는 2.5지만, 정수 나눗셈이라 소수점 이하가 버려져 2가 됩니다."
   },
   {
     "id": "java_quiz_operator_2",
@@ -3756,7 +3760,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "값을 1 증가시키는 연산자는?",
     "quizOptions": ["++","--","**","//"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "++는 변수의 값을 1 증가시키는 증가 연산자입니다. --는 반대로 1 감소, **는 자바에 없는 연산자(거듭제곱은 Math.pow() 사용), //는 자바에서 한 줄 주석 기호입니다."
   },
   {
     "id": "java_fill_operator_1",
@@ -3770,7 +3775,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "문자열 내용을 비교할 때 사용해야 하는 메서드는 _____()이다.",
     "correctAnswerText": "equals",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "자바에서 문자열은 객체이기 때문에 ==는 내용이 아니라 \"같은 객체인지\"를 비교합니다. 문자열의 실제 내용이 같은지 비교하려면 반드시 .equals() 메서드를 사용해야 합니다."
   },
   {
     "id": "java_quiz_conditional_1",
@@ -3784,7 +3790,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "switch문에서 일치하는 case가 없을 때 실행되는 키워드는?",
     "quizOptions": ["else","break","case","default"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": 3,
+    "solutionExplanation": "switch문에서 일치하는 case가 하나도 없을 때 실행되는 것이 default 블록입니다. if-else문의 else와 비슷한 역할을 합니다."
   },
   {
     "id": "java_quiz_conditional_2",
@@ -3798,7 +3805,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "조건식을 감싸는 기호는?",
     "quizOptions": ["()","[]","{}","<>"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "자바의 조건문은 if (조건)처럼 조건을 반드시 소괄호 ()로 감싸야 합니다. 대괄호나 중괄호는 각각 배열과 코드 블록에 사용됩니다."
   },
   {
     "id": "java_fill_conditional_1",
@@ -3812,7 +3820,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "switch문의 각 case를 끝낼 때 사용하는 키워드는 _____이다.",
     "correctAnswerText": "break",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "switch문의 각 case 블록 끝에는 break를 써서 그 지점에서 switch문을 빠져나가야 합니다. break가 없으면 다음 case까지 계속 이어서 실행되는 \"fall-through\" 현상이 발생합니다."
   },
   {
     "id": "java_quiz_array_1",
@@ -3826,7 +3835,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "배열의 길이를 구할 때 사용하는 것은?",
     "quizOptions": [".length()",".size()",".length",".count()"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": 2,
+    "solutionExplanation": "배열의 길이는 배열이름.length로 확인합니다. 괄호 없이 속성처럼 사용한다는 점이 문자열의 .length()(메서드, 괄호 있음)와 다른 부분이라 헷갈리기 쉽습니다."
   },
   {
     "id": "java_quiz_array_2",
@@ -3840,7 +3850,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "배열의 인덱스는 몇 번부터 시작하는가?",
     "quizOptions": ["1","-1","2","0"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": 3,
+    "solutionExplanation": "자바 배열의 인덱스는 파이썬, 자바스크립트와 마찬가지로 0부터 시작합니다. 첫 번째 요소는 배열[0]으로 접근합니다."
   },
   {
     "id": "java_fill_array_1",
@@ -3854,7 +3865,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "자바에서 배열 객체를 생성할 때 사용하는 키워드는 _____이다.",
     "correctAnswerText": "new",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "자바에서 배열 같은 객체를 실제로 만들 때는 new 키워드를 사용합니다. 예를 들어 int[] arr = new int[5];처럼 씁니다."
   },
   {
     "id": "java_quiz_loop_1",
@@ -3868,7 +3880,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "조건을 나중에 검사해 최소 1번 실행이 보장되는 반복문은?",
     "quizOptions": ["while","for","switch","do-while"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": 3,
+    "solutionExplanation": "do-while문은 반복문 코드를 먼저 한 번 실행한 뒤에 조건을 검사하기 때문에, 조건이 처음부터 거짓이어도 최소 1번은 실행이 보장됩니다. while문은 조건을 먼저 검사하므로 한 번도 실행되지 않을 수 있습니다."
   },
   {
     "id": "java_quiz_loop_2",
@@ -3882,7 +3895,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "반복문을 즉시 종료하는 키워드는?",
     "quizOptions": ["break","continue","return","stop"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "break는 반복문을 즉시 완전히 종료시킵니다. continue는 이번 반복만 건너뛰고 반복 자체는 계속되며, return은 반복문이 아니라 메서드 자체를 종료시킵니다."
   },
   {
     "id": "java_fill_loop_1",
@@ -3896,7 +3910,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "반복문에서 이번 반복만 건너뛰고 다음 반복으로 넘어갈 때 사용하는 키워드는 _____이다.",
     "correctAnswerText": "continue",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "continue는 반복문에서 그 시점 이후의 코드는 건너뛰고, 곧바로 다음 반복으로 넘어가게 합니다. break와 달리 반복문 자체는 끝나지 않습니다."
   },
   {
     "id": "java_quiz_method_1",
@@ -3910,7 +3925,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "값을 반환하지 않는 메서드의 반환타입은?",
     "quizOptions": ["void","null","none","empty"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "메서드가 아무 값도 반환하지 않을 때는 반환 타입 자리에 void를 씁니다. null은 \"값이 없음\"을 나타내는 값이지 반환 타입이 아니며, none과 empty는 자바 문법에 존재하지 않습니다."
   },
   {
     "id": "java_quiz_method_2",
@@ -3924,7 +3940,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "같은 이름, 다른 매개변수로 메서드를 여러 개 정의하는 것은?",
     "quizOptions": ["오버라이딩","오버로딩","상속","캡슐화"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "오버로딩(overloading)은 메서드 이름은 같지만 매개변수의 개수나 타입이 다른 여러 메서드를 정의하는 것입니다. 부모의 메서드를 자식이 재정의하는 것은 오버라이딩이라는 별개의 개념입니다."
   },
   {
     "id": "java_fill_method_1",
@@ -3938,7 +3955,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "메서드가 값을 호출한 곳으로 돌려줄 때 사용하는 키워드는 _____이다.",
     "correctAnswerText": "return",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "return 키워드는 메서드의 실행을 끝내고, 그 뒤에 적은 값을 메서드를 호출한 곳으로 돌려줍니다. return 없이 끝나는 메서드는 반환 타입이 void여야 합니다."
   },
   {
     "id": "java_quiz_collection_1",
@@ -3952,7 +3970,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "크기가 자유롭게 변하는 리스트를 제공하는 클래스는?",
     "quizOptions": ["Array","ArrayList","List[]","Vector[]"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "ArrayList는 배열과 달리 크기가 고정되어 있지 않아, 요소를 추가하거나 삭제하면서 자유롭게 크기가 변하는 리스트를 제공하는 클래스입니다. Array는 클래스가 아니라 자바의 배열 문법 자체를 가리키는 말이라 혼동하기 쉽습니다."
   },
   {
     "id": "java_quiz_collection_2",
@@ -3966,7 +3985,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "키-값 쌍으로 저장하는 컬렉션은?",
     "quizOptions": ["ArrayList","HashSet","HashMap","LinkedList"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": 2,
+    "solutionExplanation": "HashMap은 키(key)와 값(value)을 한 쌍으로 저장하는 컬렉션입니다. ArrayList, LinkedList는 순서가 있는 값들의 목록, HashSet은 중복 없는 값들의 모음으로 키-값 쌍을 저장하지 않습니다."
   },
   {
     "id": "java_fill_collection_1",
@@ -3980,7 +4000,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "ArrayList에 값을 추가할 때 사용하는 메서드는 _____()이다.",
     "correctAnswerText": "add",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "ArrayList에 값을 추가할 때는 리스트.add(값) 메서드를 사용합니다. 배열의 인덱스 대입과 달리, ArrayList는 크기가 자동으로 늘어나면서 값이 뒤에 추가됩니다."
   },
   {
     "id": "java_quiz_exception_1",
@@ -3994,7 +4015,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "예외가 발생했을 때 처리할 코드를 작성하는 블록은?",
     "quizOptions": ["catch","try","finally","throw"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "catch 블록은 try 블록에서 예외가 발생했을 때 그 예외를 받아서 처리하는 코드를 작성하는 곳입니다. try는 예외가 발생할 수 있는 코드를 감싸는 블록입니다."
   },
   {
     "id": "java_quiz_exception_2",
@@ -4008,7 +4030,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "예외 발생 여부와 상관없이 항상 실행되는 블록은?",
     "quizOptions": ["try","finally","catch","throws"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "finally 블록은 예외가 발생하든 안 하든, try/catch가 끝난 뒤 항상 실행됩니다. 자원을 정리하거나 마무리 작업을 할 때 사용합니다."
   },
   {
     "id": "java_fill_exception_1",
@@ -4022,7 +4045,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "예외를 직접 발생시킬 때 사용하는 키워드는 _____이다.",
     "correctAnswerText": "throw",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "throw 키워드는 특정 상황에서 직접 예외를 발생시킬 때 사용합니다. 예를 들어 throw new IllegalArgumentException(\"잘못된 값\");처럼 씁니다."
   },
   {
     "id": "java_quiz_class_1",
@@ -4036,7 +4060,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "객체를 생성할 때 사용하는 키워드는?",
     "quizOptions": ["create","new","make","object"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "자바에서 클래스로부터 실제 객체(인스턴스)를 생성할 때는 new 키워드를 사용합니다. 예를 들어 Person p = new Person();처럼 씁니다."
   },
   {
     "id": "java_quiz_class_2",
@@ -4050,7 +4075,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "필드를 외부에서 직접 접근하지 못하게 막는 접근제어자는?",
     "quizOptions": ["public","protected","private","final"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": 2,
+    "solutionExplanation": "private로 선언한 필드는 그 클래스 내부에서만 접근할 수 있고, 외부 클래스에서는 직접 접근할 수 없습니다. 이런 방식으로 데이터를 보호하는 것을 캡슐화라고 합니다."
   },
   {
     "id": "java_fill_class_1",
@@ -4064,7 +4090,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "현재 객체 자기 자신을 가리키는 키워드는 _____이다.",
     "correctAnswerText": "this",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "this는 현재 실행 중인 메서드가 속한 객체, 즉 자기 자신을 가리키는 키워드입니다. 매개변수 이름과 필드 이름이 같을 때 this.필드명으로 구분해서 사용합니다."
   },
   {
     "id": "java_quiz_inherit_1",
@@ -4078,7 +4105,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "클래스 상속을 나타낼 때 사용하는 키워드는?",
     "quizOptions": ["extends","implements","inherits","super"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "extends 키워드는 클래스가 다른 클래스를 상속받을 때 사용합니다. class Dog extends Animal처럼 쓰면 Dog가 Animal의 속성과 메서드를 물려받습니다."
   },
   {
     "id": "java_quiz_inherit_2",
@@ -4092,7 +4120,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "부모의 메서드를 자식이 같은 형태로 재정의하는 것은?",
     "quizOptions": ["오버로딩","오버라이딩","캡슐화","인터페이스"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "오버라이딩(overriding)은 부모 클래스의 메서드를 자식 클래스에서 같은 이름, 같은 매개변수로 다시 정의하는 것입니다. 이름은 같지만 매개변수가 다른 메서드를 여러 개 만드는 것은 오버로딩이라는 별개의 개념입니다."
   },
   {
     "id": "java_fill_inherit_1",
@@ -4106,7 +4135,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "부모 클래스의 생성자를 호출할 때 사용하는 키워드는 _____이다.",
     "correctAnswerText": "super",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "자식 클래스의 생성자에서 super()를 호출하면 부모 클래스의 생성자를 실행할 수 있습니다. 부모가 가진 공통 속성을 초기화할 때 사용합니다."
   },
   {
     "id": "java_quiz_interface_1",
@@ -4120,7 +4150,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "클래스가 인터페이스를 구현할 때 사용하는 키워드는?",
     "quizOptions": ["extends","interface","implements","abstract"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": 2,
+    "solutionExplanation": "클래스가 인터페이스의 내용을 실제로 구현할 때는 implements 키워드를 사용합니다. extends는 클래스 상속에, implements는 인터페이스 구현에 사용된다는 차이가 있습니다."
   },
   {
     "id": "java_quiz_interface_2",
@@ -4134,7 +4165,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "미완성 메서드를 포함할 수 있는 클래스를 선언하는 키워드는?",
     "quizOptions": ["interface","final","static","abstract"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": 3,
+    "solutionExplanation": "abstract 키워드로 선언한 클래스(추상 클래스)는 몸체가 없는 미완성 메서드(추상 메서드)를 포함할 수 있습니다. 이를 상속받는 자식 클래스가 그 메서드를 완성(구현)해야 합니다."
   },
   {
     "id": "java_fill_interface_1",
@@ -4148,7 +4180,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "인터페이스를 정의할 때 사용하는 키워드는 _____이다.",
     "correctAnswerText": "interface",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "인터페이스는 interface 키워드로 정의합니다. 클래스가 구현해야 할 메서드의 \"규칙\"만 정의하고, 실제 구현은 그 인터페이스를 implements하는 클래스에서 이루어집니다."
   },
   {
     "id": "java_quiz_string_1",
@@ -4162,7 +4195,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "반복적인 문자열 조합에 효율적인 클래스는?",
     "quizOptions": ["StringBuilder","String","Integer","Object"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "StringBuilder는 문자열을 반복적으로 이어붙이거나 수정할 때 String보다 훨씬 효율적입니다. String은 불변(immutable) 객체라 += 연산을 반복할 때마다 새 객체가 계속 생성되기 때문입니다."
   },
   {
     "id": "java_quiz_string_2",
@@ -4176,7 +4210,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "문자열을 정수로 변환하는 메서드는?",
     "quizOptions": ["String.toInt()","Integer.parseInt()","(int)str","Integer.valueOf()"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "Integer.parseInt(문자열)은 문자열을 정수(int)로 변환하는 표준 메서드입니다. String에는 toInt()라는 메서드가 없고, (int)str처럼 강제 형변환도 문자열에는 적용할 수 없습니다."
   },
   {
     "id": "java_fill_string_1",
@@ -4190,7 +4225,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "문자열에 문자를 이어 붙일 때 사용하는 연산자는 _____이다.",
     "correctAnswerText": "+",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "자바에서도 문자열끼리, 혹은 문자열과 다른 값을 이어붙일 때는 + 연산자를 사용합니다. 숫자와 문자열을 +로 연결하면 숫자가 자동으로 문자열로 변환되어 이어붙습니다."
   },
   {
     "id": "js_q1",
@@ -4703,7 +4739,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "자바스크립트에서 재할당이 불가능한 변수를 선언하는 키워드는?",
     "quizOptions": ["let","const","var","static"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "const는 한 번 값을 정하면 다시 대입할 수 없는(재할당 불가능한) 변수를 선언할 때 사용합니다. let은 재할당이 가능하고, var는 오래된 선언 방식입니다."
   },
   {
     "id": "js_quiz_2",
@@ -4724,7 +4761,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "자료형까지 정확히 같아야 true가 되는 비교 연산자는?",
     "quizOptions": ["==","=","===","!="],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": 2,
+    "solutionExplanation": "===는 값뿐만 아니라 자료형까지 정확히 같아야 true가 되는 엄격한 비교 연산자입니다. ==는 자료형이 달라도 자동 변환 후 비교하기 때문에 예상치 못한 결과가 나올 수 있어 잘 사용하지 않습니다."
   },
   {
     "id": "js_quiz_3",
@@ -4745,7 +4783,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "typeof \"안녕\"의 결과는?",
     "quizOptions": ["\"str\"","\"text\"","\"object\"","\"string\""],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": 3,
+    "solutionExplanation": "typeof는 값의 자료형을 문자열로 알려주는 연산자입니다. 문자열의 자료형은 \"string\"이며, 소문자로 표기된다는 점에 주의해야 합니다."
   },
   {
     "id": "js_quiz_4",
@@ -4766,7 +4805,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "배열의 맨 뒤에 값을 추가하는 메서드는?",
     "quizOptions": ["push()","pop()","shift()","unshift()"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "push()는 배열의 맨 뒤에 새 값을 추가하는 메서드입니다. pop()은 맨 뒤 값 제거, shift()는 맨 앞 값 제거, unshift()는 맨 앞에 값 추가로 각각 반대 방향이거나 다른 동작을 합니다."
   },
   {
     "id": "js_quiz_5",
@@ -4787,7 +4827,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "자바스크립트 삼항 연산자의 올바른 형태는?",
     "quizOptions": ["값1 if 조건 else 값2","조건 ? 값1 : 값2","조건 ? 값1 , 값2","if 조건 then 값1 else 값2"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": 1,
+    "solutionExplanation": "자바스크립트 삼항 연산자는 조건 ? 참일때값 : 거짓일때값 순서로 씁니다. 파이썬의 값1 if 조건 else 값2와는 순서가 다르니 헷갈리지 않도록 주의해야 합니다."
   },
   {
     "id": "js_quiz_6",
@@ -4808,7 +4849,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "다음 중 falsy(거짓 취급) 값이 아닌 것은?",
     "quizOptions": ["0","\"\"","\"0\" (문자열)","null"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": 2,
+    "solutionExplanation": "\"0\"은 문자열이라 falsy 목록에 들어가지 않고 truthy(참)로 취급됩니다. 반면 숫자 0, 빈 문자열 \"\", null, undefined, NaN, false는 falsy 값입니다."
   },
   {
     "id": "js_quiz_7",
@@ -4829,7 +4871,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "객체를 JSON 문자열로 변환하는 메서드는?",
     "quizOptions": ["JSON.parse()","JSON.toText()","Object.toString()","JSON.stringify()"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": 3,
+    "solutionExplanation": "JSON.stringify()는 자바스크립트 객체를 JSON 형식의 문자열로 변환합니다. 반대로 JSON 문자열을 객체로 되돌릴 때는 JSON.parse()를 사용합니다."
   },
   {
     "id": "js_quiz_8",
@@ -4850,7 +4893,8 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "배열의 모든 요소를 순서대로 계산해 하나의 값으로 합칠 때 사용하는 메서드는?",
     "quizOptions": ["reduce()","map()","filter()","find()"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": 0,
+    "solutionExplanation": "reduce()는 배열의 모든 요소를 순서대로 계산해서 하나의 값으로 합치는 메서드입니다. map()은 변환된 새 배열, filter()는 조건에 맞는 요소들의 배열, find()는 조건에 맞는 첫 요소를 반환한다는 점에서 다릅니다."
   },
   {
     "id": "js_fill_1",
@@ -4871,7 +4915,8 @@ export const problems: Problem[] = [
     ],
     "fillQuestion": "자바스크립트에서 함수를 선언할 때 사용하는 키워드는 _____이다. (예: _____ add(a, b) {...})",
     "correctAnswerText": "function",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "자바스크립트에서 일반 함수를 선언할 때는 function 키워드를 사용합니다. function 함수이름(매개변수) { ... } 형태로 작성합니다."
   },
   {
     "id": "js_fill_2",
@@ -4892,7 +4937,8 @@ export const problems: Problem[] = [
     ],
     "fillQuestion": "클래스에서 객체가 생성될 때 자동으로 실행되는 특별한 메서드의 이름은 _____이다.",
     "correctAnswerText": "constructor",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "클래스의 constructor는 new로 객체를 생성할 때 자동으로 실행되는 특별한 메서드로, 그 객체의 초기 속성값을 설정하는 역할을 합니다."
   },
   {
     "id": "js_fill_3",
@@ -4913,7 +4959,8 @@ export const problems: Problem[] = [
     ],
     "fillQuestion": "배열의 맨 뒤에 값을 추가하는 메서드 이름은 _____이다. (예: arr._____(4))",
     "correctAnswerText": "push",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "배열의 맨 뒤에 값을 추가하는 메서드는 push()입니다. arr.push(4)처럼 사용하면 배열의 길이가 하나 늘어나면서 새 값이 마지막에 추가됩니다."
   },
   {
     "id": "js_fill_4",
@@ -4934,7 +4981,8 @@ export const problems: Problem[] = [
     ],
     "fillQuestion": "함수 안에서 await를 사용하려면 함수 선언 앞에 _____ 키워드를 붙여야 한다.",
     "correctAnswerText": "async",
-    "placeholderText": "정답 입력..."
+    "placeholderText": "정답 입력...",
+    "solutionExplanation": "await는 반드시 async로 선언된 함수 안에서만 사용할 수 있습니다. async function 또는 화살표 함수 앞에 async를 붙이면 그 함수 내부에서 await로 Promise가 끝날 때까지 기다릴 수 있습니다."
   },
 
 ];
