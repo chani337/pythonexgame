@@ -426,7 +426,7 @@ export default function Sandbox({
       </div>
 
       {/* Main Workspace split */}
-      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px' }}>
+      <div className="sandbox-main-split" style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px' }}>
         {/* Left Side: Snippets Manager (Fixed Independent Pane) */}
         <div
           className="glass-card sandbox-snippets"
@@ -473,7 +473,7 @@ export default function Sandbox({
         </div>
 
         {/* Right Side: Code Editor & Console Output */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', minWidth: 0, height: '100%', minHeight: 0, overflowY: 'auto' }}>
+        <div className="sandbox-editor-pane" style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '1rem', minWidth: 0, height: '100%', minHeight: 0, overflowY: 'auto' }}>
           {/* Editor Board */}
           <div className="editor-frame" style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
             {/* Editor Header */}

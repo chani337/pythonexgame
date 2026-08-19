@@ -506,10 +506,22 @@ code, pre, .console-container, .glass-input {
     overflow-y: visible !important;
   }
 
-  /* Sandbox: snippet sidebar full width on mobile */
+  /* Sandbox: split pane stacks vertically on mobile instead of squeezing side-by-side */
+  .sandbox-main-split {
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
   .sandbox-snippets {
     width: 100% !important;
-    flex-shrink: 1 !important;
+    flex-shrink: 0 !important;
+    height: 260px !important;
+  }
+
+  .sandbox-editor-pane {
+    height: auto !important;
+    overflow-y: visible !important;
   }
 
   /* Buttons: slightly smaller on mobile */
