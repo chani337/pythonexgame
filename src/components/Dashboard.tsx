@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3 } from 'lucide-react';
+import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { useAuth } from '../contexts/AuthContext';
 import ProfileEditModal from './ProfileEditModal';
+import { triviaItems } from '../data/trivia';
 
 
 interface DashboardProps {
@@ -26,6 +27,18 @@ export default function Dashboard({
 }: DashboardProps) {
   const { user } = useAuth();
   const isMasterAdmin = user?.email?.toLowerCase() === 'chani7873@daum.net';
+
+  // 코딩 트리비아: 방문할 때마다 무작위로 하나 뽑고, 버튼으로 다시 뽑을 수 있음
+  const [triviaIndex, setTriviaIndex] = useState<number>(() => Math.floor(Math.random() * triviaItems.length));
+  const currentTrivia = triviaItems[triviaIndex];
+  const rerollTrivia = () => {
+    setTriviaIndex((prev) => {
+      if (triviaItems.length <= 1) return prev;
+      let next = Math.floor(Math.random() * triviaItems.length);
+      while (next === prev) next = Math.floor(Math.random() * triviaItems.length);
+      return next;
+    });
+  };
 
   // Stats calculations
   const totalCount = problems.length;
@@ -282,6 +295,64 @@ export default function Dashboard({
             <ChevronRight size={14} />
           </button>
         </div>
+      </div>
+
+      {/* Coding Trivia Card */}
+      <div
+        className="glass-card"
+        style={{
+          padding: '1.5rem 1.75rem',
+          borderRadius: '0px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '1.25rem',
+          flexWrap: 'wrap',
+          background: '#fffcf0',
+          border: '1px solid #f0e4b8',
+        }}
+      >
+        <div
+          style={{
+            width: '44px',
+            height: '44px',
+            flexShrink: 0,
+            background: '#fff3d1',
+            border: '1px solid #e8c766',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <Lightbulb size={20} style={{ color: '#a66908' }} />
+        </div>
+        <div style={{ flex: 1, minWidth: '260px' }}>
+          <div style={{ fontSize: '0.68rem', fontWeight: '700', color: '#a66908', letterSpacing: '0.05em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>
+            💡 코딩 트리비아
+          </div>
+          <p style={{ fontSize: '0.88rem', color: '#1a1a1a', lineHeight: '1.5' }}>
+            <span style={{ marginRight: '0.4rem' }}>{currentTrivia.emoji}</span>
+            {currentTrivia.text}
+          </p>
+        </div>
+        <button
+          onClick={rerollTrivia}
+          style={{
+            background: '#ffffff',
+            border: '1px solid #e8c766',
+            color: '#a66908',
+            padding: '0.5rem 0.9rem',
+            fontSize: '0.78rem',
+            fontWeight: '700',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            flexShrink: 0,
+          }}
+        >
+          <Shuffle size={14} />
+          다른 상식 보기
+        </button>
       </div>
 
       {/* Stats Cards Grid */}
