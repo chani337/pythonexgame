@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { docChapters } from '../data/docs';
 import type { RunResponse } from '../hooks/usePyodide';
 import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles } from 'lucide-react';
@@ -24,6 +24,9 @@ export default function DocsViewer({
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
   const [fontSizeScale, setFontSizeScale] = useState<number>(100);
 
+  const viewerRef = useRef<HTMLDivElement>(null);
+  const focusViewerRef = useRef<HTMLDivElement>(null);
+
   const filteredChapters = docChapters.filter((ch) => {
     if (selectedCategory === 'sql') {
       return ch.category === 'sql';
@@ -35,6 +38,15 @@ export default function DocsViewer({
   });
 
   const activeChapter = filteredChapters[selectedChapterIdx] || filteredChapters[0] || docChapters[0];
+
+  useEffect(() => {
+    if (viewerRef.current) {
+      viewerRef.current.scrollTop = 0;
+    }
+    if (focusViewerRef.current) {
+      focusViewerRef.current.scrollTop = 0;
+    }
+  }, [selectedChapterIdx, selectedCategory]);
 
   useEffect(() => {
     localStorage.setItem('pyquests_docs_toc_open', JSON.stringify(isTocOpen));
@@ -549,6 +561,7 @@ except Exception as e:
 
         {/* Fullscreen Reading Area */}
         <div
+          ref={focusViewerRef}
           style={{
             flex: 1,
             overflowY: 'auto',
@@ -882,6 +895,7 @@ except Exception as e:
 
         {/* Right Side: Chapter Document Viewer (Independent Internal Scroll) */}
         <div
+          ref={viewerRef}
           className="glass-card docs-content-viewer"
           style={{
             flex: 1,
