@@ -547,6 +547,10 @@ export default function ProblemWorkspace({
                 <textarea
                   ref={textareaRef}
                   value={code}
+                  autoCapitalize="none"
+                  autoComplete="off"
+                  autoCorrect="off"
+                  spellCheck={false}
                   onChange={(e) => {
                     const nativeEvent = e.nativeEvent as any;
                     if (nativeEvent?.inputType?.toLowerCase().includes('paste')) {

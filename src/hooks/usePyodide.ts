@@ -96,11 +96,17 @@ export function usePyodide() {
     });
 
     try {
+      // Normalize mobile smart quotes, apostrophes, and non-breaking spaces
+      const normalizedCode = code
+        .replace(/[\u201C\u201D]/g, '"')
+        .replace(/[\u2018\u2019\u00B4\u02B9]/g, "'")
+        .replace(/\u00A0/g, ' ');
+
       // Dynamically load numpy or pandas if used in code
-      if (code.includes('numpy') || code.includes('np.')) {
+      if (normalizedCode.includes('numpy') || normalizedCode.includes('np.')) {
         try { await pyodide.loadPackage('numpy'); } catch (e) {}
       }
-      if (code.includes('pandas') || code.includes('pd.')) {
+      if (normalizedCode.includes('pandas') || normalizedCode.includes('pd.')) {
         try { await pyodide.loadPackage('pandas'); } catch (e) {}
       }
 
@@ -111,7 +117,7 @@ import sys
 `);
 
       // 1. Run the user's custom function definition in Pyodide
-      await pyodide.runPythonAsync(code);
+      await pyodide.runPythonAsync(normalizedCode);
 
       // 1.5. If the test runner is output-based matching (stdout_match)
       if (testRunnerCode === 'stdout_match') {
