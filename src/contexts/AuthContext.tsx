@@ -57,40 +57,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
 
-  // Initialize leaderboard state with persistent local cache or default ranking to guarantee 0ms instant display on first visit
+  // Initialize leaderboard state with persistent local cache or empty array
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>(() => {
     const cached = localStorage.getItem('pyquests_cached_leaderboard');
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed)) return parsed.filter((u: any) => !u.id?.startsWith('default-runner-'));
       } catch (e) {
         console.error('Leaderboard cache parse error:', e);
       }
     }
-    return DEFAULT_LEADERBOARD;
+    return [];
   });
 
   const updateLeaderboardState = (newList: LeaderboardUser[]) => {
-    let finalData = newList;
-    if (!finalData || finalData.length === 0) {
-      const cached = localStorage.getItem('pyquests_cached_leaderboard');
-      if (cached) {
-        try {
-          const parsed = JSON.parse(cached);
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            finalData = parsed;
-          }
-        } catch (e) {
-          console.error('Cache restore error:', e);
-        }
-      }
-    }
-    if (!finalData || finalData.length === 0) {
-      finalData = DEFAULT_LEADERBOARD;
-    }
-    setLeaderboard(finalData);
-    localStorage.setItem('pyquests_cached_leaderboard', JSON.stringify(finalData));
+    const realUsersOnly = (newList || []).filter((u) => !u.id?.startsWith('default-runner-'));
+    setLeaderboard(realUsersOnly);
+    localStorage.setItem('pyquests_cached_leaderboard', JSON.stringify(realUsersOnly));
   };
 
   // Fetch initial session & user profile
@@ -288,8 +272,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Sort real DB & active local solvers by solved_count DESC, then streak DESC
       formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
 
-      // Show ONLY real registered users if any exist; fallback to defaults only if no users exist
-      const combined = formatted.length > 0 ? formatted : DEFAULT_LEADERBOARD;
+      // Show ONLY real registered users from database / session (no mock/fake fillers)
+      const combined = formatted;
 
       // Show ALL users on the leaderboard without truncation
       updateLeaderboardState(combined);
