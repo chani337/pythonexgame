@@ -202,7 +202,7 @@ export const docChapters: DocChapter[] = [
       }
     ]
   },
-  // SQL Chapters (13 Comprehensive Professional & SQLD Certification Chapters)
+  // SQL Chapters (14 Comprehensive Professional & SQLD Certification Chapters)
   {
     id: "SQL_1_SELECT",
     filename: "SQL 1. SELECT & FROM 기초 구문",
@@ -230,132 +230,132 @@ export const docChapters: DocChapter[] = [
     ]
   },
   {
-    id: "SQL_3_ORDER_BY",
-    filename: "SQL 3. ORDER BY 정렬 & LIMIT",
-    title: "SQL 3. ORDER BY 정렬 & LIMIT",
+    id: "SQL_3_SELECT_NULL",
+    filename: "SQL 3. NULL의 특성 및 치환 함수",
+    title: "SQL 3. NULL의 특성 및 치환 함수",
     category: "sql",
     cells: [
       {
-        id: "SQL_3_ORDER_BY_cell_0",
+        id: "SQL_3_SELECT_NULL_cell_0",
         type: "markdown",
-        content: "# SQL 3. ORDER BY 정렬 & LIMIT\n\n## 1. ORDER BY 절 개요\n\n조회된 데이터의 출력 순서를 특정 열 기준으로 정렬할 때 `ORDER BY` 절을 사용합니다.\n\n```sql\nSELECT   컬럼명\nFROM     테이블명\nORDER BY 정렬기준_열 [ASC | DESC];\n```\n\n---\n\n## 2. 오름차순(ASC) 및 내림차순(DESC)\n\n- `ASC` (Ascending): 오름차순 정렬 (작은 값 → 큰 값, A → Z). 기본값입니다.\n- `DESC` (Descending): 내림차순 정렬 (큰 값 → 작은 값, Z → A).\n\n```sql\nSELECT name, score\nFROM   users\nORDER BY score DESC;\n```\n\n---\n\n## 3. 다중 열 기준 정렬\n\n1차 정렬 기준의 값이 동일할 경우, 2차 정렬 기준을 적용하여 데이터를 정렬합니다.\n\n```sql\nSELECT name, dept, score\nFROM   users\nORDER BY dept ASC, score DESC;\n```\n\n---\n\n## 4. 조회 결과 개수 제한 (`LIMIT`, `OFFSET`)\n\n출력되는 행의 최대 개수를 제한할 때 `LIMIT` 키워드를 사용하며, 건너뛸 행의 개수는 `OFFSET`으로 지정합니다.\n\n```sql\nSELECT name, score\nFROM   users\nORDER BY score DESC\nLIMIT 3 OFFSET 0;\n```\n\n---\n\n## 5. 열 위치 번호로 정렬하기\n\n`ORDER BY`에는 열 이름 대신 `SELECT`에 나열한 순서의 **위치 번호**를 사용할 수도 있습니다.\n\n```sql\n-- dept(1번째), score(3번째) 기준 정렬 (위 3번 예시와 동일)\nSELECT name, dept, score FROM users ORDER BY 2 ASC, 3 DESC;\n```\n\n---\n\n## 6. NULL 값의 정렬 위치 (`NULLS FIRST` / `NULLS LAST`)\n\nDBMS마다 `NULL`의 기본 정렬 위치가 다릅니다 (Oracle은 가장 큰 값 취급, MySQL/SQLite는 가장 작은 값 취급). 정렬 위치를 직접 지정하고 싶다면 `NULLS FIRST` / `NULLS LAST`를 사용합니다. (MySQL은 미지원 — `CASE WHEN 컬럼 IS NULL THEN 1 ELSE 0 END`으로 대체합니다.)\n\n```sql\nSELECT name, dept, score FROM users ORDER BY dept NULLS LAST;\n```\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nSELECT name, dept, score FROM users ORDER BY score DESC LIMIT 3;\n```"
+        content: "# SQL 3. NULL의 특성 및 치환 함수\n\n## 1. SELECT 구문 기초\n\n```sql\nSELECT [DISTINCT] 컬럼명 [AS 별칭]\nFROM   테이블명\nWHERE  조건식\nORDER BY 정렬컬럼 [ASC|DESC];\n```\n\n---\n\n## 2. NULL의 연산 특성\n\n데이터베이스에서 `NULL` 관련 연산은 매우 중요한 특성을 가지고 있습니다.\n\n1. **산술 연산**: `NULL`이 포함된 모든 산술 연산 결과는 `NULL`입니다 (`NULL + 10 = NULL`).\n2. **비교 연산**: `NULL`과의 비교 연산은 `UNKNOWN` 상태가 되므로 `=` 연산자가 아닌 `IS NULL` 또는 `IS NOT NULL`을 사용해야 합니다.\n3. **정렬 순서**: Oracle에서는 `NULL`을 가장 큰 값으로 처리(오름차순 시 맨 뒤), MySQL/SQLite에서는 가장 작은 값으로 처리(오름차순 시 맨 앞)합니다.\n\n---\n\n## 3. NULL 치환 함수\n\n- **COALESCE(val1, val2, ...)**: 나열된 인자 중 첫 번째로 `NULL`이 아닌 값을 반환합니다 (표준 SQL).\n- **NVL(val1, val2)**: `val1`이 `NULL`이면 `val2`를 반환합니다 (Oracle).\n- **IFNULL(val1, val2)**: `val1`이 `NULL`이면 `val2`를 반환합니다 (MySQL / SQLite).\n\n---\n\n## 4. NULLIF 함수\n\n`NULLIF(val1, val2)`는 두 값이 같으면 `NULL`을, 다르면 `val1`을 반환합니다. 0으로 나누기 오류를 방지하는 등 특정 값을 의도적으로 `NULL` 처리할 때 사용합니다.\n\n```sql\n-- score가 0이면 NULL로 처리한 뒤 나눗셈 (0으로 나누기 오류 방지)\nSELECT name, 100 / NULLIF(score, 0) AS 환산값 FROM users;\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT name, score, COALESCE(score, 0) AS 치환점수 FROM users;\n```"
       }
     ]
   },
   {
-    id: "SQL_4_GROUP_BY",
-    filename: "SQL 4. 집계 함수 & GROUP BY / HAVING",
-    title: "SQL 4. 집계 함수 & GROUP BY / HAVING",
+    id: "SQL_4_ORDER_BY",
+    filename: "SQL 4. ORDER BY 정렬 & LIMIT",
+    title: "SQL 4. ORDER BY 정렬 & LIMIT",
     category: "sql",
     cells: [
       {
-        id: "SQL_4_GROUP_BY_cell_0",
+        id: "SQL_4_ORDER_BY_cell_0",
         type: "markdown",
-        content: "# SQL 4. 집계 함수 & GROUP BY / HAVING\n\n## 1. 집계 함수 (Aggregate Functions)\n\n여러 행의 데이터를 수집하여 단일 결과를 반환하는 집계 함수 목록입니다.\n\n| 함수 | 기능 | 예시 |\n|---|---|---|\n| `COUNT(*)` | 행의 총 개수 산출 | `SELECT COUNT(*) FROM users;` |\n| `SUM(score)` | 합계 계산 | `SELECT SUM(score) FROM users;` |\n| `AVG(score)` | 평균값 계산 | `SELECT AVG(score) FROM users;` |\n| `MAX(score)` | 최댓값 산출 | `SELECT MAX(score) FROM users;` |\n| `MIN(score)` | 최솟값 산출 | `SELECT MIN(score) FROM users;` |\n\n---\n\n## 2. 그룹화 (`GROUP BY` 절)\n\n특정 열의 동일한 값을 가진 데이터를 그룹으로 묶어 그룹별 집계를 수행합니다.\n\n```sql\nSELECT   dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수\nFROM     users\nGROUP BY dept;\n```\n\n---\n\n## 3. 그룹 집계 결과 필터링 (`HAVING` 절)\n\n- `WHERE`: 그룹화 전의 개별 행을 필터링합니다.\n- `HAVING`: `GROUP BY`를 통한 그룹 집계 결과를 필터링합니다.\n\n```sql\nSELECT   dept, AVG(score) AS 평균점수\nFROM     users\nGROUP BY dept\nHAVING   AVG(score) >= 85;\n```\n\n---\n\n## 4. GROUP BY의 중요한 규칙\n\n`SELECT` 절에는 `GROUP BY`에 명시한 열이나 **집계 함수로 감싼 열만** 사용할 수 있습니다. 그룹화 기준에 없는 일반 열을 그대로 조회하면 오류가 발생합니다.\n\n```sql\n-- 오류: age는 GROUP BY에도 없고 집계 함수로 감싸지도 않음\nSELECT dept, age, AVG(score) FROM users GROUP BY dept;\n\n-- 올바른 예: age를 집계하거나 GROUP BY에 포함시켜야 함\nSELECT dept, AVG(age), AVG(score) FROM users GROUP BY dept;\n```\n\n### 여러 열 기준으로 그룹화하기\n\n```sql\nSELECT   dept, age, COUNT(*) AS 인원수\nFROM     users\nGROUP BY dept, age;\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 FROM users GROUP BY dept;\n```"
+        content: "# SQL 4. ORDER BY 정렬 & LIMIT\n\n## 1. ORDER BY 절 개요\n\n조회된 데이터의 출력 순서를 특정 열 기준으로 정렬할 때 `ORDER BY` 절을 사용합니다.\n\n```sql\nSELECT   컬럼명\nFROM     테이블명\nORDER BY 정렬기준_열 [ASC | DESC];\n```\n\n---\n\n## 2. 오름차순(ASC) 및 내림차순(DESC)\n\n- `ASC` (Ascending): 오름차순 정렬 (작은 값 → 큰 값, A → Z). 기본값입니다.\n- `DESC` (Descending): 내림차순 정렬 (큰 값 → 작은 값, Z → A).\n\n```sql\nSELECT name, score\nFROM   users\nORDER BY score DESC;\n```\n\n---\n\n## 3. 다중 열 기준 정렬\n\n1차 정렬 기준의 값이 동일할 경우, 2차 정렬 기준을 적용하여 데이터를 정렬합니다.\n\n```sql\nSELECT name, dept, score\nFROM   users\nORDER BY dept ASC, score DESC;\n```\n\n---\n\n## 4. 조회 결과 개수 제한 (`LIMIT`, `OFFSET`)\n\n출력되는 행의 최대 개수를 제한할 때 `LIMIT` 키워드를 사용하며, 건너뛸 행의 개수는 `OFFSET`으로 지정합니다.\n\n```sql\nSELECT name, score\nFROM   users\nORDER BY score DESC\nLIMIT 3 OFFSET 0;\n```\n\n---\n\n## 5. 열 위치 번호로 정렬하기\n\n`ORDER BY`에는 열 이름 대신 `SELECT`에 나열한 순서의 **위치 번호**를 사용할 수도 있습니다.\n\n```sql\n-- dept(1번째), score(3번째) 기준 정렬 (위 3번 예시와 동일)\nSELECT name, dept, score FROM users ORDER BY 2 ASC, 3 DESC;\n```\n\n---\n\n## 6. NULL 값의 정렬 위치 (`NULLS FIRST` / `NULLS LAST`)\n\nDBMS마다 `NULL`의 기본 정렬 위치가 다릅니다 (Oracle은 가장 큰 값 취급, MySQL/SQLite는 가장 작은 값 취급). 정렬 위치를 직접 지정하고 싶다면 `NULLS FIRST` / `NULLS LAST`를 사용합니다. (MySQL은 미지원 — `CASE WHEN 컬럼 IS NULL THEN 1 ELSE 0 END`으로 대체합니다.)\n\n```sql\nSELECT name, dept, score FROM users ORDER BY dept NULLS LAST;\n```\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nSELECT name, dept, score FROM users ORDER BY score DESC LIMIT 3;\n```"
       }
     ]
   },
   {
-    id: "SQL_5_JOIN",
-    filename: "SQL 5. JOIN 다중 테이블 조인",
-    title: "SQL 5. JOIN 다중 테이블 조인",
+    id: "SQL_5_GROUP_BY",
+    filename: "SQL 5. 집계 함수 & GROUP BY / HAVING",
+    title: "SQL 5. 집계 함수 & GROUP BY / HAVING",
     category: "sql",
     cells: [
       {
-        id: "SQL_5_JOIN_cell_0",
+        id: "SQL_5_GROUP_BY_cell_0",
         type: "markdown",
-        content: "# SQL 5. JOIN 다중 테이블 조인\n\n## 1. 조인(JOIN) 개요\n\n관계형 데이터베이스에서 서로 연관된 복수의 테이블을 공통 키(Key) 기준으로 결합하여 단일 결과 집합으로 조회하는 구문입니다.\n\n---\n\n## 2. INNER JOIN (내부 조인)\n\n두 테이블 모두 조인 조건에 일치하는 데이터가 존재하는 행만 결합하여 출력합니다.\n\n```sql\nSELECT u.name AS 사용자이름, u.dept AS 부서, o.product AS 구매상품, o.price AS 가격\nFROM   users u\nINNER JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 3. LEFT JOIN (왼쪽 외부 조인)\n\n선행(왼쪽) 테이블의 데이터를 유지하고, 일치하는 후행(오른쪽) 테이블 데이터를 결합합니다. 일치하는 데이터가 없으면 `NULL`을 매핑합니다.\n\n```sql\nSELECT u.name, o.product, o.price\nFROM   users u\nLEFT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 4. RIGHT JOIN (오른쪽 외부 조인)\n\n후행(오른쪽) 테이블의 데이터를 모두 유지하고, 일치하는 선행(왼쪽) 테이블 데이터를 결합합니다. 일치하는 데이터가 없으면 `NULL`을 매핑합니다. `LEFT JOIN`에서 두 테이블의 순서만 바꾸면 동일한 결과를 얻을 수 있습니다.\n\n```sql\nSELECT u.name, o.product, o.price\nFROM   users u\nRIGHT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 5. FULL OUTER JOIN (완전 외부 조인)\n\n두 테이블 중 어느 한쪽에만 데이터가 존재해도 모두 결합하여 출력합니다. 일치하지 않는 쪽은 `NULL`로 채워집니다. (MySQL/SQLite는 `FULL OUTER JOIN`을 직접 지원하지 않아 `UNION`으로 `LEFT JOIN`과 `RIGHT JOIN`을 합쳐서 구현합니다.)\n\n```sql\nSELECT u.name, o.product\nFROM   users u\nLEFT JOIN orders o ON u.id = o.user_id\nUNION\nSELECT u.name, o.product\nFROM   users u\nRIGHT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 6. CROSS JOIN (교차 조인)\n\n조인 조건 없이 두 테이블의 **모든 행을 조합**하여 결합합니다(카티션 곱, Cartesian Product). 두 테이블의 행 개수를 곱한 만큼의 결과가 생성됩니다.\n\n```sql\nSELECT u.name, o.product\nFROM   users u\nCROSS JOIN orders o;\n```\n\n---\n\n## 7. SELF JOIN (자체 조인)\n\n같은 테이블을 자기 자신과 조인하는 방식으로, 주로 상사-부하 직원처럼 **같은 테이블 안에서 계층 관계**를 조회할 때 사용합니다. 반드시 서로 다른 별칭(Alias)을 지정해야 합니다.\n\n```sql\nSELECT e.name AS 직원, m.name AS 상사\nFROM   employees e\nJOIN   employees m ON e.manager_id = m.id;\n```\n\n---\n\n## 8. 3개 이상의 테이블 조인\n\n`JOIN` 절을 이어서 작성하면 3개 이상의 테이블도 함께 조회할 수 있습니다.\n\n```sql\nSELECT u.name, o.product, p.category\nFROM   users u\nJOIN   orders o ON u.id = o.user_id\nJOIN   products p ON o.product_id = p.id;\n```\n\n---\n\n## 9. 옛날 방식 조인 (WHERE 절 기반 조인)\n\n`JOIN` 키워드가 표준화되기 전에는 `FROM` 절에 테이블을 나열하고 `WHERE` 절에 조인 조건을 적는 방식을 사용했습니다. 결과는 `INNER JOIN`과 동일하지만, `WHERE`에 필터 조건과 조인 조건이 섞여 가독성이 떨어지고 실수로 조인 조건을 빠뜨리면 `CROSS JOIN`처럼 동작할 위험이 있습니다.\n\n```sql\n-- 옛날 방식 (암시적 조인)\nSELECT u.name, o.product\nFROM   users u, orders o\nWHERE  u.id = o.user_id;\n\n-- 표준 방식 (명시적 조인) — 요즘은 이 방식을 사용합니다\nSELECT u.name, o.product\nFROM   users u\nJOIN   orders o ON u.id = o.user_id;\n```\n\n> Oracle에서는 `LEFT JOIN`을 `WHERE a.col = b.col(+)` 형태로도 표현하는데, `(+)`가 붙은 쪽이 데이터가 없어도 `NULL`로 채워 함께 조회하겠다는 의미입니다. 현재는 표준 `JOIN` 구문 사용이 권장됩니다.\n\n---\n\n## 10. `ON` vs `USING`\n\n조인 조건의 두 열 이름이 완전히 같을 때는 `ON` 대신 `USING`을 사용해 더 간결하게 쓸 수 있습니다.\n\n```sql\n-- ON: 열 이름이 다르거나 같아도 사용 가능, 조건을 명시적으로 작성\nSELECT u.name, o.product FROM users u JOIN orders o ON u.id = o.user_id;\n\n-- USING: 두 테이블의 열 이름이 동일할 때만 사용 가능 (예: 둘 다 user_id)\nSELECT name, product FROM users JOIN orders USING (user_id);\n```\n\n---\n\n## 11. 대화식 SQL 실습\n\n```sql\nSELECT u.name AS 사용자이름, o.product AS 구매상품, o.price AS 가격 FROM users u INNER JOIN orders o ON u.id = o.user_id;\n```"
+        content: "# SQL 5. 집계 함수 & GROUP BY / HAVING\n\n## 1. 집계 함수 (Aggregate Functions)\n\n여러 행의 데이터를 수집하여 단일 결과를 반환하는 집계 함수 목록입니다.\n\n| 함수 | 기능 | 예시 |\n|---|---|---|\n| `COUNT(*)` | 행의 총 개수 산출 | `SELECT COUNT(*) FROM users;` |\n| `SUM(score)` | 합계 계산 | `SELECT SUM(score) FROM users;` |\n| `AVG(score)` | 평균값 계산 | `SELECT AVG(score) FROM users;` |\n| `MAX(score)` | 최댓값 산출 | `SELECT MAX(score) FROM users;` |\n| `MIN(score)` | 최솟값 산출 | `SELECT MIN(score) FROM users;` |\n\n---\n\n## 2. 그룹화 (`GROUP BY` 절)\n\n특정 열의 동일한 값을 가진 데이터를 그룹으로 묶어 그룹별 집계를 수행합니다.\n\n```sql\nSELECT   dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수\nFROM     users\nGROUP BY dept;\n```\n\n---\n\n## 3. 그룹 집계 결과 필터링 (`HAVING` 절)\n\n- `WHERE`: 그룹화 전의 개별 행을 필터링합니다.\n- `HAVING`: `GROUP BY`를 통한 그룹 집계 결과를 필터링합니다.\n\n```sql\nSELECT   dept, AVG(score) AS 평균점수\nFROM     users\nGROUP BY dept\nHAVING   AVG(score) >= 85;\n```\n\n---\n\n## 4. GROUP BY의 중요한 규칙\n\n`SELECT` 절에는 `GROUP BY`에 명시한 열이나 **집계 함수로 감싼 열만** 사용할 수 있습니다. 그룹화 기준에 없는 일반 열을 그대로 조회하면 오류가 발생합니다.\n\n```sql\n-- 오류: age는 GROUP BY에도 없고 집계 함수로 감싸지도 않음\nSELECT dept, age, AVG(score) FROM users GROUP BY dept;\n\n-- 올바른 예: age를 집계하거나 GROUP BY에 포함시켜야 함\nSELECT dept, AVG(age), AVG(score) FROM users GROUP BY dept;\n```\n\n### 여러 열 기준으로 그룹화하기\n\n```sql\nSELECT   dept, age, COUNT(*) AS 인원수\nFROM     users\nGROUP BY dept, age;\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 FROM users GROUP BY dept;\n```"
       }
     ]
   },
   {
-    id: "SQL_6_DDL_DML",
-    filename: "SQL 6. DDL & DML 데이터베이스 조작",
-    title: "SQL 6. DDL & DML 데이터베이스 조작",
+    id: "SQL_6_GROUP_FUNCTION",
+    filename: "SQL 6. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)",
+    title: "SQL 6. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)",
     category: "sql",
     cells: [
       {
-        id: "SQL_6_DDL_DML_cell_0",
+        id: "SQL_6_GROUP_FUNCTION_cell_0",
         type: "markdown",
-        content: "# SQL 6. DDL & DML 데이터베이스 조작\n\n## 1. DDL 및 DML 분류\n\n- **DDL (Data Definition Language)**: 데이터베이스 객체(테이블 등)의 구조를 정의하고 수정하는 명령어 (`CREATE TABLE`, `DROP TABLE`).\n- **DML (Data Manipulation Language)**: 테이블 내 데이터를 생성, 수정, 삭제하는 명령어 (`INSERT`, `UPDATE`, `DELETE`, `SELECT`).\n\n---\n\n## 2. 테이블 생성 (`CREATE TABLE`)\n\n```sql\nCREATE TABLE students (\n  id   INT PRIMARY KEY,\n  name VARCHAR(50) NOT NULL,\n  age  INT\n);\n```\n\n---\n\n## 3. 데이터 삽입 (`INSERT INTO ... VALUES`)\n\n```sql\nINSERT INTO users (id, name, age, score, dept)\nVALUES (6, '강감찬', 27, 92, '기획팀');\n```\n\n---\n\n## 4. 데이터 수정 (`UPDATE ... SET`)\n\n```sql\nUPDATE users\nSET    score = 98\nWHERE  name = '정찬희';\n```\n\n---\n\n## 5. 데이터 삭제 (`DELETE FROM`)\n\n```sql\nDELETE FROM users\nWHERE  id = 4;\n```\n\n---\n\n## 6. 제약조건 (Constraints)\n\n`CREATE TABLE` 시 열에 규칙을 지정하여 데이터의 무결성을 보장할 수 있습니다.\n\n| 제약조건 | 의미 |\n|---|---|\n| `PRIMARY KEY` | 행을 유일하게 식별 (NOT NULL + UNIQUE) |\n| `FOREIGN KEY` | 다른 테이블의 PRIMARY KEY를 참조 |\n| `NOT NULL` | `NULL` 값 저장 금지 |\n| `UNIQUE` | 중복되지 않는 값만 저장 |\n| `CHECK` | 지정한 조건을 만족하는 값만 저장 |\n| `DEFAULT` | 값을 입력하지 않았을 때 사용할 기본값 |\n\n```sql\nCREATE TABLE orders (\n  id      INT PRIMARY KEY,\n  user_id INT NOT NULL,\n  price   INT CHECK (price >= 0),\n  status  VARCHAR(20) DEFAULT '주문접수',\n  FOREIGN KEY (user_id) REFERENCES users(id)\n);\n```\n\n---\n\n## 7. 테이블 구조 변경 (`ALTER TABLE`)\n\n이미 만들어진 테이블에 열을 추가/수정/삭제할 때 사용합니다.\n\n```sql\nALTER TABLE users ADD COLUMN phone VARCHAR(20);\nALTER TABLE users MODIFY COLUMN phone VARCHAR(30);\nALTER TABLE users DROP COLUMN phone;\n```\n\n---\n\n## 8. DELETE vs TRUNCATE vs DROP\n\n세 명령어 모두 데이터를 지우지만 동작 방식이 크게 다릅니다.\n\n| 구분 | 종류 | 삭제 대상 | 테이블 구조 | 롤백(ROLLBACK) |\n|---|---|---|---|---|\n| `DELETE` | DML | 조건에 맞는 행 | 유지 | 가능 |\n| `TRUNCATE` | DDL | 테이블의 모든 행 | 유지 | 불가능 |\n| `DROP` | DDL | 모든 행 + 테이블 자체 | 삭제됨 | 불가능 |\n\n```sql\nDELETE FROM users WHERE id = 4;   -- 특정 행만 삭제, 되돌릴 수 있음\nTRUNCATE TABLE users;              -- 전체 행 삭제, 테이블 구조는 남음\nDROP TABLE users;                  -- 테이블 자체를 완전히 삭제\n```\n\n---\n\n## 9. 대화식 SQL 실습\n\n```sql\nSELECT * FROM users;\n```"
+        content: "# SQL 6. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)\n\n## 1. 소계/총계 그룹 함수 개요\n\n`GROUP BY` 절과 함께 사용되어 다차원 집계 소계(Subtotal) 및 총계(Grand Total) 데이터를 일괄 생성합니다.\n\n---\n\n## 2. ROLLUP vs CUBE vs GROUPING SETS\n\n- **`ROLLUP(A, B)`**: 계층 구조를 기반으로 집계를 수행합니다.\n  - 생성 집계 조합: `(A, B)`, `(A)`, `()` [총 N+1개 집계 조합 생성]\n- **`CUBE(A, B)`**: 가능한 모든 조합에 대해 집계를 수행합니다.\n  - 생성 집계 조합: `(A, B)`, `(A)`, `(B)`, `()` [총 2^N개 집계 조합 생성]\n- **`GROUPING SETS(A, B)`**: 지정된 독립적 집계 단위만 개별 생성합니다.\n  - 생성 집계 조합: `(A)`, `(B)`\n\n---\n\n## 3. 실제 SQL 문법\n\n```sql\n-- ROLLUP: (dept, name), (dept), () 순으로 소계 + 총계 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY ROLLUP(dept, name);\n\n-- CUBE: (dept, name), (dept), (name), () 모든 조합 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY CUBE(dept, name);\n\n-- GROUPING SETS: (dept), (name)만 개별적으로 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY GROUPING SETS((dept), (name));\n```\n\n---\n\n## 4. GROUPING 함수\n\n`GROUPING(컬럼)` 함수는 해당 행이 소계/총계를 위해 인위적으로 묶인 행인 경우 `1`을 반환하고, 일반 집계 행인 경우 `0`을 반환합니다. 소계/총계 행을 구분해서 표시할 때 유용합니다.\n\n```sql\nSELECT dept,\n       SUM(score) AS 합계,\n       GROUPING(dept) AS 총계여부\nFROM   users\nGROUP BY ROLLUP(dept);\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 FROM users GROUP BY ROLLUP(dept);\n```"
       }
     ]
   },
   {
-    id: "SQL_7_MODELING",
-    filename: "SQL 7. 데이터 모델링과 ERD 핵심",
-    title: "SQL 7. 데이터 모델링과 ERD 핵심",
+    id: "SQL_7_JOIN",
+    filename: "SQL 7. JOIN 다중 테이블 조인",
+    title: "SQL 7. JOIN 다중 테이블 조인",
     category: "sql",
     cells: [
       {
-        id: "SQL_7_MODELING_cell_0",
+        id: "SQL_7_JOIN_cell_0",
         type: "markdown",
-        content: "# SQL 7. 데이터 모델링과 ERD 핵심\n\n## 1. 데이터 모델링 개요\n\n데이터 모델링은 현실 세계의 비즈니스 프로세스와 데이터를 단순화하여 데이터베이스 구조로 표현하는 과정입니다.\n\n### 데이터 모델링 3단계\n1. **개념적 데이터 모델링**: 추상화 수준이 가장 높으며, 주요 엔티티와 핵심 관계를 정의합니다.\n2. **논리적 데이터 모델링**: 정규화를 수행하고 식별자, 속성, 관계를 상세히 정의합니다 (DBMS 독립적).\n3. **물리적 데이터 모델링**: 실제 DBMS 제품(Oracle, MySQL, PostgreSQL 등)의 성능, 인덱스, 데이터 타입을 고려하여 구현합니다.\n\n---\n\n## 2. 엔티티(Entity), 속성(Attribute), 관계(Relationship)\n\n- **엔티티 (Entity)**: 데이터베이스에서 관리하고자 하는 식별 가능한 객체 또는 개념 (예: 고객, 상품, 주문).\n- **속성 (Attribute)**: 엔티티가 가지는 세부 특성 및 데이터 항목 (예: 고객명, 전화번호, 회원등급).\n- **관계 (Relationship)**: 엔티티 간의 연관성 및 비즈니스 규칙 (예: 고객은 상품을 주문한다).\n\n---\n\n## 3. 식별자(Identifier) 분류 및 관계\n\n- **주식별자 (Primary Key / PK)**: 엔티티 내의 각 행을 유일하게 식별하는 대표 속성 (유일성, 최소성, 불가변성, 존재성/NOT NULL).\n- **외래식별자 (Foreign Key / FK)**: 타 엔티티의 주식별자를 참조하는 속성으로, 엔티티 간의 관계를 형성합니다.\n- **식별 관계**: 부모 엔티티의 PK가 자식 엔티티의 PK의 일부로 포함되는 관계.\n- **비식별 관계**: 부모 엔티티의 PK가 자식 엔티티의 일반 속성으로 참조되는 관계.\n\n---\n\n## 4. 정규화 (Normalization)\n\n데이터 중복을 최소화하고 이상 현상(Anomalies: 삽입/수정/삭제 이상)을 방지하기 위한 구조적 구조화 과정입니다.\n\n- **제1정규형 (1NF)**: 모든 속성의 값이 원자값(Atomic Value)을 가져야 함.\n- **제2정규형 (2NF)**: 주식별자가 복합키일 때, 부분 함수 종속성을 제거하고 완전 함수 종속성을 만족함.\n- **제3정규형 (3NF)**: 이행적 함수 종속성(A → B, B → C 이면 A → C)을 제거함.\n- **반정규화 (De-normalization)**: 시스템 성능 향상 및 조인 비용 감소를 위해 의도적으로 정규화 원칙을 위배하고 중복을 허용하는 작업.\n\n---\n\n## 5. 관계의 카디널리티 (Cardinality)\n\nERD에서 두 엔티티 사이의 관계는 **참여하는 인스턴스의 수**에 따라 세 가지로 분류됩니다.\n\n- **1:1 (일대일)**: 한 엔티티의 인스턴스 1개가 다른 엔티티의 인스턴스 1개와만 대응 (예: 사람 - 주민등록증).\n- **1:N (일대다)**: 한 엔티티의 인스턴스 1개가 다른 엔티티의 여러 인스턴스와 대응 (예: 부서 - 사원). 관계형 데이터베이스에서 가장 흔한 관계 형태입니다.\n- **N:M (다대다)**: 양쪽 엔티티의 인스턴스가 서로 여러 개씩 대응 (예: 학생 - 수강과목). N:M 관계는 그대로 테이블로 구현할 수 없어, 두 엔티티의 PK를 함께 갖는 **교차 엔티티(연결 테이블)**를 중간에 두어 1:N + N:1 관계로 분해합니다.\n\n```sql\n-- 학생(students)과 과목(courses)의 N:M 관계를 연결하는 교차 테이블\nCREATE TABLE enrollments (\n  student_id INT,\n  course_id  INT,\n  PRIMARY KEY (student_id, course_id),\n  FOREIGN KEY (student_id) REFERENCES students(id),\n  FOREIGN KEY (course_id) REFERENCES courses(id)\n);\n```\n\n---\n\n## 6. 대화식 SQL 실습\n\n```sql\nSELECT id, name, dept, score FROM users;\n```"
+        content: "# SQL 7. JOIN 다중 테이블 조인\n\n## 1. 조인(JOIN) 개요\n\n관계형 데이터베이스에서 서로 연관된 복수의 테이블을 공통 키(Key) 기준으로 결합하여 단일 결과 집합으로 조회하는 구문입니다.\n\n---\n\n## 2. INNER JOIN (내부 조인)\n\n두 테이블 모두 조인 조건에 일치하는 데이터가 존재하는 행만 결합하여 출력합니다.\n\n```sql\nSELECT u.name AS 사용자이름, u.dept AS 부서, o.product AS 구매상품, o.price AS 가격\nFROM   users u\nINNER JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 3. LEFT JOIN (왼쪽 외부 조인)\n\n선행(왼쪽) 테이블의 데이터를 유지하고, 일치하는 후행(오른쪽) 테이블 데이터를 결합합니다. 일치하는 데이터가 없으면 `NULL`을 매핑합니다.\n\n```sql\nSELECT u.name, o.product, o.price\nFROM   users u\nLEFT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 4. RIGHT JOIN (오른쪽 외부 조인)\n\n후행(오른쪽) 테이블의 데이터를 모두 유지하고, 일치하는 선행(왼쪽) 테이블 데이터를 결합합니다. 일치하는 데이터가 없으면 `NULL`을 매핑합니다. `LEFT JOIN`에서 두 테이블의 순서만 바꾸면 동일한 결과를 얻을 수 있습니다.\n\n```sql\nSELECT u.name, o.product, o.price\nFROM   users u\nRIGHT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 5. FULL OUTER JOIN (완전 외부 조인)\n\n두 테이블 중 어느 한쪽에만 데이터가 존재해도 모두 결합하여 출력합니다. 일치하지 않는 쪽은 `NULL`로 채워집니다. (MySQL/SQLite는 `FULL OUTER JOIN`을 직접 지원하지 않아 `UNION`으로 `LEFT JOIN`과 `RIGHT JOIN`을 합쳐서 구현합니다.)\n\n```sql\nSELECT u.name, o.product\nFROM   users u\nLEFT JOIN orders o ON u.id = o.user_id\nUNION\nSELECT u.name, o.product\nFROM   users u\nRIGHT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 6. CROSS JOIN (교차 조인)\n\n조인 조건 없이 두 테이블의 **모든 행을 조합**하여 결합합니다(카티션 곱, Cartesian Product). 두 테이블의 행 개수를 곱한 만큼의 결과가 생성됩니다.\n\n```sql\nSELECT u.name, o.product\nFROM   users u\nCROSS JOIN orders o;\n```\n\n---\n\n## 7. SELF JOIN (자체 조인)\n\n같은 테이블을 자기 자신과 조인하는 방식으로, 주로 상사-부하 직원처럼 **같은 테이블 안에서 계층 관계**를 조회할 때 사용합니다. 반드시 서로 다른 별칭(Alias)을 지정해야 합니다.\n\n```sql\nSELECT e.name AS 직원, m.name AS 상사\nFROM   employees e\nJOIN   employees m ON e.manager_id = m.id;\n```\n\n---\n\n## 8. 3개 이상의 테이블 조인\n\n`JOIN` 절을 이어서 작성하면 3개 이상의 테이블도 함께 조회할 수 있습니다.\n\n```sql\nSELECT u.name, o.product, p.category\nFROM   users u\nJOIN   orders o ON u.id = o.user_id\nJOIN   products p ON o.product_id = p.id;\n```\n\n---\n\n## 9. 옛날 방식 조인 (WHERE 절 기반 조인)\n\n`JOIN` 키워드가 표준화되기 전에는 `FROM` 절에 테이블을 나열하고 `WHERE` 절에 조인 조건을 적는 방식을 사용했습니다. 결과는 `INNER JOIN`과 동일하지만, `WHERE`에 필터 조건과 조인 조건이 섞여 가독성이 떨어지고 실수로 조인 조건을 빠뜨리면 `CROSS JOIN`처럼 동작할 위험이 있습니다.\n\n```sql\n-- 옛날 방식 (암시적 조인)\nSELECT u.name, o.product\nFROM   users u, orders o\nWHERE  u.id = o.user_id;\n\n-- 표준 방식 (명시적 조인) — 요즘은 이 방식을 사용합니다\nSELECT u.name, o.product\nFROM   users u\nJOIN   orders o ON u.id = o.user_id;\n```\n\n> Oracle에서는 `LEFT JOIN`을 `WHERE a.col = b.col(+)` 형태로도 표현하는데, `(+)`가 붙은 쪽이 데이터가 없어도 `NULL`로 채워 함께 조회하겠다는 의미입니다. 현재는 표준 `JOIN` 구문 사용이 권장됩니다.\n\n---\n\n## 10. `ON` vs `USING`\n\n조인 조건의 두 열 이름이 완전히 같을 때는 `ON` 대신 `USING`을 사용해 더 간결하게 쓸 수 있습니다.\n\n```sql\n-- ON: 열 이름이 다르거나 같아도 사용 가능, 조건을 명시적으로 작성\nSELECT u.name, o.product FROM users u JOIN orders o ON u.id = o.user_id;\n\n-- USING: 두 테이블의 열 이름이 동일할 때만 사용 가능 (예: 둘 다 user_id)\nSELECT name, product FROM users JOIN orders USING (user_id);\n```\n\n---\n\n## 11. 대화식 SQL 실습\n\n```sql\nSELECT u.name AS 사용자이름, o.product AS 구매상품, o.price AS 가격 FROM users u INNER JOIN orders o ON u.id = o.user_id;\n```"
       }
     ]
   },
   {
-    id: "SQL_8_SELECT_NULL",
-    filename: "SQL 8. NULL의 특성 및 치환 함수",
-    title: "SQL 8. NULL의 특성 및 치환 함수",
+    id: "SQL_8_SUBQUERY",
+    filename: "SQL 8. 서브쿼리 (Subquery) 마스터",
+    title: "SQL 8. 서브쿼리 (Subquery) 마스터",
     category: "sql",
     cells: [
       {
-        id: "SQL_8_SELECT_NULL_cell_0",
+        id: "SQL_8_SUBQUERY_cell_0",
         type: "markdown",
-        content: "# SQL 8. NULL의 특성 및 치환 함수\n\n## 1. SELECT 구문 기초\n\n```sql\nSELECT [DISTINCT] 컬럼명 [AS 별칭]\nFROM   테이블명\nWHERE  조건식\nORDER BY 정렬컬럼 [ASC|DESC];\n```\n\n---\n\n## 2. NULL의 연산 특성\n\n데이터베이스에서 `NULL` 관련 연산은 매우 중요한 특성을 가지고 있습니다.\n\n1. **산술 연산**: `NULL`이 포함된 모든 산술 연산 결과는 `NULL`입니다 (`NULL + 10 = NULL`).\n2. **비교 연산**: `NULL`과의 비교 연산은 `UNKNOWN` 상태가 되므로 `=` 연산자가 아닌 `IS NULL` 또는 `IS NOT NULL`을 사용해야 합니다.\n3. **정렬 순서**: Oracle에서는 `NULL`을 가장 큰 값으로 처리(오름차순 시 맨 뒤), MySQL/SQLite에서는 가장 작은 값으로 처리(오름차순 시 맨 앞)합니다.\n\n---\n\n## 3. NULL 치환 함수\n\n- **COALESCE(val1, val2, ...)**: 나열된 인자 중 첫 번째로 `NULL`이 아닌 값을 반환합니다 (표준 SQL).\n- **NVL(val1, val2)**: `val1`이 `NULL`이면 `val2`를 반환합니다 (Oracle).\n- **IFNULL(val1, val2)**: `val1`이 `NULL`이면 `val2`를 반환합니다 (MySQL / SQLite).\n\n---\n\n## 4. NULLIF 함수\n\n`NULLIF(val1, val2)`는 두 값이 같으면 `NULL`을, 다르면 `val1`을 반환합니다. 0으로 나누기 오류를 방지하는 등 특정 값을 의도적으로 `NULL` 처리할 때 사용합니다.\n\n```sql\n-- score가 0이면 NULL로 처리한 뒤 나눗셈 (0으로 나누기 오류 방지)\nSELECT name, 100 / NULLIF(score, 0) AS 환산값 FROM users;\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT name, score, COALESCE(score, 0) AS 치환점수 FROM users;\n```"
+        content: "# SQL 8. 서브쿼리 (Subquery) 마스터\n\n## 1. 서브쿼리 위치별 분류\n\n1. **스칼라 서브쿼리 (Scalar Subquery)**: `SELECT` 절에 위치하며 단 1행 1열의 단일 값을 반환합니다.\n2. **인라인 뷰 (Inline View)**: `FROM` 절에 위치하며 메인 쿼리 실행 시 임시 가상 테이블처럼 작동합니다.\n3. **중첩 서브쿼리 (Nested Subquery)**: `WHERE` 또는 `HAVING` 절에 위치하여 서브쿼리 조건 검증을 수행합니다.\n\n---\n\n## 2. 다중행 서브쿼리 연산자 (`IN`, `ALL`, `ANY`, `EXISTS`)\n\n- **IN**: 서브쿼리 결과 목록 중 하나라도 일치하면 참.\n- **ALL**: 서브쿼리 결과의 모든 값보다 조건이 만족해야 함 (`> ALL` 은 최댓값보다 큼).\n- **ANY / SOME**: 서브쿼리 결과 중 하나 이상 조건을 만족해야 함 (`> ANY` 는 최솟값보다 큼).\n- **EXISTS**: 서브쿼리의 결과 행이 1건이라도 존재하는지 여부만 확인 (조건 충족 시 즉시 탐색 종료로 성능 우수).\n\n```sql\nSELECT name, score\nFROM   users\nWHERE  score > (SELECT AVG(score) FROM users);\n```\n\n---\n\n## 3. 비연관 서브쿼리 vs 연관 서브쿼리\n\n- **비연관 서브쿼리 (Uncorrelated Subquery)**: 서브쿼리가 메인 쿼리와 무관하게 **독립적으로 한 번만 실행**되어 결과를 메인 쿼리에 전달합니다. 지금까지 살펴본 예시가 모두 비연관 서브쿼리입니다.\n- **연관 서브쿼리 (Correlated Subquery)**: 서브쿼리 안에서 메인 쿼리의 열을 참조하며, **메인 쿼리의 행마다 서브쿼리가 반복 실행**됩니다.\n\n```sql\n-- 연관 서브쿼리: 각 사용자(u)가 자신이 속한 부서의 평균 점수보다 높은지 확인\nSELECT u.name, u.dept, u.score\nFROM   users u\nWHERE  u.score > (\n  SELECT AVG(score) FROM users WHERE dept = u.dept\n);\n```\n\n---\n\n## 4. NOT EXISTS와 NOT IN의 NULL 함정\n\n`EXISTS`의 부정형인 `NOT EXISTS`는 연관 서브쿼리와 함께 자주 사용됩니다.\n\n```sql\nSELECT u.name\nFROM   users u\nWHERE  NOT EXISTS (\n  SELECT 1 FROM orders o WHERE o.user_id = u.id\n);\n```\n\n> **주의**: `NOT IN`의 서브쿼리 결과에 `NULL`이 하나라도 포함되면, 비교가 `UNKNOWN`이 되어 **전체 결과가 0건**이 됩니다. 서브쿼리 결과에 `NULL`이 섞일 수 있다면 `NOT IN` 대신 `NOT EXISTS`를 사용하는 것이 안전합니다.\n\n```sql\n-- 위험: orders.user_id에 NULL이 있으면 결과가 아예 없어짐\nSELECT name FROM users WHERE id NOT IN (SELECT user_id FROM orders);\n\n-- 안전: NOT EXISTS는 NULL의 영향을 받지 않음\nSELECT name FROM users u WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT name, score FROM users WHERE score > (SELECT AVG(score) FROM users);\n```"
       }
     ]
   },
   {
-    id: "SQL_9_SUBQUERY",
-    filename: "SQL 9. 서브쿼리 (Subquery) 마스터",
-    title: "SQL 9. 서브쿼리 (Subquery) 마스터",
+    id: "SQL_9_SET_OPERATOR",
+    filename: "SQL 9. 집합 연산자 (Set Operators)",
+    title: "SQL 9. 집합 연산자 (Set Operators)",
     category: "sql",
     cells: [
       {
-        id: "SQL_9_SUBQUERY_cell_0",
+        id: "SQL_9_SET_OPERATOR_cell_0",
         type: "markdown",
-        content: "# SQL 9. 서브쿼리 (Subquery) 마스터\n\n## 1. 서브쿼리 위치별 분류\n\n1. **스칼라 서브쿼리 (Scalar Subquery)**: `SELECT` 절에 위치하며 단 1행 1열의 단일 값을 반환합니다.\n2. **인라인 뷰 (Inline View)**: `FROM` 절에 위치하며 메인 쿼리 실행 시 임시 가상 테이블처럼 작동합니다.\n3. **중첩 서브쿼리 (Nested Subquery)**: `WHERE` 또는 `HAVING` 절에 위치하여 서브쿼리 조건 검증을 수행합니다.\n\n---\n\n## 2. 다중행 서브쿼리 연산자 (`IN`, `ALL`, `ANY`, `EXISTS`)\n\n- **IN**: 서브쿼리 결과 목록 중 하나라도 일치하면 참.\n- **ALL**: 서브쿼리 결과의 모든 값보다 조건이 만족해야 함 (`> ALL` 은 최댓값보다 큼).\n- **ANY / SOME**: 서브쿼리 결과 중 하나 이상 조건을 만족해야 함 (`> ANY` 는 최솟값보다 큼).\n- **EXISTS**: 서브쿼리의 결과 행이 1건이라도 존재하는지 여부만 확인 (조건 충족 시 즉시 탐색 종료로 성능 우수).\n\n```sql\nSELECT name, score\nFROM   users\nWHERE  score > (SELECT AVG(score) FROM users);\n```\n\n---\n\n## 3. 비연관 서브쿼리 vs 연관 서브쿼리\n\n- **비연관 서브쿼리 (Uncorrelated Subquery)**: 서브쿼리가 메인 쿼리와 무관하게 **독립적으로 한 번만 실행**되어 결과를 메인 쿼리에 전달합니다. 지금까지 살펴본 예시가 모두 비연관 서브쿼리입니다.\n- **연관 서브쿼리 (Correlated Subquery)**: 서브쿼리 안에서 메인 쿼리의 열을 참조하며, **메인 쿼리의 행마다 서브쿼리가 반복 실행**됩니다.\n\n```sql\n-- 연관 서브쿼리: 각 사용자(u)가 자신이 속한 부서의 평균 점수보다 높은지 확인\nSELECT u.name, u.dept, u.score\nFROM   users u\nWHERE  u.score > (\n  SELECT AVG(score) FROM users WHERE dept = u.dept\n);\n```\n\n---\n\n## 4. NOT EXISTS와 NOT IN의 NULL 함정\n\n`EXISTS`의 부정형인 `NOT EXISTS`는 연관 서브쿼리와 함께 자주 사용됩니다.\n\n```sql\nSELECT u.name\nFROM   users u\nWHERE  NOT EXISTS (\n  SELECT 1 FROM orders o WHERE o.user_id = u.id\n);\n```\n\n> **주의**: `NOT IN`의 서브쿼리 결과에 `NULL`이 하나라도 포함되면, 비교가 `UNKNOWN`이 되어 **전체 결과가 0건**이 됩니다. 서브쿼리 결과에 `NULL`이 섞일 수 있다면 `NOT IN` 대신 `NOT EXISTS`를 사용하는 것이 안전합니다.\n\n```sql\n-- 위험: orders.user_id에 NULL이 있으면 결과가 아예 없어짐\nSELECT name FROM users WHERE id NOT IN (SELECT user_id FROM orders);\n\n-- 안전: NOT EXISTS는 NULL의 영향을 받지 않음\nSELECT name FROM users u WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT name, score FROM users WHERE score > (SELECT AVG(score) FROM users);\n```"
+        content: "# SQL 9. 집합 연산자 (Set Operators)\n\n## 1. 집합 연산자 종류 및 특징\n\n| 집합 연산자 | 기능 | 중복 제거 여부 | 정렬 수행 여부 |\n|---|---|---|---|\n| `UNION` | 두 쿼리 결과의 합집합 | **중복 제거** | **자동 정렬 수행** |\n| `UNION ALL` | 두 쿼리 결과의 합집합 | 중복 유지 | 정렬 미수행 (빠름) |\n| `INTERSECT` | 두 쿼리 결과의 교집합 | 중복 제거 | 정렬 수행 |\n| `EXCEPT` / `MINUS` | 차집합 (선행 쿼리 - 후행 쿼리) | 중복 제거 | 정렬 수행 |\n\n---\n\n## 2. 집합 연산자 사용 조건\n\n1. 두 쿼리의 `SELECT` 절 컬럼 개수가 동일해야 합니다.\n2. 대응하는 컬럼의 데이터 타입이 상호 호환 가능해야 합니다.\n3. `ORDER BY` 절은 문장의 맨 마지막 쿼리에만 단 한 번 선언 가능합니다.\n\n---\n\n## 3. 대화식 SQL 실습\n\n```sql\nSELECT name, dept FROM users WHERE dept = '개발팀'\nUNION ALL\nSELECT name, dept FROM users WHERE dept = '기획팀';\n```"
       }
     ]
   },
   {
-    id: "SQL_10_SET_OPERATOR",
-    filename: "SQL 10. 집합 연산자 (Set Operators)",
-    title: "SQL 10. 집합 연산자 (Set Operators)",
+    id: "SQL_10_WINDOW_FUNCTION",
+    filename: "SQL 10. 윈도우 함수 (Window Functions)",
+    title: "SQL 10. 윈도우 함수 (Window Functions)",
     category: "sql",
     cells: [
       {
-        id: "SQL_10_SET_OPERATOR_cell_0",
+        id: "SQL_10_WINDOW_FUNCTION_cell_0",
         type: "markdown",
-        content: "# SQL 10. 집합 연산자 (Set Operators)\n\n## 1. 집합 연산자 종류 및 특징\n\n| 집합 연산자 | 기능 | 중복 제거 여부 | 정렬 수행 여부 |\n|---|---|---|---|\n| `UNION` | 두 쿼리 결과의 합집합 | **중복 제거** | **자동 정렬 수행** |\n| `UNION ALL` | 두 쿼리 결과의 합집합 | 중복 유지 | 정렬 미수행 (빠름) |\n| `INTERSECT` | 두 쿼리 결과의 교집합 | 중복 제거 | 정렬 수행 |\n| `EXCEPT` / `MINUS` | 차집합 (선행 쿼리 - 후행 쿼리) | 중복 제거 | 정렬 수행 |\n\n---\n\n## 2. 집합 연산자 사용 조건\n\n1. 두 쿼리의 `SELECT` 절 컬럼 개수가 동일해야 합니다.\n2. 대응하는 컬럼의 데이터 타입이 상호 호환 가능해야 합니다.\n3. `ORDER BY` 절은 문장의 맨 마지막 쿼리에만 단 한 번 선언 가능합니다.\n\n---\n\n## 3. 대화식 SQL 실습\n\n```sql\nSELECT name, dept FROM users WHERE dept = '개발팀'\nUNION ALL\nSELECT name, dept FROM users WHERE dept = '기획팀';\n```"
+        content: "# SQL 10. 윈도우 함수 (Window Functions)\n\n## 1. 윈도우 함수 개요 및 구문\n\n행과 행 간의 관계를 정의하여 집계 및 순위 계산을 수행하는 함수로, 원본 행의 개수를 변경하지 않고 유지합니다.\n\n```sql\nSELECT 함수이름() OVER ([PARTITION BY 컬럼] [ORDER BY 컬럼] [ROWS|RANGE 윈도우범위])\nFROM   테이블명;\n```\n\n---\n\n## 2. 순위 함수 (Ranking Functions) 특징\n\n자주 사용되는 윈도우 순위 함수입니다.\n\n- **`RANK()`**: 동률 순위 존재 시 동일 순위를 부여하고, 그 다음 순위는 동률 개수만큼 건너뜁니다 (예: 1, 2, 2, 4).\n- **`DENSE_RANK()`**: 동률 순위가 존재해도 다음 순위를 연속적으로 부여합니다 (예: 1, 2, 2, 3).\n- **`ROW_NUMBER()`**: 값의 동률 여부와 상관없이 무조건 1부터 유일한 연속 번호를 부여합니다 (예: 1, 2, 3, 4).\n\n---\n\n## 3. 위치 및 비율 윈도우 함수\n\n- **`LAG(컬럼, N)`**: 현재 행 기준 N번째 이전 행의 값을 조회합니다.\n- **`LEAD(컬럼, N)`**: 현재 행 기준 N번째 다음 행의 값을 조회합니다.\n- **`FIRST_VALUE()` / `LAST_VALUE()`**: 윈도우 파티션 내 첫 번째 및 마지막 값을 조회합니다.\n\n---\n\n## 4. 집계 윈도우 함수 (Aggregate Window Functions)\n\n`SUM`, `AVG`, `COUNT`, `MAX`, `MIN` 같은 일반 집계 함수도 `OVER()`와 함께 사용하면 행을 그룹으로 뭉치지 않고, **행마다 누적/그룹 집계 값을 함께 조회**할 수 있습니다.\n\n```sql\n-- 부서별 평균 점수를 각 행에 함께 표시 (행 개수가 줄지 않음)\nSELECT name, dept, score,\n       AVG(score) OVER (PARTITION BY dept) AS 부서평균\nFROM   users;\n\n-- 점수 기준 정렬 후 누적 합계\nSELECT name, score,\n       SUM(score) OVER (ORDER BY score) AS 누적합계\nFROM   users;\n```\n\n---\n\n## 5. NTILE() 함수\n\n`NTILE(N)`은 전체 데이터를 지정한 `N`개의 그룹으로 최대한 균등하게 나누어 그룹 번호를 부여합니다. 예를 들어 성적을 4분위로 나눌 때 사용합니다.\n\n```sql\nSELECT name, score, NTILE(4) OVER (ORDER BY score DESC) AS 사분위 FROM users;\n```\n\n---\n\n## 6. 대화식 SQL 실습\n\n```sql\nSELECT name, score, RANK() OVER (ORDER BY score DESC) AS 순위 FROM users;\n```"
       }
     ]
   },
   {
-    id: "SQL_11_GROUP_FUNCTION",
-    filename: "SQL 11. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)",
-    title: "SQL 11. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)",
+    id: "SQL_11_MODELING",
+    filename: "SQL 11. 데이터 모델링과 ERD 핵심",
+    title: "SQL 11. 데이터 모델링과 ERD 핵심",
     category: "sql",
     cells: [
       {
-        id: "SQL_11_GROUP_FUNCTION_cell_0",
+        id: "SQL_11_MODELING_cell_0",
         type: "markdown",
-        content: "# SQL 11. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)\n\n## 1. 소계/총계 그룹 함수 개요\n\n`GROUP BY` 절과 함께 사용되어 다차원 집계 소계(Subtotal) 및 총계(Grand Total) 데이터를 일괄 생성합니다.\n\n---\n\n## 2. ROLLUP vs CUBE vs GROUPING SETS\n\n- **`ROLLUP(A, B)`**: 계층 구조를 기반으로 집계를 수행합니다.\n  - 생성 집계 조합: `(A, B)`, `(A)`, `()` [총 N+1개 집계 조합 생성]\n- **`CUBE(A, B)`**: 가능한 모든 조합에 대해 집계를 수행합니다.\n  - 생성 집계 조합: `(A, B)`, `(A)`, `(B)`, `()` [총 2^N개 집계 조합 생성]\n- **`GROUPING SETS(A, B)`**: 지정된 독립적 집계 단위만 개별 생성합니다.\n  - 생성 집계 조합: `(A)`, `(B)`\n\n---\n\n## 3. 실제 SQL 문법\n\n```sql\n-- ROLLUP: (dept, name), (dept), () 순으로 소계 + 총계 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY ROLLUP(dept, name);\n\n-- CUBE: (dept, name), (dept), (name), () 모든 조합 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY CUBE(dept, name);\n\n-- GROUPING SETS: (dept), (name)만 개별적으로 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY GROUPING SETS((dept), (name));\n```\n\n---\n\n## 4. GROUPING 함수\n\n`GROUPING(컬럼)` 함수는 해당 행이 소계/총계를 위해 인위적으로 묶인 행인 경우 `1`을 반환하고, 일반 집계 행인 경우 `0`을 반환합니다. 소계/총계 행을 구분해서 표시할 때 유용합니다.\n\n```sql\nSELECT dept,\n       SUM(score) AS 합계,\n       GROUPING(dept) AS 총계여부\nFROM   users\nGROUP BY ROLLUP(dept);\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 FROM users GROUP BY ROLLUP(dept);\n```"
+        content: "# SQL 11. 데이터 모델링과 ERD 핵심\n\n## 1. 데이터 모델링 개요\n\n데이터 모델링은 현실 세계의 비즈니스 프로세스와 데이터를 단순화하여 데이터베이스 구조로 표현하는 과정입니다.\n\n### 데이터 모델링 3단계\n1. **개념적 데이터 모델링**: 추상화 수준이 가장 높으며, 주요 엔티티와 핵심 관계를 정의합니다.\n2. **논리적 데이터 모델링**: 정규화를 수행하고 식별자, 속성, 관계를 상세히 정의합니다 (DBMS 독립적).\n3. **물리적 데이터 모델링**: 실제 DBMS 제품(Oracle, MySQL, PostgreSQL 등)의 성능, 인덱스, 데이터 타입을 고려하여 구현합니다.\n\n---\n\n## 2. 엔티티(Entity), 속성(Attribute), 관계(Relationship)\n\n- **엔티티 (Entity)**: 데이터베이스에서 관리하고자 하는 식별 가능한 객체 또는 개념 (예: 고객, 상품, 주문).\n- **속성 (Attribute)**: 엔티티가 가지는 세부 특성 및 데이터 항목 (예: 고객명, 전화번호, 회원등급).\n- **관계 (Relationship)**: 엔티티 간의 연관성 및 비즈니스 규칙 (예: 고객은 상품을 주문한다).\n\n---\n\n## 3. 식별자(Identifier) 분류 및 관계\n\n- **주식별자 (Primary Key / PK)**: 엔티티 내의 각 행을 유일하게 식별하는 대표 속성 (유일성, 최소성, 불가변성, 존재성/NOT NULL).\n- **외래식별자 (Foreign Key / FK)**: 타 엔티티의 주식별자를 참조하는 속성으로, 엔티티 간의 관계를 형성합니다.\n- **식별 관계**: 부모 엔티티의 PK가 자식 엔티티의 PK의 일부로 포함되는 관계.\n- **비식별 관계**: 부모 엔티티의 PK가 자식 엔티티의 일반 속성으로 참조되는 관계.\n\n---\n\n## 4. 정규화 (Normalization)\n\n데이터 중복을 최소화하고 이상 현상(Anomalies: 삽입/수정/삭제 이상)을 방지하기 위한 구조적 구조화 과정입니다.\n\n- **제1정규형 (1NF)**: 모든 속성의 값이 원자값(Atomic Value)을 가져야 함.\n- **제2정규형 (2NF)**: 주식별자가 복합키일 때, 부분 함수 종속성을 제거하고 완전 함수 종속성을 만족함.\n- **제3정규형 (3NF)**: 이행적 함수 종속성(A → B, B → C 이면 A → C)을 제거함.\n- **반정규화 (De-normalization)**: 시스템 성능 향상 및 조인 비용 감소를 위해 의도적으로 정규화 원칙을 위배하고 중복을 허용하는 작업.\n\n---\n\n## 5. 관계의 카디널리티 (Cardinality)\n\nERD에서 두 엔티티 사이의 관계는 **참여하는 인스턴스의 수**에 따라 세 가지로 분류됩니다.\n\n- **1:1 (일대일)**: 한 엔티티의 인스턴스 1개가 다른 엔티티의 인스턴스 1개와만 대응 (예: 사람 - 주민등록증).\n- **1:N (일대다)**: 한 엔티티의 인스턴스 1개가 다른 엔티티의 여러 인스턴스와 대응 (예: 부서 - 사원). 관계형 데이터베이스에서 가장 흔한 관계 형태입니다.\n- **N:M (다대다)**: 양쪽 엔티티의 인스턴스가 서로 여러 개씩 대응 (예: 학생 - 수강과목). N:M 관계는 그대로 테이블로 구현할 수 없어, 두 엔티티의 PK를 함께 갖는 **교차 엔티티(연결 테이블)**를 중간에 두어 1:N + N:1 관계로 분해합니다.\n\n```sql\n-- 학생(students)과 과목(courses)의 N:M 관계를 연결하는 교차 테이블\nCREATE TABLE enrollments (\n  student_id INT,\n  course_id  INT,\n  PRIMARY KEY (student_id, course_id),\n  FOREIGN KEY (student_id) REFERENCES students(id),\n  FOREIGN KEY (course_id) REFERENCES courses(id)\n);\n```\n\n---\n\n## 6. 대화식 SQL 실습\n\n```sql\nSELECT id, name, dept, score FROM users;\n```"
       }
     ]
   },
   {
-    id: "SQL_12_WINDOW_FUNCTION",
-    filename: "SQL 12. 윈도우 함수 (Window Functions)",
-    title: "SQL 12. 윈도우 함수 (Window Functions)",
+    id: "SQL_12_DDL_DML",
+    filename: "SQL 12. DDL & DML 데이터베이스 조작",
+    title: "SQL 12. DDL & DML 데이터베이스 조작",
     category: "sql",
     cells: [
       {
-        id: "SQL_12_WINDOW_FUNCTION_cell_0",
+        id: "SQL_12_DDL_DML_cell_0",
         type: "markdown",
-        content: "# SQL 12. 윈도우 함수 (Window Functions)\n\n## 1. 윈도우 함수 개요 및 구문\n\n행과 행 간의 관계를 정의하여 집계 및 순위 계산을 수행하는 함수로, 원본 행의 개수를 변경하지 않고 유지합니다.\n\n```sql\nSELECT 함수이름() OVER ([PARTITION BY 컬럼] [ORDER BY 컬럼] [ROWS|RANGE 윈도우범위])\nFROM   테이블명;\n```\n\n---\n\n## 2. 순위 함수 (Ranking Functions) 특징\n\n자주 사용되는 윈도우 순위 함수입니다.\n\n- **`RANK()`**: 동률 순위 존재 시 동일 순위를 부여하고, 그 다음 순위는 동률 개수만큼 건너뜁니다 (예: 1, 2, 2, 4).\n- **`DENSE_RANK()`**: 동률 순위가 존재해도 다음 순위를 연속적으로 부여합니다 (예: 1, 2, 2, 3).\n- **`ROW_NUMBER()`**: 값의 동률 여부와 상관없이 무조건 1부터 유일한 연속 번호를 부여합니다 (예: 1, 2, 3, 4).\n\n---\n\n## 3. 위치 및 비율 윈도우 함수\n\n- **`LAG(컬럼, N)`**: 현재 행 기준 N번째 이전 행의 값을 조회합니다.\n- **`LEAD(컬럼, N)`**: 현재 행 기준 N번째 다음 행의 값을 조회합니다.\n- **`FIRST_VALUE()` / `LAST_VALUE()`**: 윈도우 파티션 내 첫 번째 및 마지막 값을 조회합니다.\n\n---\n\n## 4. 집계 윈도우 함수 (Aggregate Window Functions)\n\n`SUM`, `AVG`, `COUNT`, `MAX`, `MIN` 같은 일반 집계 함수도 `OVER()`와 함께 사용하면 행을 그룹으로 뭉치지 않고, **행마다 누적/그룹 집계 값을 함께 조회**할 수 있습니다.\n\n```sql\n-- 부서별 평균 점수를 각 행에 함께 표시 (행 개수가 줄지 않음)\nSELECT name, dept, score,\n       AVG(score) OVER (PARTITION BY dept) AS 부서평균\nFROM   users;\n\n-- 점수 기준 정렬 후 누적 합계\nSELECT name, score,\n       SUM(score) OVER (ORDER BY score) AS 누적합계\nFROM   users;\n```\n\n---\n\n## 5. NTILE() 함수\n\n`NTILE(N)`은 전체 데이터를 지정한 `N`개의 그룹으로 최대한 균등하게 나누어 그룹 번호를 부여합니다. 예를 들어 성적을 4분위로 나눌 때 사용합니다.\n\n```sql\nSELECT name, score, NTILE(4) OVER (ORDER BY score DESC) AS 사분위 FROM users;\n```\n\n---\n\n## 6. 대화식 SQL 실습\n\n```sql\nSELECT name, score, RANK() OVER (ORDER BY score DESC) AS 순위 FROM users;\n```"
+        content: "# SQL 12. DDL & DML 데이터베이스 조작\n\n## 1. DDL 및 DML 분류\n\n- **DDL (Data Definition Language)**: 데이터베이스 객체(테이블 등)의 구조를 정의하고 수정하는 명령어 (`CREATE TABLE`, `DROP TABLE`).\n- **DML (Data Manipulation Language)**: 테이블 내 데이터를 생성, 수정, 삭제하는 명령어 (`INSERT`, `UPDATE`, `DELETE`, `SELECT`).\n\n---\n\n## 2. 테이블 생성 (`CREATE TABLE`)\n\n```sql\nCREATE TABLE students (\n  id   INT PRIMARY KEY,\n  name VARCHAR(50) NOT NULL,\n  age  INT\n);\n```\n\n---\n\n## 3. 데이터 삽입 (`INSERT INTO ... VALUES`)\n\n```sql\nINSERT INTO users (id, name, age, score, dept)\nVALUES (6, '강감찬', 27, 92, '기획팀');\n```\n\n---\n\n## 4. 데이터 수정 (`UPDATE ... SET`)\n\n```sql\nUPDATE users\nSET    score = 98\nWHERE  name = '정찬희';\n```\n\n---\n\n## 5. 데이터 삭제 (`DELETE FROM`)\n\n```sql\nDELETE FROM users\nWHERE  id = 4;\n```\n\n---\n\n## 6. 제약조건 (Constraints)\n\n`CREATE TABLE` 시 열에 규칙을 지정하여 데이터의 무결성을 보장할 수 있습니다.\n\n| 제약조건 | 의미 |\n|---|---|\n| `PRIMARY KEY` | 행을 유일하게 식별 (NOT NULL + UNIQUE) |\n| `FOREIGN KEY` | 다른 테이블의 PRIMARY KEY를 참조 |\n| `NOT NULL` | `NULL` 값 저장 금지 |\n| `UNIQUE` | 중복되지 않는 값만 저장 |\n| `CHECK` | 지정한 조건을 만족하는 값만 저장 |\n| `DEFAULT` | 값을 입력하지 않았을 때 사용할 기본값 |\n\n```sql\nCREATE TABLE orders (\n  id      INT PRIMARY KEY,\n  user_id INT NOT NULL,\n  price   INT CHECK (price >= 0),\n  status  VARCHAR(20) DEFAULT '주문접수',\n  FOREIGN KEY (user_id) REFERENCES users(id)\n);\n```\n\n---\n\n## 7. 테이블 구조 변경 (`ALTER TABLE`)\n\n이미 만들어진 테이블에 열을 추가/수정/삭제할 때 사용합니다.\n\n```sql\nALTER TABLE users ADD COLUMN phone VARCHAR(20);\nALTER TABLE users MODIFY COLUMN phone VARCHAR(30);\nALTER TABLE users DROP COLUMN phone;\n```\n\n---\n\n## 8. DELETE vs TRUNCATE vs DROP\n\n세 명령어 모두 데이터를 지우지만 동작 방식이 크게 다릅니다.\n\n| 구분 | 종류 | 삭제 대상 | 테이블 구조 | 롤백(ROLLBACK) |\n|---|---|---|---|---|\n| `DELETE` | DML | 조건에 맞는 행 | 유지 | 가능 |\n| `TRUNCATE` | DDL | 테이블의 모든 행 | 유지 | 불가능 |\n| `DROP` | DDL | 모든 행 + 테이블 자체 | 삭제됨 | 불가능 |\n\n```sql\nDELETE FROM users WHERE id = 4;   -- 특정 행만 삭제, 되돌릴 수 있음\nTRUNCATE TABLE users;              -- 전체 행 삭제, 테이블 구조는 남음\nDROP TABLE users;                  -- 테이블 자체를 완전히 삭제\n```\n\n---\n\n## 9. 대화식 SQL 실습\n\n```sql\nSELECT * FROM users;\n```"
       }
     ]
   },
@@ -369,6 +369,19 @@ export const docChapters: DocChapter[] = [
         id: "SQL_13_CTE_TCL_DCL_cell_0",
         type: "markdown",
         content: "# SQL 13. 가상 테이블, TCL, DCL 및 트랜잭션\n\n## 1. 뷰 (VIEW) - 가상 테이블\n\n뷰는 실제 데이터를 저장하지 않고, `SELECT` 쿼리 결과를 테이블처럼 사용할 수 있게 해주는 **가상의 테이블**입니다. 자주 사용하는 복잡한 쿼리를 뷰로 만들어두면 이후에는 간단히 조회만 하면 됩니다.\n\n```sql\nCREATE VIEW high_scorers AS\nSELECT id, name, dept, score\nFROM   users\nWHERE  score >= 85;\n\n-- 뷰는 일반 테이블처럼 조회 가능\nSELECT * FROM high_scorers;\n\n-- 뷰 삭제\nDROP VIEW high_scorers;\n```\n\n> 뷰의 장점: ① 복잡한 쿼리를 감춰 재사용성을 높임 ② 특정 열/행만 노출시켜 보안성을 높임. 단, 뷰는 원본 데이터를 저장하지 않으므로 조회할 때마다 내부 쿼리가 다시 실행됩니다.\n\n---\n\n## 2. WITH 절 (Common Table Expression - CTE)\n\n```sql\nWITH HighScorers AS (\n  SELECT id, name, dept, score\n  FROM   users\n  WHERE  score >= 85\n)\nSELECT * FROM HighScorers;\n```\n\nCTE는 뷰와 달리 **해당 쿼리 안에서만 임시로 존재**합니다.\n\n### 재귀 CTE (Recursive CTE)\n\n조직도처럼 계층 구조 데이터를 조회할 때는 `WITH RECURSIVE`를 사용합니다.\n\n```sql\nWITH RECURSIVE org_chart AS (\n  -- 1) 시작 지점: 최상위 관리자\n  SELECT id, name, manager_id, 1 AS level\n  FROM   employees\n  WHERE  manager_id IS NULL\n\n  UNION ALL\n\n  -- 2) 재귀 부분: 하위 직원을 계속 이어붙임\n  SELECT e.id, e.name, e.manager_id, oc.level + 1\n  FROM   employees e\n  JOIN   org_chart oc ON e.manager_id = oc.id\n)\nSELECT * FROM org_chart;\n```\n\n---\n\n## 3. TCL (Transaction Control Language) 및 ACID 특성\n\n- **TCL 명령어**: `COMMIT` (변경사항 확정 저장), `ROLLBACK` (변경사항 취소 원복), `SAVEPOINT` (복구 지점 지정).\n- **트랜잭션 ACID 4대 특성**:\n  - **원자성 (Atomicity)**: All or Nothing (모두 반영되거나 모두 취소).\n  - **일관성 (Consistency)**: 무결성 제약조건 유지.\n  - **고립성 (Isolation)**: 타 트랜잭션 격리.\n  - **지속성 (Durability)**: 성공 결과의 영구 저장.\n\n### SAVEPOINT 사용 예시\n\n```sql\nUPDATE users SET score = 100 WHERE id = 1;\nSAVEPOINT sp1;\n\nUPDATE users SET score = 0 WHERE id = 2;\nROLLBACK TO sp1;  -- sp1 이후 변경(사용자 2 수정)만 취소, 사용자 1 수정은 유지\n\nCOMMIT;\n```\n\n---\n\n## 4. DCL (Data Control Language) 권한 관리\n\n- **`GRANT`**: 사용자에게 권한 부여 (`GRANT SELECT ON users TO john;`).\n- **`REVOKE`**: 사용자로부터 권한 회수 (`REVOKE SELECT ON users FROM john;`).\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT * FROM users;\n```"
+      }
+    ]
+  },
+  {
+    id: "SQL_14_INDEX",
+    filename: "SQL 14. 인덱스(INDEX)와 성능 기초",
+    title: "SQL 14. 인덱스(INDEX)와 성능 기초",
+    category: "sql",
+    cells: [
+      {
+        id: "SQL_14_INDEX_cell_0",
+        type: "markdown",
+        content: "# SQL 14. 인덱스(INDEX)와 성능 기초\n\n## 1. 인덱스란?\n\n인덱스(Index)는 책의 '찾아보기'처럼, 테이블에서 원하는 데이터를 빠르게 찾을 수 있도록 만든 별도의 자료구조입니다. 인덱스가 없으면 조건에 맞는 행을 찾기 위해 테이블 전체를 처음부터 끝까지 읽어야 합니다 (풀 테이블 스캔, Full Table Scan).\n\n---\n\n## 2. 인덱스 생성 (`CREATE INDEX`)\n\n```sql\nCREATE INDEX idx_users_name ON users(name);\n\n-- 인덱스 삭제\nDROP INDEX idx_users_name;\n```\n\n---\n\n## 3. 인덱스의 종류\n\n- **단일 열 인덱스**: 한 개의 열에 생성하는 기본 형태입니다.\n- **복합(다중 열) 인덱스**: 여러 열을 묶어서 생성합니다. 열의 순서가 중요하며, 맨 앞 열부터 조건에 사용해야 인덱스가 효과를 냅니다.\n- **UNIQUE 인덱스**: 값의 중복을 허용하지 않는 인덱스로, `PRIMARY KEY`와 `UNIQUE` 제약조건을 지정하면 자동으로 생성됩니다.\n\n```sql\nCREATE INDEX idx_users_dept_score ON users(dept, score);\nCREATE UNIQUE INDEX idx_users_email ON users(email);\n```\n\n---\n\n## 4. 인덱스의 장단점\n\n- **장점**: `WHERE`, `JOIN`, `ORDER BY`에서 조건/정렬 대상 열을 빠르게 찾아 조회 성능을 크게 향상시킵니다.\n- **단점**: 인덱스 자체도 저장 공간을 차지하며, `INSERT`/`UPDATE`/`DELETE` 시 인덱스도 함께 갱신해야 하므로 **쓰기 성능은 오히려 느려질 수 있습니다.** 따라서 조회가 잦고 변경이 적은 열에 선별적으로 생성하는 것이 좋습니다.\n\n---\n\n## 5. 인덱스가 잘 활용되지 않는 경우\n\n다음과 같은 경우에는 인덱스를 만들어도 사용되지 않거나 효과가 떨어질 수 있습니다.\n\n```sql\n-- 인덱스가 걸린 열을 가공하면 인덱스를 타지 못함\nSELECT * FROM users WHERE score + 1 = 91;\n\n-- LIKE에서 앞에 %가 오면 인덱스를 타지 못함\nSELECT * FROM users WHERE name LIKE '%철수';\n```\n\n---\n\n## 6. 실행계획 확인 (`EXPLAIN`)\n\n작성한 쿼리가 인덱스를 사용하는지, 풀 테이블 스캔을 하는지는 `EXPLAIN`으로 확인할 수 있습니다.\n\n```sql\nEXPLAIN SELECT * FROM users WHERE name = '김철수';\n```\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nCREATE INDEX idx_users_dept ON users(dept);\nSELECT * FROM users WHERE dept = '개발팀';\n```"
       }
     ]
   }
