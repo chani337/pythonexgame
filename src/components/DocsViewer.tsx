@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { docChapters } from '../data/docs';
 import type { RunResponse } from '../hooks/usePyodide';
-import { BookOpen, Play, Share2, AlertCircle, RefreshCw } from 'lucide-react';
+import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 
 interface DocsViewerProps {
   runPythonCode: (code: string) => Promise<RunResponse>;
@@ -16,6 +16,14 @@ export default function DocsViewer({
 }: DocsViewerProps) {
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(0);
   const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean }>>({});
+  const [isTocOpen, setIsTocOpen] = useState<boolean>(() => {
+    const saved = localStorage.getItem('pyquests_docs_toc_open');
+    return saved !== null ? JSON.parse(saved) : true;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('pyquests_docs_toc_open', JSON.stringify(isTocOpen));
+  }, [isTocOpen]);
 
   const activeChapter = docChapters[selectedChapterIdx];
 
@@ -278,91 +286,133 @@ export default function DocsViewer({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', flex: 1, height: '100%' }}>
       {/* Title Header */}
-      <div>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-          파이썬 학습 가이드
-        </h2>
-        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-          Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 예제 코드를 즉석에서 실행해 보세요.
-        </p>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+        <div>
+          <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
+            파이썬 학습 가이드
+          </h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+            Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 예제 코드를 즉석에서 실행해 보세요.
+          </p>
+        </div>
+        <button
+          onClick={() => setIsTocOpen(!isTocOpen)}
+          style={{
+            background: isTocOpen ? '#ffffff' : '#1a1a1a',
+            color: isTocOpen ? '#1a1a1a' : '#ffffff',
+            border: '1px solid #1a1a1a',
+            padding: '0.55rem 0.95rem',
+            fontSize: '0.78rem',
+            fontWeight: '700',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          {isTocOpen ? <PanelLeftClose size={15} /> : <PanelLeftOpen size={15} />}
+          {isTocOpen ? '학습 목차 접기' : '📚 학습 목차 열기'}
+        </button>
       </div>
 
       {/* Main split layout */}
-      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px' }}>
+      <div style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
         {/* Left Side: Chapter Navigation (Fixed Independent Pane) */}
-        <div
-          className="glass-card docs-chapter-nav"
-          style={{
-            width: '260px',
-            padding: '1.25rem',
-            display: 'flex',
-            flexDirection: 'column',
-            gap: '0.75rem',
-            flexShrink: 0,
-            borderRadius: '0px',
-            height: '100%',
-            overflow: 'hidden',
-          }}
-        >
-          <h3 style={{ fontSize: '0.9rem', fontWeight: '700', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem', letterSpacing: '0.05em' }}>
-            📚 학습 목차
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
-            {docChapters.map((chapter, idx) => (
+        {isTocOpen && (
+          <div
+            className="glass-card docs-chapter-nav"
+            style={{
+              width: '260px',
+              padding: '1.25rem',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '0.75rem',
+              flexShrink: 0,
+              borderRadius: '0px',
+              height: '100%',
+              overflow: 'hidden',
+              transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
+            }}
+          >
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
+              <h3 style={{ fontSize: '0.9rem', fontWeight: '700', letterSpacing: '0.05em' }}>
+                📚 학습 목차
+              </h3>
               <button
-                key={chapter.id}
-                onClick={() => {
-                  setSelectedChapterIdx(idx);
-                  setCodeOutputs({});
-                }}
+                onClick={() => setIsTocOpen(false)}
+                title="목차 접기"
                 style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: '0.2rem',
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '0.65rem',
-                  padding: '0.8rem 1rem',
-                  textAlign: 'left',
-                  borderRadius: '0px',
-                  background: selectedChapterIdx === idx ? '#1a1a1a' : 'transparent',
-                  border: 'none',
-                  color: selectedChapterIdx === idx ? '#ffffff' : 'var(--text-secondary)',
-                  cursor: 'pointer',
-                  fontSize: '0.8rem',
-                  fontWeight: selectedChapterIdx === idx ? '700' : '500',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedChapterIdx !== idx) {
-                    e.currentTarget.style.background = 'var(--bg-dark)';
-                    e.currentTarget.style.color = '#1a1a1a';
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedChapterIdx !== idx) {
-                    e.currentTarget.style.background = 'transparent';
-                    e.currentTarget.style.color = 'var(--text-secondary)';
-                  }
                 }}
               >
-                <BookOpen size={14} />
-                <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                  {chapter.title}
-                </span>
+                <PanelLeftClose size={16} />
               </button>
-            ))}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
+              {docChapters.map((chapter, idx) => (
+                <button
+                  key={chapter.id}
+                  onClick={() => {
+                    setSelectedChapterIdx(idx);
+                    setCodeOutputs({});
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.65rem',
+                    padding: '0.8rem 1rem',
+                    textAlign: 'left',
+                    borderRadius: '0px',
+                    background: selectedChapterIdx === idx ? '#1a1a1a' : 'transparent',
+                    border: 'none',
+                    color: selectedChapterIdx === idx ? '#ffffff' : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                    fontSize: '0.8rem',
+                    fontWeight: selectedChapterIdx === idx ? '700' : '500',
+                    transition: 'all 0.2s ease',
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedChapterIdx !== idx) {
+                      e.currentTarget.style.background = 'var(--bg-dark)';
+                      e.currentTarget.style.color = '#1a1a1a';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedChapterIdx !== idx) {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = 'var(--text-secondary)';
+                    }
+                  }}
+                >
+                  <BookOpen size={14} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {chapter.title}
+                  </span>
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Right Side: Chapter Document Viewer (Independent Internal Scroll) */}
         <div
           className="glass-card docs-content-viewer"
           style={{
             flex: 1,
-            padding: '2.5rem 3rem',
+            padding: isTocOpen ? '2.5rem 3rem' : '2.5rem 4rem',
             height: '100%',
             overflowY: 'auto',
             borderRadius: '0px',
             background: '#ffffff',
             minWidth: 0,
+            transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)',
           }}
         >
           {activeChapter.cells.map((cell) => {
