@@ -229,10 +229,11 @@ export default function ProblemWorkspace({
       if (res.error) {
         setConsoleError(res.error);
         setTestResults([]);
+        onWrongAttempt?.(problem.id);
       } else if (res.testResults) {
         setTestResults(res.testResults);
         setHasTested(true);
-        
+
         if (res.success) {
           setWorkspaceSuccess(true);
           onMarkSolved(problem.id);
@@ -247,6 +248,7 @@ export default function ProblemWorkspace({
       }
     } catch (err: any) {
       setConsoleError(err.message || '실행 중 오류가 발생했습니다.');
+      onWrongAttempt?.(problem.id);
     } finally {
       setIsRunning(false);
     }
