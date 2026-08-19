@@ -2468,22 +2468,23 @@ export const problems: Problem[] = [
     "category": "Pandas",
     "difficulty": "advanced",
     "type": "coding",
-    "description": "학생 데이터프레임에서 점수가 90점 이상인 데이터의 `\"이름\"` 열을 출력하세요.",
+    "description": "학생 데이터프레임에서 점수가 90점 이상인 데이터의 `\"이름\"` 열을 리스트로 출력하세요.",
     "constraints": [
       "`import pandas as pd`를 사용하세요.",
-      "`df[df[\"점수\"] >= 90][\"이름\"]` 형태를 활용하세요."
+      "`df[df[\"점수\"] >= 90][\"이름\"]` 형태를 활용하세요.",
+      "`.tolist()`를 사용해 리스트로 변환한 뒤 출력하세요."
     ],
     "examples": [
       {
         "input": "코드 출력 예시",
-        "output": "0    김철수\n2    박민수\nName: 이름, dtype: object"
+        "output": "['김철수', '박민수']"
       }
     ],
-    "initialCode": "import pandas as pd\n\ndata = {\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"점수\": [90, 85, 100]\n}\ndf = pd.DataFrame(data)\n# 90점 이상인 학생의 이름만 출력하세요\n",
+    "initialCode": "import pandas as pd\n\ndata = {\n    \"이름\": [\"김철수\", \"이영희\", \"박민수\"],\n    \"점수\": [90, 85, 100]\n}\ndf = pd.DataFrame(data)\n# 90점 이상인 학생의 이름만 리스트로 출력하세요\n",
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "0    김철수\n2    박민수\nName: 이름, dtype: object"
+        "expected": "['김철수', '박민수']"
       }
     ],
     "testRunnerCode": "stdout_match"

@@ -26,7 +26,7 @@ export default function DocsViewer({
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
   const [fontSizeScale, setFontSizeScale] = useState<number>(100);
 
-  const { user } = useAuth();
+  const { user, syncReadChapterToSupabase, fetchUserReadChapterIds } = useAuth();
 
   const [readChapterIds, setReadChapterIds] = useState<string[]>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
@@ -34,20 +34,34 @@ export default function DocsViewer({
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Reload read-chapter progress when the logged-in user changes (login/logout/guest)
+  // Reload read-chapter progress when the logged-in user changes (login/logout/guest),
+  // merging any local guest progress with what's already saved in Supabase for this account.
   useEffect(() => {
     const activeUserId = user?.id || 'guest';
-    const saved = localStorage.getItem(`pyquests_read_chapters_${activeUserId}`);
-    setReadChapterIds(saved ? JSON.parse(saved) : []);
+    const localKey = `pyquests_read_chapters_${activeUserId}`;
+    const localSaved = localStorage.getItem(localKey);
+    const localIds: string[] = localSaved ? JSON.parse(localSaved) : [];
+
+    if (user) {
+      fetchUserReadChapterIds().then((remoteIds) => {
+        const merged = Array.from(new Set([...localIds, ...remoteIds]));
+        setReadChapterIds(merged);
+        localStorage.setItem(localKey, JSON.stringify(merged));
+      });
+    } else {
+      setReadChapterIds(localIds);
+    }
   }, [user]);
 
   const toggleChapterRead = (chapterId: string) => {
     setReadChapterIds((prev) => {
-      const next = prev.includes(chapterId)
-        ? prev.filter((id) => id !== chapterId)
-        : [...prev, chapterId];
+      const willBeRead = !prev.includes(chapterId);
+      const next = willBeRead
+        ? [...prev, chapterId]
+        : prev.filter((id) => id !== chapterId);
       const activeUserId = user?.id || 'guest';
       localStorage.setItem(`pyquests_read_chapters_${activeUserId}`, JSON.stringify(next));
+      syncReadChapterToSupabase(chapterId, willBeRead);
       return next;
     });
   };
@@ -58,6 +72,7 @@ export default function DocsViewer({
       const next = [...prev, chapterId];
       const activeUserId = user?.id || 'guest';
       localStorage.setItem(`pyquests_read_chapters_${activeUserId}`, JSON.stringify(next));
+      syncReadChapterToSupabase(chapterId, true);
       return next;
     });
   };
@@ -179,6 +194,126 @@ export default function DocsViewer({
           );
         })}
       </div>
+    );
+  };
+
+  // Shared cell renderer for both focus mode and the normal split-view layout.
+  // 'focus' uses the dark terminal-style output console; 'normal' uses the light card style.
+  const renderChapterCells = (variant: 'focus' | 'normal') => {
+    const codeFontSize = variant === 'focus' ? '0.88rem' : '0.82rem';
+    const handleExport = (code: string) => {
+      if (variant === 'focus') toggleFocusMode();
+      onExportToSandbox(code);
+    };
+
+    return (
+      <>
+        {activeChapter.cells.map((cell) => {
+          if (!cell.content.trim()) return null;
+          if (cell.type === 'markdown') {
+            return (
+              <div key={cell.id} style={{ marginBottom: '1.5rem' }}>
+                {renderMarkdownBlock(cell.content)}
+              </div>
+            );
+          } else if (cell.type === 'code') {
+            const outputState = codeOutputs[cell.id] || { stdout: '', error: null, isRunning: false };
+            return (
+              <div key={cell.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
+                <div className="editor-frame">
+                  <div className="editor-tabs" style={{ height: '36px' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8' }}>Python 예제 코드</span>
+                  </div>
+                  <pre
+                    style={{
+                      padding: '1.25rem',
+                      margin: 0,
+                      background: 'transparent',
+                      fontFamily: 'var(--font-mono)',
+                      fontSize: codeFontSize,
+                      lineHeight: '1.6',
+                      color: '#f8fafc',
+                      overflowX: 'auto',
+                    }}
+                  >
+                    {cell.content}
+                  </pre>
+                  <div style={{ padding: '0.6rem 1rem', background: '#0a080f', borderTop: '1px solid #1e1b2e', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
+                    <button
+                      className="btn-secondary"
+                      onClick={() => handleExport(cell.content)}
+                      style={{
+                        padding: '0.45rem 1rem',
+                        fontSize: '0.72rem',
+                        background: 'transparent',
+                        color: '#cbd5e1',
+                        borderColor: '#2e2d3d',
+                        textTransform: variant === 'normal' ? 'uppercase' : undefined,
+                      }}
+                    >
+                      <Share2 size={12} /> 샌드박스 전송
+                    </button>
+                    <button
+                      className="btn-primary"
+                      onClick={() => handleRunCellCode(cell.id, cell.content)}
+                      disabled={outputState.isRunning || isPyodideLoading}
+                      style={{
+                        padding: '0.45rem 1rem',
+                        fontSize: '0.72rem',
+                        background: '#ffffff',
+                        color: '#000000',
+                        borderColor: '#ffffff',
+                        textTransform: variant === 'normal' ? 'uppercase' : undefined,
+                      }}
+                    >
+                      {outputState.isRunning ? (
+                        <RefreshCw size={11} className="pulse-glow" style={{ animation: 'spin 2s linear infinite' }} />
+                      ) : (
+                        <Play size={12} />
+                      )}
+                      실행하기
+                    </button>
+                  </div>
+                </div>
+                {(outputState.stdout || outputState.error) && (
+                  variant === 'focus' ? (
+                    <div style={{ padding: '1rem', background: '#0a080f', border: '1px solid #1e1b2e', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: outputState.error ? '#ef4444' : '#10b981' }}>
+                      <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{outputState.error || outputState.stdout}</pre>
+                    </div>
+                  ) : (
+                    <div className="terminal-frame" style={{ borderRadius: '0px', padding: '1rem', background: '#fafafa', border: '1px solid #eaeaea' }}>
+                      <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
+                        실행 결과 출력 (Stdout)
+                      </span>
+                      <pre
+                        style={{
+                          margin: 0,
+                          fontFamily: 'var(--font-mono)',
+                          fontSize: '0.78rem',
+                          color: outputState.error ? '#cf222e' : '#1a1a1a',
+                          whiteSpace: 'pre-wrap',
+                          lineHeight: '1.5',
+                        }}
+                      >
+                        {outputState.error ? (
+                          <span>
+                            <AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} />
+                            {outputState.error}
+                          </span>
+                        ) : (
+                          outputState.stdout
+                        )}
+                      </pre>
+                    </div>
+                  )
+                )}
+              </div>
+            );
+          }
+          return null;
+        })}
+        {renderChapterQuiz()}
+      </>
     );
   };
 
@@ -768,69 +903,7 @@ except Exception as e:
             </div>
           </div>
 
-          {activeChapter.cells.map((cell) => {
-            if (!cell.content.trim()) return null;
-            if (cell.type === 'markdown') {
-              return (
-                <div key={cell.id} style={{ marginBottom: '1.5rem' }}>
-                  {renderMarkdownBlock(cell.content)}
-                </div>
-              );
-            } else if (cell.type === 'code') {
-              const outputState = codeOutputs[cell.id] || { stdout: '', error: null, isRunning: false };
-              return (
-                <div key={cell.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
-                  <div className="editor-frame">
-                    <div className="editor-tabs" style={{ height: '36px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8' }}>Python 예제 코드</span>
-                    </div>
-                    <pre
-                      style={{
-                        padding: '1.25rem',
-                        margin: 0,
-                        background: 'transparent',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.88rem',
-                        lineHeight: '1.6',
-                        color: '#f8fafc',
-                        overflowX: 'auto',
-                      }}
-                    >
-                      {cell.content}
-                    </pre>
-                    <div style={{ padding: '0.6rem 1rem', background: '#0a080f', borderTop: '1px solid #1e1b2e', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                      <button
-                        className="btn-secondary"
-                        onClick={() => {
-                          toggleFocusMode();
-                          onExportToSandbox(cell.content);
-                        }}
-                        style={{ padding: '0.45rem 1rem', fontSize: '0.72rem', background: 'transparent', color: '#cbd5e1', borderColor: '#2e2d3d' }}
-                      >
-                        <Share2 size={12} /> 샌드박스 전송
-                      </button>
-                      <button
-                        className="btn-primary"
-                        onClick={() => handleRunCellCode(cell.id, cell.content)}
-                        disabled={outputState.isRunning || isPyodideLoading}
-                        style={{ padding: '0.45rem 1rem', fontSize: '0.72rem', background: '#ffffff', color: '#000000', borderColor: '#ffffff' }}
-                      >
-                        {outputState.isRunning ? <RefreshCw size={11} className="pulse-glow" style={{ animation: 'spin 2s linear infinite' }} /> : <Play size={12} />}
-                        실행하기
-                      </button>
-                    </div>
-                  </div>
-                  {(outputState.stdout || outputState.error) && (
-                    <div style={{ padding: '1rem', background: '#0a080f', border: '1px solid #1e1b2e', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: outputState.error ? '#ef4444' : '#10b981' }}>
-                      <pre style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{outputState.error || outputState.stdout}</pre>
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            return null;
-          })}
-          {renderChapterQuiz()}
+          {renderChapterCells('focus')}
         </div>
       </div>
     );
@@ -1115,128 +1188,7 @@ except Exception as e:
               {isActiveChapterRead ? '완료됨' : '완료로 표시'}
             </button>
           </div>
-          {activeChapter.cells.map((cell) => {
-            if (!cell.content.trim()) return null;
-            if (cell.type === 'markdown') {
-              return (
-                <div key={cell.id} style={{ marginBottom: '1.5rem' }}>
-                  {renderMarkdownBlock(cell.content)}
-                </div>
-              );
-            } else if (cell.type === 'code') {
-              const outputState = codeOutputs[cell.id] || { stdout: '', error: null, isRunning: false };
-              
-              return (
-                <div key={cell.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
-                  {/* Code Block Frame */}
-                  <div className="editor-frame">
-                    <div className="editor-tabs" style={{ height: '36px' }}>
-                      <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8' }}>Python 예제 코드</span>
-                    </div>
-                    <pre
-                      style={{
-                        padding: '1.25rem',
-                        margin: 0,
-                        background: 'transparent',
-                        fontFamily: 'var(--font-mono)',
-                        fontSize: '0.82rem',
-                        lineHeight: '1.6',
-                        color: '#f8fafc',
-                        overflowX: 'auto',
-                      }}
-                    >
-                      {cell.content}
-                    </pre>
-                    {/* Action Bar */}
-                    <div
-                      style={{
-                        padding: '0.6rem 1rem',
-                        background: '#0a080f',
-                        borderTop: '1px solid #1e1b2e',
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        gap: '0.5rem',
-                      }}
-                    >
-                      <button
-                        className="btn-secondary"
-                        onClick={() => onExportToSandbox(cell.content)}
-                        style={{
-                          padding: '0.45rem 1rem',
-                          fontSize: '0.72rem',
-                          background: 'transparent',
-                          color: '#cbd5e1',
-                          borderColor: '#2e2d3d',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        <Share2 size={12} />
-                        샌드박스 전송
-                      </button>
-                      <button
-                        className="btn-primary"
-                        onClick={() => handleRunCellCode(cell.id, cell.content)}
-                        disabled={outputState.isRunning || isPyodideLoading}
-                        style={{
-                          padding: '0.45rem 1rem',
-                          fontSize: '0.72rem',
-                          background: '#ffffff',
-                          color: '#000000',
-                          borderColor: '#ffffff',
-                          textTransform: 'uppercase',
-                        }}
-                      >
-                        {outputState.isRunning ? (
-                          <RefreshCw size={11} className="pulse-glow" style={{ animation: 'spin 2s linear infinite' }} />
-                        ) : (
-                          <Play size={12} />
-                        )}
-                        실행하기
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Interactive Cell Output Console */}
-                  {(outputState.stdout || outputState.error) && (
-                    <div
-                      className="terminal-frame"
-                      style={{
-                        borderRadius: '0px',
-                        padding: '1rem',
-                        background: '#fafafa',
-                        border: '1px solid #eaeaea',
-                      }}
-                    >
-                      <span style={{ fontSize: '0.65rem', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', display: 'block', marginBottom: '0.4rem' }}>
-                        실행 결과 출력 (Stdout)
-                      </span>
-                      <pre
-                        style={{
-                          margin: 0,
-                          fontFamily: 'var(--font-mono)',
-                          fontSize: '0.78rem',
-                          color: outputState.error ? '#cf222e' : '#1a1a1a',
-                          whiteSpace: 'pre-wrap',
-                          lineHeight: '1.5',
-                        }}
-                      >
-                        {outputState.error ? (
-                          <span>
-                            <AlertCircle size={12} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} />
-                            {outputState.error}
-                          </span>
-                        ) : (
-                          outputState.stdout
-                        )}
-                      </pre>
-                    </div>
-                  )}
-                </div>
-              );
-            }
-            return null;
-          })}
-          {renderChapterQuiz()}
+          {renderChapterCells('normal')}
         </div>
       </div>
     </div>

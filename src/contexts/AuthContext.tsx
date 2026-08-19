@@ -47,6 +47,8 @@ interface AuthContextType {
   syncSolvedToSupabase: (problemId: string) => Promise<void>;
   syncStatsToSupabase: (streak: number, lastSolvedDate: string, sandboxRuns: number) => Promise<void>;
   fetchUserSolvedIds: () => Promise<string[]>;
+  syncReadChapterToSupabase: (chapterId: string, isRead: boolean) => Promise<void>;
+  fetchUserReadChapterIds: () => Promise<string[]>;
   updateDisplayName: (newDisplayName: string) => Promise<{ error?: any }>;
 }
 
@@ -191,6 +193,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await supabase.from('user_solved_problems').upsert(records, { onConflict: 'user_id,problem_id' });
         }
       }
+
+      const savedReadChapters = localStorage.getItem(`pyquests_read_chapters_${userId}`) || localStorage.getItem('pyquests_read_chapters_guest');
+      if (savedReadChapters) {
+        const readChapterIds: string[] = JSON.parse(savedReadChapters);
+        if (readChapterIds.length > 0) {
+          const records = readChapterIds.map((cid) => ({
+            user_id: userId,
+            chapter_id: cid,
+          }));
+          await supabase.from('user_read_chapters').upsert(records, { onConflict: 'user_id,chapter_id' });
+        }
+      }
     } catch (err) {
       console.error('Merge local storage progress error:', err);
     }
@@ -298,6 +312,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error('Fetch solved ids error:', err);
+    }
+    return [];
+  };
+
+  const fetchUserReadChapterIds = async (): Promise<string[]> => {
+    if (!isSupabaseConfigured || !user) return [];
+    try {
+      const { data, error } = await supabase
+        .from('user_read_chapters')
+        .select('chapter_id')
+        .eq('user_id', user.id);
+
+      if (!error && data) {
+        return data.map((row) => row.chapter_id);
+      }
+    } catch (err) {
+      console.error('Fetch read chapter ids error:', err);
     }
     return [];
   };
@@ -414,6 +445,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshLeaderboard();
     } catch (err) {
       console.error('Sync solved error:', err);
+    }
+  };
+
+  const syncReadChapterToSupabase = async (chapterId: string, isRead: boolean) => {
+    if (!isSupabaseConfigured || !user) return;
+    try {
+      if (isRead) {
+        await ensureProfileExists(user.id, user.email || '');
+        await supabase.from('user_read_chapters').upsert(
+          { user_id: user.id, chapter_id: chapterId },
+          { onConflict: 'user_id,chapter_id' }
+        );
+      } else {
+        await supabase.from('user_read_chapters')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('chapter_id', chapterId);
+      }
+    } catch (err) {
+      console.error('Sync read chapter error:', err);
     }
   };
 
@@ -547,6 +598,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         syncSolvedToSupabase,
         syncStatsToSupabase,
         fetchUserSolvedIds,
+        syncReadChapterToSupabase,
+        fetchUserReadChapterIds,
         updateDisplayName,
       }}
     >

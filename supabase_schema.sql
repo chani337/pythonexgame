@@ -37,6 +37,21 @@ ALTER TABLE public.user_solved_problems DISABLE ROW LEVEL SECURITY;
 -- Grant ALL permissions to anon, authenticated, and service_role
 GRANT ALL ON public.user_solved_problems TO anon, authenticated, service_role, postgres;
 
+-- 2b. User Read Chapters Table (학습 가이드 챕터 완료 진도)
+CREATE TABLE IF NOT EXISTS public.user_read_chapters (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  chapter_id TEXT NOT NULL,
+  read_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_user_chapter UNIQUE (user_id, chapter_id)
+);
+
+-- Disable RLS on user_read_chapters so progress can sync easily like other tables
+ALTER TABLE public.user_read_chapters DISABLE ROW LEVEL SECURITY;
+
+-- Grant ALL permissions to anon, authenticated, and service_role
+GRANT ALL ON public.user_read_chapters TO anon, authenticated, service_role, postgres;
+
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
