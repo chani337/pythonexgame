@@ -20,13 +20,19 @@ export interface RunResponse {
   testResults?: TestResult[];
 }
 
-export function usePyodide() {
+// `enabled` defers the actual WASM download/init (Pyodide + numpy/pandas is
+// several MB and blocks the main thread for multiple seconds) until a view
+// that needs Python actually mounts, instead of eagerly loading it for every
+// visit including the dashboard/problem list which never run Python at all.
+export function usePyodide(enabled: boolean = true) {
   const [pyodide, setPyodide] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) return;
     let isMounted = true;
+    setLoading(true);
 
     async function initPyodide() {
       try {
@@ -70,7 +76,7 @@ export function usePyodide() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [enabled]);
 
   const runCode = async (
     code: string,

@@ -163,8 +163,21 @@ print("변환 리스트:", result)
     localStorage.setItem('pyquests_sandbox_code', sandboxCode);
   }, [sandboxCode]);
 
-  // Pyodide in-browser runtime
-  const { loading: isPyodideLoading, runCode } = usePyodide();
+  // Pyodide in-browser runtime: deferred until a view that actually needs
+  // Python (sandbox/docs/a non-JS coding problem) mounts, since the WASM
+  // download + numpy/pandas preload blocks the main thread for several
+  // seconds and shouldn't happen just for browsing the dashboard. Once
+  // triggered it latches on so navigating away and back doesn't reload it.
+  const [pyodideNeeded, setPyodideNeeded] = useState(false);
+  useEffect(() => {
+    const problemLanguage = selectedProblem?.language || (selectedProblem ? 'python' : undefined);
+    const needsPyodide =
+      currentView === 'sandbox' ||
+      currentView === 'docs' ||
+      (!!selectedProblem && problemLanguage !== 'js');
+    if (needsPyodide) setPyodideNeeded(true);
+  }, [currentView, selectedProblem]);
+  const { loading: isPyodideLoading, runCode } = usePyodide(pyodideNeeded);
   const { runCode: runJsCode } = useJsRunner();
 
   // Save changes to localStorage scoped to user
