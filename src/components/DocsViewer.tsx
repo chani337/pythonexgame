@@ -808,6 +808,7 @@ except Exception as e:
                     fontSize: '0.8rem',
                     fontWeight: selectedChapterIdx === idx ? '700' : '500',
                     transition: 'all 0.2s ease',
+                    width: '100%',
                   }}
                   onMouseEnter={(e) => {
                     if (selectedChapterIdx !== idx) {
@@ -822,8 +823,8 @@ except Exception as e:
                     }
                   }}
                 >
-                  <BookOpen size={14} />
-                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  <BookOpen size={15} style={{ flexShrink: 0, width: '15px', height: '15px', minWidth: '15px', minHeight: '15px' }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
                     {chapter.title}
                   </span>
                 </button>
