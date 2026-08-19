@@ -2253,7 +2253,8 @@ export const problems: Problem[] = [
         "expected": "{'name': '민수', 'age': 20}"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리는 {키: 값} 형태로 이름표(키)를 붙여 값을 저장하는 자료구조입니다. 리스트가 순서(인덱스)로 값을 관리한다면, 딕셔너리는 의미 있는 키로 값을 관리합니다."
   },
   {
     "id": "advanced_part9_q2",
@@ -2279,7 +2280,8 @@ export const problems: Problem[] = [
         "expected": "민수"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리[키]로 그 키에 해당하는 값을 꺼낼 수 있습니다. 리스트의 인덱스 대신 \"이름\"이라는 키를 사용해 값에 접근하는 것이 딕셔너리의 핵심입니다."
   },
   {
     "id": "advanced_part9_q3",
@@ -2305,7 +2307,8 @@ export const problems: Problem[] = [
         "expected": "{'name': '민수', 'age': 20, 'major': '컴퓨터공학'}"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리[새로운키] = 값처럼 아직 없는 키에 값을 대입하면, 딕셔너리에 새 항목이 추가됩니다. 이미 있는 키라면 값이 덮어씌워집니다."
   },
   {
     "id": "advanced_part9_q4",
@@ -2330,7 +2333,8 @@ export const problems: Problem[] = [
         "expected": "{'name': '민수', 'age': 21}"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "이미 존재하는 키에 다시 값을 대입하면 기존 값이 새 값으로 바뀝니다. 딕셔너리[키] = 새값이라는 문법은 \"추가\"와 \"수정\" 모두에 똑같이 사용됩니다."
   },
   {
     "id": "advanced_part9_q5",
@@ -2356,7 +2360,8 @@ export const problems: Problem[] = [
         "expected": "{'name': '민수'}"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "del 딕셔너리[키]는 딕셔너리에서 해당 키와 값을 통째로 삭제합니다. 리스트의 특정 인덱스를 지울 때도 del을 사용할 수 있습니다."
   },
   {
     "id": "advanced_part9_q6",
@@ -2382,7 +2387,8 @@ export const problems: Problem[] = [
         "expected": "dict_keys(['name', 'age', 'city'])"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리.keys()는 딕셔너리에 있는 모든 키를 모아서 반환합니다. for문과 함께 사용하면 모든 키를 순서대로 순회할 수 있습니다."
   },
   {
     "id": "advanced_part9_q7",
@@ -2408,7 +2414,8 @@ export const problems: Problem[] = [
         "expected": "dict_values(['민수', 20, '광주'])"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리.values()는 키는 제외하고 저장된 모든 값만 모아서 반환합니다. keys()와 짝을 이루는 메서드입니다."
   },
   {
     "id": "advanced_part9_q8",
@@ -2434,7 +2441,8 @@ export const problems: Problem[] = [
         "expected": "name 민수\nage 20"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리.items()는 (키, 값) 쌍을 함께 반환합니다. for 키, 값 in 딕셔너리.items():처럼 쓰면 키와 값을 동시에 꺼내며 반복할 수 있습니다."
   },
   {
     "id": "advanced_part9_q9",
@@ -2461,7 +2469,8 @@ export const problems: Problem[] = [
         "expected": "30000"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "상품 이름을 키로 쓰면, 딕셔너리[\"키보드\"]처럼 사람이 이해하기 쉬운 이름으로 바로 값을 조회할 수 있습니다. 실제 서비스에서 이름-가격 데이터를 다룰 때 자주 쓰이는 구조입니다."
   },
   {
     "id": "advanced_part9_q10",
@@ -2489,7 +2498,8 @@ export const problems: Problem[] = [
         "expected": "민수\n영희"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리.items()로 이름과 점수를 함께 꺼내면서, if 점수 >= 80: 조건으로 원하는 학생만 걸러 출력할 수 있습니다. 반복문, 조건문, 딕셔너리를 함께 활용하는 문제입니다."
   },
   {
     "id": "numpy_q1",
@@ -2516,7 +2526,8 @@ export const problems: Problem[] = [
         "expected": "88.0"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "np.array(리스트)는 파이썬 리스트를 NumPy 배열로 바꿔줍니다. 배열.mean()을 사용하면 반복문 없이 바로 평균을 계산할 수 있습니다."
   },
   {
     "id": "numpy_q2",
@@ -2542,7 +2553,8 @@ export const problems: Problem[] = [
         "expected": "[20 25 30]"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "NumPy 배열은 배열[배열 >= 20]처럼 조건을 대괄호 안에 넣으면, 그 조건을 만족하는 값들만 걸러낸 새 배열을 반환합니다. 파이썬 리스트에는 없는 NumPy만의 강력한 기능입니다."
   },
   {
     "id": "pandas_q1",
@@ -2568,7 +2580,8 @@ export const problems: Problem[] = [
         "expected": "86.0"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "DataFrame에서 df[\"열이름\"]으로 특정 열(Series)을 선택할 수 있고, 여기에 .mean()을 붙이면 그 열의 평균을 바로 계산할 수 있습니다."
   },
   {
     "id": "pandas_q2",
@@ -2595,7 +2608,8 @@ export const problems: Problem[] = [
         "expected": "['김철수', '박민수']"
       }
     ],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "df[조건]은 조건을 만족하는 행만 걸러줍니다. df[df[\"점수\"] >= 90][\"이름\"]처럼 조건으로 행을 거른 뒤 원하는 열만 선택하면, 조건에 맞는 이름만 뽑아낼 수 있습니다."
   },
   {
     "id": "lambda_q1",
@@ -2741,7 +2755,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"0으로 나눌 수 없습니다."}],
     "initialCode": "try:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    # 여기에 코드를 작성하세요\n    pass\n",
     "testCases": [{"input":"코드 실행","expected":"0으로 나눌 수 없습니다."}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "try 블록에서 코드를 실행하다 에러가 발생하면, 그 즉시 실행이 중단되고 except 블록으로 넘어갑니다. 0으로 나누면 ZeroDivisionError가 발생하는데, except ZeroDivisionError:로 이 에러만 콕 집어 처리할 수 있습니다."
   },
   {
     "id": "py_exc_2",
@@ -2755,7 +2770,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"5.0"}],
     "initialCode": "try:\n    result = 10 / 2\nexcept ZeroDivisionError:\n    print(\"0으로 나눌 수 없습니다.\")\n# else 블록을 이어서 작성하세요\n",
     "testCases": [{"input":"코드 실행","expected":"5.0"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "try-except-else 구조에서 else 블록은 try 블록에서 예외가 하나도 발생하지 않았을 때만 실행됩니다. \"정상적으로 성공했을 때만 실행할 코드\"를 except와 분리해서 작성할 수 있습니다."
   },
   {
     "id": "py_exc_3",
@@ -2769,7 +2785,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"인덱스 범위를 벗어났습니다.\n작업을 종료합니다."}],
     "initialCode": "numbers = [1, 2, 3]\ntry:\n    print(numbers[5])\nexcept IndexError:\n    # 여기에 코드를 작성하세요\n    pass\nfinally:\n    # 여기에 코드를 작성하세요\n    pass\n",
     "testCases": [{"input":"코드 실행","expected":"인덱스 범위를 벗어났습니다.\n작업을 종료합니다."}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "finally 블록은 예외가 발생하든 안 하든 항상 마지막에 실행됩니다. 파일을 닫거나 \"작업 종료\" 메시지를 남기는 등 반드시 수행해야 하는 마무리 작업에 사용합니다."
   },
   {
     "id": "py_exc_4",
@@ -2783,7 +2800,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"숫자로 변환할 수 없습니다."}],
     "initialCode": "try:\n    number = int(\"abc\")\nexcept ValueError:\n    # 여기에 코드를 작성하세요\n    pass\n",
     "testCases": [{"input":"코드 실행","expected":"숫자로 변환할 수 없습니다."}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "int('abc')처럼 숫자로 바꿀 수 없는 문자열을 변환하려 하면 ValueError가 발생합니다. except ValueError:로 감싸면 프로그램이 멈추지 않고 대체 메시지를 출력할 수 있습니다."
   },
   {
     "id": "py_exc_5",
@@ -2797,7 +2815,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"나이는 음수일 수 없습니다."}],
     "initialCode": "def check_age(age):\n    # 여기에 코드를 작성하세요\n    pass\n\ntry:\n    check_age(-5)\nexcept ValueError as e:\n    print(e)\n",
     "testCases": [{"input":"코드 실행","expected":"나이는 음수일 수 없습니다."}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "raise ValueError(\"메시지\")를 사용하면 특정 조건에서 직접 예외를 발생시킬 수 있습니다. 함수를 호출하는 쪽에서는 이를 try-except로 감싸 예외 메시지(예외객체.args[0] 또는 str(예외객체))를 확인할 수 있습니다."
   },
   {
     "id": "py_exc_6",
@@ -2811,7 +2830,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"음수는 허용되지 않습니다."}],
     "initialCode": "class NegativeNumberError(Exception):\n    pass\n\ndef check_number(n):\n    # 여기에 코드를 작성하세요\n    pass\n\ntry:\n    check_number(-3)\nexcept NegativeNumberError as e:\n    print(e)\n",
     "testCases": [{"input":"코드 실행","expected":"음수는 허용되지 않습니다."}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "class 나만의예외(Exception):처럼 Exception을 상속받으면 나만의 예외 클래스를 만들 수 있습니다. 이렇게 만든 예외도 일반 내장 예외처럼 raise로 발생시키고 except로 잡을 수 있습니다."
   },
   {
     "id": "py_cls_1",
@@ -2825,7 +2845,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"민수\n20"}],
     "initialCode": "class Person:\n    def __init__(self, name, age):\n        # 여기에 코드를 작성하세요\n        pass\n\np = Person(\"민수\", 20)\nprint(p.name)\nprint(p.age)\n",
     "testCases": [{"input":"코드 실행","expected":"민수\n20"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "class 클래스이름:과 __init__(self, ...) 생성자로 클래스를 정의합니다. 객체를 만들 때(Person(\"민수\", 20)) 전달한 값이 self.이름, self.나이에 저장되어 그 객체만의 데이터가 됩니다."
   },
   {
     "id": "py_cls_2",
@@ -2839,7 +2860,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"안녕하세요, 저는 찬희입니다."}],
     "initialCode": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\n    def introduce(self):\n        # 여기에 코드를 작성하세요\n        pass\n\np = Person(\"찬희\", 25)\np.introduce()\n",
     "testCases": [{"input":"코드 실행","expected":"안녕하세요, 저는 찬희입니다."}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "클래스 안에 정의한 함수를 메서드라고 하며, 항상 첫 번째 매개변수로 self(객체 자기 자신)를 받습니다. 메서드 안에서 self.속성으로 그 객체의 데이터에 접근할 수 있습니다."
   },
   {
     "id": "py_cls_3",
@@ -2853,7 +2875,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"초코\n개"}],
     "initialCode": "class Dog:\n    # 여기에 클래스 변수를 작성하세요\n\n    def __init__(self, name):\n        self.name = name\n\nd = Dog(\"초코\")\nprint(d.name)\nprint(d.species)\n",
     "testCases": [{"input":"코드 실행","expected":"초코\n개"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "클래스 변수는 class 블록 바로 아래에 선언되어 모든 객체가 공유하는 값이고, self.속성 = 값으로 만드는 인스턴스 변수는 객체마다 따로 가지는 값입니다. species는 모든 Dog가 같지만, 이름은 객체마다 다릅니다."
   },
   {
     "id": "py_cls_4",
@@ -2867,7 +2890,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"민수"}],
     "initialCode": "class Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\ns1 = Student(\"민수\", 90)\ns2 = Student(\"철수\", 85)\n\n# 점수가 더 높은 학생의 이름을 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"민수"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "객체는 각자 독립적인 속성값을 가지므로, 두 객체의 같은 속성(점수)을 서로 비교할 수 있습니다. student1.score > student2.score처럼 비교해서 조건에 따라 원하는 객체의 정보를 출력할 수 있습니다."
   },
   {
     "id": "py_cls_5",
@@ -2881,7 +2905,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"80"}],
     "initialCode": "class Character:\n    def __init__(self):\n        self.hp = 100\n\n    def take_damage(self, amount):\n        # 여기에 코드를 작성하세요\n        pass\n\nc = Character()\nc.take_damage(20)\nprint(c.hp)\n",
     "testCases": [{"input":"코드 실행","expected":"80"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "메서드 안에서 self.속성 = 새값처럼 값을 바꾸면, 그 객체의 상태가 실제로 변경됩니다. take_damage()를 호출할 때마다 hp가 줄어들고, 그 변화가 객체에 계속 유지됩니다."
   },
   {
     "id": "py_cls_6",
@@ -2895,7 +2920,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"사과: 1000\n바나나: 2000\n포도: 3000"}],
     "initialCode": "class Product:\n    def __init__(self, name, price):\n        self.name = name\n        self.price = price\n\n# 리스트를 만들고 반복문으로 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"사과: 1000\n바나나: 2000\n포도: 3000"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "객체도 일반 값처럼 리스트에 담을 수 있습니다. for 상품 in 상품리스트:로 순회하면서 각 객체의 속성(상품.이름, 상품.가격)에 접근해 원하는 형식으로 출력할 수 있습니다."
   },
   {
     "id": "py_inh_1",
@@ -2909,7 +2935,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"초코"}],
     "initialCode": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\n# Dog 클래스를 작성하세요\n\nd = Dog(\"초코\")\nprint(d.name)\n",
     "testCases": [{"input":"코드 실행","expected":"초코"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "class Dog(Animal):처럼 괄호 안에 부모 클래스를 적으면 상속을 받습니다. Dog는 Animal의 속성과 메서드를 그대로 물려받아 사용할 수 있습니다."
   },
   {
     "id": "py_inh_2",
@@ -2923,7 +2950,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"멍멍!"}],
     "initialCode": "class Animal:\n    def make_sound(self):\n        print(\"동물이 소리를 냅니다.\")\n\n# Dog 클래스에서 make_sound를 오버라이딩하세요\n\nd = Dog()\nd.make_sound()\n",
     "testCases": [{"input":"코드 실행","expected":"멍멍!"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "자식 클래스에서 부모와 같은 이름의 메서드를 다시 정의하면, 자식 객체는 새로 정의한 메서드가 우선 실행됩니다. 이를 메서드 오버라이딩(재정의)이라고 합니다."
   },
   {
     "id": "py_inh_3",
@@ -2937,7 +2965,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"초코\n말티즈"}],
     "initialCode": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        # 여기에 코드를 작성하세요\n        pass\n\nd = Dog(\"초코\", \"말티즈\")\nprint(d.name)\nprint(d.breed)\n",
     "testCases": [{"input":"코드 실행","expected":"초코\n말티즈"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "자식 클래스의 __init__에서 super().__init__(...)을 호출하면 부모 클래스의 생성자를 실행해서 공통 속성(이름)을 초기화할 수 있습니다. 그 아래에 자식만의 속성(breed)을 추가로 저장하면 됩니다."
   },
   {
     "id": "py_inh_4",
@@ -2951,7 +2980,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"멍멍!\n야옹!"}],
     "initialCode": "class Animal:\n    def make_sound(self):\n        pass\n\n# Dog, Cat 클래스를 작성하세요\n\nanimals = [Dog(), Cat()]\nfor a in animals:\n    a.make_sound()\n",
     "testCases": [{"input":"코드 실행","expected":"멍멍!\n야옹!"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "서로 다른 클래스(Dog, Cat)의 객체라도 부모가 같으면 같은 이름의 메서드(make_sound)를 각자의 방식대로 실행할 수 있습니다. 이렇게 같은 코드로 서로 다른 동작을 하는 것을 다형성이라고 부릅니다."
   },
   {
     "id": "py_inh_5",
@@ -2965,7 +2995,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"먹이를 먹습니다.\n꼬리를 흔듭니다."}],
     "initialCode": "class Animal:\n    def eat(self):\n        print(\"먹이를 먹습니다.\")\n\n# Dog 클래스에서 eat()을 오버라이딩하세요\n\nd = Dog()\nd.eat()\n",
     "testCases": [{"input":"코드 실행","expected":"먹이를 먹습니다.\n꼬리를 흔듭니다."}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "자식 클래스의 메서드 안에서 super().메서드이름()을 호출하면 부모의 원래 동작을 실행한 뒤, 그 아래에 자식만의 추가 동작을 이어서 작성할 수 있습니다. 부모의 기능을 완전히 대체하지 않고 확장하는 방식입니다."
   },
   {
     "id": "py_inh_6",
@@ -2979,7 +3010,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"True\nTrue"}],
     "initialCode": "class Animal:\n    pass\n\nclass Dog(Animal):\n    pass\n\nd = Dog()\n# isinstance 결과를 각각 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"True\nTrue"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "isinstance(객체, 클래스)는 그 객체가 해당 클래스(또는 그 클래스를 상속받은 자식 클래스)의 인스턴스인지 확인합니다. Dog는 Animal을 상속받았으므로, Dog 객체는 Animal의 인스턴스이기도 해서 두 isinstance 결과가 모두 True가 됩니다."
   },
   {
     "id": "py_ds_1",
@@ -3008,7 +3040,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}"}],
     "initialCode": "# 딕셔너리 컴프리헨션으로 작성하세요\n",
     "testCases": [{"input":"코드 실행","expected":"{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리 컴프리헨션 {키식: 값식 for 변수 in range(...)}은 리스트 컴프리헨션과 같은 원리로 딕셔너리를 한 줄로 만드는 문법입니다. 숫자를 키로, 그 제곱을 값으로 동시에 계산해서 채워 넣을 수 있습니다."
   },
   {
     "id": "py_ds_3",
@@ -3037,7 +3070,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"87.5"}],
     "initialCode": "scores = {\"민수\": [90, 85], \"철수\": [70, 80]}\n# 민수의 점수 평균을 출력하세요\n",
     "testCases": [{"input":"코드 실행","expected":"87.5"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "딕셔너리의 값으로 리스트를 저장하면, 딕셔너리[\"민수\"]로 그 학생의 점수 리스트를 꺼낸 뒤 sum()과 len()으로 평균을 계산할 수 있습니다. 딕셔너리와 리스트를 조합해서 더 복잡한 데이터를 표현하는 예시입니다."
   },
   {
     "id": "py_ds_5",
