@@ -3,6 +3,7 @@ import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Sh
 import type { Problem } from '../data/problems';
 import { useAuth } from '../contexts/AuthContext';
 import ProfileEditModal from './ProfileEditModal';
+import LearningRoadmap from './LearningRoadmap';
 import { triviaItems } from '../data/trivia';
 
 
@@ -10,7 +11,7 @@ interface DashboardProps {
   problems: Problem[];
   solvedIds: string[];
   streak: number;
-  onNavigateToProblems: () => void;
+  onNavigateToProblems: (language?: string, difficulty?: string) => void;
   onSelectProblem: (problem: Problem) => void;
   sandboxRunCount: number;
   onUnlockAll?: () => void;
@@ -299,7 +300,7 @@ export default function Dashboard({
               {isMasterAdmin ? '👑 마스터 모드: 모든 문제 풀기 & 뱃지 해금' : '⚡ 모든 문제 풀기 & 뱃지 전체 해금'}
             </button>
           )}
-          <button className="btn-primary" onClick={onNavigateToProblems}>
+          <button className="btn-primary" onClick={() => onNavigateToProblems()}>
             <BookOpen size={15} />
             학습 시작하기
             <ChevronRight size={14} />
@@ -553,6 +554,9 @@ export default function Dashboard({
           </div>
         </div>
       </div>
+
+      {/* Learning Roadmap */}
+      <LearningRoadmap problems={problems} solvedIds={solvedIds} onNavigate={onNavigateToProblems} />
 
       {/* Badges Section */}
       <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '0px' }}>

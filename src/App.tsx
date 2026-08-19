@@ -386,7 +386,11 @@ print("변환 리스트:", result)
             problems={problems}
             solvedIds={solvedIds}
             streak={streak}
-            onNavigateToProblems={() => setCurrentView('problems')}
+            onNavigateToProblems={(language, difficulty) => {
+              if (language) setSelectedLanguage(language);
+              if (difficulty) setSelectedDifficulty(difficulty);
+              setCurrentView('problems');
+            }}
             onSelectProblem={handleSelectProblem}
             sandboxRunCount={sandboxRunCount}
             onUnlockAll={handleUnlockAllProblems}
