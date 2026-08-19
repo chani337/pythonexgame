@@ -438,6 +438,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const updateDisplayName = async (newDisplayName: string) => {
+    if (!user) {
+      setAuthModalOpen(true);
+      return { error: { message: '로그인한 회원만 닉네임을 변경할 수 있습니다. 먼저 로그인해 주세요.' } };
+    }
+
     const cleanName = newDisplayName.trim();
     if (!cleanName) {
       return { error: { message: '닉네임을 입력해 주세요.' } };
@@ -449,7 +454,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: { message: '부적절하거나 비하/욕설 단어는 닉네임으로 사용할 수 없습니다.' } };
     }
 
-    const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
+    const activeUserId = user.id;
 
     // 1. Duplication check in Supabase profiles table
     if (isSupabaseConfigured) {

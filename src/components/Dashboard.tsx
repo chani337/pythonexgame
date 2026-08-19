@@ -531,25 +531,26 @@ function LeaderboardWidget() {
           🔥 글로벌 명예의 전당 (실시간 랭킹)
         </h3>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <button
-            onClick={() => setProfileEditOpen(true)}
-            style={{
-              background: 'transparent',
-              border: '1px solid var(--border-subtle)',
-              color: '#1a1a1a',
-              fontSize: '0.75rem',
-              fontWeight: '700',
-              padding: '0.3rem 0.6rem',
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.3rem',
-            }}
-          >
-            <Edit3 size={12} />
-            닉네임 변경
-          </button>
-          {!user && (
+          {user ? (
+            <button
+              onClick={() => setProfileEditOpen(true)}
+              style={{
+                background: 'transparent',
+                border: '1px solid var(--border-subtle)',
+                color: '#1a1a1a',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                padding: '0.3rem 0.6rem',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+              }}
+            >
+              <Edit3 size={12} />
+              닉네임 변경
+            </button>
+          ) : (
             <button
               onClick={() => setAuthModalOpen(true)}
               style={{

@@ -8,7 +8,7 @@ interface ProfileEditModalProps {
 }
 
 export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalProps) {
-  const { user, profile, updateDisplayName } = useAuth();
+  const { user, profile, updateDisplayName, setAuthModalOpen } = useAuth();
   const currentName = profile?.display_name || user?.email?.split('@')[0] || '러너';
   const [displayName, setDisplayName] = useState(currentName);
   const [loading, setLoading] = useState(false);
@@ -172,8 +172,64 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
           </div>
         )}
 
-        {/* Form */}
-        <form onSubmit={handleSubmit}>
+        {/* Non-member block view */}
+        {!user ? (
+          <div style={{ textAlign: 'center', padding: '1rem 0' }}>
+            <div
+              style={{
+                backgroundColor: '#fef2f2',
+                border: '1px solid #fecaca',
+                color: '#dc2626',
+                padding: '1rem',
+                borderRadius: '8px',
+                fontSize: '0.88rem',
+                lineHeight: '1.5',
+                marginBottom: '1.5rem',
+              }}
+            >
+              로그인한 회원만 닉네임을 설정 및 변경하실 수 있습니다. 로그인 후 나만의 닉네임으로 랭킹에 도전해 보세요!
+            </div>
+            <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'center' }}>
+              <button
+                type="button"
+                onClick={onClose}
+                style={{
+                  padding: '0.65rem 1.25rem',
+                  borderRadius: '8px',
+                  border: '1px solid #d1d5db',
+                  backgroundColor: '#ffffff',
+                  color: '#374151',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                }}
+              >
+                닫기
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  onClose();
+                  setAuthModalOpen(true);
+                }}
+                style={{
+                  padding: '0.65rem 1.5rem',
+                  borderRadius: '8px',
+                  border: 'none',
+                  backgroundColor: '#111827',
+                  color: '#ffffff',
+                  fontWeight: 600,
+                  fontSize: '0.9rem',
+                  cursor: 'pointer',
+                }}
+              >
+                로그인 / 회원가입
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Form for logged in users */
+          <form onSubmit={handleSubmit}>
           <div style={{ marginBottom: '1.5rem' }}>
             <label
               htmlFor="nickname-input"
@@ -250,6 +306,7 @@ export default function ProfileEditModal({ isOpen, onClose }: ProfileEditModalPr
             </button>
           </div>
         </form>
+        )}
       </div>
     </div>
   );
