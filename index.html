@@ -12,6 +12,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Pyodide WASM Python Runtime -->
     <script src="https://cdn.jsdelivr.net/pyodide/v0.26.2/full/pyodide.js"></script>
+    <!-- Apply saved dark mode before first paint to avoid a light-mode flash -->
+    <script>
+      try {
+        if (localStorage.getItem('pyquests_dark_mode') === 'true') {
+          document.documentElement.classList.add('dark-mode');
+        }
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

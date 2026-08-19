@@ -58,6 +58,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Dark mode: the app is built almost entirely with hardcoded inline hex
+   colors rather than the CSS variables above, so a per-element palette
+   retrofit would mean auditing hundreds of individual styles. Instead we
+   invert the whole page's colors, then counter-invert the surfaces that are
+   already intentionally dark in light mode (the code editor chrome) so they
+   stay visually unchanged rather than flipping to light. */
+html.dark-mode {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html.dark-mode .editor-frame,
+html.dark-mode .editor-tabs {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-display);
   font-weight: 600;

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, BookOpen, Terminal, GraduationCap, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3 } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Terminal, GraduationCap, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useDarkMode } from '../hooks/useDarkMode';
 import ProfileEditModal from './ProfileEditModal';
 
 interface SidebarProps {
@@ -25,6 +26,7 @@ export default function Sidebar({
     const saved = localStorage.getItem('pyquests_sidebar_collapsed');
     return saved !== null ? JSON.parse(saved) : false;
   });
+  const { isDark, toggleDark } = useDarkMode();
 
   useEffect(() => {
     localStorage.setItem('pyquests_sidebar_collapsed', JSON.stringify(isCollapsed));
@@ -102,26 +104,48 @@ export default function Sidebar({
               )}
             </div>
 
-            <button
-              onClick={() => setIsCollapsed(!isCollapsed)}
-              title={isCollapsed ? '메인 메뉴 펼치기' : '메인 메뉴 접기'}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                cursor: 'pointer',
-                padding: '0.35rem',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                borderRadius: '0px',
-                transition: 'color 0.2s ease',
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
-              onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
-            >
-              {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.15rem' }}>
+              <button
+                onClick={toggleDark}
+                title={isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: '0.35rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '0px',
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+              >
+                {isDark ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+              <button
+                onClick={() => setIsCollapsed(!isCollapsed)}
+                title={isCollapsed ? '메인 메뉴 펼치기' : '메인 메뉴 접기'}
+                style={{
+                  background: 'transparent',
+                  border: 'none',
+                  color: 'var(--text-secondary)',
+                  cursor: 'pointer',
+                  padding: '0.35rem',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderRadius: '0px',
+                  transition: 'color 0.2s ease',
+                }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = '#1a1a1a')}
+                onMouseLeave={(e) => (e.currentTarget.style.color = 'var(--text-secondary)')}
+              >
+                {isCollapsed ? <PanelLeftOpen size={18} /> : <PanelLeftClose size={18} />}
+              </button>
+            </div>
           </div>
 
           {/* Navigation Menu */}
@@ -436,6 +460,24 @@ export default function Sidebar({
               gap: '0.75rem',
             }}
           >
+            <button
+              onClick={toggleDark}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'transparent',
+                border: '1px solid var(--border-subtle)',
+                padding: '0.6rem 0.75rem',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                color: '#1a1a1a',
+                cursor: 'pointer',
+              }}
+            >
+              {isDark ? <Sun size={16} /> : <Moon size={16} />}
+              {isDark ? '라이트 모드로 전환' : '다크 모드로 전환'}
+            </button>
             {streak > 0 && (
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
                 <span>🔥</span>
