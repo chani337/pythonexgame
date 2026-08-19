@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
-import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import confetti from 'canvas-confetti';
@@ -12,6 +12,9 @@ interface ProblemWorkspaceProps {
   runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onMarkSolved: (problemId: string) => void;
+  isBookmarked?: boolean;
+  onToggleReview?: (problemId: string) => void;
+  onWrongAttempt?: (problemId: string) => void;
 }
 
 export default function ProblemWorkspace({
@@ -22,6 +25,9 @@ export default function ProblemWorkspace({
   runPythonCode,
   isPyodideLoading,
   onMarkSolved,
+  isBookmarked,
+  onToggleReview,
+  onWrongAttempt,
 }: ProblemWorkspaceProps) {
   const problemLanguage = problem.language || 'python';
   const editorFileLabel =
@@ -235,6 +241,8 @@ export default function ProblemWorkspace({
             spread: 70,
             origin: { y: 0.6 }
           });
+        } else {
+          onWrongAttempt?.(problem.id);
         }
       }
     } catch (err: any) {
@@ -262,6 +270,7 @@ export default function ProblemWorkspace({
     } else {
       setWorkspaceSuccess(false);
       setConsoleError('오답입니다. 다시 한번 생각해 보세요!');
+      onWrongAttempt?.(problem.id);
     }
   };
 
@@ -285,6 +294,7 @@ export default function ProblemWorkspace({
     } else {
       setWorkspaceSuccess(false);
       setConsoleError(`오답입니다. '${fillText}'은(는) 올바른 식별자가 아닙니다. 제약 조건을 확인하세요.`);
+      onWrongAttempt?.(problem.id);
     }
   };
 
@@ -317,6 +327,28 @@ export default function ProblemWorkspace({
 
         {/* Quick Prev / Next Navigation */}
         <div style={{ display: 'flex', gap: '0.5rem' }}>
+          {onToggleReview && (
+            <button
+              onClick={() => onToggleReview(problem.id)}
+              title={isBookmarked ? '오답노트에서 제거' : '오답노트에 추가'}
+              style={{
+                background: isBookmarked ? '#fff8e6' : '#ffffff',
+                border: '1px solid',
+                borderColor: isBookmarked ? '#e8a90c' : 'var(--border-subtle)',
+                color: isBookmarked ? '#a66908' : 'var(--text-secondary)',
+                padding: '0.35rem 0.6rem',
+                fontSize: '0.78rem',
+                fontWeight: '600',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.3rem',
+              }}
+            >
+              <Star size={14} fill={isBookmarked ? '#e8a90c' : 'none'} />
+              {isBookmarked ? '복습 표시됨' : '복습 표시'}
+            </button>
+          )}
           {onPrevProblem && (
             <button
               onClick={onPrevProblem}

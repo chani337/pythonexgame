@@ -1,11 +1,13 @@
 import { useLayoutEffect, useEffect, useState } from 'react';
-import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle, ArrowUp } from 'lucide-react';
+import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle, ArrowUp, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { filterProblems } from '../data/problems';
 
 interface ProblemListProps {
   problems: Problem[];
   solvedIds: string[];
+  reviewIds?: string[];
+  onToggleReview?: (problemId: string) => void;
   onSelectProblem: (problem: Problem) => void;
   selectedLanguage: string;
   setSelectedLanguage: (language: string) => void;
@@ -21,6 +23,8 @@ interface ProblemListProps {
 export default function ProblemList({
   problems,
   solvedIds,
+  reviewIds = [],
+  onToggleReview,
   onSelectProblem,
   selectedLanguage,
   setSelectedLanguage,
@@ -57,13 +61,16 @@ export default function ProblemList({
     document.querySelector('.main-content')?.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // 오답노트: 별표 표시했거나 틀렸던 문제만 보기 (다른 필터와 함께 적용됨)
+  const [reviewOnly, setReviewOnly] = useState(false);
+
   // Filter logic (shared with App.tsx's next/prev navigation via filterProblems)
   const filteredProblems = filterProblems(problems, {
     language: selectedLanguage,
     difficulty: selectedDifficulty,
     type: selectedType,
     search: searchQuery,
-  });
+  }).filter((p) => !reviewOnly || reviewIds.includes(p.id));
 
   const getProblemTypeLabel = (type: string) => {
     switch (type) {
@@ -199,6 +206,29 @@ export default function ProblemList({
               </button>
             ))}
           </div>
+
+          {/* Review-only toggle */}
+          <button
+            onClick={() => setReviewOnly((prev) => !prev)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.35rem',
+              padding: '0.4rem 0.85rem',
+              fontSize: '0.8rem',
+              fontWeight: '600',
+              borderRadius: '0px',
+              border: '1px solid',
+              borderColor: reviewOnly ? '#e8a90c' : 'var(--border-subtle)',
+              cursor: 'pointer',
+              background: reviewOnly ? '#fff8e6' : '#f4f4f6',
+              color: reviewOnly ? '#a66908' : 'var(--text-secondary)',
+              transition: 'all 0.2s ease',
+            }}
+          >
+            <Star size={14} fill={reviewOnly ? '#e8a90c' : 'none'} />
+            오답노트 {reviewIds.length > 0 && `(${reviewIds.length})`}
+          </button>
         </div>
 
         {/* Right Side: Search Input */}
@@ -248,6 +278,7 @@ export default function ProblemList({
         >
           {filteredProblems.map((problem) => {
             const isSolved = solvedIds.includes(problem.id);
+            const isReview = reviewIds.includes(problem.id);
             const typeInfo = getProblemTypeLabel(problem.type);
             const TypeIcon = typeInfo.icon;
             const langInfo = getLanguageLabel(problem.language);
@@ -277,30 +308,51 @@ export default function ProblemList({
                   borderLeft: `4px solid ${diffBorderColor}`,
                 }}
               >
-                {/* Solved Stamp */}
-                {isSolved && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      right: '1.5rem',
-                      top: '1.5rem',
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.25rem',
-                      fontSize: '0.7rem',
-                      color: '#1a1a1a',
-                      fontWeight: '700',
-                      background: '#f4f4f6',
-                      border: '1px solid #1a1a1a',
-                      padding: '0.25rem 0.5rem',
-                      textTransform: 'uppercase',
-                      letterSpacing: '0.05em',
-                    }}
-                  >
-                    <CheckCircle2 size={12} />
-                    Clear
-                  </div>
-                )}
+                {/* Top-right badges: review star + solved stamp */}
+                <div style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  {onToggleReview && (
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onToggleReview(problem.id);
+                      }}
+                      title={isReview ? '오답노트에서 제거' : '오답노트에 추가'}
+                      style={{
+                        background: isReview ? '#fff8e6' : 'transparent',
+                        border: '1px solid',
+                        borderColor: isReview ? '#e8a90c' : 'var(--border-subtle)',
+                        color: '#a66908',
+                        padding: '0.3rem',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <Star size={13} fill={isReview ? '#e8a90c' : 'none'} />
+                    </button>
+                  )}
+                  {isSolved && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.25rem',
+                        fontSize: '0.7rem',
+                        color: '#1a1a1a',
+                        fontWeight: '700',
+                        background: '#f4f4f6',
+                        border: '1px solid #1a1a1a',
+                        padding: '0.25rem 0.5rem',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.05em',
+                      }}
+                    >
+                      <CheckCircle2 size={12} />
+                      Clear
+                    </div>
+                  )}
+                </div>
 
                 {/* Problem Info */}
                 <div>
@@ -410,7 +462,9 @@ export default function ProblemList({
             borderRadius: '0px',
           }}
         >
-          검색 및 필터 조건에 부합하는 문제가 없습니다.
+          {reviewOnly
+            ? '오답노트가 비어있습니다. 문제를 풀다가 틀리면 자동으로 추가되거나, ⭐ 버튼으로 직접 표시할 수 있어요.'
+            : '검색 및 필터 조건에 부합하는 문제가 없습니다.'}
         </div>
       )}
 

@@ -32,6 +32,13 @@ function MainApp() {
     return saved ? JSON.parse(saved) : [];
   });
 
+  // 오답노트: 틀린 문제는 자동으로, 별표는 수동으로 추가되는 "복습 목록"
+  const [reviewIds, setReviewIds] = useState<string[]>(() => {
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
+    const saved = localStorage.getItem(`pyquests_review_ids_${lastId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
   const [streak, setStreak] = useState<number>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
     const saved = localStorage.getItem(`pyquests_streak_${lastId}`) || localStorage.getItem('pyquests_streak');
@@ -62,11 +69,17 @@ function MainApp() {
         setSolvedIds(merged);
         localStorage.setItem(localKey, JSON.stringify(merged));
       });
+
+      const savedReview = localStorage.getItem(`pyquests_review_ids_${user.id}`);
+      setReviewIds(savedReview ? JSON.parse(savedReview) : []);
     } else if (!isAuthLoading) {
       // Load local guest progress when not logged in instead of resetting to 0
       const guestSolved = localStorage.getItem('pyquests_solved_ids_guest') || localStorage.getItem('pyquests_solved_ids');
       const guestSolvedList = guestSolved ? JSON.parse(guestSolved) : [];
       setSolvedIds(guestSolvedList);
+
+      const guestReview = localStorage.getItem('pyquests_review_ids_guest');
+      setReviewIds(guestReview ? JSON.parse(guestReview) : []);
 
       const guestStreak = localStorage.getItem('pyquests_streak_guest') || localStorage.getItem('pyquests_streak') || '0';
       setStreak(parseInt(guestStreak, 10));
@@ -156,6 +169,23 @@ print("변환 리스트:", result)
     const storageKey = user ? `pyquests_sandbox_runs_${user.id}` : 'pyquests_sandbox_runs_guest';
     localStorage.setItem(storageKey, sandboxRunCount.toString());
   }, [sandboxRunCount, user]);
+
+  useEffect(() => {
+    const storageKey = user ? `pyquests_review_ids_${user.id}` : 'pyquests_review_ids_guest';
+    localStorage.setItem(storageKey, JSON.stringify(reviewIds));
+  }, [reviewIds, user]);
+
+  // Manually star/unstar a problem for review (오답노트 즐겨찾기)
+  const handleToggleReview = (problemId: string) => {
+    setReviewIds((prev) =>
+      prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId]
+    );
+  };
+
+  // Auto-add a problem to the review list the first time it's answered incorrectly
+  const handleWrongAttempt = (problemId: string) => {
+    setReviewIds((prev) => (prev.includes(problemId) ? prev : [...prev, problemId]));
+  };
 
   // Mark a problem as solved and compute the streak
   const handleMarkSolved = (problemId: string) => {
@@ -318,6 +348,9 @@ print("변환 리스트:", result)
             runPythonCode={runCode}
             isPyodideLoading={isPyodideLoading}
             onMarkSolved={handleMarkSolved}
+            isBookmarked={reviewIds.includes(selectedProblem.id)}
+            onToggleReview={handleToggleReview}
+            onWrongAttempt={handleWrongAttempt}
           />
         ) : currentView === 'dashboard' ? (
           <Dashboard
@@ -333,6 +366,8 @@ print("변환 리스트:", result)
           <ProblemList
             problems={problems}
             solvedIds={solvedIds}
+            reviewIds={reviewIds}
+            onToggleReview={handleToggleReview}
             onSelectProblem={handleSelectProblem}
             selectedLanguage={selectedLanguage}
             setSelectedLanguage={setSelectedLanguage}
