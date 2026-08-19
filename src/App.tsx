@@ -1,11 +1,15 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import Sidebar from './components/Sidebar';
-import Dashboard from './components/Dashboard';
-import ProblemList from './components/ProblemList';
-import ProblemWorkspace from './components/ProblemWorkspace';
-import Sandbox from './components/Sandbox';
-import DocsViewer from './components/DocsViewer';
 import AuthModal from './components/AuthModal';
+
+// Lazily loaded so each view's code (and, for DocsViewer, the large docs.ts
+// chapter text) only downloads when the user actually navigates there,
+// instead of all being bundled into the initial page load.
+const Dashboard = lazy(() => import('./components/Dashboard'));
+const ProblemList = lazy(() => import('./components/ProblemList'));
+const ProblemWorkspace = lazy(() => import('./components/ProblemWorkspace'));
+const Sandbox = lazy(() => import('./components/Sandbox'));
+const DocsViewer = lazy(() => import('./components/DocsViewer'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import { problems, filterProblems } from './data/problems';
@@ -17,7 +21,7 @@ function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
 
-  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds } = useAuth();
+  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
@@ -71,8 +75,15 @@ function MainApp() {
         localStorage.setItem(localKey, JSON.stringify(merged));
       });
 
-      const savedReview = localStorage.getItem(`pyquests_review_ids_${user.id}`);
-      setReviewIds(savedReview ? JSON.parse(savedReview) : []);
+      const localReviewKey = `pyquests_review_ids_${user.id}`;
+      const savedLocalReview = localStorage.getItem(localReviewKey);
+      const localReview: string[] = savedLocalReview ? JSON.parse(savedLocalReview) : [];
+
+      fetchUserReviewProblemIds().then((remoteReviewIds) => {
+        const merged = Array.from(new Set([...localReview, ...(remoteReviewIds || [])]));
+        setReviewIds(merged);
+        localStorage.setItem(localReviewKey, JSON.stringify(merged));
+      });
     } else if (!isAuthLoading) {
       // Load local guest progress when not logged in instead of resetting to 0
       const guestSolved = localStorage.getItem('pyquests_solved_ids_guest') || localStorage.getItem('pyquests_solved_ids');
@@ -179,14 +190,20 @@ print("변환 리스트:", result)
 
   // Manually star/unstar a problem for review (오답노트 즐겨찾기)
   const handleToggleReview = (problemId: string) => {
-    setReviewIds((prev) =>
-      prev.includes(problemId) ? prev.filter((id) => id !== problemId) : [...prev, problemId]
-    );
+    setReviewIds((prev) => {
+      const nowInReview = !prev.includes(problemId);
+      syncReviewProblemToSupabase(problemId, nowInReview);
+      return nowInReview ? [...prev, problemId] : prev.filter((id) => id !== problemId);
+    });
   };
 
   // Auto-add a problem to the review list the first time it's answered incorrectly
   const handleWrongAttempt = (problemId: string) => {
-    setReviewIds((prev) => (prev.includes(problemId) ? prev : [...prev, problemId]));
+    setReviewIds((prev) => {
+      if (prev.includes(problemId)) return prev;
+      syncReviewProblemToSupabase(problemId, true);
+      return [...prev, problemId];
+    });
   };
 
   // Mark a problem as solved and compute the streak
@@ -342,6 +359,13 @@ print("변환 리스트:", result)
 
       {/* Main Content Router */}
       <main className="main-content">
+        <Suspense
+          fallback={
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
+              불러오는 중...
+            </div>
+          }
+        >
         {selectedProblem ? (
           <ProblemWorkspace
             problem={selectedProblem}
@@ -406,6 +430,7 @@ print("변환 리스트:", result)
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center' }}>404 Not Found</div>
         )}
+        </Suspense>
       </main>
     </div>
   );

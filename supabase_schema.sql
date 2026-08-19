@@ -52,6 +52,21 @@ ALTER TABLE public.user_read_chapters DISABLE ROW LEVEL SECURITY;
 -- Grant ALL permissions to anon, authenticated, and service_role
 GRANT ALL ON public.user_read_chapters TO anon, authenticated, service_role, postgres;
 
+-- 2c. User Review Problems Table (오답노트: 틀렸거나 별표 표시한 문제)
+CREATE TABLE IF NOT EXISTS public.user_review_problems (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  problem_id TEXT NOT NULL,
+  added_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_user_review_problem UNIQUE (user_id, problem_id)
+);
+
+-- Disable RLS on user_review_problems so progress can sync easily like other tables
+ALTER TABLE public.user_review_problems DISABLE ROW LEVEL SECURITY;
+
+-- Grant ALL permissions to anon, authenticated, and service_role
+GRANT ALL ON public.user_review_problems TO anon, authenticated, service_role, postgres;
+
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$

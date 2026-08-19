@@ -49,6 +49,8 @@ interface AuthContextType {
   fetchUserSolvedIds: () => Promise<string[]>;
   syncReadChapterToSupabase: (chapterId: string, isRead: boolean) => Promise<void>;
   fetchUserReadChapterIds: () => Promise<string[]>;
+  syncReviewProblemToSupabase: (problemId: string, isInReview: boolean) => Promise<void>;
+  fetchUserReviewProblemIds: () => Promise<string[]>;
   updateDisplayName: (newDisplayName: string) => Promise<{ error?: any }>;
 }
 
@@ -205,6 +207,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await supabase.from('user_read_chapters').upsert(records, { onConflict: 'user_id,chapter_id' });
         }
       }
+
+      const savedReview = localStorage.getItem(`pyquests_review_ids_${userId}`) || localStorage.getItem('pyquests_review_ids_guest');
+      if (savedReview) {
+        const reviewIds: string[] = JSON.parse(savedReview);
+        if (reviewIds.length > 0) {
+          const records = reviewIds.map((pid) => ({
+            user_id: userId,
+            problem_id: pid,
+          }));
+          await supabase.from('user_review_problems').upsert(records, { onConflict: 'user_id,problem_id' });
+        }
+      }
     } catch (err) {
       console.error('Merge local storage progress error:', err);
     }
@@ -335,6 +349,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     } catch (err) {
       console.error('Fetch read chapter ids error:', err);
+    }
+    return [];
+  };
+
+  const fetchUserReviewProblemIds = async (): Promise<string[]> => {
+    if (!isSupabaseConfigured || !user) return [];
+    try {
+      const { data, error } = await supabase
+        .from('user_review_problems')
+        .select('problem_id')
+        .eq('user_id', user.id);
+
+      if (!error && data) {
+        return data.map((row) => row.problem_id);
+      }
+    } catch (err) {
+      console.error('Fetch review problem ids error:', err);
     }
     return [];
   };
@@ -474,6 +505,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const syncReviewProblemToSupabase = async (problemId: string, isInReview: boolean) => {
+    if (!isSupabaseConfigured || !user) return;
+    try {
+      if (isInReview) {
+        await ensureProfileExists(user.id, user.email || '');
+        await supabase.from('user_review_problems').upsert(
+          { user_id: user.id, problem_id: problemId },
+          { onConflict: 'user_id,problem_id' }
+        );
+      } else {
+        await supabase.from('user_review_problems')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('problem_id', problemId);
+      }
+    } catch (err) {
+      console.error('Sync review problem error:', err);
+    }
+  };
+
   const syncStatsToSupabase = async (streak: number, lastSolvedDate: string, sandboxRuns: number) => {
     if (!isSupabaseConfigured || !user) return;
     try {
@@ -606,6 +657,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fetchUserSolvedIds,
         syncReadChapterToSupabase,
         fetchUserReadChapterIds,
+        syncReviewProblemToSupabase,
+        fetchUserReviewProblemIds,
         updateDisplayName,
       }}
     >
