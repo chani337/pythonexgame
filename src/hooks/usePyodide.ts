@@ -45,6 +45,13 @@ export function usePyodide() {
           indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/',
         });
 
+        // Preload common packages (numpy, pandas) for seamless problem solving
+        try {
+          await py.loadPackage(['numpy', 'pandas']);
+        } catch (pkgErr) {
+          console.warn('Package preload notice:', pkgErr);
+        }
+
         if (isMounted) {
           setPyodide(py);
           setLoading(false);
@@ -89,6 +96,14 @@ export function usePyodide() {
     });
 
     try {
+      // Dynamically load numpy or pandas if used in code
+      if (code.includes('numpy') || code.includes('np.')) {
+        try { await pyodide.loadPackage('numpy'); } catch (e) {}
+      }
+      if (code.includes('pandas') || code.includes('pd.')) {
+        try { await pyodide.loadPackage('pandas'); } catch (e) {}
+      }
+
       // Clear python globals cache (except builtins) to avoid state pollution between runs
       await pyodide.runPythonAsync(`
 import sys
