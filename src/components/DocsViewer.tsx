@@ -14,6 +14,7 @@ export default function DocsViewer({
   isPyodideLoading,
   onExportToSandbox,
 }: DocsViewerProps) {
+  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql'>('python');
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(0);
   const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean }>>({});
   const [isTocOpen, setIsTocOpen] = useState<boolean>(() => {
@@ -22,6 +23,15 @@ export default function DocsViewer({
   });
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
   const [fontSizeScale, setFontSizeScale] = useState<number>(100);
+
+  const filteredChapters = docChapters.filter((ch) => {
+    if (selectedCategory === 'sql') {
+      return ch.category === 'sql';
+    }
+    return ch.category !== 'sql';
+  });
+
+  const activeChapter = filteredChapters[selectedChapterIdx] || filteredChapters[0] || docChapters[0];
 
   useEffect(() => {
     localStorage.setItem('pyquests_docs_toc_open', JSON.stringify(isTocOpen));
@@ -68,9 +78,7 @@ export default function DocsViewer({
     }
   };
 
-  const activeChapter = docChapters[selectedChapterIdx];
-
-  const handleRunCellCode = async (cellId: string, code: string) => {
+  const handleRunCellCode = async (cellId: string, rawCode: string) => {
     if (isPyodideLoading) return;
     
     // Set running state
@@ -79,8 +87,54 @@ export default function DocsViewer({
       [cellId]: { stdout: '실행 중...', error: null, isRunning: true }
     }));
 
+    let executableCode = rawCode;
+    const trimmed = rawCode.trim().toUpperCase();
+    const isRawSql = trimmed.startsWith('SELECT') || trimmed.startsWith('CREATE') || trimmed.startsWith('INSERT') || trimmed.startsWith('UPDATE') || trimmed.startsWith('DELETE') || trimmed.startsWith('WITH');
+
+    if (isRawSql || selectedCategory === 'sql') {
+      const cleanSql = rawCode.replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
+      executableCode = `import sqlite3
+conn = sqlite3.connect(':memory:')
+cursor = conn.cursor()
+cursor.executescript("""
+CREATE TABLE IF NOT EXISTS users (id INT, name TEXT, age INT, score INT, dept TEXT);
+DELETE FROM users;
+INSERT INTO users VALUES 
+  (1, '김철수', 20, 90, '개발팀'),
+  (2, '이영희', 25, 85, '기획팀'),
+  (3, '박민수', 22, 100, '개발팀'),
+  (4, '최수민', 28, 70, '디자인팀'),
+  (5, '정찬희', 24, 95, '개발팀');
+
+CREATE TABLE IF NOT EXISTS orders (order_id INT, user_id INT, product TEXT, price INT);
+DELETE FROM orders;
+INSERT INTO orders VALUES
+  (101, 1, '노트북', 1500000),
+  (102, 1, '마우스', 30000),
+  (103, 3, '키보드', 120000),
+  (104, 5, '모니터', 450000);
+""")
+
+query = """${cleanSql}"""
+try:
+    cursor.execute(query)
+    rows = cursor.fetchall()
+    if cursor.description:
+        cols = [d[0] for d in cursor.description]
+        print(" | ".join(cols))
+        print("-" * 40)
+        for r in rows:
+            print(" | ".join(str(x) if x is not None else 'NULL' for x in r))
+    else:
+        conn.commit()
+        print("SQL 쿼리가 성공적으로 실행되었습니다.")
+except Exception as e:
+    print(f"SQL 실행 오류: {e}")
+`;
+    }
+
     try {
-      const res = await runPythonCode(code);
+      const res = await runPythonCode(executableCode);
       setCodeOutputs(prev => ({
         ...prev,
         [cellId]: {
@@ -92,11 +146,7 @@ export default function DocsViewer({
     } catch (err: any) {
       setCodeOutputs(prev => ({
         ...prev,
-        [cellId]: {
-          stdout: '',
-          error: err.message || '실행 오류가 발생했습니다.',
-          isRunning: false
-        }
+        [cellId]: { stdout: '', error: String(err), isRunning: false }
       }));
     }
   };
@@ -360,6 +410,46 @@ export default function DocsViewer({
               <span style={{ fontWeight: '700', fontSize: '0.95rem', letterSpacing: '0.03em' }}>집중 학습 모드</span>
             </div>
 
+            {/* Category Selector */}
+            <div style={{ display: 'flex', gap: '0.25rem', background: '#0a080f', padding: '0.2rem', border: '1px solid #334155' }}>
+              <button
+                onClick={() => {
+                  setSelectedCategory('python');
+                  setSelectedChapterIdx(0);
+                  setCodeOutputs({});
+                }}
+                style={{
+                  background: selectedCategory === 'python' ? '#38bdf8' : 'transparent',
+                  color: selectedCategory === 'python' ? '#000000' : '#cbd5e1',
+                  border: 'none',
+                  padding: '0.3rem 0.6rem',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                }}
+              >
+                🐍 파이썬
+              </button>
+              <button
+                onClick={() => {
+                  setSelectedCategory('sql');
+                  setSelectedChapterIdx(0);
+                  setCodeOutputs({});
+                }}
+                style={{
+                  background: selectedCategory === 'sql' ? '#38bdf8' : 'transparent',
+                  color: selectedCategory === 'sql' ? '#000000' : '#cbd5e1',
+                  border: 'none',
+                  padding: '0.3rem 0.6rem',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                }}
+              >
+                🐬 SQL
+              </button>
+            </div>
+
             {/* Chapter Selection Dropdown */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <span style={{ fontSize: '0.78rem', color: '#94a3b8' }}>목차:</span>
@@ -380,7 +470,7 @@ export default function DocsViewer({
                   borderRadius: '0px',
                 }}
               >
-                {docChapters.map((ch, idx) => (
+                {filteredChapters.map((ch, idx) => (
                   <option key={ch.id} value={idx}>
                     {idx + 1}. {ch.title}
                   </option>
@@ -556,10 +646,10 @@ export default function DocsViewer({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-            파이썬 학습 가이드
+            {selectedCategory === 'python' ? '파이썬 학습 가이드' : 'SQL 데이터베이스 학습 가이드'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 예제 코드를 즉석에서 실행해 보세요.
+            Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -605,6 +695,58 @@ export default function DocsViewer({
         </div>
       </div>
 
+      {/* Category Tabs */}
+      <div style={{ display: 'flex', gap: '0.5rem' }}>
+        <button
+          onClick={() => {
+            setSelectedCategory('python');
+            setSelectedChapterIdx(0);
+            setCodeOutputs({});
+          }}
+          style={{
+            padding: '0.65rem 1.4rem',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            background: selectedCategory === 'python' ? '#1a1a1a' : '#ffffff',
+            color: selectedCategory === 'python' ? '#ffffff' : 'var(--text-secondary)',
+            border: '1px solid #1a1a1a',
+            borderRadius: '0px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            boxShadow: selectedCategory === 'python' ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🐍 파이썬 (Python)
+        </button>
+        <button
+          onClick={() => {
+            setSelectedCategory('sql');
+            setSelectedChapterIdx(0);
+            setCodeOutputs({});
+          }}
+          style={{
+            padding: '0.65rem 1.4rem',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            background: selectedCategory === 'sql' ? '#0969da' : '#ffffff',
+            color: selectedCategory === 'sql' ? '#ffffff' : 'var(--text-secondary)',
+            border: '1px solid #0969da',
+            borderRadius: '0px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            boxShadow: selectedCategory === 'sql' ? '0 2px 8px rgba(9,105,218,0.2)' : 'none',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          🐬 SQL 데이터베이스 (Database)
+        </button>
+      </div>
+
       {/* Main split layout */}
       <div style={{ display: 'flex', gap: '1.25rem', flex: 1, height: 'calc(100vh - 180px)', minHeight: '500px', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
         {/* Left Side: Chapter Navigation (Fixed Independent Pane) */}
@@ -626,7 +768,7 @@ export default function DocsViewer({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: '700', letterSpacing: '0.05em' }}>
-                📚 학습 목차
+                📚 {selectedCategory === 'python' ? '파이썬' : 'SQL'} 학습 목차
               </h3>
               <button
                 onClick={() => setIsTocOpen(false)}
@@ -645,7 +787,7 @@ export default function DocsViewer({
               </button>
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
-              {docChapters.map((chapter, idx) => (
+              {filteredChapters.map((chapter, idx) => (
                 <button
                   key={chapter.id}
                   onClick={() => {

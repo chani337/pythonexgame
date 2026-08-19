@@ -200,5 +200,84 @@ export const docChapters: DocChapter[] = [
         "content": "# 파이썬 Matplotlib 기초\r\n\r\n## 1. Matplotlib란?\r\n\r\nMatplotlib는 **데이터를 그래프로 시각화할 수 있게 도와주는 파이썬 라이브러리**입니다.  \r\n숫자나 표 형태의 데이터를 **눈으로 보기 쉽게 그래프나 차트로 표현**할 때 사용합니다.\r\n\r\n쉽게 말하면 Matplotlib는  \r\n**데이터를 그림으로 보여주는 도구**입니다.\r\n\r\n예를 들어,\r\n\r\n- 학생 점수를 막대그래프로 보기\r\n- 월별 매출을 선그래프로 보기\r\n- 과일 판매량을 그래프로 표현하기\r\n- 데이터의 패턴을 시각적으로 확인하기\r\n\r\n같은 경우에 자주 사용합니다.\r\n\r\nMatplotlib는 보통 `plt`라는 이름으로 불러와서 사용합니다.\r\n\r\n---\r\n\r\n## 2. Matplotlib 불러오기\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n```\r\n\r\n### 설명\r\n\r\n- `matplotlib.pyplot`은 그래프를 그릴 때 자주 사용하는 기능이 모여 있는 부분입니다.\r\n- `as plt`는 앞으로 `matplotlib.pyplot`을 `plt`라고 짧게 부르겠다는 뜻입니다.\r\n\r\n---\r\n\r\n## 3. 그래프를 그리는 기본 흐름\r\n\r\nMatplotlib는 보통 아래 순서로 사용합니다.\r\n\r\n1. 라이브러리 불러오기\r\n2. 데이터 준비하기\r\n3. 그래프 그리기\r\n4. 그래프 보여주기\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4]\r\ny = [10, 20, 30, 40]\r\n\r\nplt.plot(x, y)\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 4. 선 그래프 그리기\r\n\r\n선 그래프는 **값의 변화 흐름**을 볼 때 자주 사용합니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4]\r\ny = [10, 20, 30, 40]\r\n\r\nplt.plot(x, y)\r\nplt.show()\r\n```\r\n\r\n### 설명\r\n\r\n- `plot()`은 선 그래프를 그리는 함수입니다.\r\n- `show()`는 그래프를 화면에 보여주는 함수입니다.\r\n\r\n---\r\n\r\n## 5. 막대 그래프 그리기\r\n\r\n막대 그래프는 **항목별 크기 비교**를 할 때 자주 사용합니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nfruit = [\"사과\", \"바나나\", \"포도\"]\r\ncount = [5, 8, 3]\r\n\r\nplt.bar(fruit, count)\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 6. 제목과 축 이름 넣기\r\n\r\n그래프에는 제목과 축 이름을 넣으면 더 보기 쉬워집니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4]\r\ny = [10, 20, 30, 40]\r\n\r\nplt.plot(x, y)\r\nplt.title(\"선 그래프 예제\")\r\nplt.xlabel(\"x축\")\r\nplt.ylabel(\"y축\")\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 7. 한글이 깨질 때\r\n\r\n그래프에서 한글이 깨질 수 있습니다.  \r\n이때는 한글 폰트 설정이 필요할 수 있습니다.\r\n\r\nWindows 환경에서는 보통 아래처럼 설정합니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nplt.rcParams[\"font.family\"] = \"Malgun Gothic\"\r\nplt.rcParams[\"axes.unicode_minus\"] = False\r\n```\r\n\r\n### 설명\r\n\r\n- `\"Malgun Gothic\"`은 윈도우에서 자주 사용하는 한글 폰트입니다.\r\n- `axes.unicode_minus = False`는 마이너스 기호가 깨지는 문제를 막기 위한 설정입니다.\r\n\r\n---\r\n\r\n## 8. 산점도 그리기\r\n\r\n산점도는 **값들의 분포나 관계**를 볼 때 사용합니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4, 5]\r\ny = [2, 4, 5, 4, 6]\r\n\r\nplt.scatter(x, y)\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 9. 파이 차트 그리기\r\n\r\n파이 차트는 **전체에서 각 항목이 차지하는 비율**을 볼 때 사용합니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nlabels = [\"사과\", \"바나나\", \"포도\"]\r\nsizes = [30, 50, 20]\r\n\r\nplt.pie(sizes, labels=labels)\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 10. 그래프 크기 조절하기\r\n\r\n그래프가 너무 작거나 크면 `figure()`를 사용해서 크기를 조절할 수 있습니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4]\r\ny = [10, 20, 30, 40]\r\n\r\nplt.figure(figsize=(8, 4))\r\nplt.plot(x, y)\r\nplt.show()\r\n```\r\n\r\n### 설명\r\n\r\n- `figsize=(가로, 세로)` 형식으로 크기를 조절합니다.\r\n\r\n---\r\n\r\n## 11. 값 여러 개를 한 그래프에 그리기\r\n\r\n한 그래프에 여러 개의 데이터를 함께 표시할 수도 있습니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4]\r\ny1 = [10, 20, 30, 40]\r\ny2 = [15, 25, 35, 45]\r\n\r\nplt.plot(x, y1)\r\nplt.plot(x, y2)\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 12. 범례 넣기\r\n\r\n그래프가 여러 개일 때는 어떤 선이 무엇을 의미하는지 알려주는 **범례**를 넣을 수 있습니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4]\r\ny1 = [10, 20, 30, 40]\r\ny2 = [15, 25, 35, 45]\r\n\r\nplt.plot(x, y1, label=\"A반\")\r\nplt.plot(x, y2, label=\"B반\")\r\nplt.legend()\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 13. 실습 예제 1: 점수 선 그래프\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nscore = [70, 80, 90, 85, 95]\r\n\r\nplt.plot(score)\r\nplt.title(\"학생 점수 변화\")\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 14. 실습 예제 2: 과일 판매량 막대그래프\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nfruit = [\"사과\", \"바나나\", \"포도\"]\r\ncount = [10, 7, 5]\r\n\r\nplt.bar(fruit, count)\r\nplt.title(\"과일 판매량\")\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 15. 실습 예제 3: 공부 시간과 점수 산점도\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nstudy_time = [1, 2, 3, 4, 5]\r\nscore = [50, 60, 70, 80, 90]\r\n\r\nplt.scatter(study_time, score)\r\nplt.title(\"공부 시간과 점수\")\r\nplt.xlabel(\"공부 시간\")\r\nplt.ylabel(\"점수\")\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 16. 그래프 저장하기\r\n\r\n그린 그래프는 이미지 파일로 저장할 수도 있습니다.\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3, 4]\r\ny = [10, 20, 30, 40]\r\n\r\nplt.plot(x, y)\r\nplt.savefig(\"graph.png\")\r\nplt.show()\r\n```\r\n\r\n### 설명\r\n\r\n- `savefig()`는 그래프를 파일로 저장하는 함수입니다.\r\n- 보통 `show()` 전에 작성합니다.\r\n\r\n---\r\n\r\n## 17. 자주 하는 실수\r\n\r\n### 1) `show()`를 쓰지 않는 경우\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3]\r\ny = [10, 20, 30]\r\n\r\nplt.plot(x, y)\r\n```\r\n\r\n환경에 따라 그래프가 바로 안 보일 수 있습니다.  \r\n그래프를 확실히 출력하려면 `plt.show()`를 쓰는 것이 좋습니다.\r\n\r\n### 2) x축과 y축 길이가 다른 경우\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\nx = [1, 2, 3]\r\ny = [10, 20]\r\n\r\nplt.plot(x, y)\r\nplt.show()\r\n```\r\n\r\n이 경우 데이터 개수가 맞지 않아 오류가 날 수 있습니다.\r\n\r\n### 3) 한글 폰트 설정을 하지 않는 경우\r\n\r\n한글 제목이나 축 이름을 넣었는데 글자가 깨질 수 있습니다.  \r\n이때는 폰트 설정이 필요할 수 있습니다.\r\n\r\n### 4) `savefig()`를 `show()` 뒤에 쓰는 경우\r\n\r\n환경에 따라 빈 이미지가 저장될 수 있으므로  \r\n보통 `savefig()`를 먼저 쓰고 `show()`를 나중에 쓰는 편이 안전합니다.\r\n\r\n---\r\n\r\n## 18. 한 번에 정리하는 Matplotlib 예제\r\n\r\n```python\r\nimport matplotlib.pyplot as plt\r\n\r\n# 한글 폰트 설정\r\nplt.rcParams[\"font.family\"] = \"Malgun Gothic\"\r\nplt.rcParams[\"axes.unicode_minus\"] = False\r\n\r\n# 데이터 준비\r\nfruit = [\"사과\", \"바나나\", \"포도\"]\r\ncount = [10, 7, 5]\r\n\r\n# 그래프 크기 설정\r\nplt.figure(figsize=(8, 4))\r\n\r\n# 막대 그래프 그리기\r\nplt.bar(fruit, count)\r\n\r\n# 제목과 축 이름 설정\r\nplt.title(\"과일 판매량\")\r\nplt.xlabel(\"과일 이름\")\r\nplt.ylabel(\"판매 개수\")\r\n\r\n# 그래프 저장\r\nplt.savefig(\"fruit_graph.png\")\r\n\r\n# 그래프 출력\r\nplt.show()\r\n```\r\n\r\n---\r\n\r\n## 19. 핵심 정리\r\n\r\n- Matplotlib는 그래프를 그리기 위한 라이브러리\r\n- 보통 `import matplotlib.pyplot as plt`로 불러옴\r\n- `plot()`은 선 그래프, `bar()`는 막대 그래프, `scatter()`는 산점도\r\n- `title()`, `xlabel()`, `ylabel()`로 그래프 설명을 넣을 수 있음\r\n- `show()`로 그래프를 화면에 출력함\r\n- `savefig()`로 그래프를 파일로 저장할 수 있음\r\n\r\n---\r\n\r\n## 20. 마무리\r\n\r\nMatplotlib는 앞으로 배우게 될\r\n\r\n- 데이터 시각화\r\n- 실데이터분석\r\n- Pandas 그래프 확인\r\n- 머신러닝 결과 해석\r\n\r\n에서 매우 중요한 역할을 합니다.  \r\n특히 **숫자 데이터를 눈으로 확인하는 경험**을 만드는 데 꼭 필요한 도구입니다."
       }
     ]
+  },
+  // SQL Chapters
+  {
+    id: "SQL_1_SELECT",
+    filename: "SQL 1. SELECT & FROM 기초",
+    title: "SQL 1. SELECT & FROM 기초",
+    category: "sql",
+    cells: [
+      {
+        id: "SQL_1_SELECT_cell_0",
+        type: "markdown",
+        content: "# SQL 1. SELECT & FROM 기초 정리\n\n## 1. SQL이란?\n\nSQL(Structured Query Language)은 **관계형 데이터베이스(RDBMS)에 저장된 데이터를 조회, 입력, 수정, 삭제하기 위한 표준 데이터 언어**입니다.\n\n---\n\n## 2. SELECT & FROM 기본 구문\n\n- `SELECT`: 가져오고 싶은 열(Column) 이름을 지정합니다.\n- `FROM`: 데이터를 조회할 테이블(Table) 이름을 지정합니다.\n\n```sql\nSELECT * FROM users;\n```\n\n> `*`(애스터리스크)는 테이블의 **모든 열(All Columns)**을 가져오라는 의미입니다.\n\n---\n\n## 3. 특정 열(Column)만 선택하여 조회하기\n\n```sql\nSELECT name, age, dept FROM users;\n```\n\n---\n\n## 4. 열 이름에 별칭(Alias) 붙이기: `AS` 키워드\n\n```sql\nSELECT name AS 이름, score AS 파이썬점수 FROM users;\n```\n\n---\n\n## 5. 중복 제거하기: `DISTINCT` 키워드\n\n```sql\nSELECT DISTINCT dept FROM users;\n```\n\n---\n\n## 6. 대화식 SQL 실습 테스트 (SQLite)\n\n아래 코드를 실행해 보세요! 브라우저 내 메모리 데이터베이스에서 SQL 쿼리가 바로 실행됩니다.\n\n```sql\nSELECT id, name, dept, score FROM users;\n```"
+      }
+    ]
+  },
+  {
+    id: "SQL_2_WHERE",
+    filename: "SQL 2. WHERE 조건절 & 필터링",
+    title: "SQL 2. WHERE 조건절 & 필터링",
+    category: "sql",
+    cells: [
+      {
+        id: "SQL_2_WHERE_cell_0",
+        type: "markdown",
+        content: "# SQL 2. WHERE 조건절 & 필터링 정리\n\n## 1. WHERE 절이란?\n\n`WHERE` 절은 **원하는 조건에 맞는 특정 행(Row)만 필터링하여 조회할 때** 사용합니다.\n\n```sql\nSELECT 열이름 FROM 테이블이름 WHERE 조건식;\n```\n\n---\n\n## 2. 비교 및 논리 연산자 (`AND`, `OR`, `NOT`)\n\n```sql\nSELECT name, dept, score FROM users WHERE dept = '개발팀' AND score >= 90;\n```\n\n---\n\n## 3. 범위 및 목록 필터링: `BETWEEN` & `IN`\n\n```sql\n-- 80점 이상 95점 이하\nSELECT name, score FROM users WHERE score BETWEEN 80 AND 95;\n\n-- 개발팀 또는 디자인팀\nSELECT name, dept FROM users WHERE dept IN ('개발팀', '디자인팀');\n```\n\n---\n\n## 4. 패턴 검색: `LIKE` 와일드카드 (`%`, `_`)\n\n```sql\n-- '김'으로 시작하는 이름 검색\nSELECT * FROM users WHERE name LIKE '김%';\n```\n\n---\n\n## 5. 대화식 SQL 실습 테스트\n\n```sql\nSELECT name, dept, score FROM users WHERE score >= 85 AND dept = '개발팀';\n```"
+      }
+    ]
+  },
+  {
+    id: "SQL_3_ORDER_BY",
+    filename: "SQL 3. ORDER BY 정렬 & LIMIT",
+    title: "SQL 3. ORDER BY 정렬 & LIMIT",
+    category: "sql",
+    cells: [
+      {
+        id: "SQL_3_ORDER_BY_cell_0",
+        type: "markdown",
+        content: "# SQL 3. ORDER BY 정렬 & LIMIT 정리\n\n## 1. ORDER BY 절이란?\n\n`ORDER BY` 절은 조회 결과를 특정 열을 기준으로 **오름차순(ASC) 또는 내림차순(DESC)** 정렬할 때 사용합니다.\n\n```sql\n-- 점수가 높은 순(내림차순)으로 정렬\nSELECT name, score FROM users ORDER BY score DESC;\n```\n\n---\n\n## 2. 개수 제한: `LIMIT` & `OFFSET`\n\n```sql\n-- 점수 1등~3등까지 3명만 출력\nSELECT name, score FROM users ORDER BY score DESC LIMIT 3;\n```\n\n---\n\n## 3. 대화식 SQL 실습 테스트\n\n```sql\nSELECT name, dept, score FROM users ORDER BY score DESC LIMIT 3;\n```"
+      }
+    ]
+  },
+  {
+    id: "SQL_4_GROUP_BY",
+    filename: "SQL 4. 집계 함수 & GROUP BY / HAVING",
+    title: "SQL 4. 집계 함수 & GROUP BY / HAVING",
+    category: "sql",
+    cells: [
+      {
+        id: "SQL_4_GROUP_BY_cell_0",
+        type: "markdown",
+        content: "# SQL 4. 집계 함수 & GROUP BY / HAVING 정리\n\n## 1. 집계 함수 (Aggregate Functions)\n\n- `COUNT(*)`: 행 개수\n- `SUM(score)`: 합계\n- `AVG(score)`: 평균\n- `MAX(score)` / `MIN(score)`: 최대/최소값\n\n---\n\n## 2. 그룹화: `GROUP BY` & `HAVING` 절\n\n```sql\n-- 부서별 평균 점수가 85점 이상인 부서만 조회\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 \nFROM users \nGROUP BY dept \nHAVING AVG(score) >= 85;\n```\n\n---\n\n## 3. 대화식 SQL 실습 테스트\n\n```sql\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 FROM users GROUP BY dept;\n```"
+      }
+    ]
+  },
+  {
+    id: "SQL_5_JOIN",
+    filename: "SQL 5. JOIN 다중 테이블 조인",
+    title: "SQL 5. JOIN 다중 테이블 조인",
+    category: "sql",
+    cells: [
+      {
+        id: "SQL_5_JOIN_cell_0",
+        type: "markdown",
+        content: "# SQL 5. JOIN 다중 테이블 조인 정리\n\n## 1. INNER JOIN (내부 조인)\n\n양쪽 테이블 모두에 데이터가 있는 행(교집합)만 결합합니다.\n\n```sql\nSELECT u.name, u.dept, o.product, o.price \nFROM users u \nINNER JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 2. LEFT JOIN (왼쪽 외부 조인)\n\n왼쪽 테이블의 모든 행을 유지하고 오른쪽 정보를 붙입니다.\n\n```sql\nSELECT u.name, o.product, o.price \nFROM users u \nLEFT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 3. 대화식 SQL 실습 테스트\n\n```sql\nSELECT u.name AS 사용자이름, o.product AS 구매상품, o.price AS 가격 FROM users u INNER JOIN orders o ON u.id = o.user_id;\n```"
+      }
+    ]
+  },
+  {
+    id: "SQL_6_DDL_DML",
+    filename: "SQL 6. DDL & DML 데이터베이스 조작",
+    title: "SQL 6. DDL & DML 데이터베이스 조작",
+    category: "sql",
+    cells: [
+      {
+        id: "SQL_6_DDL_DML_cell_0",
+        type: "markdown",
+        content: "# SQL 6. DDL & DML 데이터베이스 조작 정리\n\n## 1. DDL & DML 개요\n\n- `CREATE TABLE`: 테이블 구조 생성\n- `INSERT INTO`: 데이터 추가\n- `UPDATE ... SET`: 데이터 수정\n- `DELETE FROM`: 데이터 삭제\n\n---\n\n## 2. 대화식 SQL 실습 테스트\n\n```sql\nSELECT * FROM users;\n```"
+      }
+    ]
   }
 ];
