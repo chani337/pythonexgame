@@ -9,6 +9,7 @@ export interface DocChapter {
   id: string;
   filename: string;
   title: string;
+  category?: 'python' | 'sql';
   cells: DocCell[];
 }
 
