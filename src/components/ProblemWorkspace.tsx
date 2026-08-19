@@ -45,38 +45,90 @@ export default function ProblemWorkspace({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Block paste keyboard shortcuts on Windows (Ctrl+V, Shift+Insert), macOS (Cmd+V), and Korean IME ('ㅍ')
+    const key = e.key ? e.key.toLowerCase() : '';
+    const codeKey = e.code || '';
+    if (
+      ((e.ctrlKey || e.metaKey) && (key === 'v' || key === 'ㅍ' || codeKey === 'KeyV' || e.keyCode === 86)) ||
+      (e.shiftKey && (key === 'insert' || codeKey === 'Insert'))
+    ) {
+      e.preventDefault();
+      e.stopPropagation();
+      return;
+    }
+
+    // Tab key -> 4 spaces indent
     if (e.key === 'Tab') {
       e.preventDefault();
       const target = e.currentTarget;
       const start = target.selectionStart;
       const end = target.selectionEnd;
 
-      if (e.shiftKey) {
-        // Unindent
-        const lines = code.split('\n');
-        let currentPos = 0;
-        for (let i = 0; i < lines.length; i++) {
-          const lineLen = lines[i].length + 1;
-          if (currentPos + lineLen > start) {
-            if (lines[i].startsWith('    ')) {
-              lines[i] = lines[i].substring(4);
-              setCode(lines.join('\n'));
+      if (start === end) {
+        // Single cursor
+        if (e.shiftKey) {
+          // Unindent
+          const lineStart = code.lastIndexOf('\n', start - 1) + 1;
+          const lineText = code.substring(lineStart, start);
+          if (lineText.startsWith('    ')) {
+            const newCode = code.substring(0, lineStart) + code.substring(lineStart + 4);
+            setCode(newCode);
+            setTimeout(() => {
+              target.selectionStart = target.selectionEnd = Math.max(lineStart, start - 4);
+            }, 0);
+          } else {
+            const spaceMatch = lineText.match(/^ +/);
+            if (spaceMatch) {
+              const removeCount = Math.min(spaceMatch[0].length, 4);
+              const newCode = code.substring(0, lineStart) + code.substring(lineStart + removeCount);
+              setCode(newCode);
               setTimeout(() => {
-                target.selectionStart = Math.max(0, start - 4);
-                target.selectionEnd = Math.max(0, end - 4);
+                target.selectionStart = target.selectionEnd = Math.max(lineStart, start - removeCount);
               }, 0);
             }
-            break;
           }
-          currentPos += lineLen;
+        } else {
+          // Indent 4 spaces
+          const newCode = code.substring(0, start) + '    ' + code.substring(end);
+          setCode(newCode);
+          setTimeout(() => {
+            target.selectionStart = target.selectionEnd = start + 4;
+          }, 0);
         }
       } else {
-        // Indent 4 spaces
-        const newCode = code.substring(0, start) + '    ' + code.substring(end);
-        setCode(newCode);
-        setTimeout(() => {
-          target.selectionStart = target.selectionEnd = start + 4;
-        }, 0);
+        // Multi-line selection
+        const lineStart = code.lastIndexOf('\n', start - 1) + 1;
+        const selectedText = code.substring(lineStart, end);
+        const lines = selectedText.split('\n');
+
+        if (e.shiftKey) {
+          let charsRemoved = 0;
+          const unindentedLines = lines.map((line) => {
+            if (line.startsWith('    ')) {
+              charsRemoved += 4;
+              return line.substring(4);
+            }
+            const spaces = line.match(/^ +/)?.[0].length || 0;
+            const toRemove = Math.min(spaces, 4);
+            charsRemoved += toRemove;
+            return line.substring(toRemove);
+          });
+          const newCode = code.substring(0, lineStart) + unindentedLines.join('\n') + code.substring(end);
+          setCode(newCode);
+          setTimeout(() => {
+            target.selectionStart = Math.max(lineStart, start - 4);
+            target.selectionEnd = Math.max(start, end - charsRemoved);
+          }, 0);
+        } else {
+          const indentedLines = lines.map((line) => '    ' + line);
+          const addedLength = lines.length * 4;
+          const newCode = code.substring(0, lineStart) + indentedLines.join('\n') + code.substring(end);
+          setCode(newCode);
+          setTimeout(() => {
+            target.selectionStart = start + 4;
+            target.selectionEnd = end + addedLength;
+          }, 0);
+        }
       }
     }
   };
@@ -444,10 +496,30 @@ export default function ProblemWorkspace({
                 <textarea
                   ref={textareaRef}
                   value={code}
-                  onChange={(e) => setCode(e.target.value)}
+                  onChange={(e) => {
+                    const nativeEvent = e.nativeEvent as any;
+                    if (nativeEvent?.inputType?.toLowerCase().includes('paste')) {
+                      return;
+                    }
+                    setCode(e.target.value);
+                  }}
                   onScroll={handleScroll}
                   onKeyDown={handleKeyDown}
-                  placeholder="여기에 파이썬 코드를 작성하세요..."
+                  onBeforeInput={(e: any) => {
+                    if (e.nativeEvent?.inputType?.toLowerCase().includes('paste')) {
+                      e.preventDefault();
+                      e.stopPropagation();
+                    }
+                  }}
+                  onPaste={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                  placeholder="여기에 파이썬 코드를 직접 타이핑하여 작성하세요..."
                   className="code-editor-textarea"
                   style={{
                     margin: '0px',

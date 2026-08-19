@@ -511,6 +511,16 @@ export default function Dashboard({
 function LeaderboardWidget() {
   const { leaderboard, isConfigured, setAuthModalOpen, user } = useAuth();
 
+  const isSelfUser = (item: any) => {
+    if (user && item.id === user.id) return true;
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'local_runner';
+    const lastEmail = localStorage.getItem('pyquests_last_user_email');
+    if (item.id === lastId) return true;
+    if (lastEmail && item.email === lastEmail) return true;
+    if (!user && (item.id === 'local_runner' || item.display_name === '나 (게스트 러너)' || item.display_name === '나')) return true;
+    return false;
+  };
+
   return (
     <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '0px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
@@ -540,43 +550,46 @@ function LeaderboardWidget() {
         </div>
       ) : leaderboard.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {leaderboard.map((item, index) => (
-            <div
-              key={item.id || index}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '0.75rem 1rem',
-                background: item.id === user?.id ? '#f4fbf7' : '#ffffff',
-                border: item.id === user?.id ? '1px solid #1a1a1a' : '1px solid var(--border-subtle)',
-              }}
-            >
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
-                <span
-                  style={{
-                    fontFamily: 'var(--font-mono)',
-                    fontWeight: '800',
-                    fontSize: '0.9rem',
-                    color: index === 0 ? '#a66908' : index === 1 ? '#57606a' : index === 2 ? '#8c959f' : 'var(--text-muted)',
-                    minWidth: '24px',
-                  }}
-                >
-                  #{index + 1}
-                </span>
-                <div>
-                  <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#1a1a1a' }}>
-                    {item.display_name} {item.id === user?.id && <span style={{ fontSize: '0.7rem', color: '#0969da' }}>(나)</span>}
+          {leaderboard.map((item, index) => {
+            const isSelf = isSelfUser(item);
+            return (
+              <div
+                key={item.id || index}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  padding: '0.75rem 1rem',
+                  background: isSelf ? '#f4fbf7' : '#ffffff',
+                  border: isSelf ? '1px solid #1a1a1a' : '1px solid var(--border-subtle)',
+                }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+                  <span
+                    style={{
+                      fontFamily: 'var(--font-mono)',
+                      fontWeight: '800',
+                      fontSize: '0.9rem',
+                      color: index === 0 ? '#a66908' : index === 1 ? '#57606a' : index === 2 ? '#8c959f' : 'var(--text-muted)',
+                      minWidth: '24px',
+                    }}
+                  >
+                    #{index + 1}
                   </span>
+                  <div>
+                    <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#1a1a1a' }}>
+                      {item.display_name} {isSelf && <span style={{ fontSize: '0.7rem', color: '#0969da' }}>(나)</span>}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.78rem' }}>
+                  <span style={{ color: '#a66908', fontWeight: '600' }}>🔥 {item.streak}일 연속</span>
+                  <span style={{ color: '#1a1a1a', fontWeight: '700' }}>{item.solved_count}문제 클리어</span>
                 </div>
               </div>
-
-              <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.78rem' }}>
-                <span style={{ color: '#a66908', fontWeight: '600' }}>🔥 {item.streak}일 연속</span>
-                <span style={{ color: '#1a1a1a', fontWeight: '700' }}>{item.solved_count}문제 클리어</span>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       ) : (
         <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '1rem', textAlign: 'center' }}>

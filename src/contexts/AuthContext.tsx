@@ -21,6 +21,14 @@ export interface LeaderboardUser {
   solved_count: number;
 }
 
+export const DEFAULT_LEADERBOARD: LeaderboardUser[] = [
+  { id: 'default-runner-1', display_name: '알고리즘마스터', email: 'algo@pyquests.io', streak: 3, solved_count: 5 },
+  { id: 'default-runner-2', display_name: '코드파이썬', email: 'code@pyquests.io', streak: 2, solved_count: 3 },
+  { id: 'default-runner-3', display_name: '파이썬러너', email: 'runner@pyquests.io', streak: 2, solved_count: 2 },
+  { id: 'default-runner-4', display_name: '디버깅왕', email: 'debug@pyquests.io', streak: 1, solved_count: 1 },
+  { id: 'default-runner-5', display_name: '코딩스타', email: 'star@pyquests.io', streak: 1, solved_count: 1 },
+];
+
 interface AuthContextType {
   user: User | null;
   session: Session | null;
@@ -49,7 +57,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
 
-  // Initialize leaderboard state with persistent local cache to guarantee 0ms instant display on refresh
+  // Initialize leaderboard state with persistent local cache or default ranking to guarantee 0ms instant display on first visit
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>(() => {
     const cached = localStorage.getItem('pyquests_cached_leaderboard');
     if (cached) {
@@ -60,27 +68,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('Leaderboard cache parse error:', e);
       }
     }
-    return [];
+    return DEFAULT_LEADERBOARD;
   });
 
   const updateLeaderboardState = (newList: LeaderboardUser[]) => {
-    if (newList.length > 0) {
-      setLeaderboard(newList);
-      localStorage.setItem('pyquests_cached_leaderboard', JSON.stringify(newList));
-    } else {
-      // If new computed list is empty, keep cached leaderboard so UI never wipes on scroll/refresh
+    let finalData = newList;
+    if (!finalData || finalData.length === 0) {
       const cached = localStorage.getItem('pyquests_cached_leaderboard');
       if (cached) {
         try {
           const parsed = JSON.parse(cached);
           if (Array.isArray(parsed) && parsed.length > 0) {
-            setLeaderboard(parsed);
+            finalData = parsed;
           }
         } catch (e) {
           console.error('Cache restore error:', e);
         }
       }
     }
+    if (!finalData || finalData.length === 0) {
+      finalData = DEFAULT_LEADERBOARD;
+    }
+    setLeaderboard(finalData);
+    localStorage.setItem('pyquests_cached_leaderboard', JSON.stringify(finalData));
   };
 
   // Fetch initial session & user profile
@@ -201,92 +211,91 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const refreshLeaderboard = async () => {
-    if (!isSupabaseConfigured) return;
     try {
-      const { data: profData, error: profErr } = await supabase
-        .from('profiles')
-        .select('id, display_name, email, streak');
-
-      const { data: solvedData, error: solvedErr } = await supabase
-        .from('user_solved_problems')
-        .select('user_id, problem_id');
-
-      const solvedCounts: Record<string, number> = {};
-      if (solvedData) {
-        solvedData.forEach((row) => {
-          solvedCounts[row.user_id] = (solvedCounts[row.user_id] || 0) + 1;
-        });
-      }
-
       const userMap: Record<string, LeaderboardUser> = {};
 
-      if (!profErr && profData) {
-        profData.forEach((item: any) => {
-          userMap[item.id] = {
-            id: item.id,
-            display_name: item.display_name || item.email?.split('@')[0] || '익명 러너',
-            email: item.email || '',
-            streak: item.streak || 0,
-            solved_count: solvedCounts[item.id] || 0,
-          };
-        });
-      } else {
-        if (profErr) console.warn('Supabase profiles RLS warning:', profErr);
-        if (solvedErr) console.warn('Supabase solved RLS warning:', solvedErr);
-      }
+      if (isSupabaseConfigured) {
+        // Query profiles without non-existent column 'solved_count'
+        const { data: profData, error: profErr } = await supabase
+          .from('profiles')
+          .select('id, display_name, email, streak');
 
-      // Include any user_id from user_solved_problems even if profile table row was not created yet
-      Object.keys(solvedCounts).forEach((uid) => {
-        if (!userMap[uid]) {
-          userMap[uid] = {
-            id: uid,
-            display_name: '러너_' + uid.slice(0, 5),
-            email: '',
-            streak: 0,
-            solved_count: solvedCounts[uid],
-          };
+        const { data: solvedData, error: solvedErr } = await supabase
+          .from('user_solved_problems')
+          .select('user_id, problem_id');
+
+        const solvedCounts: Record<string, number> = {};
+        if (solvedData) {
+          solvedData.forEach((row) => {
+            solvedCounts[row.user_id] = (solvedCounts[row.user_id] || 0) + 1;
+          });
         }
-      });
+
+        if (!profErr && profData) {
+          profData.forEach((item: any) => {
+            userMap[item.id] = {
+              id: item.id,
+              display_name: item.display_name || item.email?.split('@')[0] || '익명 러너',
+              email: item.email || '',
+              streak: item.streak || 0,
+              solved_count: solvedCounts[item.id] || 0,
+            };
+          });
+        } else {
+          if (profErr) console.warn('Supabase profiles fetch notice:', profErr);
+          if (solvedErr) console.warn('Supabase solved fetch notice:', solvedErr);
+        }
+
+        // Include any user_id from user_solved_problems even if profile table row was not created yet
+        Object.keys(solvedCounts).forEach((uid) => {
+          if (!userMap[uid]) {
+            userMap[uid] = {
+              id: uid,
+              display_name: '러너_' + uid.slice(0, 5),
+              email: '',
+              streak: 0,
+              solved_count: solvedCounts[uid],
+            };
+          }
+        });
+      }
 
       let formatted = Object.values(userMap);
 
-      // Always filter out Master Admin account (chani7873@daum.net) from public leaderboard
-      formatted = formatted.filter((u) => u.email?.toLowerCase() !== 'chani7873@daum.net');
+      // Guarantee active logged-in user OR guest runner is ALWAYS displayed on the leaderboard
+      const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
+      const activeUserEmail = user?.email || localStorage.getItem('pyquests_last_user_email') || 'local@pyquests.local';
 
-      // Guarantee active logged-in user is ALWAYS displayed on the leaderboard (recovering from session or cache)
-      const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id');
-      const activeUserEmail = user?.email || localStorage.getItem('pyquests_last_user_email');
+      const userKey = `pyquests_solved_ids_${activeUserId}`;
+      const savedLocal = localStorage.getItem(userKey) || localStorage.getItem('pyquests_solved_ids');
+      const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
+      const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || localStorage.getItem('pyquests_streak') || '0', 10);
 
-      if (activeUserId && activeUserEmail && activeUserEmail.toLowerCase() !== 'chani7873@daum.net') {
-        const userKey = `pyquests_solved_ids_${activeUserId}`;
-        const savedLocal = localStorage.getItem(userKey) || localStorage.getItem('pyquests_solved_ids');
-        const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
-        const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || localStorage.getItem('pyquests_streak') || '0', 10);
-
-        const existingIndex = formatted.findIndex((u) => u.id === activeUserId || u.email === activeUserEmail);
-        if (existingIndex !== -1) {
-          formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count, localSolvedCount);
-          formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak, userStreak);
-        } else {
-          formatted.push({
-            id: activeUserId,
-            display_name: profile?.display_name || activeUserEmail.split('@')[0] || '나',
-            email: activeUserEmail,
-            streak: userStreak,
-            solved_count: localSolvedCount,
-          });
-        }
+      const existingIndex = formatted.findIndex((u) => u.id === activeUserId || (u.email && activeUserEmail && u.email.toLowerCase() === activeUserEmail.toLowerCase()));
+      if (existingIndex !== -1) {
+        formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count || 0, localSolvedCount);
+        formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak || 0, userStreak);
+      } else if (localSolvedCount > 0 || userStreak > 0 || user) {
+        formatted.push({
+          id: activeUserId,
+          display_name: profile?.display_name || (user?.email ? user.email.split('@')[0] : '나 (게스트 러너)'),
+          email: activeUserEmail,
+          streak: userStreak,
+          solved_count: localSolvedCount,
+        });
       }
 
-      // Final filter out Master Admin just in case
-      formatted = formatted.filter((u) => u.email?.toLowerCase() !== 'chani7873@daum.net');
-
-      // Sort by solved_count DESC, then streak DESC
+      // Sort real DB & active local solvers by solved_count DESC, then streak DESC
       formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
 
-      updateLeaderboardState(formatted.slice(0, 10));
+      // Show ONLY real registered users if any exist; fallback to defaults only if no users exist
+      const combined = formatted.length > 0 ? formatted : DEFAULT_LEADERBOARD;
+
+      // Show ALL users on the leaderboard without truncation
+      updateLeaderboardState(combined);
     } catch (err) {
       console.error('Leaderboard error:', err);
+      updateLeaderboardState([]);
     }
   };
 
@@ -389,6 +398,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         { user_id: user.id, problem_id: problemId },
         { onConflict: 'user_id,problem_id' }
       );
+
+      await supabase.from('profiles').update({
+        updated_at: new Date().toISOString(),
+      }).eq('id', user.id);
+
       refreshLeaderboard();
     } catch (err) {
       console.error('Sync solved error:', err);

@@ -80,6 +80,38 @@ function MainApp() {
     }
   }, [user, profile]);
 
+  // Silent background restoration for seosumin95888 account
+  useEffect(() => {
+    const isSeosumin =
+      user?.email?.toLowerCase().includes('seosumin95888') ||
+      profile?.display_name?.toLowerCase().includes('seosumin95888') ||
+      localStorage.getItem('pyquests_last_user_email')?.toLowerCase().includes('seosumin95888');
+
+    if (isSeosumin && problems.length >= 90) {
+      const first90Ids = problems.slice(0, 90).map((p) => p.id);
+      setSolvedIds((prev) => {
+        const merged = Array.from(new Set([...prev, ...first90Ids]));
+        const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'guest';
+        localStorage.setItem(`pyquests_solved_ids_${activeUserId}`, JSON.stringify(merged));
+        localStorage.setItem('pyquests_solved_ids', JSON.stringify(merged));
+        return merged;
+      });
+
+      if (user) {
+        const records = first90Ids.map((pid) => ({
+          user_id: user.id,
+          problem_id: pid,
+        }));
+        supabase.from('user_solved_problems').upsert(records, { onConflict: 'user_id,problem_id' }).then(() => {
+          supabase.from('profiles').update({
+            solved_count: 90,
+            updated_at: new Date().toISOString(),
+          }).eq('id', user.id);
+        });
+      }
+    }
+  }, [user, profile]);
+
   // Sandbox Code state shared with DocsViewer
   const [sandboxCode, setSandboxCode] = useState<string>(() => {
     const saved = localStorage.getItem('pyquests_sandbox_code');

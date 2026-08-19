@@ -8,12 +8,19 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   streak INT DEFAULT 0,
   last_solved_date TEXT,
   sandbox_runs INT DEFAULT 0,
+  solved_count INT DEFAULT 0,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Disable RLS on profiles so public leaderboard can query easily
+-- Ensure solved_count column exists if table was created previously
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS solved_count INT DEFAULT 0;
+
+-- Disable RLS on profiles so public leaderboard can query all registered users easily
 ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
+
+-- Grant SELECT to anon and authenticated roles
+GRANT SELECT ON public.profiles TO anon, authenticated;
 
 -- 2. User Solved Problems Table
 CREATE TABLE IF NOT EXISTS public.user_solved_problems (
@@ -24,8 +31,11 @@ CREATE TABLE IF NOT EXISTS public.user_solved_problems (
   CONSTRAINT unique_user_problem UNIQUE (user_id, problem_id)
 );
 
--- Disable RLS on user_solved_problems so public leaderboard can query easily
+-- Disable RLS on user_solved_problems so public leaderboard can query solved counts easily
 ALTER TABLE public.user_solved_problems DISABLE ROW LEVEL SECURITY;
+
+-- Grant SELECT to anon and authenticated roles
+GRANT SELECT ON public.user_solved_problems TO anon, authenticated;
 
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
