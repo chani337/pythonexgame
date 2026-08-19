@@ -454,9 +454,37 @@ code, pre, .console-container, .glass-input {
     padding: 1rem !important;
   }
 
-  /* Editor frame stays intact but narrower */
+  /* Mobile Workspace Layout & Tabs */
+  .mobile-workspace-tabs {
+    display: flex !important;
+  }
+
+  .mobile-tab-desc-hidden {
+    display: none !important;
+  }
+
+  .mobile-tab-editor-hidden {
+    display: none !important;
+  }
+
+  .problem-workspace-split {
+    display: flex !important;
+    flex-direction: column !important;
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* Editor frame stays intact but properly sized on mobile */
   .editor-frame {
     min-width: 0 !important;
+    min-height: 360px !important;
+    height: auto !important;
+  }
+
+  .code-editor-textarea {
+    min-height: 220px !important;
+    font-size: 0.88rem !important;
   }
 
   /* DocsViewer: chapter nav full width on mobile */

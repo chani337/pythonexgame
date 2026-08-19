@@ -33,6 +33,7 @@ export default function ProblemWorkspace({
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [hasTested, setHasTested] = useState<boolean>(false);
   const [workspaceSuccess, setWorkspaceSuccess] = useState<boolean>(false);
+  const [mobileTab, setMobileTab] = useState<'desc' | 'editor'>('desc');
 
   // Synchronized scrolling for line numbers
   const lineNumbersRef = useRef<HTMLDivElement>(null);
@@ -347,8 +348,45 @@ export default function ProblemWorkspace({
         </div>
       </div>
 
+      {/* Mobile Tab Switcher */}
+      <div className="mobile-workspace-tabs" style={{ display: 'none', marginBottom: '0.75rem', gap: '0.5rem' }}>
+        <button
+          onClick={() => setMobileTab('desc')}
+          style={{
+            flex: 1,
+            padding: '0.65rem',
+            fontSize: '0.8rem',
+            fontWeight: '700',
+            background: mobileTab === 'desc' ? '#1a1a1a' : '#ffffff',
+            color: mobileTab === 'desc' ? '#ffffff' : '#1a1a1a',
+            border: '1px solid #1a1a1a',
+            borderRadius: '0px',
+            cursor: 'pointer',
+          }}
+        >
+          📖 문제 설명
+        </button>
+        <button
+          onClick={() => setMobileTab('editor')}
+          style={{
+            flex: 1,
+            padding: '0.65rem',
+            fontSize: '0.8rem',
+            fontWeight: '700',
+            background: mobileTab === 'editor' ? '#1a1a1a' : '#ffffff',
+            color: mobileTab === 'editor' ? '#ffffff' : '#1a1a1a',
+            border: '1px solid #1a1a1a',
+            borderRadius: '0px',
+            cursor: 'pointer',
+          }}
+        >
+          💻 코드 작성 & 실행
+        </button>
+      </div>
+
       {/* Main Grid: Description | Editor */}
       <div
+        className="problem-workspace-split"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))',
@@ -361,7 +399,7 @@ export default function ProblemWorkspace({
       >
         {/* Left Side: Description Panel */}
         <div
-          className="glass-card"
+          className={`glass-card ${mobileTab === 'editor' ? 'mobile-tab-desc-hidden' : ''}`}
           style={{
             padding: '2rem',
             display: 'flex',
@@ -452,7 +490,7 @@ export default function ProblemWorkspace({
         </div>
 
         {/* Right Side: Action Area */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', minHeight: 0, overflowY: 'auto' }}>
+        <div className={`problem-workspace-right ${mobileTab === 'desc' ? 'mobile-tab-editor-hidden' : ''}`} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', height: '100%', minHeight: 0, overflowY: 'auto' }}>
           {/* Coding Challenge View */}
           {problem.type === 'coding' && (
             <div className="editor-frame" style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0 }}>
