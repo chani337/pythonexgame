@@ -59,6 +59,7 @@ export default function ProblemWorkspace({
   const [hasTested, setHasTested] = useState<boolean>(false);
   const [workspaceSuccess, setWorkspaceSuccess] = useState<boolean>(false);
   const [mobileTab, setMobileTab] = useState<'desc' | 'editor'>('desc');
+  const [showExplanation, setShowExplanation] = useState<boolean>(false);
 
   // Synchronized scrolling for line numbers
   const lineNumbersRef = useRef<HTMLDivElement>(null);
@@ -219,7 +220,17 @@ export default function ProblemWorkspace({
     setTestResults([]);
     setHasTested(false);
     setWorkspaceSuccess(false);
+    setShowExplanation(false);
   }, [problem]);
+
+  // Auto-dismiss the success toast after a few seconds so it doesn't sit on
+  // top of the "해설 보기" button (and other lower controls) indefinitely --
+  // previously the only way to clear it was to navigate away entirely.
+  useEffect(() => {
+    if (!workspaceSuccess) return;
+    const timer = setTimeout(() => setWorkspaceSuccess(false), 4500);
+    return () => clearTimeout(timer);
+  }, [workspaceSuccess]);
 
   // Handle run/test action
   const handleRun = async () => {
@@ -881,6 +892,44 @@ export default function ProblemWorkspace({
                     )}
                   </div>
                 ))}
+              </div>
+            )}
+
+            {hasTested && problem.solutionExplanation && (
+              <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
+                <button
+                  onClick={() => setShowExplanation((prev) => !prev)}
+                  style={{
+                    background: 'transparent',
+                    border: '1px solid #8250df',
+                    color: '#8250df',
+                    padding: '0.4rem 0.75rem',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                  }}
+                >
+                  💡 {showExplanation ? '해설 접기' : '해설 보기'}
+                </button>
+                {showExplanation && (
+                  <div
+                    style={{
+                      marginTop: '0.5rem',
+                      padding: '0.85rem 1rem',
+                      background: '#faf5ff',
+                      border: '1px solid #e2d4fb',
+                      fontSize: '0.8rem',
+                      color: '#1a1a1a',
+                      lineHeight: '1.6',
+                      whiteSpace: 'pre-line',
+                    }}
+                  >
+                    {problem.solutionExplanation}
+                  </div>
+                )}
               </div>
             )}
           </div>

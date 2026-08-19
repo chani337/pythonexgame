@@ -20,6 +20,7 @@ export interface Problem {
   initialCode?: string;
   testCases?: TestCase[];
   testRunnerCode?: string;
+  solutionExplanation?: string;
   quizQuestion?: string;
   quizOptions?: string[];
   correctAnswerIndex?: number;
@@ -3117,7 +3118,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n최수민 | 디자인팀\n정찬희 | 개발팀"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n최수민 | 디자인팀\n정찬희 | 개발팀"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "SELECT 뒤에 원하는 열 이름을 콤마로 나열하면 그 열들만 조회됩니다. *을 쓰면 모든 열이 나오지만, 필요한 열만 지정하면 결과가 더 명확하고 성능에도 유리합니다."
   },
   {
     "id": "sql_q2",
@@ -3131,7 +3133,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "WHERE절은 FROM에서 가져온 행 중 조건을 만족하는 행만 걸러냅니다. score >= 90처럼 비교 연산자로 숫자 조건을 표현할 수 있습니다."
   },
   {
     "id": "sql_q3",
@@ -3145,7 +3148,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "AND는 여러 조건을 모두 만족해야 참이 되는 연산자입니다. \"개발팀이면서 점수 90 이상\"처럼 두 조건을 동시에 만족하는 행만 남기고 싶을 때 사용합니다."
   },
   {
     "id": "sql_q4",
@@ -3159,7 +3163,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n이영희\n최수민"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n이영희\n최수민"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "OR는 여러 조건 중 하나라도 만족하면 참이 되는 연산자입니다. AND와 헷갈리기 쉬운데, \"둘 중 하나\"를 원할 땐 OR, \"둘 다\"를 원할 땐 AND를 씁니다."
   },
   {
     "id": "sql_q5",
@@ -3173,7 +3178,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "LIKE는 문자열 패턴 매칭에 사용하며, %는 길이에 상관없이 아무 문자열이나 대응하는 와일드카드입니다. \"김%\"는 \"김\"으로 시작하는 모든 문자열과 일치합니다."
   },
   {
     "id": "sql_q6",
@@ -3187,7 +3193,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | age\n----------------------------------------\n김철수 | 20\n이영희 | 25\n박민수 | 22\n정찬희 | 24"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | age\n----------------------------------------\n김철수 | 20\n이영희 | 25\n박민수 | 22\n정찬희 | 24"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "BETWEEN A AND B는 age >= A AND age <= B와 같은 뜻으로, 두 값을 포함한 범위를 조회할 때 씁니다. 부등호를 두 번 쓰는 것보다 간결합니다."
   },
   {
     "id": "sql_q7",
@@ -3201,7 +3208,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n정찬희 | 개발팀"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n정찬희 | 개발팀"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "IN은 여러 값 중 하나와 일치하는지 확인할 때 사용하며, dept = '개발팀' OR dept = '기획팀'을 IN ('개발팀', '기획팀')로 더 간결하게 표현할 수 있습니다."
   },
   {
     "id": "sql_q8",
@@ -3215,7 +3223,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90\n이영희 | 85\n최수민 | 70"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90\n이영희 | 85\n최수민 | 70"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "ORDER BY 열 DESC는 해당 열을 기준으로 내림차순(큰 값부터) 정렬합니다. 오름차순은 ASC이며, 기본값이라 생략할 수 있습니다."
   },
   {
     "id": "sql_q9",
@@ -3229,7 +3238,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "LIMIT은 조회 결과 중 앞에서부터 지정한 개수만 반환합니다. ORDER BY로 먼저 정렬한 뒤 LIMIT을 적용해야 \"상위 N개\"라는 의미가 성립합니다."
   },
   {
     "id": "sql_q10",
@@ -3243,7 +3253,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"dept\n----------------------------------------\n개발팀\n기획팀\n디자인팀"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"dept\n----------------------------------------\n개발팀\n기획팀\n디자인팀"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "DISTINCT는 조회 결과에서 완전히 같은 행(또는 지정한 열의 같은 값)을 하나로 합쳐 중복을 제거합니다. 부서 목록처럼 \"어떤 종류가 있는지\"를 볼 때 유용합니다."
   },
   {
     "id": "sql_q11",
@@ -3257,7 +3268,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"cnt\n----------------------------------------\n5"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"cnt\n----------------------------------------\n5"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "COUNT(*)는 조건을 만족하는 행의 개수를 셉니다. AS로 결과 열에 별칭을 지정하면 결과가 더 읽기 쉬워집니다."
   },
   {
     "id": "sql_q12",
@@ -3271,7 +3283,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"avg_score\n----------------------------------------\n88.0"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"avg_score\n----------------------------------------\n88.0"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "AVG()는 지정한 열의 평균값을 계산하는 집계 함수입니다. COUNT, SUM, MAX, MIN과 함께 자주 쓰이는 대표적인 집계 함수 중 하나입니다."
   },
   {
     "id": "sql_q13",
@@ -3285,7 +3298,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"dept | cnt\n----------------------------------------\n개발팀 | 3\n기획팀 | 1\n디자인팀 | 1"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"dept | cnt\n----------------------------------------\n개발팀 | 3\n기획팀 | 1\n디자인팀 | 1"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "GROUP BY는 지정한 열의 같은 값끼리 행을 묶어줍니다. 이렇게 묶인 그룹마다 COUNT(*) 같은 집계 함수를 적용하면 그룹별 통계를 구할 수 있습니다."
   },
   {
     "id": "sql_q14",
@@ -3299,7 +3313,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "HAVING은 GROUP BY로 만들어진 그룹에 대해 조건을 거는 절입니다. WHERE는 그룹화 전 개별 행을 거르지만, 그룹 자체(예: 그룹 평균)를 거르려면 HAVING을 사용해야 합니다."
   },
   {
     "id": "sql_q15",
@@ -3313,7 +3328,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"max_score | min_score\n----------------------------------------\n100 | 70"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"max_score | min_score\n----------------------------------------\n100 | 70"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "MAX()와 MIN()은 각각 지정한 열에서 가장 큰 값과 가장 작은 값을 구하는 집계 함수입니다. 한 SELECT문에서 여러 집계 함수를 동시에 사용할 수 있습니다."
   },
   {
     "id": "sql_q16",
@@ -3327,7 +3343,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n박민수 | 키보드\n정찬희 | 모니터"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n박민수 | 키보드\n정찬희 | 모니터"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "INNER JOIN은 두 테이블에서 ON 조건이 일치하는 행끼리만 연결해서 보여줍니다. users.id = orders.user_id처럼 관계를 맺어주는 열을 ON에 명시해야 합니다."
   },
   {
     "id": "sql_q17",
@@ -3341,7 +3358,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | NULL\n박민수 | 키보드\n최수민 | NULL\n정찬희 | 모니터"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | NULL\n박민수 | 키보드\n최수민 | NULL\n정찬희 | 모니터"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "LEFT JOIN은 왼쪽 테이블(users)의 모든 행을 기준으로, 오른쪽 테이블(orders)에 일치하는 값이 없으면 그 자리를 NULL로 채워서 보여줍니다. INNER JOIN과 달리 \"주문이 없는 사용자\"도 결과에서 사라지지 않습니다."
   },
   {
     "id": "sql_q18",
@@ -3355,7 +3373,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | product | price\n----------------------------------------\n김철수 | 노트북 | 1500000\n박민수 | 키보드 | 120000\n정찬희 | 모니터 | 450000"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | product | price\n----------------------------------------\n김철수 | 노트북 | 1500000\n박민수 | 키보드 | 120000\n정찬희 | 모니터 | 450000"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "JOIN으로 두 테이블을 연결한 뒤에도 WHERE로 추가 조건을 걸 수 있습니다. JOIN이 먼저 두 테이블을 합치고, 그 결과에 WHERE 조건이 적용된다고 생각하면 이해하기 쉽습니다."
   },
   {
     "id": "sql_q19",
@@ -3369,7 +3388,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "서브쿼리(괄호 안의 SELECT문)는 먼저 실행되어 하나의 값(여기서는 전체 평균)을 만들고, 바깥 쿼리는 그 값을 조건으로 활용합니다. AVG(score)를 조건에 직접 쓸 수 없기 때문에 서브쿼리로 감싸야 합니다."
   },
   {
     "id": "sql_q20",
@@ -3383,7 +3403,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "IN 뒤에 서브쿼리를 쓰면, 그 서브쿼리가 만든 목록에 포함되는 값만 걸러낼 수 있습니다. \"주문 테이블에 등장하는 user_id 목록에 속하는 사용자\"를 찾는 전형적인 패턴입니다."
   },
   {
     "id": "sql_q21",
@@ -3397,7 +3418,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "EXISTS는 서브쿼리 결과가 하나라도 있으면 TRUE를 반환합니다. IN과 결과는 비슷하지만, EXISTS는 값 자체가 아니라 \"존재 여부\"만 확인하기 때문에 대량 데이터에서 더 효율적일 수 있습니다."
   },
   {
     "id": "sql_q22",
@@ -3411,7 +3433,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "UNION은 두 SELECT 결과를 세로로 합치면서 완전히 같은 행은 자동으로 제거합니다. 두 쿼리의 열 개수와 순서가 같아야 합니다."
   },
   {
     "id": "sql_q23",
@@ -3425,7 +3448,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"dept\n----------------------------------------\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"dept\n----------------------------------------\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "UNION ALL은 UNION과 달리 중복 제거 없이 두 결과를 그대로 이어 붙입니다. 중복 제거 연산이 없어 UNION보다 처리 속도가 더 빠릅니다."
   },
   {
     "id": "sql_q24",
@@ -3439,7 +3463,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | score | rnk\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | score | rnk\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "RANK()는 OVER절과 함께 사용하는 윈도우 함수로, ORDER BY 기준으로 순위를 매깁니다. 동점이 있으면 같은 순위를 부여하고 다음 순위를 건너뜁니다(1, 1, 3 방식)."
   },
   {
     "id": "sql_q25",
@@ -3453,7 +3478,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | score | rn\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | score | rn\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "ROW_NUMBER()도 윈도우 함수지만 RANK()와 달리 동점이어도 절대 겹치지 않는 고유한 순번을 1부터 매깁니다."
   },
   {
     "id": "sql_q26",
@@ -3467,7 +3493,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | dept | score | dept_avg\n----------------------------------------\n김철수 | 개발팀 | 90 | 95.0\n박민수 | 개발팀 | 100 | 95.0\n정찬희 | 개발팀 | 95 | 95.0\n이영희 | 기획팀 | 85 | 85.0\n최수민 | 디자인팀 | 70 | 70.0"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | dept | score | dept_avg\n----------------------------------------\n김철수 | 개발팀 | 90 | 95.0\n박민수 | 개발팀 | 100 | 95.0\n정찬희 | 개발팀 | 95 | 95.0\n이영희 | 기획팀 | 85 | 85.0\n최수민 | 디자인팀 | 70 | 70.0"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "PARTITION BY는 윈도우 함수를 적용할 때 데이터를 그룹으로 나누는 역할을 합니다. GROUP BY와 달리 원본 행을 그대로 유지하면서, 각 행에 \"자신이 속한 그룹의 집계값\"을 함께 보여줄 수 있습니다."
   },
   {
     "id": "sql_q27",
@@ -3481,7 +3508,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n이영희\n최수민"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n이영희\n최수민"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "LEFT JOIN 결과에서 오른쪽 테이블 값이 NULL인 행만 걸러내면 \"왼쪽에는 있지만 오른쪽과 연결되지 않은\" 데이터를 찾을 수 있습니다. 미주문 고객을 찾는 대표적인 패턴입니다."
   },
   {
     "id": "sql_q28",
@@ -3495,7 +3523,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | 주문없음\n박민수 | 키보드\n최수민 | 주문없음\n정찬희 | 모니터"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | 주문없음\n박민수 | 키보드\n최수민 | 주문없음\n정찬희 | 모니터"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "COALESCE(값, 대체값)는 첫 번째 값이 NULL일 때 지정한 대체값을 대신 반환합니다. LEFT JOIN으로 생긴 NULL을 사람이 읽기 좋은 문구로 바꿀 때 자주 사용합니다."
   },
   {
     "id": "sql_q29",
@@ -3509,7 +3538,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"name | grade\n----------------------------------------\n김철수 | A\n이영희 | B\n박민수 | A\n최수민 | C\n정찬희 | A"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"name | grade\n----------------------------------------\n김철수 | A\n이영희 | B\n박민수 | A\n최수민 | C\n정찬희 | A"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "CASE WHEN 조건1 THEN 값1 WHEN 조건2 THEN 값2 ELSE 값3 END은 조건에 따라 다른 값을 반환하는 SQL의 조건문입니다. 위에서부터 순서대로 검사하다가 처음 참이 되는 조건의 값을 사용합니다."
   },
   {
     "id": "sql_q30",
@@ -3523,7 +3553,8 @@ export const problems: Problem[] = [
     "examples": [{"input":"코드 출력 예시","output":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0\n디자인팀 | 70.0"}],
     "initialCode": "",
     "testCases": [{"input":"코드 실행","expected":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0\n디자인팀 | 70.0"}],
-    "testRunnerCode": "stdout_match"
+    "testRunnerCode": "stdout_match",
+    "solutionExplanation": "ROUND(값, 자릿수)는 숫자를 지정한 소수 자릿수로 반올림합니다. AVG()의 결과가 소수점 아래로 길게 나올 때 보기 좋게 다듬는 용도로 자주 함께 쓰입니다."
   },
   {
     "id": "java_quiz_intro_1",
