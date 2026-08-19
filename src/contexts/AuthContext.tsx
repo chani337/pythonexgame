@@ -46,6 +46,7 @@ interface AuthContextType {
   syncSolvedToSupabase: (problemId: string) => Promise<void>;
   syncStatsToSupabase: (streak: number, lastSolvedDate: string, sandboxRuns: number) => Promise<void>;
   fetchUserSolvedIds: () => Promise<string[]>;
+  updateDisplayName: (newDisplayName: string) => Promise<{ error?: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -413,6 +414,61 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateDisplayName = async (newDisplayName: string) => {
+    const cleanName = newDisplayName.trim();
+    if (!cleanName) {
+      return { error: { message: '닉네임을 입력해 주세요.' } };
+    }
+    if (cleanName.length > 15) {
+      return { error: { message: '닉네임은 최대 15자까지 설정할 수 있습니다.' } };
+    }
+
+    // Save to local storage for instant availability
+    const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
+    localStorage.setItem(`pyquests_display_name_${activeUserId}`, cleanName);
+    localStorage.setItem('pyquests_display_name', cleanName);
+
+    // Update profile state
+    setProfile((prev) => {
+      if (prev) {
+        return { ...prev, display_name: cleanName };
+      }
+      return {
+        id: activeUserId,
+        email: user?.email || '',
+        display_name: cleanName,
+        streak: 0,
+        last_solved_date: null,
+        sandbox_runs: 0,
+      };
+    });
+
+    if (isSupabaseConfigured && user) {
+      try {
+        const { error } = await supabase
+          .from('profiles')
+          .upsert({
+            id: user.id,
+            email: user.email || '',
+            display_name: cleanName,
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'id' });
+
+        if (error) {
+          console.error('Supabase profile name update error:', error);
+          return { error };
+        }
+      } catch (err) {
+        console.error('Update display name error:', err);
+        return { error: err };
+      }
+    }
+
+    // Refresh leaderboard with new display name
+    await refreshLeaderboard();
+    return {};
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -432,6 +488,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         syncSolvedToSupabase,
         syncStatsToSupabase,
         fetchUserSolvedIds,
+        updateDisplayName,
       }}
     >
       {children}

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, BookOpen, Terminal, GraduationCap, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Terminal, GraduationCap, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import ProfileEditModal from './ProfileEditModal';
 
 interface SidebarProps {
   currentView: string;
@@ -19,6 +20,7 @@ export default function Sidebar({
 }: SidebarProps) {
   const progressPercent = Math.round((solvedCount / totalCount) * 100) || 0;
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [profileEditModalOpen, setProfileEditModalOpen] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState<boolean>(() => {
     const saved = localStorage.getItem('pyquests_sidebar_collapsed');
     return saved !== null ? JSON.parse(saved) : false;
@@ -195,9 +197,31 @@ export default function Sidebar({
           >
             {user ? (
               <div style={{ textAlign: isCollapsed ? 'center' : 'left' }}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'flex-start', gap: '0.4rem', fontSize: '0.78rem', fontWeight: '700', color: '#1a1a1a' }}>
-                  <UserCheck size={14} color="#0969da" />
-                  {!isCollapsed && <span>{profile?.display_name || user.email?.split('@')[0]}</span>}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: isCollapsed ? 'center' : 'space-between', gap: '0.4rem', fontSize: '0.78rem', fontWeight: '700', color: '#1a1a1a' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <UserCheck size={14} color="#0969da" style={{ flexShrink: 0 }} />
+                    {!isCollapsed && <span>{profile?.display_name || user.email?.split('@')[0]}</span>}
+                  </div>
+                  {!isCollapsed && (
+                    <button
+                      onClick={() => setProfileEditModalOpen(true)}
+                      title="닉네임 변경"
+                      style={{
+                        background: 'transparent',
+                        border: 'none',
+                        color: 'var(--text-secondary)',
+                        cursor: 'pointer',
+                        padding: '2px 4px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        borderRadius: '4px',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <Edit3 size={13} />
+                    </button>
+                  )}
                 </div>
                 {!isCollapsed && (
                   <div style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: '0.1rem' }}>
@@ -433,6 +457,11 @@ export default function Sidebar({
           </div>
         )}
       </div>
+
+      <ProfileEditModal
+        isOpen={profileEditModalOpen}
+        onClose={() => setProfileEditModalOpen(false)}
+      />
     </aside>
   );
 }

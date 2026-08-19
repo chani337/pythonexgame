@@ -1,6 +1,8 @@
-import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3 } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { useAuth } from '../contexts/AuthContext';
+import ProfileEditModal from './ProfileEditModal';
 
 
 interface DashboardProps {
@@ -510,6 +512,7 @@ export default function Dashboard({
 
 function LeaderboardWidget() {
   const { leaderboard, isConfigured, setAuthModalOpen, user } = useAuth();
+  const [profileEditOpen, setProfileEditOpen] = useState(false);
 
   const isSelfUser = (item: any) => {
     if (user && item.id === user.id) return true;
@@ -527,21 +530,41 @@ function LeaderboardWidget() {
         <h3 style={{ fontSize: '0.95rem', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '0.5rem', letterSpacing: '0.05em' }}>
           🔥 글로벌 명예의 전당 (실시간 랭킹)
         </h3>
-        {!user && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <button
-            onClick={() => setAuthModalOpen(true)}
+            onClick={() => setProfileEditOpen(true)}
             style={{
               background: 'transparent',
-              border: 'none',
-              color: '#0969da',
+              border: '1px solid var(--border-subtle)',
+              color: '#1a1a1a',
               fontSize: '0.75rem',
               fontWeight: '700',
+              padding: '0.3rem 0.6rem',
               cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.3rem',
             }}
           >
-            내 순위 등록하기 (로그인)
+            <Edit3 size={12} />
+            닉네임 변경
           </button>
-        )}
+          {!user && (
+            <button
+              onClick={() => setAuthModalOpen(true)}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: '#0969da',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+              }}
+            >
+              내 순위 등록하기 (로그인)
+            </button>
+          )}
+        </div>
       </div>
 
       {!isConfigured ? (
@@ -576,10 +599,27 @@ function LeaderboardWidget() {
                   >
                     #{index + 1}
                   </span>
-                  <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#1a1a1a' }}>
                       {item.display_name} {isSelf && <span style={{ fontSize: '0.7rem', color: '#0969da' }}>(나)</span>}
                     </span>
+                    {isSelf && (
+                      <button
+                        onClick={() => setProfileEditOpen(true)}
+                        title="닉네임 수정"
+                        style={{
+                          background: 'none',
+                          border: 'none',
+                          color: '#6b7280',
+                          cursor: 'pointer',
+                          padding: '2px',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        <Edit3 size={13} />
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -596,6 +636,11 @@ function LeaderboardWidget() {
           아직 랭킹 정보가 없습니다. 첫 번째로 문제를 풀고 1위에 도전해보세요!
         </div>
       )}
+
+      <ProfileEditModal
+        isOpen={profileEditOpen}
+        onClose={() => setProfileEditOpen(false)}
+      />
     </div>
   );
 }
