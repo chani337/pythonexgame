@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { docChapters } from '../data/docs';
 import type { RunResponse } from '../hooks/usePyodide';
-import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles } from 'lucide-react';
+import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles, CheckCircle2, Circle, HelpCircle, X } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { chapterQuizzes } from '../data/chapterQuizzes';
 
 interface DocsViewerProps {
   runPythonCode: (code: string) => Promise<RunResponse>;
@@ -24,6 +26,58 @@ export default function DocsViewer({
   const [isFocusMode, setIsFocusMode] = useState<boolean>(false);
   const [fontSizeScale, setFontSizeScale] = useState<number>(100);
 
+  const { user } = useAuth();
+
+  const [readChapterIds, setReadChapterIds] = useState<string[]>(() => {
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
+    const saved = localStorage.getItem(`pyquests_read_chapters_${lastId}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Reload read-chapter progress when the logged-in user changes (login/logout/guest)
+  useEffect(() => {
+    const activeUserId = user?.id || 'guest';
+    const saved = localStorage.getItem(`pyquests_read_chapters_${activeUserId}`);
+    setReadChapterIds(saved ? JSON.parse(saved) : []);
+  }, [user]);
+
+  const toggleChapterRead = (chapterId: string) => {
+    setReadChapterIds((prev) => {
+      const next = prev.includes(chapterId)
+        ? prev.filter((id) => id !== chapterId)
+        : [...prev, chapterId];
+      const activeUserId = user?.id || 'guest';
+      localStorage.setItem(`pyquests_read_chapters_${activeUserId}`, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  const markChapterRead = (chapterId: string) => {
+    setReadChapterIds((prev) => {
+      if (prev.includes(chapterId)) return prev;
+      const next = [...prev, chapterId];
+      const activeUserId = user?.id || 'guest';
+      localStorage.setItem(`pyquests_read_chapters_${activeUserId}`, JSON.stringify(next));
+      return next;
+    });
+  };
+
+  // Chapter comprehension-check quiz: answers keyed by `${chapterId}_${questionIndex}`
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>(() => {
+    const saved = localStorage.getItem('pyquests_docs_quiz_answers');
+    return saved ? JSON.parse(saved) : {};
+  });
+
+  const selectQuizAnswer = (chapterId: string, qIndex: number, optionIndex: number) => {
+    setQuizAnswers((prev) => {
+      const key = `${chapterId}_${qIndex}`;
+      if (prev[key] !== undefined) return prev; // already answered, keep first answer
+      const next = { ...prev, [key]: optionIndex };
+      localStorage.setItem('pyquests_docs_quiz_answers', JSON.stringify(next));
+      return next;
+    });
+  };
+
   const viewerRef = useRef<HTMLDivElement>(null);
   const focusViewerRef = useRef<HTMLDivElement>(null);
 
@@ -38,6 +92,95 @@ export default function DocsViewer({
   });
 
   const activeChapter = filteredChapters[selectedChapterIdx] || filteredChapters[0] || docChapters[0];
+  const readCountInCategory = filteredChapters.filter((ch) => readChapterIds.includes(ch.id)).length;
+  const isActiveChapterRead = readChapterIds.includes(activeChapter.id);
+  const activeQuiz = chapterQuizzes.find((q) => q.chapterId === activeChapter.id);
+
+  // Auto-mark the chapter as read once every quiz question is answered correctly
+  useEffect(() => {
+    if (!activeQuiz) return;
+    const allCorrect = activeQuiz.questions.every((q, qIdx) => {
+      const key = `${activeChapter.id}_${qIdx}`;
+      return quizAnswers[key] === q.correctIndex;
+    });
+    if (allCorrect) {
+      markChapterRead(activeChapter.id);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quizAnswers, activeChapter.id]);
+
+  const renderChapterQuiz = () => {
+    if (!activeQuiz) return null;
+    return (
+      <div style={{ marginTop: '2.5rem', paddingTop: '1.75rem', borderTop: '2px solid #1a1a1a' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+          <HelpCircle size={18} color="#1a1a1a" />
+          <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#1a1a1a' }}>이해도 체크</h3>
+        </div>
+        {activeQuiz.questions.map((q, qIdx) => {
+          const key = `${activeChapter.id}_${qIdx}`;
+          const answered = quizAnswers[key];
+          return (
+            <div key={key} style={{ marginBottom: '1.5rem', padding: '1.1rem 1.25rem', background: 'var(--bg-dark)', border: '1px solid var(--border-subtle)' }}>
+              <p style={{ fontSize: '0.85rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '0.85rem' }}>
+                Q{qIdx + 1}. {q.question}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                {q.options.map((opt, optIdx) => {
+                  const isSelected = answered === optIdx;
+                  const isCorrectOption = optIdx === q.correctIndex;
+                  let bg = '#ffffff';
+                  let border = '1px solid var(--border-subtle)';
+                  let color = 'var(--text-secondary)';
+                  if (answered !== undefined) {
+                    if (isCorrectOption) {
+                      bg = '#dcfce7';
+                      border = '1px solid #16a34a';
+                      color = '#15803d';
+                    } else if (isSelected && !isCorrectOption) {
+                      bg = '#fee2e2';
+                      border = '1px solid #dc2626';
+                      color = '#b91c1c';
+                    }
+                  }
+                  return (
+                    <button
+                      key={optIdx}
+                      onClick={() => selectQuizAnswer(activeChapter.id, qIdx, optIdx)}
+                      disabled={answered !== undefined}
+                      style={{
+                        textAlign: 'left',
+                        padding: '0.6rem 0.9rem',
+                        fontSize: '0.8rem',
+                        fontWeight: isSelected || (answered !== undefined && isCorrectOption) ? '700' : '500',
+                        background: bg,
+                        border,
+                        color,
+                        cursor: answered !== undefined ? 'default' : 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                      }}
+                    >
+                      {answered !== undefined && isCorrectOption && <CheckCircle2 size={14} color="#16a34a" style={{ flexShrink: 0 }} />}
+                      {answered !== undefined && isSelected && !isCorrectOption && <X size={14} color="#dc2626" style={{ flexShrink: 0 }} />}
+                      {opt}
+                    </button>
+                  );
+                })}
+              </div>
+              {answered !== undefined && (
+                <p style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', marginTop: '0.75rem', lineHeight: '1.5' }}>
+                  {answered === q.correctIndex ? '✅ 정답입니다! ' : '❌ 오답입니다. '}
+                  {q.explanation}
+                </p>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   useEffect(() => {
     if (viewerRef.current) {
@@ -505,7 +648,7 @@ except Exception as e:
               >
                 {filteredChapters.map((ch, idx) => (
                   <option key={ch.id} value={idx}>
-                    {idx + 1}. {ch.title}
+                    {readChapterIds.includes(ch.id) ? '✓ ' : ''}{idx + 1}. {ch.title}
                   </option>
                 ))}
               </select>
@@ -582,6 +725,24 @@ except Exception as e:
               </h1>
             </div>
             <div style={{ display: 'flex', gap: '0.5rem' }}>
+              <button
+                onClick={() => toggleChapterRead(activeChapter.id)}
+                style={{
+                  padding: '0.5rem 1rem',
+                  fontSize: '0.8rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                  border: isActiveChapterRead ? '1px solid #16a34a' : '1px solid #334155',
+                  background: isActiveChapterRead ? '#16a34a' : 'transparent',
+                  color: isActiveChapterRead ? '#ffffff' : '#cbd5e1',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                }}
+              >
+                {isActiveChapterRead ? <CheckCircle2 size={15} /> : <Circle size={15} />}
+                {isActiveChapterRead ? '완료됨' : '완료로 표시'}
+              </button>
               <button
                 disabled={selectedChapterIdx === 0}
                 onClick={() => {
@@ -669,6 +830,7 @@ except Exception as e:
             }
             return null;
           })}
+          {renderChapterQuiz()}
         </div>
       </div>
     );
@@ -846,6 +1008,22 @@ except Exception as e:
                 <PanelLeftClose size={16} />
               </button>
             </div>
+            <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.72rem', color: 'var(--text-secondary)', marginBottom: '0.35rem' }}>
+                <span>진행률</span>
+                <span style={{ fontWeight: '700', color: '#1a1a1a' }}>{readCountInCategory} / {filteredChapters.length}</span>
+              </div>
+              <div style={{ height: '4px', background: '#eaeaea', overflow: 'hidden' }}>
+                <div
+                  style={{
+                    height: '100%',
+                    width: `${filteredChapters.length ? Math.round((readCountInCategory / filteredChapters.length) * 100) : 0}%`,
+                    background: '#1a1a1a',
+                    transition: 'width 0.3s ease',
+                  }}
+                />
+              </div>
+            </div>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', overflowY: 'auto', flex: 1, paddingRight: '4px' }}>
               {filteredChapters.map((chapter, idx) => (
                 <button
@@ -883,7 +1061,14 @@ except Exception as e:
                     }
                   }}
                 >
-                  <BookOpen size={15} style={{ flexShrink: 0, width: '15px', height: '15px', minWidth: '15px', minHeight: '15px' }} />
+                  {readChapterIds.includes(chapter.id) ? (
+                    <CheckCircle2
+                      size={15}
+                      style={{ flexShrink: 0, width: '15px', height: '15px', minWidth: '15px', minHeight: '15px', color: selectedChapterIdx === idx ? '#4ade80' : '#16a34a' }}
+                    />
+                  ) : (
+                    <BookOpen size={15} style={{ flexShrink: 0, width: '15px', height: '15px', minWidth: '15px', minHeight: '15px' }} />
+                  )}
                   <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', flex: 1, minWidth: 0 }}>
                     {chapter.title}
                   </span>
@@ -909,6 +1094,27 @@ except Exception as e:
             transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1), zoom 0.2s ease',
           }}
         >
+          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+            <button
+              onClick={() => toggleChapterRead(activeChapter.id)}
+              style={{
+                padding: '0.5rem 1rem',
+                fontSize: '0.8rem',
+                fontWeight: '700',
+                cursor: 'pointer',
+                border: isActiveChapterRead ? '1px solid #16a34a' : '1px solid #1a1a1a',
+                background: isActiveChapterRead ? '#16a34a' : '#ffffff',
+                color: isActiveChapterRead ? '#ffffff' : '#1a1a1a',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.4rem',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {isActiveChapterRead ? <CheckCircle2 size={15} /> : <Circle size={15} />}
+              {isActiveChapterRead ? '완료됨' : '완료로 표시'}
+            </button>
+          </div>
           {activeChapter.cells.map((cell) => {
             if (!cell.content.trim()) return null;
             if (cell.type === 'markdown') {
@@ -1030,6 +1236,7 @@ except Exception as e:
             }
             return null;
           })}
+          {renderChapterQuiz()}
         </div>
       </div>
     </div>
