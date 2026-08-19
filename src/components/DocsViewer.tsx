@@ -382,7 +382,13 @@ export default function DocsViewer({
               >
                 가-
               </button>
-              <span style={{ fontSize: '0.72rem', color: '#94a3b8', minWidth: '40px', textAlign: 'center' }}>{fontSizeScale}%</span>
+              <button
+                onClick={() => setFontSizeScale(100)}
+                title="글자 크기 초기화 (100%)"
+                style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer', fontSize: '0.72rem', minWidth: '42px', textAlign: 'center' }}
+              >
+                {fontSizeScale}%
+              </button>
               <button
                 onClick={() => setFontSizeScale((prev) => Math.min(150, prev + 10))}
                 title="글자 크기 확대"
@@ -419,8 +425,10 @@ export default function DocsViewer({
             flex: 1,
             overflowY: 'auto',
             padding: '3rem 18%',
-            fontSize: `${fontSizeScale}%`,
+            zoom: fontSizeScale / 100,
+            fontSize: `${0.9 * (fontSizeScale / 100)}rem`,
             background: '#ffffff',
+            transition: 'zoom 0.2s ease, font-size 0.2s ease',
           }}
         >
           <div style={{ marginBottom: '2.5rem', borderBottom: '2px solid #1a1a1a', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
