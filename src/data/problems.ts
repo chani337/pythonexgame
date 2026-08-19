@@ -5,7 +5,7 @@ export interface TestCase {
 }
 
 export type ProblemType = 'coding' | 'quiz' | 'fill';
-export type ProblemLanguage = 'python' | 'sql' | 'java';
+export type ProblemLanguage = 'python' | 'sql' | 'java' | 'js';
 
 export interface Problem {
   id: string;
@@ -4028,5 +4028,772 @@ export const problems: Problem[] = [
     "fillQuestion": "문자열에 문자를 이어 붙일 때 사용하는 연산자는 _____이다.",
     "correctAnswerText": "+",
     "placeholderText": "정답 입력..."
-  }
+  },
+  {
+    "id": "js_q1",
+    "title": "JS 변수 문제 1. 이름 저장하기",
+    "category": "변수",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "변수 name에 \"김철수\"를 저장하고 출력하세요.",
+    "constraints": [
+      "변수 이름은 name으로 작성하세요.",
+      "\"김철수\"를 저장하세요.",
+      "console.log로 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "김철수"
+      }
+    ],
+    "initialCode": "// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "김철수"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q2",
+    "title": "JS 연산자 문제 1. 두 수 더하기",
+    "category": "연산자",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "변수 a(7)와 b(5)를 더한 결과를 출력하세요.",
+    "constraints": [
+      "변수 이름은 a, b로 작성하세요.",
+      "a + b의 결과를 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "12"
+      }
+    ],
+    "initialCode": "// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "12"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q3",
+    "title": "JS 문자열 문제 1. 문자열 반복하기",
+    "category": "문자열",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "\"파이팅! \"을 3번 반복하여 출력하세요. (repeat 메서드 사용)",
+    "constraints": [
+      "repeat() 메서드를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "파이팅! 파이팅! 파이팅! "
+      }
+    ],
+    "initialCode": "// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "파이팅! 파이팅! 파이팅! "
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q4",
+    "title": "JS 조건문 문제 1. 짝수/홀수 판별하기",
+    "category": "조건문",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "숫자 7이 짝수면 \"짝수\", 홀수면 \"홀수\"를 출력하세요.",
+    "constraints": [
+      "삼항 연산자 또는 if문을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "홀수"
+      }
+    ],
+    "initialCode": "const number = 7;\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "홀수"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q5",
+    "title": "JS 배열 문제 1. 배열 길이 구하기",
+    "category": "배열",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "배열 [\"사과\", \"바나나\", \"포도\"]의 길이를 출력하세요.",
+    "constraints": [
+      "length 속성을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "3"
+      }
+    ],
+    "initialCode": "const fruits = [\"사과\", \"바나나\", \"포도\"];\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "3"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q6",
+    "title": "JS 배열 문제 2. 마지막 요소 가져오기",
+    "category": "배열",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "배열 [10, 20, 30, 40]의 마지막 요소를 출력하세요. (음수 인덱스는 지원되지 않습니다)",
+    "constraints": [
+      "numbers[numbers.length - 1] 형태를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "40"
+      }
+    ],
+    "initialCode": "const numbers = [10, 20, 30, 40];\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "40"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q7",
+    "title": "JS 문자열 문제 2. 템플릿 리터럴로 문장 만들기",
+    "category": "문자열",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "템플릿 리터럴을 사용해 \"찬희님의 점수는 95점입니다.\"를 출력하세요.",
+    "constraints": [
+      "name=\"찬희\", score=95 변수를 사용하세요.",
+      "백틱(``)과 ${}를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "찬희님의 점수는 95점입니다."
+      }
+    ],
+    "initialCode": "const name = \"찬희\";\nconst score = 95;\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "찬희님의 점수는 95점입니다."
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q8",
+    "title": "JS 문자열 문제 3. 대문자로 변환하기",
+    "category": "문자열",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "\"hello world\"를 모두 대문자로 변환하여 출력하세요.",
+    "constraints": [
+      "toUpperCase() 메서드를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "HELLO WORLD"
+      }
+    ],
+    "initialCode": "const text = \"hello world\";\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "HELLO WORLD"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q9",
+    "title": "JS 문자열 문제 4. 문자열 합치기",
+    "category": "문자열",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "\"Hello\"와 \"World\"를 공백으로 이어서 \"Hello World\"를 출력하세요.",
+    "constraints": [
+      "템플릿 리터럴을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "Hello World"
+      }
+    ],
+    "initialCode": "const first = \"Hello\";\nconst second = \"World\";\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Hello World"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q10",
+    "title": "JS 조건문 문제 2. 성인 여부 판단하기",
+    "category": "조건문",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "js",
+    "description": "나이(15)가 18 이상이면 \"성인\", 아니면 \"미성년자\"를 출력하세요.",
+    "constraints": [
+      "삼항 연산자 또는 if문을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "미성년자"
+      }
+    ],
+    "initialCode": "const age = 15;\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "미성년자"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q11",
+    "title": "JS 반복문 문제 1. 1부터 10까지 합 구하기",
+    "category": "반복문",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "js",
+    "description": "for문을 사용해 1부터 10까지의 합을 구해 출력하세요.",
+    "constraints": [
+      "for문을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "55"
+      }
+    ],
+    "initialCode": "let total = 0;\n// 코드를 작성하세요\nconsole.log(total);\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "55"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q12",
+    "title": "JS 배열 고차함수 문제 1. map으로 제곱 배열 만들기",
+    "category": "배열 고차함수",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "js",
+    "description": "배열 [1,2,3,4,5]의 각 요소를 제곱한 뒤, \", \"로 이어서 출력하세요. (예: \"1, 4, 9, 16, 25\")",
+    "constraints": [
+      "map()과 join(\", \")을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "1, 4, 9, 16, 25"
+      }
+    ],
+    "initialCode": "const numbers = [1, 2, 3, 4, 5];\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "1, 4, 9, 16, 25"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q13",
+    "title": "JS 배열 고차함수 문제 2. filter로 짝수만 걸러내기",
+    "category": "배열 고차함수",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "js",
+    "description": "배열 [1~10]에서 짝수만 걸러내어 \", \"로 이어서 출력하세요.",
+    "constraints": [
+      "filter()와 join(\", \")을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "2, 4, 6, 8, 10"
+      }
+    ],
+    "initialCode": "const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "2, 4, 6, 8, 10"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q14",
+    "title": "JS 배열 고차함수 문제 3. reduce로 합계 구하기",
+    "category": "배열 고차함수",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "js",
+    "description": "배열 [10,20,30,40,50]의 합계를 reduce()로 구해 출력하세요.",
+    "constraints": [
+      "reduce()를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "150"
+      }
+    ],
+    "initialCode": "const numbers = [10, 20, 30, 40, 50];\n// 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "150"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q15",
+    "title": "JS 함수 문제 1. 최댓값 구하는 함수",
+    "category": "함수",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "js",
+    "description": "배열을 받아 최댓값을 반환하는 함수 getMax를 작성하고, [3,7,2,9,4]로 호출한 결과를 출력하세요.",
+    "constraints": [
+      "함수 이름은 getMax로 작성하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "9"
+      }
+    ],
+    "initialCode": "function getMax(numbers) {\n  // 코드를 작성하세요\n}\n\nconsole.log(getMax([3, 7, 2, 9, 4]));\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "9"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q16",
+    "title": "JS 예외 처리 문제 1. try/catch로 에러 처리하기",
+    "category": "예외 처리",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "js",
+    "description": "divide(10, 0)을 호출했을 때 0으로 나누면 \"0으로 나눌 수 없습니다.\"라는 에러를 던지고, try/catch로 잡아서 에러 메시지를 출력하세요.",
+    "constraints": [
+      "throw new Error(\"0으로 나눌 수 없습니다.\")를 사용하세요.",
+      "try/catch로 감싸고 error.message를 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "0으로 나눌 수 없습니다."
+      }
+    ],
+    "initialCode": "function divide(a, b) {\n  // b가 0이면 에러를 던지세요\n  return a / b;\n}\n\n// try/catch로 divide(10, 0)을 호출하고 에러 메시지를 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "0으로 나눌 수 없습니다."
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q17",
+    "title": "JS 클래스 문제 1. 계좌 클래스 만들기",
+    "category": "클래스",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "js",
+    "description": "Account 클래스를 만들어 owner, balance를 저장하고, deposit(입금)/withdraw(출금) 메서드를 구현하세요. \"찬희\" 계정을 10000으로 시작해 5000을 입금하고 3000을 출금한 후 잔액을 출력하세요.",
+    "constraints": [
+      "클래스 이름은 Account로 작성하세요.",
+      "deposit(amount), withdraw(amount) 메서드를 구현하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "12000"
+      }
+    ],
+    "initialCode": "class Account {\n  constructor(owner, balance) {\n    this.owner = owner;\n    this.balance = balance;\n  }\n  // deposit, withdraw 메서드를 작성하세요\n}\n\nconst acc = new Account(\"찬희\", 10000);\nacc.deposit(5000);\nacc.withdraw(3000);\nconsole.log(acc.balance);\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "12000"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_q18",
+    "title": "JS 비동기 문제 1. async/await로 대기 후 출력하기",
+    "category": "비동기",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "js",
+    "description": "주어진 wait 함수로 100ms를 기다린 뒤 \"완료\"를 출력하세요.",
+    "constraints": [
+      "await를 사용해 wait(100)이 끝날 때까지 기다리세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "완료"
+      }
+    ],
+    "initialCode": "function wait(ms) {\n  return new Promise((resolve) => setTimeout(resolve, ms));\n}\n\n// await로 100ms를 기다린 후 \"완료\"를 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "완료"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "js_quiz_1",
+    "title": "JS 퀴즈 1. 변수",
+    "category": "변수",
+    "difficulty": "basic",
+    "type": "quiz",
+    "language": "js",
+    "description": "자바스크립트에서 재할당이 불가능한 변수를 선언하는 키워드는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "자바스크립트에서 재할당이 불가능한 변수를 선언하는 키워드는?",
+    "quizOptions": [
+      "const",
+      "let",
+      "var",
+      "static"
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_quiz_2",
+    "title": "JS 퀴즈 2. 비교 연산자",
+    "category": "연산자",
+    "difficulty": "basic",
+    "type": "quiz",
+    "language": "js",
+    "description": "자료형까지 정확히 같아야 true가 되는 비교 연산자는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "자료형까지 정확히 같아야 true가 되는 비교 연산자는?",
+    "quizOptions": [
+      "===",
+      "==",
+      "=",
+      "!="
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_quiz_3",
+    "title": "JS 퀴즈 3. typeof",
+    "category": "자료형",
+    "difficulty": "basic",
+    "type": "quiz",
+    "language": "js",
+    "description": "typeof \"안녕\"의 결과는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "typeof \"안녕\"의 결과는?",
+    "quizOptions": [
+      "\"string\"",
+      "\"str\"",
+      "\"text\"",
+      "\"object\""
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_quiz_4",
+    "title": "JS 퀴즈 4. 배열 메서드",
+    "category": "배열",
+    "difficulty": "basic",
+    "type": "quiz",
+    "language": "js",
+    "description": "배열의 맨 뒤에 값을 추가하는 메서드는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "배열의 맨 뒤에 값을 추가하는 메서드는?",
+    "quizOptions": [
+      "push()",
+      "pop()",
+      "shift()",
+      "unshift()"
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_quiz_5",
+    "title": "JS 퀴즈 5. 삼항 연산자",
+    "category": "연산자",
+    "difficulty": "intermediate",
+    "type": "quiz",
+    "language": "js",
+    "description": "자바스크립트 삼항 연산자의 올바른 형태는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "자바스크립트 삼항 연산자의 올바른 형태는?",
+    "quizOptions": [
+      "조건 ? 값1 : 값2",
+      "값1 if 조건 else 값2",
+      "조건 ? 값1 , 값2",
+      "if 조건 then 값1 else 값2"
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_quiz_6",
+    "title": "JS 퀴즈 6. falsy 값",
+    "category": "조건문",
+    "difficulty": "intermediate",
+    "type": "quiz",
+    "language": "js",
+    "description": "다음 중 falsy(거짓 취급) 값이 아닌 것은?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "다음 중 falsy(거짓 취급) 값이 아닌 것은?",
+    "quizOptions": [
+      "\"0\" (문자열)",
+      "0",
+      "\"\"",
+      "null"
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_quiz_7",
+    "title": "JS 퀴즈 7. JSON",
+    "category": "문자열",
+    "difficulty": "intermediate",
+    "type": "quiz",
+    "language": "js",
+    "description": "객체를 JSON 문자열로 변환하는 메서드는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "객체를 JSON 문자열로 변환하는 메서드는?",
+    "quizOptions": [
+      "JSON.stringify()",
+      "JSON.parse()",
+      "JSON.toText()",
+      "Object.toString()"
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_quiz_8",
+    "title": "JS 퀴즈 8. 배열 고차함수",
+    "category": "배열 고차함수",
+    "difficulty": "intermediate",
+    "type": "quiz",
+    "language": "js",
+    "description": "배열의 모든 요소를 순서대로 계산해 하나의 값으로 합칠 때 사용하는 메서드는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "배열의 모든 요소를 순서대로 계산해 하나의 값으로 합칠 때 사용하는 메서드는?",
+    "quizOptions": [
+      "reduce()",
+      "map()",
+      "filter()",
+      "find()"
+    ],
+    "correctAnswerIndex": 0
+  },
+  {
+    "id": "js_fill_1",
+    "title": "JS 빈칸 채우기 1. 함수 선언",
+    "category": "함수",
+    "difficulty": "basic",
+    "type": "fill",
+    "language": "js",
+    "description": "빈칸에 들어갈 정확한 키워드를 입력하세요.",
+    "constraints": [
+      "대소문자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": "자바스크립트에서 함수를 선언할 때 사용하는 키워드는 _____이다. (예: _____ add(a, b) {...})",
+    "correctAnswerText": "function",
+    "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "js_fill_2",
+    "title": "JS 빈칸 채우기 2. 클래스 생성자",
+    "category": "클래스",
+    "difficulty": "basic",
+    "type": "fill",
+    "language": "js",
+    "description": "빈칸에 들어갈 정확한 키워드를 입력하세요.",
+    "constraints": [
+      "대소문자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": "클래스에서 객체가 생성될 때 자동으로 실행되는 특별한 메서드의 이름은 _____이다.",
+    "correctAnswerText": "constructor",
+    "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "js_fill_3",
+    "title": "JS 빈칸 채우기 3. 배열 메서드",
+    "category": "배열",
+    "difficulty": "basic",
+    "type": "fill",
+    "language": "js",
+    "description": "빈칸에 들어갈 정확한 키워드를 입력하세요.",
+    "constraints": [
+      "대소문자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": "배열의 맨 뒤에 값을 추가하는 메서드 이름은 _____이다. (예: arr._____(4))",
+    "correctAnswerText": "push",
+    "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "js_fill_4",
+    "title": "JS 빈칸 채우기 4. 비동기 함수",
+    "category": "비동기",
+    "difficulty": "intermediate",
+    "type": "fill",
+    "language": "js",
+    "description": "빈칸에 들어갈 정확한 키워드를 입력하세요.",
+    "constraints": [
+      "대소문자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": "함수 안에서 await를 사용하려면 함수 선언 앞에 _____ 키워드를 붙여야 한다.",
+    "correctAnswerText": "async",
+    "placeholderText": "정답 입력..."
+  },
+
 ];

@@ -10,6 +10,7 @@ interface ProblemWorkspaceProps {
   onNextProblem?: () => void;
   onPrevProblem?: () => void;
   runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
+  runJsCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onMarkSolved: (problemId: string) => void;
   isBookmarked?: boolean;
@@ -23,6 +24,7 @@ export default function ProblemWorkspace({
   onNextProblem,
   onPrevProblem,
   runPythonCode,
+  runJsCode,
   isPyodideLoading,
   onMarkSolved,
   isBookmarked,
@@ -33,11 +35,16 @@ export default function ProblemWorkspace({
   const editorFileLabel =
     problemLanguage === 'sql' ? 'query.sql (SQL 편집기)' :
     problemLanguage === 'java' ? 'Main.java (자바 편집기)' :
+    problemLanguage === 'js' ? 'main.js (자바스크립트 편집기)' :
     'main.py (파이썬 편집기)';
   const editorPlaceholder =
     problemLanguage === 'sql' ? '여기에 SQL 쿼리를 직접 타이핑하여 작성하세요...' :
     problemLanguage === 'java' ? '여기에 자바 코드를 직접 타이핑하여 작성하세요...' :
+    problemLanguage === 'js' ? '여기에 자바스크립트 코드를 직접 타이핑하여 작성하세요...' :
     '여기에 파이썬 코드를 직접 타이핑하여 작성하세요...';
+  // JS runs natively in the browser (Web Worker), so unlike Pyodide it has no loading phase
+  const isRuntimeLoading = problemLanguage === 'js' ? false : isPyodideLoading;
+  const executeCode = problemLanguage === 'js' && runJsCode ? runJsCode : runPythonCode;
 
   const [code, setCode] = useState<string>(problem.initialCode || '');
   const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
@@ -214,16 +221,16 @@ export default function ProblemWorkspace({
 
   // Handle run/test action
   const handleRun = async () => {
-    if (isPyodideLoading) return;
+    if (isRuntimeLoading) return;
     setIsRunning(true);
-    setConsoleOutput('파이썬 코드를 컴파일하고 실행 중...');
+    setConsoleOutput(problemLanguage === 'js' ? '자바스크립트 코드를 실행 중...' : '파이썬 코드를 컴파일하고 실행 중...');
     setConsoleError(null);
     setWorkspaceSuccess(false);
 
     try {
       let codeToExecute = code;
-      
-      const res = await runPythonCode(codeToExecute, problem.testCases, problem.testRunnerCode);
+
+      const res = await executeCode(codeToExecute, problem.testCases, problem.testRunnerCode);
       
       setConsoleOutput(res.stdout || (res.success ? '실행 완료 (출력값 없음)' : ''));
       if (res.error) {
@@ -633,7 +640,7 @@ export default function ProblemWorkspace({
                     wordBreak: 'normal',
                     overflowWrap: 'normal',
                   }}
-                  disabled={isPyodideLoading}
+                  disabled={isRuntimeLoading}
                 />
               </div>
 
@@ -653,7 +660,7 @@ export default function ProblemWorkspace({
                   onClick={() => handleRun()}
                   className="btn-secondary"
                   style={{ padding: '0.6rem 1.2rem', fontSize: '0.78rem', background: '#0a080f', color: '#cbd5e1', borderColor: '#2e2d3d' }}
-                  disabled={isRunning || isPyodideLoading}
+                  disabled={isRunning || isRuntimeLoading}
                   title="코드 실행 (Ctrl + Enter 또는 Shift + Enter)"
                 >
                   <Play size={14} />
@@ -663,7 +670,7 @@ export default function ProblemWorkspace({
                   onClick={() => handleRun()}
                   className="btn-primary"
                   style={{ padding: '0.6rem 1.4rem', fontSize: '0.78rem', background: '#ffffff', color: '#000000', borderColor: '#ffffff' }}
-                  disabled={isRunning || isPyodideLoading}
+                  disabled={isRunning || isRuntimeLoading}
                   title="제출하기 (Ctrl + Enter 또는 Shift + Enter)"
                 >
                   <Send size={14} />
@@ -810,13 +817,13 @@ export default function ProblemWorkspace({
             
             {/* Terminal Panel */}
             <div className="console-container" style={{ flex: 1, padding: '0.5rem 0' }}>
-              {isPyodideLoading && (
+              {isRuntimeLoading && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-yellow)', fontSize: '0.8rem' }}>
                   <RefreshCw size={12} className="pulse-glow" style={{ animation: 'spin 2s linear infinite' }} />
                   파이썬 WebAssembly 런타임을 로딩 중입니다...
                 </div>
               )}
-              {!isPyodideLoading && !hasTested && consoleOutput === '' && (
+              {!isRuntimeLoading && !hasTested && consoleOutput === '' && (
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                   <span className="console-prompt">&gt;</span> 코드를 실행하면 여기에 출력 및 채점 로그가 나타납니다.
                 </div>

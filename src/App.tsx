@@ -11,6 +11,7 @@ import { supabase } from './lib/supabase';
 import { problems, filterProblems } from './data/problems';
 import type { Problem } from './data/problems';
 import { usePyodide } from './hooks/usePyodide';
+import { useJsRunner } from './hooks/useJsRunner';
 
 function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
@@ -153,6 +154,7 @@ print("변환 리스트:", result)
 
   // Pyodide in-browser runtime
   const { loading: isPyodideLoading, runCode } = usePyodide();
+  const { runCode: runJsCode } = useJsRunner();
 
   // Save changes to localStorage scoped to user
   useEffect(() => {
@@ -346,6 +348,7 @@ print("변환 리스트:", result)
             onNextProblem={handleNextProblem}
             onPrevProblem={handlePrevProblem}
             runPythonCode={runCode}
+            runJsCode={runJsCode}
             isPyodideLoading={isPyodideLoading}
             onMarkSolved={handleMarkSolved}
             isBookmarked={reviewIds.includes(selectedProblem.id)}
@@ -395,6 +398,8 @@ print("변환 리스트:", result)
               setSandboxCode(codeText);
               setCurrentView('sandbox');
             }}
+            problems={problems}
+            onSelectProblem={handleSelectProblem}
           />
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center' }}>404 Not Found</div>

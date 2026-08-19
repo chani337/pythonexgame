@@ -1,22 +1,51 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { docChapters } from '../data/docs';
+import type { DocChapter } from '../data/docs';
 import type { RunResponse } from '../hooks/usePyodide';
-import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles, CheckCircle2, Circle, HelpCircle, X, Search } from 'lucide-react';
+import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles, CheckCircle2, Circle, HelpCircle, X, Search, ChevronRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { chapterQuizzes } from '../data/chapterQuizzes';
+import type { Problem } from '../data/problems';
 
 interface DocsViewerProps {
   runPythonCode: (code: string) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onExportToSandbox: (code: string) => void;
+  problems: Problem[];
+  onSelectProblem: (problem: Problem) => void;
+}
+
+// Suggests practice problems related to a chapter by matching keywords extracted
+// from the chapter title against each problem's category/title, scoped to the
+// same language. Best-effort: chapters with no matching problems (e.g. the
+// NumPy/Pandas/ML chapters) simply show no related-problems section.
+function getRelatedProblems(chapter: DocChapter, allProblems: Problem[]): Problem[] {
+  const lang = chapter.category === 'sql' ? 'sql' : chapter.category === 'java' ? 'java' : chapter.category === 'js' ? 'js' : 'python';
+
+  const cleanTitle = chapter.title
+    .replace(/^(SQL|Java|JS)\s*\d+\.\s*/i, '')
+    .replace(/^\d+[.\-]\s*/, '')
+    .replace(/[()&/,]/g, ' ')
+    .replace(/(정리|기초|입문|마스터|핵심)/g, '')
+    .trim();
+
+  const keywords = Array.from(new Set(cleanTitle.split(/[\s_]+/).filter((w) => w.length >= 2)));
+  if (keywords.length === 0) return [];
+
+  return allProblems
+    .filter((p) => (p.language || 'python') === lang)
+    .filter((p) => keywords.some((kw) => p.category.includes(kw) || p.title.includes(kw) || kw.includes(p.category)))
+    .slice(0, 4);
 }
 
 export default function DocsViewer({
   runPythonCode,
   isPyodideLoading,
   onExportToSandbox,
+  problems,
+  onSelectProblem,
 }: DocsViewerProps) {
-  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java'>('python');
+  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java' | 'js'>('python');
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(0);
   const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean }>>({});
   const [isTocOpen, setIsTocOpen] = useState<boolean>(() => {
@@ -104,7 +133,10 @@ export default function DocsViewer({
     if (selectedCategory === 'java') {
       return ch.category === 'java';
     }
-    return ch.category !== 'sql' && ch.category !== 'java';
+    if (selectedCategory === 'js') {
+      return ch.category === 'js';
+    }
+    return ch.category !== 'sql' && ch.category !== 'java' && ch.category !== 'js';
   });
 
   // Chapter TOC search: matches by title or cell content, but keeps each entry's
@@ -123,6 +155,7 @@ export default function DocsViewer({
   const readCountInCategory = filteredChapters.filter((ch) => readChapterIds.includes(ch.id)).length;
   const isActiveChapterRead = readChapterIds.includes(activeChapter.id);
   const activeQuiz = chapterQuizzes.find((q) => q.chapterId === activeChapter.id);
+  const relatedProblems = getRelatedProblems(activeChapter, problems);
 
   // Auto-mark the chapter as read once every quiz question is answered correctly
   useEffect(() => {
@@ -326,6 +359,42 @@ export default function DocsViewer({
           return null;
         })}
         {renderChapterQuiz()}
+        {relatedProblems.length > 0 && (
+          <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--border-subtle)' }}>
+            <h4 style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              🎯 관련 문제 풀어보기
+            </h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              {relatedProblems.map((problem) => (
+                <button
+                  key={problem.id}
+                  onClick={() => onSelectProblem(problem)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.75rem',
+                    padding: '0.75rem 1rem',
+                    background: variant === 'focus' ? '#161520' : '#ffffff',
+                    border: variant === 'focus' ? '1px solid #2e2d3d' : '1px solid var(--border-subtle)',
+                    color: variant === 'focus' ? '#e2e8f0' : '#1a1a1a',
+                    textAlign: 'left',
+                    cursor: 'pointer',
+                    fontSize: '0.82rem',
+                    fontWeight: '600',
+                    width: '100%',
+                  }}
+                >
+                  <span>{problem.title}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', fontSize: '0.72rem', color: variant === 'focus' ? '#94a3b8' : 'var(--text-secondary)', flexShrink: 0 }}>
+                    {problem.difficulty === 'basic' ? '기초' : problem.difficulty === 'intermediate' ? '중급' : '고급'}
+                    <ChevronRight size={14} />
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </>
     );
   };
@@ -731,6 +800,25 @@ export default function DocsViewer({
               >
                 JAVA
               </button>
+              <button
+                onClick={() => {
+                  setSelectedCategory('js');
+                  setSelectedChapterIdx(0);
+                  setCodeOutputs({});
+                  setChapterSearchQuery('');
+                }}
+                style={{
+                  background: selectedCategory === 'js' ? '#38bdf8' : 'transparent',
+                  color: selectedCategory === 'js' ? '#000000' : '#cbd5e1',
+                  border: 'none',
+                  padding: '0.3rem 0.6rem',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                }}
+              >
+                JS
+              </button>
             </div>
 
             {/* Chapter Selection Dropdown */}
@@ -887,11 +975,13 @@ export default function DocsViewer({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-            {selectedCategory === 'python' ? '파이썬 학습 가이드' : selectedCategory === 'sql' ? 'SQL 데이터베이스 학습 가이드' : 'Java 학습 가이드'}
+            {selectedCategory === 'python' ? '파이썬 학습 가이드' : selectedCategory === 'sql' ? 'SQL 데이터베이스 학습 가이드' : selectedCategory === 'js' ? '자바스크립트 학습 가이드' : 'Java 학습 가이드'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
             {selectedCategory === 'java'
               ? '자바 기초 문법부터 객체지향까지 핵심 파트별 문서를 열람해 보세요. (자바는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)'
+              : selectedCategory === 'js'
+              ? '변수부터 비동기까지 핵심 파트별 문서를 열람해 보세요. (자바스크립트도 "문제 학습" 페이지에서 실제로 실행 및 채점할 수 있어요!)'
               : 'Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.'}
           </p>
         </div>
@@ -1015,6 +1105,31 @@ export default function DocsViewer({
         >
           자바 (Java)
         </button>
+        <button
+          onClick={() => {
+            setSelectedCategory('js');
+            setSelectedChapterIdx(0);
+            setCodeOutputs({});
+            setChapterSearchQuery('');
+          }}
+          style={{
+            padding: '0.65rem 1.4rem',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            background: selectedCategory === 'js' ? '#f0db4f' : '#ffffff',
+            color: selectedCategory === 'js' ? '#1a1a1a' : 'var(--text-secondary)',
+            border: '1px solid #d4b83a',
+            borderRadius: '0px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            boxShadow: selectedCategory === 'js' ? '0 2px 8px rgba(212,184,58,0.3)' : 'none',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          자바스크립트 (JS)
+        </button>
       </div>
 
       {/* Main split layout */}
@@ -1038,7 +1153,7 @@ export default function DocsViewer({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: '700', letterSpacing: '0.05em' }}>
-                {selectedCategory === 'python' ? '파이썬' : selectedCategory === 'sql' ? 'SQL' : 'Java'} 학습 목차
+                {selectedCategory === 'python' ? '파이썬' : selectedCategory === 'sql' ? 'SQL' : selectedCategory === 'js' ? 'JS' : 'Java'} 학습 목차
               </h3>
               <button
                 onClick={() => setIsTocOpen(false)}

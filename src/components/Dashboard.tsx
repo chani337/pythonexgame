@@ -60,9 +60,9 @@ export default function Dashboard({
   // Scope badge counting to a single language so adding SQL/Java problems doesn't
   // silently inflate Python-named badges (or vice versa). Problems without an
   // explicit `language` field are treated as Python (the original 99 problems).
-  const problemsByLanguage = (lang: 'python' | 'sql' | 'java') =>
+  const problemsByLanguage = (lang: 'python' | 'sql' | 'java' | 'js') =>
     problems.filter((p) => (p.language || 'python') === lang);
-  const solvedIdsByLanguage = (lang: 'python' | 'sql' | 'java') => {
+  const solvedIdsByLanguage = (lang: 'python' | 'sql' | 'java' | 'js') => {
     const ids = new Set(problemsByLanguage(lang).map((p) => p.id));
     return solvedIds.filter((id) => ids.has(id));
   };
@@ -73,6 +73,7 @@ export default function Dashboard({
   );
   const sqlSolvedCount = solvedIdsByLanguage('sql').length;
   const javaSolvedCount = solvedIdsByLanguage('java').length;
+  const jsSolvedCount = solvedIdsByLanguage('js').length;
 
   // Badge data
   const badges = [
@@ -138,6 +139,15 @@ export default function Dashboard({
       color: '#1a1a1a',
       shadow: 'none',
       unlocked: javaSolvedCount >= 5,
+    },
+    {
+      id: 'js_coder',
+      name: '자바스크립트 코더',
+      description: 'JavaScript 문제를 5개 이상 해결하세요.',
+      icon: '⚡',
+      color: '#1a1a1a',
+      shadow: 'none',
+      unlocked: jsSolvedCount >= 5,
     },
     {
       id: 'sandbox_explorer',
