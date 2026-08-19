@@ -51,6 +51,8 @@ interface AuthContextType {
   fetchUserReadChapterIds: () => Promise<string[]>;
   syncReviewProblemToSupabase: (problemId: string, isInReview: boolean) => Promise<void>;
   fetchUserReviewProblemIds: () => Promise<string[]>;
+  syncQuizAnswerToSupabase: (chapterId: string, questionIndex: number, answerIndex: number) => Promise<void>;
+  fetchUserQuizAnswers: () => Promise<Record<string, number>>;
   updateDisplayName: (newDisplayName: string) => Promise<{ error?: any }>;
 }
 
@@ -219,6 +221,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           await supabase.from('user_review_problems').upsert(records, { onConflict: 'user_id,problem_id' });
         }
       }
+
+      const savedQuizAnswers = localStorage.getItem(`pyquests_docs_quiz_answers_${userId}`) || localStorage.getItem('pyquests_docs_quiz_answers');
+      if (savedQuizAnswers) {
+        const quizMap: Record<string, number> = JSON.parse(savedQuizAnswers);
+        const records = Object.entries(quizMap)
+          .map(([key, answerIndex]) => {
+            const match = key.match(/^(.+)_(\d+)$/);
+            if (!match) return null;
+            return {
+              user_id: userId,
+              chapter_id: match[1],
+              question_index: parseInt(match[2], 10),
+              answer_index: answerIndex,
+            };
+          })
+          .filter((r): r is NonNullable<typeof r> => r !== null);
+        if (records.length > 0) {
+          await supabase.from('user_quiz_answers').upsert(records, { onConflict: 'user_id,chapter_id,question_index' });
+        }
+      }
     } catch (err) {
       console.error('Merge local storage progress error:', err);
     }
@@ -368,6 +390,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Fetch review problem ids error:', err);
     }
     return [];
+  };
+
+  const fetchUserQuizAnswers = async (): Promise<Record<string, number>> => {
+    if (!isSupabaseConfigured || !user) return {};
+    try {
+      const { data, error } = await supabase
+        .from('user_quiz_answers')
+        .select('chapter_id, question_index, answer_index')
+        .eq('user_id', user.id);
+
+      if (!error && data) {
+        const result: Record<string, number> = {};
+        data.forEach((row) => {
+          result[`${row.chapter_id}_${row.question_index}`] = row.answer_index;
+        });
+        return result;
+      }
+    } catch (err) {
+      console.error('Fetch quiz answers error:', err);
+    }
+    return {};
   };
 
   const signUp = async (email: string, password: string, displayName: string) => {
@@ -525,6 +568,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const syncQuizAnswerToSupabase = async (chapterId: string, questionIndex: number, answerIndex: number) => {
+    if (!isSupabaseConfigured || !user) return;
+    try {
+      await ensureProfileExists(user.id, user.email || '');
+      await supabase.from('user_quiz_answers').upsert(
+        { user_id: user.id, chapter_id: chapterId, question_index: questionIndex, answer_index: answerIndex },
+        { onConflict: 'user_id,chapter_id,question_index' }
+      );
+    } catch (err) {
+      console.error('Sync quiz answer error:', err);
+    }
+  };
+
   const syncStatsToSupabase = async (streak: number, lastSolvedDate: string, sandboxRuns: number) => {
     if (!isSupabaseConfigured || !user) return;
     try {
@@ -659,6 +715,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fetchUserReadChapterIds,
         syncReviewProblemToSupabase,
         fetchUserReviewProblemIds,
+        syncQuizAnswerToSupabase,
+        fetchUserQuizAnswers,
         updateDisplayName,
       }}
     >

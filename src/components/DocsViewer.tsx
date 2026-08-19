@@ -65,7 +65,7 @@ export default function DocsViewer({
   const [fontSizeScale, setFontSizeScale] = useState<number>(100);
   const [chapterSearchQuery, setChapterSearchQuery] = useState<string>('');
 
-  const { user, syncReadChapterToSupabase, fetchUserReadChapterIds } = useAuth();
+  const { user, syncReadChapterToSupabase, fetchUserReadChapterIds, syncQuizAnswerToSupabase, fetchUserQuizAnswers } = useAuth();
 
   const [readChapterIds, setReadChapterIds] = useState<string[]>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
@@ -118,18 +118,40 @@ export default function DocsViewer({
 
   // Chapter comprehension-check quiz: answers keyed by `${chapterId}_${questionIndex}`
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>(() => {
-    const saved = localStorage.getItem('pyquests_docs_quiz_answers');
+    const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
+    const saved = localStorage.getItem(`pyquests_docs_quiz_answers_${lastId}`) || localStorage.getItem('pyquests_docs_quiz_answers');
     return saved ? JSON.parse(saved) : {};
   });
+
+  // Reload quiz-answer progress when the logged-in user changes (login/logout/guest),
+  // merging any local guest progress with what's already saved in Supabase for this account.
+  useEffect(() => {
+    const activeUserId = user?.id || 'guest';
+    const localKey = `pyquests_docs_quiz_answers_${activeUserId}`;
+    const localSaved = localStorage.getItem(localKey) || localStorage.getItem('pyquests_docs_quiz_answers');
+    const localAnswers: Record<string, number> = localSaved ? JSON.parse(localSaved) : {};
+
+    if (user) {
+      fetchUserQuizAnswers().then((remoteAnswers) => {
+        const merged = { ...remoteAnswers, ...localAnswers };
+        setQuizAnswers(merged);
+        localStorage.setItem(localKey, JSON.stringify(merged));
+      });
+    } else {
+      setQuizAnswers(localAnswers);
+    }
+  }, [user]);
 
   const selectQuizAnswer = (chapterId: string, qIndex: number, optionIndex: number) => {
     setQuizAnswers((prev) => {
       const key = `${chapterId}_${qIndex}`;
       if (prev[key] !== undefined) return prev; // already answered, keep first answer
       const next = { ...prev, [key]: optionIndex };
-      localStorage.setItem('pyquests_docs_quiz_answers', JSON.stringify(next));
+      const activeUserId = user?.id || 'guest';
+      localStorage.setItem(`pyquests_docs_quiz_answers_${activeUserId}`, JSON.stringify(next));
       return next;
     });
+    syncQuizAnswerToSupabase(chapterId, qIndex, optionIndex);
   };
 
   const viewerRef = useRef<HTMLDivElement>(null);

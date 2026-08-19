@@ -67,6 +67,23 @@ ALTER TABLE public.user_review_problems DISABLE ROW LEVEL SECURITY;
 -- Grant ALL permissions to anon, authenticated, and service_role
 GRANT ALL ON public.user_review_problems TO anon, authenticated, service_role, postgres;
 
+-- 2d. User Quiz Answers Table (학습가이드 챕터 내 이해도 체크 퀴즈 정답 기록)
+CREATE TABLE IF NOT EXISTS public.user_quiz_answers (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  chapter_id TEXT NOT NULL,
+  question_index INT NOT NULL,
+  answer_index INT NOT NULL,
+  answered_at TIMESTAMPTZ DEFAULT NOW(),
+  CONSTRAINT unique_user_chapter_question UNIQUE (user_id, chapter_id, question_index)
+);
+
+-- Disable RLS on user_quiz_answers so progress can sync easily like other tables
+ALTER TABLE public.user_quiz_answers DISABLE ROW LEVEL SECURITY;
+
+-- Grant ALL permissions to anon, authenticated, and service_role
+GRANT ALL ON public.user_quiz_answers TO anon, authenticated, service_role, postgres;
+
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
