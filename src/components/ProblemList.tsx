@@ -72,6 +72,16 @@ export default function ProblemList({
     search: searchQuery,
   }).filter((p) => !reviewOnly || reviewIds.includes(p.id));
 
+  // Rendering all ~230 problem cards at once is what actually makes switching
+  // to this tab slow (measured ~650ms of main-thread blocking on a throttled
+  // mobile CPU) -- only render a page at a time. If we're restoring a scroll
+  // position from before the user opened a problem, render everything so the
+  // restore isn't cut short by a short, paginated list.
+  const [visibleCount, setVisibleCount] = useState<number>(() =>
+    initialScrollPos && initialScrollPos > 0 ? Infinity : 30
+  );
+  const visibleProblems = filteredProblems.slice(0, visibleCount);
+
   const getProblemTypeLabel = (type: string) => {
     switch (type) {
       case 'coding':
@@ -279,7 +289,7 @@ export default function ProblemList({
             gap: '1rem',
           }}
         >
-          {filteredProblems.map((problem) => {
+          {visibleProblems.map((problem) => {
             const isSolved = solvedIds.includes(problem.id);
             const isReview = reviewIds.includes(problem.id);
             const typeInfo = getProblemTypeLabel(problem.type);
@@ -454,7 +464,23 @@ export default function ProblemList({
             );
           })}
         </div>
-      ) : (
+      ) : null}
+
+      {filteredProblems.length > visibleProblems.length && (
+        <button
+          onClick={() => setVisibleCount((prev) => prev + 30)}
+          className="btn-secondary"
+          style={{
+            alignSelf: 'center',
+            padding: '0.7rem 2rem',
+            fontSize: '0.85rem',
+          }}
+        >
+          더 보기 ({filteredProblems.length - visibleProblems.length}개 남음)
+        </button>
+      )}
+
+      {filteredProblems.length === 0 && (
         <div
           className="glass-card"
           style={{
