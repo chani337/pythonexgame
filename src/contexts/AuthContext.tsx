@@ -22,6 +22,13 @@ export interface LeaderboardUser {
   solved_count: number;
 }
 
+// profiles.email is no longer publicly readable (RLS locks it to the owning
+// row), so the admin's row is excluded from public leaderboards by id
+// instead of by email. Exported so other leaderboard views (e.g. the
+// weekly/per-language breakdowns in Dashboard) apply the same exclusion.
+export const ADMIN_EMAIL = 'chani7873@daum.net';
+export const ADMIN_USER_ID = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da';
+
 export const DEFAULT_LEADERBOARD: LeaderboardUser[] = [
   { id: 'default-runner-1', display_name: '알고리즘마스터', email: 'algo@pyquests.io', streak: 3, solved_count: 5 },
   { id: 'default-runner-2', display_name: '코드파이썬', email: 'code@pyquests.io', streak: 2, solved_count: 3 },
@@ -245,12 +252,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Merge local storage progress error:', err);
     }
   };
-
-  const ADMIN_EMAIL = 'chani7873@daum.net';
-  // profiles.email is no longer publicly readable (RLS locks it to the owning
-  // row), so the admin's row is excluded from the public leaderboard by id
-  // instead of by email.
-  const ADMIN_USER_ID = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da';
 
   const refreshLeaderboard = async () => {
     try {

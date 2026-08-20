@@ -1,10 +1,68 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb } from 'lucide-react';
 import type { Problem } from '../data/problems';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, ADMIN_USER_ID } from '../contexts/AuthContext';
+import type { LeaderboardUser } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
 import LearningRoadmap from './LearningRoadmap';
 import { triviaItems } from '../data/trivia';
+
+type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js';
+
+const RANKING_TABS: { id: RankingMode; label: string }[] = [
+  { id: 'all', label: '전체' },
+  { id: 'week', label: '이번 주' },
+  { id: 'python', label: 'Python' },
+  { id: 'sql', label: 'SQL' },
+  { id: 'java', label: 'Java' },
+  { id: 'js', label: 'JS' },
+];
+
+// Solved-problem counts for the "이번 주"/per-language tabs -- computed
+// on demand (only when that tab is selected) since the default "전체" view
+// already has realtime updates handled by AuthContext's refreshLeaderboard.
+async function fetchFilteredLeaderboard(mode: RankingMode, problems: Problem[]): Promise<LeaderboardUser[]> {
+  if (mode === 'all') return [];
+
+  const langById = new Map(problems.map((p) => [p.id, p.language || 'python']));
+
+  let query = supabase.from('user_solved_problems').select('user_id, problem_id, solved_at');
+  if (mode === 'week') {
+    const now = new Date();
+    const daysSinceMonday = (now.getDay() + 6) % 7;
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - daysSinceMonday);
+    monday.setHours(0, 0, 0, 0);
+    query = query.gte('solved_at', monday.toISOString());
+  }
+
+  const { data, error } = await query;
+  if (error || !data) return [];
+
+  const counts: Record<string, number> = {};
+  data.forEach((row: { user_id: string; problem_id: string }) => {
+    if (mode !== 'week' && langById.get(row.problem_id) !== mode) return;
+    counts[row.user_id] = (counts[row.user_id] || 0) + 1;
+  });
+
+  const userIds = Object.keys(counts).filter((uid) => uid !== ADMIN_USER_ID);
+  if (userIds.length === 0) return [];
+
+  const { data: profs } = await supabase.from('leaderboard_public').select('id, display_name, streak').in('id', userIds);
+  const profMap = new Map((profs || []).map((p: any) => [p.id, p]));
+
+  return userIds
+    .map((uid) => ({
+      id: uid,
+      display_name: profMap.get(uid)?.display_name || '러너_' + uid.slice(0, 5),
+      email: '',
+      streak: profMap.get(uid)?.streak || 0,
+      solved_count: counts[uid],
+    }))
+    .sort((a, b) => b.solved_count - a.solved_count || b.streak - a.streak)
+    .slice(0, 10);
+}
 
 
 interface DashboardProps {
@@ -625,14 +683,34 @@ export default function Dashboard({
       </div>
 
       {/* Global Leaderboard Section */}
-      <LeaderboardWidget />
+      <LeaderboardWidget problems={problems} />
     </div>
   );
 }
 
-function LeaderboardWidget() {
+function LeaderboardWidget({ problems }: { problems: Problem[] }) {
   const { leaderboard, isConfigured, setAuthModalOpen, user } = useAuth();
   const [profileEditOpen, setProfileEditOpen] = useState(false);
+  const [mode, setMode] = useState<RankingMode>('all');
+  const [filteredList, setFilteredList] = useState<LeaderboardUser[]>([]);
+  const [isLoadingFiltered, setIsLoadingFiltered] = useState(false);
+
+  useEffect(() => {
+    if (mode === 'all') return;
+    let cancelled = false;
+    setIsLoadingFiltered(true);
+    fetchFilteredLeaderboard(mode, problems).then((result) => {
+      if (!cancelled) {
+        setFilteredList(result);
+        setIsLoadingFiltered(false);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [mode, problems]);
+
+  const displayList = mode === 'all' ? leaderboard : filteredList;
 
   const isSelfUser = (item: any) => {
     if (user && item.id === user.id) return true;
@@ -688,13 +766,40 @@ function LeaderboardWidget() {
         </div>
       </div>
 
+      {isConfigured && (
+        <div className="docs-category-tabs" style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', overflowX: 'auto' }}>
+          {RANKING_TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setMode(tab.id)}
+              style={{
+                flexShrink: 0,
+                padding: '0.4rem 0.85rem',
+                fontSize: '0.75rem',
+                fontWeight: '700',
+                background: mode === tab.id ? '#1a1a1a' : '#ffffff',
+                color: mode === tab.id ? '#ffffff' : 'var(--text-secondary)',
+                border: '1px solid #1a1a1a',
+                cursor: 'pointer',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!isConfigured ? (
         <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '1rem', background: '#f4f4f6' }}>
           클라우드 데이터베이스 연동 시 전체 러너들의 실시간 문제 해결 및 스트릭 랭킹이 여기에 표시됩니다.
         </div>
-      ) : leaderboard.length > 0 ? (
+      ) : isLoadingFiltered ? (
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '1rem', textAlign: 'center' }}>
+          불러오는 중...
+        </div>
+      ) : displayList.length > 0 ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-          {leaderboard.map((item, index) => {
+          {displayList.map((item, index) => {
             const isSelf = isSelfUser(item);
             return (
               <div
@@ -754,7 +859,11 @@ function LeaderboardWidget() {
         </div>
       ) : (
         <div style={{ fontSize: '0.78rem', color: 'var(--text-secondary)', padding: '1rem', textAlign: 'center' }}>
-          아직 랭킹 정보가 없습니다. 첫 번째로 문제를 풀고 1위에 도전해보세요!
+          {mode === 'all'
+            ? '아직 랭킹 정보가 없습니다. 첫 번째로 문제를 풀고 1위에 도전해보세요!'
+            : mode === 'week'
+            ? '이번 주에 문제를 푼 러너가 아직 없습니다. 첫 번째로 도전해보세요!'
+            : `${RANKING_TABS.find((t) => t.id === mode)?.label} 문제를 푼 러너가 아직 없습니다. 첫 번째로 도전해보세요!`}
         </div>
       )}
 
