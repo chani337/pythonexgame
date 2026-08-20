@@ -147,7 +147,7 @@ export default function ProblemWorkspace({
         expected: decodeAnswer(tc.expected),
       }));
       const res = await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
-      
+
       setConsoleOutput(res.stdout || (res.success ? '실행 완료 (출력값 없음)' : ''));
       if (res.error) {
         setConsoleError(res.error);

@@ -7,7 +7,7 @@ export interface TestCase {
 }
 
 export type ProblemType = 'coding' | 'quiz' | 'fill';
-export type ProblemLanguage = 'python' | 'sql' | 'java' | 'js';
+export type ProblemLanguage = 'python' | 'sql' | 'java' | 'js' | 'algorithm';
 
 export interface Problem {
   id: string;
@@ -4760,5 +4760,1934 @@ export const problems: Problem[] = [
     "correctAnswerText": "YXN5bmM=",
     "placeholderText": "정답 입력..."
   },
+
+  {
+  "id": "algo_array_two_sum",
+  "title": "알고리즘 1. Two Sum (두 수의 합)",
+  "category": "배열",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums와 목표값 target이 주어질 때, 두 수를 더해 target이 되는 두 원소의 인덱스를 리스트로 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, target)`으로 작성하세요.",
+    "정답은 항상 하나만 존재한다고 가정합니다.",
+    "같은 원소를 두 번 사용할 수 없습니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([2, 7, 11, 15], 9)",
+      "output": "[0, 1]"
+    }
+  ],
+  "initialCode": "def solution(nums, target):\n    # nums 리스트 안에서 두 수를 더해 target이 되는 두 인덱스를 리스트로 반환하세요.\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([2, 7, 11, 15], 9)",
+      "expected": "WzAsIDFd"
+    },
+    {
+      "input": "solution([3, 2, 4], 6)",
+      "expected": "WzEsIDJd"
+    },
+    {
+      "input": "solution([3, 3], 6)",
+      "expected": "WzAsIDFd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_array_max",
+  "title": "알고리즘 2. 배열 최댓값",
+  "category": "배열",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums에서 가장 큰 값을 반환하는 solution 함수를 작성하세요. 내장 함수 max()는 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+    "nums는 최소 1개 이상의 원소를 가집니다.",
+    "내장 함수 max()를 사용하지 마세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([3, 7, 2, 9, 4])",
+      "output": "9"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([3, 7, 2, 9, 4])",
+      "expected": "OQ=="
+    },
+    {
+      "input": "solution([-5, -1, -10])",
+      "expected": "LTE="
+    },
+    {
+      "input": "solution([42])",
+      "expected": "NDI="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_array_second_max",
+  "title": "알고리즘 3. 두 번째로 큰 수",
+  "category": "배열",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums에서 두 번째로 큰 값을 반환하는 solution 함수를 작성하세요. (중복 값이 있으면 서로 다른 값 기준으로 두 번째)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+    "nums는 서로 다른 값이 최소 2개 이상 존재합니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([3, 7, 2, 9, 4])",
+      "output": "7"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([3, 7, 2, 9, 4])",
+      "expected": "Nw=="
+    },
+    {
+      "input": "solution([5, 5, 4])",
+      "expected": "NA=="
+    },
+    {
+      "input": "solution([10, 20])",
+      "expected": "MTA="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_string_reverse",
+  "title": "알고리즘 4. 문자열 뒤집기",
+  "category": "문자열",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 s를 뒤집어서 반환하는 solution 함수를 작성하세요. 슬라이싱을 사용하지 말고 반복문으로 구현하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요.",
+    "슬라이싱(`[::-1]`)을 사용하지 마세요."
+  ],
+  "examples": [
+    {
+      "input": "solution('hello')",
+      "output": "olleh"
+    }
+  ],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('hello')",
+      "expected": "b2xsZWg="
+    },
+    {
+      "input": "solution('python')",
+      "expected": "bm9odHlw"
+    },
+    {
+      "input": "solution('a')",
+      "expected": "YQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_string_palindrome",
+  "title": "알고리즘 5. 팰린드롬 판별",
+  "category": "문자열",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 s가 앞으로 읽으나 뒤로 읽으나 같은 팰린드롬인지 판별하는 solution 함수를 작성하세요. True/False를 반환합니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요.",
+    "대소문자를 구분합니다."
+  ],
+  "examples": [
+    {
+      "input": "solution('level')",
+      "output": "True"
+    }
+  ],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('level')",
+      "expected": "VHJ1ZQ=="
+    },
+    {
+      "input": "solution('hello')",
+      "expected": "RmFsc2U="
+    },
+    {
+      "input": "solution('a')",
+      "expected": "VHJ1ZQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_string_anagram",
+  "title": "알고리즘 6. 애너그램 판별",
+  "category": "문자열",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "두 문자열 a, b가 서로 애너그램(같은 글자를 재배열해서 만들 수 있는 관계)인지 판별하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(a, b)`으로 작성하세요.",
+    "공백은 무시하지 않습니다."
+  ],
+  "examples": [
+    {
+      "input": "solution('listen', 'silent')",
+      "output": "True"
+    }
+  ],
+  "initialCode": "def solution(a, b):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('listen', 'silent')",
+      "expected": "VHJ1ZQ=="
+    },
+    {
+      "input": "solution('hello', 'world')",
+      "expected": "RmFsc2U="
+    },
+    {
+      "input": "solution('abc', 'cab')",
+      "expected": "VHJ1ZQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_array_remove_dup",
+  "title": "알고리즘 7. 중복 제거하고 정렬",
+  "category": "배열",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums에서 중복을 제거하고 오름차순으로 정렬한 리스트를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([4, 2, 4, 1, 2, 3])",
+      "output": "[1, 2, 3, 4]"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([4, 2, 4, 1, 2, 3])",
+      "expected": "WzEsIDIsIDMsIDRd"
+    },
+    {
+      "input": "solution([5, 5, 5])",
+      "expected": "WzVd"
+    },
+    {
+      "input": "solution([])",
+      "expected": "W10="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_array_rotate",
+  "title": "알고리즘 8. 배열 회전",
+  "category": "배열",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums를 오른쪽으로 k칸 회전시킨 리스트를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, k)`으로 작성하세요.",
+    "k는 nums의 길이보다 작거나 같습니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 2, 3, 4, 5], 2)",
+      "output": "[4, 5, 1, 2, 3]"
+    }
+  ],
+  "initialCode": "def solution(nums, k):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 2, 3, 4, 5], 2)",
+      "expected": "WzQsIDUsIDEsIDIsIDNd"
+    },
+    {
+      "input": "solution([1, 2, 3], 0)",
+      "expected": "WzEsIDIsIDNd"
+    },
+    {
+      "input": "solution([1, 2], 3)",
+      "expected": "WzIsIDFd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_string_count_vowels",
+  "title": "알고리즘 9. 모음 개수 세기",
+  "category": "문자열",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 s에 포함된 모음(a, e, i, o, u, 대소문자 무관)의 개수를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution('Hello World')",
+      "output": "3"
+    }
+  ],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('Hello World')",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution('PYTHON')",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution('bcdfg')",
+      "expected": "MA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_array_flatten_sum",
+  "title": "알고리즘 10. 중첩 리스트 합",
+  "category": "배열",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "2차원 리스트 matrix의 모든 원소의 합을 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(matrix)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([[1, 2], [3, 4], [5]])",
+      "output": "15"
+    }
+  ],
+  "initialCode": "def solution(matrix):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([[1, 2], [3, 4], [5]])",
+      "expected": "MTU="
+    },
+    {
+      "input": "solution([[10]])",
+      "expected": "MTA="
+    },
+    {
+      "input": "solution([[1, 1], [1, 1]])",
+      "expected": "NA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_string_most_frequent",
+  "title": "알고리즘 11. 가장 많이 등장한 문자",
+  "category": "문자열",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 s에서 가장 많이 등장한 문자를 반환하는 solution 함수를 작성하세요. (동점이면 알파벳 순으로 먼저 오는 문자)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요.",
+    "공백은 제외하고 셉니다."
+  ],
+  "examples": [
+    {
+      "input": "solution('banana')",
+      "output": "a"
+    }
+  ],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('banana')",
+      "expected": "YQ=="
+    },
+    {
+      "input": "solution('aabbcc')",
+      "expected": "YQ=="
+    },
+    {
+      "input": "solution('x')",
+      "expected": "eA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sort_bubble",
+  "title": "알고리즘 12. 버블 정렬 구현",
+  "category": "정렬",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums를 버블 정렬 알고리즘으로 직접 구현하여 오름차순 정렬한 리스트를 반환하는 solution 함수를 작성하세요. 내장 함수 sorted()/sort()는 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+    "sorted()나 .sort()를 사용하지 마세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([5, 2, 4, 1, 3])",
+      "output": "[1, 2, 3, 4, 5]"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([5, 2, 4, 1, 3])",
+      "expected": "WzEsIDIsIDMsIDQsIDVd"
+    },
+    {
+      "input": "solution([1])",
+      "expected": "WzFd"
+    },
+    {
+      "input": "solution([3, 3, 2])",
+      "expected": "WzIsIDMsIDNd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sort_by_length",
+  "title": "알고리즘 13. 길이순 정렬",
+  "category": "정렬",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 리스트 words를 글자 길이가 짧은 순서대로 정렬한 리스트를 반환하는 solution 함수를 작성하세요. (길이가 같으면 원래 순서 유지)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(words)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution(['apple', 'kiwi', 'fig', 'banana'])",
+      "output": "['fig', 'kiwi', 'apple', 'banana']"
+    }
+  ],
+  "initialCode": "def solution(words):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(['apple', 'kiwi', 'fig', 'banana'])",
+      "expected": "WydmaWcnLCAna2l3aScsICdhcHBsZScsICdiYW5hbmEnXQ=="
+    },
+    {
+      "input": "solution(['a', 'bb', 'c'])",
+      "expected": "WydhJywgJ2MnLCAnYmInXQ=="
+    },
+    {
+      "input": "solution([])",
+      "expected": "W10="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sort_merge_two",
+  "title": "알고리즘 14. 정렬된 두 리스트 합치기",
+  "category": "정렬",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "이미 오름차순 정렬된 두 리스트 a, b를 합쳐서 하나의 오름차순 정렬된 리스트로 반환하는 solution 함수를 작성하세요. sorted()는 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(a, b)`으로 작성하세요.",
+    "sorted()를 사용하지 마세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 3, 5], [2, 4, 6])",
+      "output": "[1, 2, 3, 4, 5, 6]"
+    }
+  ],
+  "initialCode": "def solution(a, b):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 3, 5], [2, 4, 6])",
+      "expected": "WzEsIDIsIDMsIDQsIDUsIDZd"
+    },
+    {
+      "input": "solution([], [1, 2])",
+      "expected": "WzEsIDJd"
+    },
+    {
+      "input": "solution([1, 1], [1, 1])",
+      "expected": "WzEsIDEsIDEsIDFd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sort_kth_largest",
+  "title": "알고리즘 15. K번째로 큰 수",
+  "category": "정렬",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums에서 k번째로 큰 값을 반환하는 solution 함수를 작성하세요. (1번째가 가장 큰 값)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, k)`으로 작성하세요.",
+    "k는 nums의 길이 이하입니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([3, 1, 5, 4, 2], 2)",
+      "output": "4"
+    }
+  ],
+  "initialCode": "def solution(nums, k):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([3, 1, 5, 4, 2], 2)",
+      "expected": "NA=="
+    },
+    {
+      "input": "solution([1], 1)",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution([7, 7, 7], 3)",
+      "expected": "Nw=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sort_custom_dict",
+  "title": "알고리즘 16. 점수 기준 정렬",
+  "category": "정렬",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "(이름, 점수) 튜플 리스트 students를 점수가 높은 순서로 정렬한 이름 리스트를 반환하는 solution 함수를 작성하세요. 점수가 같으면 이름 오름차순입니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(students)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([('철수', 80), ('영희', 95), ('민수', 80)])",
+      "output": "['영희', '민수', '철수']"
+    }
+  ],
+  "initialCode": "def solution(students):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([('철수', 80), ('영희', 95), ('민수', 80)])",
+      "expected": "WyfsmIHtnawnLCAn66+87IiYJywgJ+yyoOyImCdd"
+    },
+    {
+      "input": "solution([('a', 1), ('b', 1)])",
+      "expected": "WydhJywgJ2InXQ=="
+    },
+    {
+      "input": "solution([('solo', 100)])",
+      "expected": "Wydzb2xvJ10="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_binary_search",
+  "title": "알고리즘 17. 이진 탐색",
+  "category": "이분탐색",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "오름차순으로 정렬된 리스트 nums에서 target의 인덱스를 이진 탐색으로 찾아 반환하는 solution 함수를 작성하세요. 없으면 -1을 반환합니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, target)`으로 작성하세요.",
+    "반드시 이진 탐색(반씩 좁혀가는 방식)으로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 3, 5, 7, 9, 11], 7)",
+      "output": "3"
+    }
+  ],
+  "initialCode": "def solution(nums, target):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 3, 5, 7, 9, 11], 7)",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution([1, 3, 5, 7, 9, 11], 4)",
+      "expected": "LTE="
+    },
+    {
+      "input": "solution([2, 4, 6], 2)",
+      "expected": "MA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_binary_search_insert",
+  "title": "알고리즘 18. 삽입 위치 찾기",
+  "category": "이분탐색",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "오름차순 정렬된 리스트 nums에 target을 삽입했을 때 정렬 상태를 유지하는 인덱스를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, target)`으로 작성하세요.",
+    "이진 탐색으로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 3, 5, 6], 5)",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(nums, target):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 3, 5, 6], 5)",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([1, 3, 5, 6], 2)",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution([1, 3, 5, 6], 7)",
+      "expected": "NA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_binary_search_sqrt",
+  "title": "알고리즘 19. 정수 제곱근",
+  "category": "이분탐색",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "음이 아닌 정수 n의 제곱근을 내림한 정수를 이진 탐색으로 구하는 solution 함수를 작성하세요. (예: 8의 제곱근은 약 2.83이므로 2를 반환)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(n)`으로 작성하세요.",
+    "`n ** 0.5`나 `math.sqrt`를 사용하지 말고 이진 탐색으로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution(8)",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(n):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(8)",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution(16)",
+      "expected": "NA=="
+    },
+    {
+      "input": "solution(1)",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_binary_search_first_occurrence",
+  "title": "알고리즘 20. 첫 등장 위치 찾기",
+  "category": "이분탐색",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "오름차순 정렬된 리스트 nums에서 target이 처음 등장하는 인덱스를 이진 탐색으로 찾는 solution 함수를 작성하세요. 없으면 -1을 반환합니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, target)`으로 작성하세요.",
+    "중복된 값이 있을 수 있습니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 2, 2, 2, 3], 2)",
+      "output": "1"
+    }
+  ],
+  "initialCode": "def solution(nums, target):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 2, 2, 2, 3], 2)",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution([1, 2, 3], 5)",
+      "expected": "LTE="
+    },
+    {
+      "input": "solution([1, 1, 1], 1)",
+      "expected": "MA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_binary_search_peak",
+  "title": "알고리즘 21. 봉우리 원소 찾기",
+  "category": "이분탐색",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "리스트 nums에서 양옆 원소보다 큰 봉우리(peak) 원소의 인덱스 하나를 이진 탐색으로 찾는 solution 함수를 작성하세요. (양 끝은 바깥쪽이 -무한대라고 가정)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+    "항상 봉우리가 하나 이상 존재합니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 2, 3, 1])",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 2, 3, 1])",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([1, 2, 1, 3, 5, 6, 4])",
+      "expected": "NQ=="
+    },
+    {
+      "input": "solution([5])",
+      "expected": "MA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_greedy_coin_change",
+  "title": "알고리즘 22. 동전 개수 최소화",
+  "category": "그리디",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "동전 종류 리스트 coins(내림차순 정렬됨)와 금액 amount가 주어질 때, 그리디하게 큰 동전부터 사용해서 amount를 만드는 데 필요한 최소 동전 개수를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(coins, amount)`으로 작성하세요.",
+    "coins는 내림차순 정렬되어 있고, 그리디하게 항상 정답이 나온다고 가정합니다 (예: [500, 100, 50, 10])."
+  ],
+  "examples": [
+    {
+      "input": "solution([500, 100, 50, 10], 1260)",
+      "output": "6"
+    }
+  ],
+  "initialCode": "def solution(coins, amount):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([500, 100, 50, 10], 1260)",
+      "expected": "Ng=="
+    },
+    {
+      "input": "solution([500, 100, 50, 10], 500)",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution([100, 10, 1], 234)",
+      "expected": "OQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_greedy_activity_selection",
+  "title": "알고리즘 23. 최대 회의실 사용",
+  "category": "그리디",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "회의 시작/종료 시간 튜플 리스트 meetings가 주어질 때, 겹치지 않게 진행할 수 있는 최대 회의 개수를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(meetings)`으로 작성하세요.",
+    "meetings의 각 원소는 (시작시간, 종료시간) 튜플입니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([(1, 3), (2, 4), (3, 5), (0, 6)])",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(meetings):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([(1, 3), (2, 4), (3, 5), (0, 6)])",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([(1, 2), (2, 3), (3, 4)])",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution([(1, 10)])",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_greedy_max_profit",
+  "title": "알고리즘 24. 최대 이익 (주식)",
+  "category": "그리디",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "일별 주가 리스트 prices가 주어질 때, 한 번만 사고팔아서 얻을 수 있는 최대 이익을 반환하는 solution 함수를 작성하세요. 이익이 없으면 0을 반환합니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(prices)`으로 작성하세요.",
+    "매수는 매도보다 앞선 날짜여야 합니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([7, 1, 5, 3, 6, 4])",
+      "output": "5"
+    }
+  ],
+  "initialCode": "def solution(prices):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([7, 1, 5, 3, 6, 4])",
+      "expected": "NQ=="
+    },
+    {
+      "input": "solution([7, 6, 4, 3, 1])",
+      "expected": "MA=="
+    },
+    {
+      "input": "solution([1, 2])",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_greedy_jump_game",
+  "title": "알고리즘 25. 점프 게임",
+  "category": "그리디",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "각 칸에서 최대로 뛸 수 있는 거리가 적힌 리스트 nums가 주어질 때, 0번 칸에서 시작해 마지막 칸까지 도달할 수 있는지 True/False로 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([2, 3, 1, 1, 4])",
+      "output": "True"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([2, 3, 1, 1, 4])",
+      "expected": "VHJ1ZQ=="
+    },
+    {
+      "input": "solution([3, 2, 1, 0, 4])",
+      "expected": "RmFsc2U="
+    },
+    {
+      "input": "solution([0])",
+      "expected": "VHJ1ZQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_greedy_min_coins_change",
+  "title": "알고리즘 26. 거스름돈 동전 목록",
+  "category": "그리디",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "동전 종류 리스트 coins(내림차순)와 금액 amount가 주어질 때, 그리디하게 사용한 동전들을 큰 단위부터 나열한 리스트로 반환하는 solution 함수를 작성하세요. (사용하지 않은 동전은 제외)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(coins, amount)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([500, 100, 50, 10], 680)",
+      "output": "[500, 100, 50, 10, 10, 10]"
+    }
+  ],
+  "initialCode": "def solution(coins, amount):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([500, 100, 50, 10], 680)",
+      "expected": "WzUwMCwgMTAwLCA1MCwgMTAsIDEwLCAxMF0="
+    },
+    {
+      "input": "solution([500, 100, 50, 10], 50)",
+      "expected": "WzUwXQ=="
+    },
+    {
+      "input": "solution([100, 10], 0)",
+      "expected": "W10="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_two_pointer_sum_sorted",
+  "title": "알고리즘 27. 정렬된 배열의 두 수 합 (투 포인터)",
+  "category": "투포인터",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "오름차순 정렬된 리스트 nums에서 두 수를 더해 target이 되는 두 인덱스를 투 포인터로 찾아 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, target)`으로 작성하세요.",
+    "양쪽 끝에서 좁혀오는 투 포인터 방식으로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 2, 4, 6, 8], 10)",
+      "output": "[1, 4]"
+    }
+  ],
+  "initialCode": "def solution(nums, target):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 2, 4, 6, 8], 10)",
+      "expected": "WzEsIDRd"
+    },
+    {
+      "input": "solution([1, 2, 3], 100)",
+      "expected": "W10="
+    },
+    {
+      "input": "solution([-3, 0, 3, 5], 2)",
+      "expected": "WzAsIDNd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_two_pointer_remove_dup_sorted",
+  "title": "알고리즘 28. 정렬된 배열 중복 제거 (투 포인터)",
+  "category": "투포인터",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "오름차순 정렬된 리스트 nums에서 중복을 제거한 리스트를 순서를 유지한 채 반환하는 solution 함수를 작성하세요. set()은 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+    "set()을 사용하지 마세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 1, 2, 2, 2, 3])",
+      "output": "[1, 2, 3]"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 1, 2, 2, 2, 3])",
+      "expected": "WzEsIDIsIDNd"
+    },
+    {
+      "input": "solution([5])",
+      "expected": "WzVd"
+    },
+    {
+      "input": "solution([1, 2, 3])",
+      "expected": "WzEsIDIsIDNd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sliding_window_max_sum",
+  "title": "알고리즘 29. 슬라이딩 윈도우 최대합",
+  "category": "슬라이딩윈도우",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums와 윈도우 크기 k가 주어질 때, 연속된 k개 원소의 합 중 최댓값을 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, k)`으로 작성하세요.",
+    "k는 nums의 길이 이하입니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([2, 1, 5, 1, 3, 2], 3)",
+      "output": "9"
+    }
+  ],
+  "initialCode": "def solution(nums, k):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([2, 1, 5, 1, 3, 2], 3)",
+      "expected": "OQ=="
+    },
+    {
+      "input": "solution([1, 1, 1, 1], 2)",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([5], 1)",
+      "expected": "NQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sliding_window_longest_unique",
+  "title": "알고리즘 30. 중복 없는 가장 긴 부분 문자열",
+  "category": "슬라이딩윈도우",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 s에서 같은 문자가 반복되지 않는 가장 긴 부분 문자열의 길이를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution('abcabcbb')",
+      "output": "3"
+    }
+  ],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('abcabcbb')",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution('bbbbb')",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution('pwwkew')",
+      "expected": "Mw=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_two_pointer_container",
+  "title": "알고리즘 31. 최대 물통 용량",
+  "category": "투포인터",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "각 지점의 벽 높이가 담긴 리스트 height가 주어질 때, 두 벽 사이에 담을 수 있는 최대 물의 양(높이 × 거리)을 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(height)`으로 작성하세요.",
+    "투 포인터로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 8, 6, 2, 5, 4, 8, 3, 7])",
+      "output": "49"
+    }
+  ],
+  "initialCode": "def solution(height):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 8, 6, 2, 5, 4, 8, 3, 7])",
+      "expected": "NDk="
+    },
+    {
+      "input": "solution([1, 1])",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution([4, 3, 2, 1, 4])",
+      "expected": "MTY="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_sliding_window_min_len",
+  "title": "알고리즘 32. 합이 target 이상인 최소 길이 부분배열",
+  "category": "슬라이딩윈도우",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "양의 정수 리스트 nums와 목표값 target이 주어질 때, 합이 target 이상이 되는 가장 짧은 연속 부분 배열의 길이를 반환하는 solution 함수를 작성하세요. 없으면 0을 반환합니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, target)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([2, 3, 1, 2, 4, 3], 7)",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(nums, target):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([2, 3, 1, 2, 4, 3], 7)",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([1, 1, 1, 1], 10)",
+      "expected": "MA=="
+    },
+    {
+      "input": "solution([10], 5)",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_stack_valid_parens",
+  "title": "알고리즘 33. 올바른 괄호 판별",
+  "category": "스택",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "괄호 문자열 s가 짝이 올바르게 맞는지 스택을 이용해 판별하는 solution 함수를 작성하세요. (, ), {, }, [, ] 만 포함됩니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요.",
+    "리스트를 스택처럼 사용하세요 (append/pop)."
+  ],
+  "examples": [
+    {
+      "input": "solution('({[]})')",
+      "output": "True"
+    }
+  ],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('({[]})')",
+      "expected": "VHJ1ZQ=="
+    },
+    {
+      "input": "solution('(]')",
+      "expected": "RmFsc2U="
+    },
+    {
+      "input": "solution('(()')",
+      "expected": "RmFsc2U="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_stack_eval_rpn",
+  "title": "알고리즘 34. 후위 표기식 계산",
+  "category": "스택",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "공백으로 구분된 후위 표기식(RPN) 문자열 expr을 스택으로 계산해 정수 결과를 반환하는 solution 함수를 작성하세요. 연산자는 +, -, *, / 이며 정수 나눗셈입니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(expr)`으로 작성하세요.",
+    "나눗셈은 int()로 변환한 정수 나눗셈으로 처리하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution('2 1 + 3 *')",
+      "output": "9"
+    }
+  ],
+  "initialCode": "def solution(expr):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('2 1 + 3 *')",
+      "expected": "OQ=="
+    },
+    {
+      "input": "solution('4 13 5 / +')",
+      "expected": "Ng=="
+    },
+    {
+      "input": "solution('10 2 /')",
+      "expected": "NQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_queue_via_stacks",
+  "title": "알고리즘 35. 큐 시뮬레이션",
+  "category": "큐",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums를 큐(선입선출)에 순서대로 넣었다가 하나씩 뺄 때의 순서를 리스트로 반환하는 solution 함수를 작성하세요. (즉, nums를 그대로 반환하되 큐 자료구조로 직접 구현하세요)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+    "collections.deque를 사용해 큐를 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 2, 3])",
+      "output": "[1, 2, 3]"
+    }
+  ],
+  "initialCode": "from collections import deque\n\ndef solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 2, 3])",
+      "expected": "WzEsIDIsIDNd"
+    },
+    {
+      "input": "solution([])",
+      "expected": "W10="
+    },
+    {
+      "input": "solution([9])",
+      "expected": "Wzld"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_stack_daily_temperatures",
+  "title": "알고리즘 36. 더 따뜻한 날까지 며칠",
+  "category": "스택",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "일별 기온 리스트 temps가 주어질 때, 각 날짜에서 자신보다 기온이 높은 날이 나올 때까지 며칠을 기다려야 하는지 리스트로 반환하는 solution 함수를 작성하세요. 없으면 0입니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(temps)`으로 작성하세요.",
+    "스택(인덱스를 저장하는 리스트)을 사용해 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([73, 74, 75, 71, 69, 72, 76, 73])",
+      "output": "[1, 1, 4, 2, 1, 1, 0, 0]"
+    }
+  ],
+  "initialCode": "def solution(temps):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([73, 74, 75, 71, 69, 72, 76, 73])",
+      "expected": "WzEsIDEsIDQsIDIsIDEsIDEsIDAsIDBd"
+    },
+    {
+      "input": "solution([30, 40, 50, 60])",
+      "expected": "WzEsIDEsIDEsIDBd"
+    },
+    {
+      "input": "solution([30, 60, 90])",
+      "expected": "WzEsIDEsIDBd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_stack_min_stack_check",
+  "title": "알고리즘 37. 스택 최솟값 추적",
+  "category": "스택",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "연산 리스트 ops가 주어질 때, 각 연산을 순서대로 처리하며 \"min\" 연산이 나올 때마다 그 시점 스택의 최솟값을 기록한 리스트를 반환하는 solution 함수를 작성하세요. 연산은 (\"push\", 값), (\"pop\",), (\"min\",) 형태입니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(ops)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([('push', 3), ('push', 1), ('min',), ('pop',), ('min',)])",
+      "output": "[1, 3]"
+    }
+  ],
+  "initialCode": "def solution(ops):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([('push', 3), ('push', 1), ('min',), ('pop',), ('min',)])",
+      "expected": "WzEsIDNd"
+    },
+    {
+      "input": "solution([('push', 5), ('min',)])",
+      "expected": "WzVd"
+    },
+    {
+      "input": "solution([('push', 2), ('push', 2), ('pop',), ('min',)])",
+      "expected": "WzJd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_hash_first_unique",
+  "title": "알고리즘 38. 첫 번째 고유 문자",
+  "category": "해시맵",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 s에서 딱 한 번만 등장하는 첫 번째 문자를 반환하는 solution 함수를 작성하세요. 없으면 빈 문자열을 반환합니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution('leetcode')",
+      "output": "l"
+    }
+  ],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution('leetcode')",
+      "expected": "bA=="
+    },
+    {
+      "input": "solution('aabb')",
+      "expected": ""
+    },
+    {
+      "input": "solution('z')",
+      "expected": "eg=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_hash_contains_dup",
+  "title": "알고리즘 39. 중복 원소 존재 확인",
+  "category": "해시맵",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums에 중복된 값이 하나라도 있는지 True/False로 반환하는 solution 함수를 작성하세요. 이중 반복문은 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+    "이중 for문(O(n²))을 사용하지 마세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 2, 3, 1])",
+      "output": "True"
+    }
+  ],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 2, 3, 1])",
+      "expected": "VHJ1ZQ=="
+    },
+    {
+      "input": "solution([1, 2, 3, 4])",
+      "expected": "RmFsc2U="
+    },
+    {
+      "input": "solution([])",
+      "expected": "RmFsc2U="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_hash_intersection",
+  "title": "알고리즘 40. 두 배열의 교집합",
+  "category": "해시맵",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "두 정수 리스트 a, b의 교집합(공통으로 들어있는 값들, 중복 없이)을 오름차순 정렬된 리스트로 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(a, b)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 2, 2, 3], [2, 3, 4])",
+      "output": "[2, 3]"
+    }
+  ],
+  "initialCode": "def solution(a, b):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 2, 2, 3], [2, 3, 4])",
+      "expected": "WzIsIDNd"
+    },
+    {
+      "input": "solution([1, 2], [3, 4])",
+      "expected": "W10="
+    },
+    {
+      "input": "solution([5], [5])",
+      "expected": "WzVd"
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_hash_group_anagrams_count",
+  "title": "알고리즘 41. 애너그램 그룹 개수",
+  "category": "해시맵",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 리스트 words가 주어질 때, 서로 애너그램인 단어끼리 묶었을 때 생기는 그룹의 개수를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(words)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution(['eat', 'tea', 'tan', 'ate', 'nat', 'bat'])",
+      "output": "3"
+    }
+  ],
+  "initialCode": "def solution(words):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(['eat', 'tea', 'tan', 'ate', 'nat', 'bat'])",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution(['abc', 'cab', 'bca'])",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution(['x', 'y'])",
+      "expected": "Mg=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_hash_two_sum_count_pairs",
+  "title": "알고리즘 42. 합이 target인 쌍의 개수",
+  "category": "해시맵",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums와 target이 주어질 때, 더해서 target이 되는 서로 다른 인덱스 쌍의 개수를 반환하는 solution 함수를 작성하세요. (같은 값 쌍도 인덱스가 다르면 별개로 셉니다)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(nums, target)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 5, 3, 3, 2], 6)",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(nums, target):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 5, 3, 3, 2], 6)",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([1, 1, 1], 2)",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution([1, 2, 3], 100)",
+      "expected": "MA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_recursion_factorial",
+  "title": "알고리즘 43. 재귀로 팩토리얼",
+  "category": "재귀",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "음이 아닌 정수 n의 팩토리얼(n!)을 재귀 함수로 구하는 solution 함수를 작성하세요. 반복문(for/while)은 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(n)`으로 작성하세요.",
+    "반드시 재귀 호출로 구현하세요 (for/while 금지)."
+  ],
+  "examples": [
+    {
+      "input": "solution(5)",
+      "output": "120"
+    }
+  ],
+  "initialCode": "def solution(n):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(5)",
+      "expected": "MTIw"
+    },
+    {
+      "input": "solution(0)",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution(1)",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_recursion_fibonacci",
+  "title": "알고리즘 44. 재귀로 피보나치",
+  "category": "재귀",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "n번째 피보나치 수를 재귀 함수로 구하는 solution 함수를 작성하세요. (0번째=0, 1번째=1, 이후 앞 두 수의 합)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(n)`으로 작성하세요.",
+    "재귀 호출로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution(6)",
+      "output": "8"
+    }
+  ],
+  "initialCode": "def solution(n):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(6)",
+      "expected": "OA=="
+    },
+    {
+      "input": "solution(0)",
+      "expected": "MA=="
+    },
+    {
+      "input": "solution(1)",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_recursion_power",
+  "title": "알고리즘 45. 재귀로 거듭제곱",
+  "category": "재귀",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "밑 base와 지수 exp(0 이상의 정수)가 주어질 때 base의 exp제곱을 재귀로 구하는 solution 함수를 작성하세요. `**` 연산자는 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(base, exp)`으로 작성하세요.",
+    "`**` 연산자를 사용하지 마세요."
+  ],
+  "examples": [
+    {
+      "input": "solution(2, 10)",
+      "output": "1024"
+    }
+  ],
+  "initialCode": "def solution(base, exp):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(2, 10)",
+      "expected": "MTAyNA=="
+    },
+    {
+      "input": "solution(5, 0)",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution(3, 3)",
+      "expected": "Mjc="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_recursion_digit_sum",
+  "title": "알고리즘 46. 재귀로 각 자리 숫자 합",
+  "category": "재귀",
+  "difficulty": "basic",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "음이 아닌 정수 n의 각 자리 숫자를 모두 더한 값을 재귀로 구하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(n)`으로 작성하세요.",
+    "재귀 호출로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution(12345)",
+      "output": "15"
+    }
+  ],
+  "initialCode": "def solution(n):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(12345)",
+      "expected": "MTU="
+    },
+    {
+      "input": "solution(7)",
+      "expected": "Nw=="
+    },
+    {
+      "input": "solution(100)",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_graph_bfs_reachable",
+  "title": "알고리즘 47. BFS로 도달 가능한 노드 개수",
+  "category": "그래프",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "인접 리스트로 주어진 그래프 graph(딕셔너리, {노드: [연결된 노드들]})와 시작 노드 start에서 BFS로 도달 가능한 노드의 개수(자기 자신 포함)를 반환하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(graph, start)`으로 작성하세요.",
+    "collections.deque로 BFS를 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution({1: [2, 3], 2: [1, 4], 3: [1], 4: [2], 5: []}, 1)",
+      "output": "4"
+    }
+  ],
+  "initialCode": "from collections import deque\n\ndef solution(graph, start):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution({1: [2, 3], 2: [1, 4], 3: [1], 4: [2], 5: []}, 1)",
+      "expected": "NA=="
+    },
+    {
+      "input": "solution({1: [2], 2: [1], 3: [4], 4: [3]}, 1)",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution({1: []}, 1)",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_graph_dfs_components",
+  "title": "알고리즘 48. 연결 요소 개수 (DFS)",
+  "category": "그래프",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "인접 리스트로 주어진 무방향 그래프 graph(딕셔너리)에서 서로 연결된 노드들의 묶음(연결 요소)이 몇 개인지 DFS로 세는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(graph)`으로 작성하세요.",
+    "재귀 DFS로 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution({1: [2], 2: [1], 3: [4], 4: [3], 5: []})",
+      "output": "3"
+    }
+  ],
+  "initialCode": "def solution(graph):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution({1: [2], 2: [1], 3: [4], 4: [3], 5: []})",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution({1: [2, 3], 2: [1], 3: [1]})",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution({1: [], 2: [], 3: []})",
+      "expected": "Mw=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_graph_grid_islands",
+  "title": "알고리즘 49. 섬의 개수 (그리드 DFS)",
+  "category": "그래프",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "0(바다)과 1(육지)로 이루어진 2차원 그리드 grid가 주어질 때, 상하좌우로 붙어있는 육지 덩어리(섬)의 개수를 DFS로 세는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(grid)`으로 작성하세요.",
+    "대각선은 연결로 취급하지 않습니다."
+  ],
+  "examples": [
+    {
+      "input": "solution([[1, 1, 0], [0, 1, 0], [0, 0, 1]])",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(grid):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([[1, 1, 0], [0, 1, 0], [0, 0, 1]])",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([[1, 0], [0, 1]])",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([[0, 0], [0, 0]])",
+      "expected": "MA=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_graph_bfs_shortest_path",
+  "title": "알고리즘 50. BFS 최단 거리",
+  "category": "그래프",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "가중치 없는 그래프 graph(딕셔너리)에서 start부터 end까지 최소 몇 번의 간선을 거쳐야 하는지 BFS로 구하는 solution 함수를 작성하세요. 도달 불가능하면 -1을 반환합니다.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(graph, start, end)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution({1: [2, 3], 2: [4], 3: [4], 4: [5], 5: []}, 1, 5)",
+      "output": "3"
+    }
+  ],
+  "initialCode": "from collections import deque\n\ndef solution(graph, start, end):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution({1: [2, 3], 2: [4], 3: [4], 4: [5], 5: []}, 1, 5)",
+      "expected": "Mw=="
+    },
+    {
+      "input": "solution({1: [2], 2: [1]}, 1, 3)",
+      "expected": "LTE="
+    },
+    {
+      "input": "solution({1: [2], 2: [3], 3: []}, 1, 3)",
+      "expected": "Mg=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_dp_climbing_stairs",
+  "title": "알고리즘 51. 계단 오르기 경우의 수",
+  "category": "DP",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "한 번에 1칸 또는 2칸씩 오를 수 있을 때, n칸짜리 계단을 오르는 방법의 수를 동적계획법으로 구하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(n)`으로 작성하세요.",
+    "n은 1 이상입니다."
+  ],
+  "examples": [
+    {
+      "input": "solution(5)",
+      "output": "8"
+    }
+  ],
+  "initialCode": "def solution(n):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(5)",
+      "expected": "OA=="
+    },
+    {
+      "input": "solution(1)",
+      "expected": "MQ=="
+    },
+    {
+      "input": "solution(2)",
+      "expected": "Mg=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_dp_fibonacci_memo",
+  "title": "알고리즘 52. DP로 피보나치 (메모이제이션)",
+  "category": "DP",
+  "difficulty": "intermediate",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "n번째 피보나치 수를 DP(리스트를 이용한 메모이제이션)로 구하는 solution 함수를 작성하세요. 단순 재귀(중복 계산 있는 방식)는 사용하지 마세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(n)`으로 작성하세요.",
+    "리스트에 계산 결과를 저장해가며 구현하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution(10)",
+      "output": "55"
+    }
+  ],
+  "initialCode": "def solution(n):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution(10)",
+      "expected": "NTU="
+    },
+    {
+      "input": "solution(0)",
+      "expected": "MA=="
+    },
+    {
+      "input": "solution(1)",
+      "expected": "MQ=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_dp_coin_change_min",
+  "title": "알고리즘 53. 최소 동전 개수 (DP)",
+  "category": "DP",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "동전 종류 리스트 coins와 금액 amount가 주어질 때, amount를 만드는 데 필요한 최소 동전 개수를 DP로 구하는 solution 함수를 작성하세요. 만들 수 없으면 -1을 반환합니다. (coins가 서로의 배수가 아니어도 항상 정확해야 합니다)",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(coins, amount)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([1, 3, 4], 6)",
+      "output": "2"
+    }
+  ],
+  "initialCode": "def solution(coins, amount):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([1, 3, 4], 6)",
+      "expected": "Mg=="
+    },
+    {
+      "input": "solution([2], 3)",
+      "expected": "LTE="
+    },
+    {
+      "input": "solution([1, 5, 10], 12)",
+      "expected": "Mw=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+
+  {
+  "id": "algo_dp_house_robber",
+  "title": "알고리즘 54. 최대 도둑 (인접한 집 제외)",
+  "category": "DP",
+  "difficulty": "advanced",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "일렬로 늘어선 집들의 금액 리스트 houses가 주어질 때, 바로 옆집은 훔칠 수 없다는 조건 하에 훔칠 수 있는 최대 금액을 DP로 구하는 solution 함수를 작성하세요.",
+  "constraints": [
+    "함수 이름은 `solution`, 매개변수는 `(houses)`으로 작성하세요."
+  ],
+  "examples": [
+    {
+      "input": "solution([2, 7, 9, 3, 1])",
+      "output": "12"
+    }
+  ],
+  "initialCode": "def solution(houses):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+    {
+      "input": "solution([2, 7, 9, 3, 1])",
+      "expected": "MTI="
+    },
+    {
+      "input": "solution([5])",
+      "expected": "NQ=="
+    },
+    {
+      "input": "solution([1, 2])",
+      "expected": "Mg=="
+    }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
 
 ];
