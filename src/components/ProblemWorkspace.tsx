@@ -1,6 +1,7 @@
 import { useState, useEffect, Fragment } from 'react';
 import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
+import { solutionExplanations } from '../data/solutionExplanations';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import confetti from 'canvas-confetti';
 import CodeEditor from './CodeEditor';
@@ -719,7 +720,7 @@ export default function ProblemWorkspace({
               </div>
             )}
 
-            {hasTested && problem.solutionExplanation && (
+            {hasTested && solutionExplanations[problem.id] && (
               <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
                 <button
                   onClick={() => setShowExplanation((prev) => !prev)}
@@ -751,7 +752,7 @@ export default function ProblemWorkspace({
                       whiteSpace: 'pre-line',
                     }}
                   >
-                    {problem.solutionExplanation}
+                    {solutionExplanations[problem.id]}
                   </div>
                 )}
               </div>
