@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Play, FileCode, RefreshCw } from 'lucide-react';
 import type { RunResponse } from '../hooks/usePyodide';
 import CodeEditor from './CodeEditor';
@@ -269,6 +269,16 @@ export default function Sandbox({
   const [error, setError] = useState<string | null>(null);
   const [activeSnippetIdx, setActiveSnippetIdx] = useState<number | null>(0);
 
+  // Auto-scroll the console to the bottom whenever a run finishes, so the
+  // error explanation (rendered last) is visible without the user having to
+  // notice the box is scrollable and drag it down themselves.
+  const consoleContainerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (consoleContainerRef.current) {
+      consoleContainerRef.current.scrollTop = consoleContainerRef.current.scrollHeight;
+    }
+  }, [stdout, error]);
+
   // Sync active snippet tab highlighting when code changes from external source (like DocsViewer)
   useEffect(() => {
     const matchedIdx = SNIPPETS.findIndex((s) => s.code === code);
@@ -450,7 +460,7 @@ export default function Sandbox({
           {/* Web Console Output */}
           <div className="terminal-frame" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', height: '220px', flexShrink: 0 }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>실행 콘솔 결과</span>
-            <div className="console-container" style={{ flex: 1, padding: '0.5rem 0' }}>
+            <div ref={consoleContainerRef} className="console-container" style={{ flex: 1, padding: '0.5rem 0' }}>
               {isPyodideLoading && (
                 <div style={{ color: 'var(--accent-yellow)', fontSize: '0.8rem' }}>
                   파이썬 WebAssembly 런타임을 로딩 중입니다...

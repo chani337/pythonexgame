@@ -1,4 +1,4 @@
-import { useState, useEffect, Fragment } from 'react';
+import { useState, useEffect, useRef, Fragment } from 'react';
 import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { solutionExplanations } from '../data/solutionExplanations';
@@ -65,6 +65,16 @@ export default function ProblemWorkspace({
   const [workspaceSuccess, setWorkspaceSuccess] = useState<boolean>(false);
   const [mobileTab, setMobileTab] = useState<'desc' | 'editor'>('desc');
   const [showExplanation, setShowExplanation] = useState<boolean>(false);
+
+  // Auto-scroll the console to the bottom whenever a run finishes, so the
+  // error explanation (rendered last) is visible without the user having to
+  // notice the box is scrollable and drag it down themselves.
+  const consoleContainerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (consoleContainerRef.current) {
+      consoleContainerRef.current.scrollTop = consoleContainerRef.current.scrollHeight;
+    }
+  }, [consoleOutput, consoleError, testResults]);
 
   // Helper to safely render inline code backticks & operators
   const renderFormattedText = (text: string) => {
@@ -662,7 +672,7 @@ export default function ProblemWorkspace({
             <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>실행 콘솔 & 테스트 검증 결과</span>
             
             {/* Terminal Panel */}
-            <div className="console-container" style={{ flex: 1, padding: '0.5rem 0' }}>
+            <div ref={consoleContainerRef} className="console-container" style={{ flex: 1, padding: '0.5rem 0' }}>
               {isRuntimeLoading && (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-yellow)', fontSize: '0.8rem' }}>
                   <RefreshCw size={12} className="pulse-glow" style={{ animation: 'spin 2s linear infinite' }} />
