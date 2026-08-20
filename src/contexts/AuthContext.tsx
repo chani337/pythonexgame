@@ -503,6 +503,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  // Only creates the profile row if it's genuinely missing (needed for the
+  // FK on tables like user_solved_problems) -- ignoreDuplicates makes this
+  // INSERT ... ON CONFLICT DO NOTHING instead of DO UPDATE, so it never
+  // touches an existing row. This used to overwrite display_name back to
+  // the email prefix on every solve/review/quiz sync, silently wiping out
+  // any nickname the user had actually set.
   const ensureProfileExists = async (userId: string, userEmail: string) => {
     if (!isSupabaseConfigured) return;
     try {
@@ -510,7 +516,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: userId,
         email: userEmail,
         display_name: userEmail.split('@')[0],
-      }, { onConflict: 'id' });
+      }, { onConflict: 'id', ignoreDuplicates: true });
     } catch (err) {
       console.error('Ensure profile error:', err);
     }
