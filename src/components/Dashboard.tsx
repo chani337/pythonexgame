@@ -8,7 +8,7 @@ import ProfileEditModal from './ProfileEditModal';
 import LearningRoadmap from './LearningRoadmap';
 import { triviaItems } from '../data/trivia';
 
-type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js';
+type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js' | 'algorithm';
 
 const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'all', label: '전체' },
@@ -17,6 +17,7 @@ const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'sql', label: 'SQL' },
   { id: 'java', label: 'Java' },
   { id: 'js', label: 'JS' },
+  { id: 'algorithm', label: '알고리즘' },
 ];
 
 // Solved-problem counts for the "이번 주"/per-language tabs -- computed
