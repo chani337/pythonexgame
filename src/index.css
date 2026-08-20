@@ -484,9 +484,11 @@ code, pre, .console-container, .glass-input {
     box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.06);
   }
 
-  /* Main content fills remaining space above bottom bar */
+  /* Main content fills remaining space above bottom bar. Bottom/top padding
+     stack the safe-area inset on top of the base spacing so content never
+     slides under the iPhone home indicator or status bar/notch. */
   .main-content {
-    padding: 1.25rem 1rem 5.5rem 1rem !important;
+    padding: calc(1.25rem + env(safe-area-inset-top, 0px)) 1rem calc(5.5rem + env(safe-area-inset-bottom, 0px)) 1rem !important;
     height: auto !important;
     min-height: 0;
     flex: 1;
