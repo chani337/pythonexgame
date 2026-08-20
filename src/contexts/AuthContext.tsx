@@ -247,16 +247,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const ADMIN_EMAIL = 'chani7873@daum.net';
+  // profiles.email is no longer publicly readable (RLS locks it to the owning
+  // row), so the admin's row is excluded from the public leaderboard by id
+  // instead of by email.
+  const ADMIN_USER_ID = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da';
 
   const refreshLeaderboard = async () => {
     try {
       const userMap: Record<string, LeaderboardUser> = {};
 
       if (isSupabaseConfigured) {
-        // Query profiles without non-existent column 'solved_count'
+        // Public leaderboard data (nickname + streak only, no email) comes
+        // from a view so it stays readable without exposing profiles.email.
         const { data: profData, error: profErr } = await supabase
-          .from('profiles')
-          .select('id, display_name, email, streak');
+          .from('leaderboard_public')
+          .select('id, display_name, streak');
 
         const { data: solvedData, error: solvedErr } = await supabase
           .from('user_solved_problems')
@@ -273,8 +278,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           profData.forEach((item: any) => {
             userMap[item.id] = {
               id: item.id,
-              display_name: item.display_name || item.email?.split('@')[0] || '익명 러너',
-              email: item.email || '',
+              display_name: item.display_name || '익명 러너',
+              email: '',
               streak: item.streak || 0,
               solved_count: solvedCounts[item.id] || 0,
             };
@@ -299,7 +304,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Admin account is excluded from the public leaderboard (recovery/testing data shouldn't rank)
-      let formatted = Object.values(userMap).filter((u) => u.email?.toLowerCase() !== ADMIN_EMAIL);
+      let formatted = Object.values(userMap).filter((u) => u.id !== ADMIN_USER_ID);
 
       // Guarantee active logged-in user OR guest runner is ALWAYS displayed on the leaderboard
       const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
@@ -426,9 +431,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      // Check duplication in profiles table
+      // Check duplication via the public view (profiles itself is locked to
+      // the owning row now, so a direct table query would only ever see
+      // this session's own row).
       const { data: dupData } = await supabase
-        .from('profiles')
+        .from('leaderboard_public')
         .select('id')
         .ilike('display_name', cleanName);
 
@@ -624,7 +631,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isSupabaseConfigured) {
       try {
         const { data: existing, error: dupErr } = await supabase
-          .from('profiles')
+          .from('leaderboard_public')
           .select('id, display_name')
           .ilike('display_name', cleanName);
 
