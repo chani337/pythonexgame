@@ -1,6 +1,8 @@
 // Auto-generated problems file from 문제.txt
 export interface TestCase {
   input: string;
+  // base64-encoded (see src/utils/answerObfuscation.ts), decode before
+  // comparing against actual program output.
   expected: string;
 }
 
@@ -22,10 +24,13 @@ export interface Problem {
   testRunnerCode?: string;
   quizQuestion?: string;
   quizOptions?: string[];
-  correctAnswerIndex?: number;
+  // base64-encoded (see src/utils/answerObfuscation.ts) so it isn't plainly
+  // readable by scanning the bundled source next to the option list.
+  correctAnswerIndex?: string;
   fillQuestion?: string;
   fillPrefix?: string;
   fillSuffix?: string;
+  // base64-encoded, same reason as correctAnswerIndex above.
   correctAnswerText?: string;
   placeholderText?: string;
 }
@@ -78,7 +83,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "김철수"
+        "expected": "6rmA7LKg7IiY"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -105,7 +110,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "20"
+        "expected": "MjA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -133,7 +138,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "김철수\n20\n치킨"
+        "expected": "6rmA7LKg7IiYCjIwCuy5mO2CqA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -161,7 +166,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "한국대학교\n2"
+        "expected": "7ZWc6rWt64yA7ZWZ6rWQCjI="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -189,7 +194,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "20"
+        "expected": "MjA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -216,7 +221,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "키보드\n35000"
+        "expected": "7YKk67O065OcCjM1MDAw"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -243,7 +248,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "175.5\n68.2"
+        "expected": "MTc1LjUKNjguMg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -269,7 +274,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "100\n100"
+        "expected": "MTAwCjEwMA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -297,7 +302,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "용사\n10\n100"
+        "expected": "7Jqp7IKsCjEwCjEwMA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -325,7 +330,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "민수\n25\n광주\n게임"
+        "expected": "66+87IiYCjI1Cuq0keyjvArqsozsnoQ="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -351,7 +356,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "Hello Python"
+        "expected": "SGVsbG8gUHl0aG9u"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -377,7 +382,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "안녕하세요 민수"
+        "expected": "7JWI64WV7ZWY7IS47JqUIOuvvOyImA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -402,7 +407,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "파이썬!파이썬!파이썬!"
+        "expected": "7YyM7J207I2sIe2MjOydtOyNrCHtjIzsnbTsjawh"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -428,7 +433,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "6"
+        "expected": "Ng=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -453,7 +458,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "P"
+        "expected": "UA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -478,7 +483,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "o"
+        "expected": "bw=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -503,7 +508,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "Pyt"
+        "expected": "UHl0"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -528,7 +533,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "HELLO PYTHON"
+        "expected": "SEVMTE8gUFlUSE9O"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -553,7 +558,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "I like Python"
+        "expected": "SSBsaWtlIFB5dGhvbg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -578,7 +583,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "['사과', '바나나', '포도']"
+        "expected": "Wyfsgqzqs7wnLCAn67CU64KY64KYJywgJ+2PrOuPhCdd"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -603,7 +608,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "15"
+        "expected": "MTU="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -629,7 +634,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "24\n16\n80\n5.0"
+        "expected": "MjQKMTYKODAKNS4w"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -654,7 +659,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "3"
+        "expected": "Mw=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -679,7 +684,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "2"
+        "expected": "Mg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -704,7 +709,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "25"
+        "expected": "MjU="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -729,7 +734,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "True"
+        "expected": "VHJ1ZQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -756,7 +761,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "True"
+        "expected": "VHJ1ZQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -782,7 +787,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "True"
+        "expected": "VHJ1ZQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -809,7 +814,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "True"
+        "expected": "VHJ1ZQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -834,7 +839,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "False"
+        "expected": "RmFsc2U="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -860,7 +865,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "성인입니다."
+        "expected": "7ISx7J247J6F64uI64ukLg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -885,7 +890,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "양수입니다."
+        "expected": "7JaR7IiY7J6F64uI64ukLg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -912,7 +917,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "홀수입니다."
+        "expected": "7ZmA7IiY7J6F64uI64ukLg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -937,7 +942,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "합격"
+        "expected": "7ZWp6rKp"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -963,7 +968,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "로그인 성공"
+        "expected": "66Gc6re47J24IOyEseqztQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -989,7 +994,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "음수입니다."
+        "expected": "7J2M7IiY7J6F64uI64ukLg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1018,7 +1023,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "B"
+        "expected": "Qg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1045,7 +1050,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "입장 불가"
+        "expected": "7J6F7J6lIOu2iOqwgA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1072,7 +1077,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "무료 배송"
+        "expected": "66y066OMIOuwsOyGoQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1100,7 +1105,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "관리자 페이지 접속 가능"
+        "expected": "6rSA66as7J6QIO2OmOydtOyngCDsoJHsho0g6rCA64ql"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1125,7 +1130,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "['사과', '바나나', '포도']"
+        "expected": "Wyfsgqzqs7wnLCAn67CU64KY64KYJywgJ+2PrOuPhCdd"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1151,7 +1156,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "사과"
+        "expected": "7IKs6rO8"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1177,7 +1182,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "40"
+        "expected": "NDA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1202,7 +1207,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "[20, 30, 40]"
+        "expected": "WzIwLCAzMCwgNDBd"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1228,7 +1233,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "['사과', '바나나', '딸기']"
+        "expected": "Wyfsgqzqs7wnLCAn67CU64KY64KYJywgJ+uUuOq4sCdd"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1254,7 +1259,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "['사과', '포도']"
+        "expected": "Wyfsgqzqs7wnLCAn7Y+s64+EJ10="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1279,7 +1284,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "[10, 200, 30]"
+        "expected": "WzEwLCAyMDAsIDMwXQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1305,7 +1310,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "5"
+        "expected": "NQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1331,7 +1336,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "[1, 2, 3, 4, 5]"
+        "expected": "WzEsIDIsIDMsIDQsIDVd"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1357,7 +1362,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "True"
+        "expected": "VHJ1ZQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1382,7 +1387,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "('월요일', '화요일', '수요일')"
+        "expected": "KCfsm5TsmpTsnbwnLCAn7ZmU7JqU7J28JywgJ+yImOyalOydvCcp"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1407,7 +1412,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "10"
+        "expected": "MTA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1432,7 +1437,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "40"
+        "expected": "NDA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1457,7 +1462,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "(20, 30, 40)"
+        "expected": "KDIwLCAzMCwgNDAp"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1483,7 +1488,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "5"
+        "expected": "NQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1509,7 +1514,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "True"
+        "expected": "VHJ1ZQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1535,7 +1540,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "(1, 2, 3, 4, 5, 6)"
+        "expected": "KDEsIDIsIDMsIDQsIDUsIDYp"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1560,7 +1565,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "('안녕', '안녕', '안녕')"
+        "expected": "KCfslYjrhZUnLCAn7JWI64WVJywgJ+yViOuFlScp"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1587,7 +1592,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "민수\n25"
+        "expected": "66+87IiYCjI1"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1613,7 +1618,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "10\n20"
+        "expected": "MTAKMjA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1639,7 +1644,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "1\n2\n3\n4\n5"
+        "expected": "MQoyCjMKNAo1"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1665,7 +1670,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "사과\n바나나\n포도"
+        "expected": "7IKs6rO8CuuwlOuCmOuCmArtj6zrj4Q="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1690,7 +1695,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "2\n4\n6\n8\n10"
+        "expected": "Mgo0CjYKOAoxMA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1716,7 +1721,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "15"
+        "expected": "MTU="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1741,7 +1746,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "파이썬\n파이썬\n파이썬\n파이썬\n파이썬"
+        "expected": "7YyM7J207I2sCu2MjOydtOyNrArtjIzsnbTsjawK7YyM7J207I2sCu2MjOydtOyNrA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1766,7 +1771,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "5\n4\n3\n2\n1"
+        "expected": "NQo0CjMKMgox"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1791,7 +1796,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "2 x 1 = 2\n2 x 2 = 4\n2 x 3 = 6\n2 x 4 = 8\n2 x 5 = 10\n2 x 6 = 12\n2 x 7 = 14\n2 x 8 = 16\n2 x 9 = 18"
+        "expected": "MiB4IDEgPSAyCjIgeCAyID0gNAoyIHggMyA9IDYKMiB4IDQgPSA4CjIgeCA1ID0gMTAKMiB4IDYgPSAxMgoyIHggNyA9IDE0CjIgeCA4ID0gMTYKMiB4IDkgPSAxOA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1816,7 +1821,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "3\n6\n9\n12\n15\n18"
+        "expected": "Mwo2CjkKMTIKMTUKMTg="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1842,7 +1847,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "1\n2\n3\n4\n5"
+        "expected": "MQoyCjMKNAo1"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1869,7 +1874,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "100"
+        "expected": "MTAw"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1895,7 +1900,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "안녕하세요"
+        "expected": "7JWI64WV7ZWY7IS47JqU"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1922,7 +1927,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "안녕하세요 민수"
+        "expected": "7JWI64WV7ZWY7IS47JqUIOuvvOyImA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1950,7 +1955,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "30"
+        "expected": "MzA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -1976,7 +1981,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "25"
+        "expected": "MjU="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2004,7 +2009,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "성인"
+        "expected": "7ISx7J24"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2032,7 +2037,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "짝수"
+        "expected": "7Ked7IiY"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2058,7 +2063,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "20"
+        "expected": "MjA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2085,7 +2090,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "9000.0"
+        "expected": "OTAwMC4w"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2112,7 +2117,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "사과\n바나나\n포도"
+        "expected": "7IKs6rO8CuuwlOuCmOuCmArtj6zrj4Q="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2142,7 +2147,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "B"
+        "expected": "Qg=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2169,7 +2174,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "{'name': '민수', 'age': 20}"
+        "expected": "eyduYW1lJzogJ+uvvOyImCcsICdhZ2UnOiAyMH0="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2195,7 +2200,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "민수"
+        "expected": "66+87IiY"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2221,7 +2226,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "{'name': '민수', 'age': 20, 'major': '컴퓨터공학'}"
+        "expected": "eyduYW1lJzogJ+uvvOyImCcsICdhZ2UnOiAyMCwgJ21ham9yJzogJ+y7tO2TqO2EsOqzte2VmSd9"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2246,7 +2251,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "{'name': '민수', 'age': 21}"
+        "expected": "eyduYW1lJzogJ+uvvOyImCcsICdhZ2UnOiAyMX0="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2272,7 +2277,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "{'name': '민수'}"
+        "expected": "eyduYW1lJzogJ+uvvOyImCd9"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2298,7 +2303,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "dict_keys(['name', 'age', 'city'])"
+        "expected": "ZGljdF9rZXlzKFsnbmFtZScsICdhZ2UnLCAnY2l0eSddKQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2324,7 +2329,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "dict_values(['민수', 20, '광주'])"
+        "expected": "ZGljdF92YWx1ZXMoWyfrr7zsiJgnLCAyMCwgJ+q0keyjvCddKQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2350,7 +2355,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "name 민수\nage 20"
+        "expected": "bmFtZSDrr7zsiJgKYWdlIDIw"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2377,7 +2382,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "30000"
+        "expected": "MzAwMDA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2405,7 +2410,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "민수\n영희"
+        "expected": "66+87IiYCuyYge2drA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2432,7 +2437,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "88.0"
+        "expected": "ODguMA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2458,7 +2463,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "[20 25 30]"
+        "expected": "WzIwIDI1IDMwXQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2484,7 +2489,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "86.0"
+        "expected": "ODYuMA=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2511,7 +2516,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "['김철수', '박민수']"
+        "expected": "WyfquYDssqDsiJgnLCAn67CV66+87IiYJ10="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2537,7 +2542,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "[1, 4, 9, 16, 25]"
+        "expected": "WzEsIDQsIDksIDE2LCAyNV0="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2563,7 +2568,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "True\nFalse"
+        "expected": "VHJ1ZQpGYWxzZQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2588,7 +2593,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "55"
+        "expected": "NTU="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2613,7 +2618,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "120"
+        "expected": "MTIw"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2638,7 +2643,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "[1, 2, 4, 8, 9]"
+        "expected": "WzEsIDIsIDQsIDgsIDld"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -2654,7 +2659,7 @@ export const problems: Problem[] = [
     "constraints": ["try-except를 사용하세요.","ZeroDivisionError를 처리하세요."],
     "examples": [{"input":"코드 출력 예시","output":"0으로 나눌 수 없습니다."}],
     "initialCode": "try:\n    result = 10 / 0\nexcept ZeroDivisionError:\n    # 여기에 코드를 작성하세요\n    pass\n",
-    "testCases": [{"input":"코드 실행","expected":"0으로 나눌 수 없습니다."}],
+    "testCases": [{"input":"코드 실행","expected": "MOycvOuhnCDrgpjriIwg7IiYIOyXhuyKteuLiOuLpC4="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2668,7 +2673,7 @@ export const problems: Problem[] = [
     "constraints": ["try, except ZeroDivisionError, else를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"5.0"}],
     "initialCode": "try:\n    result = 10 / 2\nexcept ZeroDivisionError:\n    print(\"0으로 나눌 수 없습니다.\")\n# else 블록을 이어서 작성하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"5.0"}],
+    "testCases": [{"input":"코드 실행","expected": "NS4w"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2682,7 +2687,7 @@ export const problems: Problem[] = [
     "constraints": ["numbers = [1, 2, 3]","인덱스 5에 접근을 시도하세요.","IndexError를 처리하고 \"인덱스 범위를 벗어났습니다.\"를 출력하세요."],
     "examples": [{"input":"코드 출력 예시","output":"인덱스 범위를 벗어났습니다.\n작업을 종료합니다."}],
     "initialCode": "numbers = [1, 2, 3]\ntry:\n    print(numbers[5])\nexcept IndexError:\n    # 여기에 코드를 작성하세요\n    pass\nfinally:\n    # 여기에 코드를 작성하세요\n    pass\n",
-    "testCases": [{"input":"코드 실행","expected":"인덱스 범위를 벗어났습니다.\n작업을 종료합니다."}],
+    "testCases": [{"input":"코드 실행","expected": "7J24642x7IqkIOuylOychOulvCDrspfslrTrgqzsirXri4jri6QuCuyekeyXheydhCDsooXro4ztlanri4jri6Qu"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2696,7 +2701,7 @@ export const problems: Problem[] = [
     "constraints": ["int()를 사용하세요.","ValueError를 처리하세요."],
     "examples": [{"input":"코드 출력 예시","output":"숫자로 변환할 수 없습니다."}],
     "initialCode": "try:\n    number = int(\"abc\")\nexcept ValueError:\n    # 여기에 코드를 작성하세요\n    pass\n",
-    "testCases": [{"input":"코드 실행","expected":"숫자로 변환할 수 없습니다."}],
+    "testCases": [{"input":"코드 실행","expected": "7Iir7J6Q66GcIOuzgO2ZmO2VoCDsiJgg7JeG7Iq164uI64ukLg=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2710,7 +2715,7 @@ export const problems: Problem[] = [
     "constraints": ["함수 이름은 check_age","raise ValueError(\"나이는 음수일 수 없습니다.\")를 사용하세요.","except ValueError as e: print(e) 형태로 처리하세요."],
     "examples": [{"input":"코드 출력 예시","output":"나이는 음수일 수 없습니다."}],
     "initialCode": "def check_age(age):\n    # 여기에 코드를 작성하세요\n    pass\n\ntry:\n    check_age(-5)\nexcept ValueError as e:\n    print(e)\n",
-    "testCases": [{"input":"코드 실행","expected":"나이는 음수일 수 없습니다."}],
+    "testCases": [{"input":"코드 실행","expected": "64KY7J2064qUIOydjOyImOydvCDsiJgg7JeG7Iq164uI64ukLg=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2724,7 +2729,7 @@ export const problems: Problem[] = [
     "constraints": ["class NegativeNumberError(Exception): 형태로 정의하세요.","음수(-3)를 전달하면 \"음수는 허용되지 않습니다.\"를 예외 메시지로 발생시키세요."],
     "examples": [{"input":"코드 출력 예시","output":"음수는 허용되지 않습니다."}],
     "initialCode": "class NegativeNumberError(Exception):\n    pass\n\ndef check_number(n):\n    # 여기에 코드를 작성하세요\n    pass\n\ntry:\n    check_number(-3)\nexcept NegativeNumberError as e:\n    print(e)\n",
-    "testCases": [{"input":"코드 실행","expected":"음수는 허용되지 않습니다."}],
+    "testCases": [{"input":"코드 실행","expected": "7J2M7IiY64qUIO2XiOyaqeuQmOyngCDslYrsirXri4jri6Qu"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2738,7 +2743,7 @@ export const problems: Problem[] = [
     "constraints": ["클래스 이름은 Person","__init__(self, name, age)로 생성자를 정의하세요."],
     "examples": [{"input":"코드 출력 예시","output":"민수\n20"}],
     "initialCode": "class Person:\n    def __init__(self, name, age):\n        # 여기에 코드를 작성하세요\n        pass\n\np = Person(\"민수\", 20)\nprint(p.name)\nprint(p.age)\n",
-    "testCases": [{"input":"코드 실행","expected":"민수\n20"}],
+    "testCases": [{"input":"코드 실행","expected": "66+87IiYCjIw"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2752,7 +2757,7 @@ export const problems: Problem[] = [
     "constraints": ["introduce() 메서드에서 f-string을 사용하세요.","출력 형식: \"안녕하세요, 저는 이름입니다.\""],
     "examples": [{"input":"코드 출력 예시","output":"안녕하세요, 저는 찬희입니다."}],
     "initialCode": "class Person:\n    def __init__(self, name, age):\n        self.name = name\n        self.age = age\n\n    def introduce(self):\n        # 여기에 코드를 작성하세요\n        pass\n\np = Person(\"찬희\", 25)\np.introduce()\n",
-    "testCases": [{"input":"코드 실행","expected":"안녕하세요, 저는 찬희입니다."}],
+    "testCases": [{"input":"코드 실행","expected": "7JWI64WV7ZWY7IS47JqULCDsoIDripQg7LCs7Z2s7J6F64uI64ukLg=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2766,7 +2771,7 @@ export const problems: Problem[] = [
     "constraints": ["클래스 변수 species를 클래스 바로 아래에 선언하세요."],
     "examples": [{"input":"코드 출력 예시","output":"초코\n개"}],
     "initialCode": "class Dog:\n    # 여기에 클래스 변수를 작성하세요\n\n    def __init__(self, name):\n        self.name = name\n\nd = Dog(\"초코\")\nprint(d.name)\nprint(d.species)\n",
-    "testCases": [{"input":"코드 실행","expected":"초코\n개"}],
+    "testCases": [{"input":"코드 실행","expected": "7LSI7L2UCuqwnA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2780,7 +2785,7 @@ export const problems: Problem[] = [
     "constraints": ["클래스 이름은 Student","__init__(self, name, score)를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"민수"}],
     "initialCode": "class Student:\n    def __init__(self, name, score):\n        self.name = name\n        self.score = score\n\ns1 = Student(\"민수\", 90)\ns2 = Student(\"철수\", 85)\n\n# 점수가 더 높은 학생의 이름을 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"민수"}],
+    "testCases": [{"input":"코드 실행","expected": "66+87IiY"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2794,7 +2799,7 @@ export const problems: Problem[] = [
     "constraints": ["생성자에서 self.hp = 100으로 초기화하세요.","take_damage(self, amount) 메서드를 작성하세요."],
     "examples": [{"input":"코드 출력 예시","output":"80"}],
     "initialCode": "class Character:\n    def __init__(self):\n        self.hp = 100\n\n    def take_damage(self, amount):\n        # 여기에 코드를 작성하세요\n        pass\n\nc = Character()\nc.take_damage(20)\nprint(c.hp)\n",
-    "testCases": [{"input":"코드 실행","expected":"80"}],
+    "testCases": [{"input":"코드 실행","expected": "ODA="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2808,7 +2813,7 @@ export const problems: Problem[] = [
     "constraints": ["Product 클래스를 만들고 리스트에 3개의 객체를 담으세요.","for문으로 반복하며 f-string으로 출력하세요."],
     "examples": [{"input":"코드 출력 예시","output":"사과: 1000\n바나나: 2000\n포도: 3000"}],
     "initialCode": "class Product:\n    def __init__(self, name, price):\n        self.name = name\n        self.price = price\n\n# 리스트를 만들고 반복문으로 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"사과: 1000\n바나나: 2000\n포도: 3000"}],
+    "testCases": [{"input":"코드 실행","expected": "7IKs6rO8OiAxMDAwCuuwlOuCmOuCmDogMjAwMArtj6zrj4Q6IDMwMDA="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2822,7 +2827,7 @@ export const problems: Problem[] = [
     "constraints": ["class Dog(Animal): 형태로 상속하세요."],
     "examples": [{"input":"코드 출력 예시","output":"초코"}],
     "initialCode": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\n# Dog 클래스를 작성하세요\n\nd = Dog(\"초코\")\nprint(d.name)\n",
-    "testCases": [{"input":"코드 실행","expected":"초코"}],
+    "testCases": [{"input":"코드 실행","expected": "7LSI7L2U"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2836,7 +2841,7 @@ export const problems: Problem[] = [
     "constraints": ["Dog 클래스에서 make_sound()를 다시 정의(오버라이딩)하세요."],
     "examples": [{"input":"코드 출력 예시","output":"멍멍!"}],
     "initialCode": "class Animal:\n    def make_sound(self):\n        print(\"동물이 소리를 냅니다.\")\n\n# Dog 클래스에서 make_sound를 오버라이딩하세요\n\nd = Dog()\nd.make_sound()\n",
-    "testCases": [{"input":"코드 실행","expected":"멍멍!"}],
+    "testCases": [{"input":"코드 실행","expected": "66mN66mNIQ=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2850,7 +2855,7 @@ export const problems: Problem[] = [
     "constraints": ["super().__init__(name)을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"초코\n말티즈"}],
     "initialCode": "class Animal:\n    def __init__(self, name):\n        self.name = name\n\nclass Dog(Animal):\n    def __init__(self, name, breed):\n        # 여기에 코드를 작성하세요\n        pass\n\nd = Dog(\"초코\", \"말티즈\")\nprint(d.name)\nprint(d.breed)\n",
-    "testCases": [{"input":"코드 실행","expected":"초코\n말티즈"}],
+    "testCases": [{"input":"코드 실행","expected": "7LSI7L2UCuunkO2LsOymiA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2864,7 +2869,7 @@ export const problems: Problem[] = [
     "constraints": ["Dog, Cat 모두 Animal을 상속받아 make_sound()를 오버라이딩하세요."],
     "examples": [{"input":"코드 출력 예시","output":"멍멍!\n야옹!"}],
     "initialCode": "class Animal:\n    def make_sound(self):\n        pass\n\n# Dog, Cat 클래스를 작성하세요\n\nanimals = [Dog(), Cat()]\nfor a in animals:\n    a.make_sound()\n",
-    "testCases": [{"input":"코드 실행","expected":"멍멍!\n야옹!"}],
+    "testCases": [{"input":"코드 실행","expected": "66mN66mNIQrslbzsmLkh"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2878,7 +2883,7 @@ export const problems: Problem[] = [
     "constraints": ["super().eat()으로 부모 메서드를 먼저 호출하세요."],
     "examples": [{"input":"코드 출력 예시","output":"먹이를 먹습니다.\n꼬리를 흔듭니다."}],
     "initialCode": "class Animal:\n    def eat(self):\n        print(\"먹이를 먹습니다.\")\n\n# Dog 클래스에서 eat()을 오버라이딩하세요\n\nd = Dog()\nd.eat()\n",
-    "testCases": [{"input":"코드 실행","expected":"먹이를 먹습니다.\n꼬리를 흔듭니다."}],
+    "testCases": [{"input":"코드 실행","expected": "66i57J2066W8IOuoueyKteuLiOuLpC4K6rys66as66W8IO2dlOuTreuLiOuLpC4="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2892,7 +2897,7 @@ export const problems: Problem[] = [
     "constraints": ["isinstance(객체, 클래스)를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"True\nTrue"}],
     "initialCode": "class Animal:\n    pass\n\nclass Dog(Animal):\n    pass\n\nd = Dog()\n# isinstance 결과를 각각 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"True\nTrue"}],
+    "testCases": [{"input":"코드 실행","expected": "VHJ1ZQpUcnVl"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2906,7 +2911,7 @@ export const problems: Problem[] = [
     "constraints": ["[x for x in ... if ...] 형태를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"[2, 4, 6, 8, 10]"}],
     "initialCode": "# 리스트 컴프리헨션으로 작성하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"[2, 4, 6, 8, 10]"}],
+    "testCases": [{"input":"코드 실행","expected": "WzIsIDQsIDYsIDgsIDEwXQ=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2920,7 +2925,7 @@ export const problems: Problem[] = [
     "constraints": ["{x: x**2 for x in ...} 형태를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}"}],
     "initialCode": "# 딕셔너리 컴프리헨션으로 작성하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"{1: 1, 2: 4, 3: 9, 4: 16, 5: 25}"}],
+    "testCases": [{"input":"코드 실행","expected": "ezE6IDEsIDI6IDQsIDM6IDksIDQ6IDE2LCA1OiAyNX0="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2934,7 +2939,7 @@ export const problems: Problem[] = [
     "constraints": ["matrix[행][열] 형태로 접근하세요."],
     "examples": [{"input":"코드 출력 예시","output":"6"}],
     "initialCode": "matrix = [[1,2,3],[4,5,6],[7,8,9]]\n# 두 번째 행의 세 번째 값을 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"6"}],
+    "testCases": [{"input":"코드 실행","expected": "Ng=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2948,7 +2953,7 @@ export const problems: Problem[] = [
     "constraints": ["scores = {\"민수\": [90, 85], \"철수\": [70, 80]}","sum()과 len()을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"87.5"}],
     "initialCode": "scores = {\"민수\": [90, 85], \"철수\": [70, 80]}\n# 민수의 점수 평균을 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"87.5"}],
+    "testCases": [{"input":"코드 실행","expected": "ODcuNQ=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2962,7 +2967,7 @@ export const problems: Problem[] = [
     "constraints": ["sorted(리스트, key=lambda x: x[1], reverse=True)를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"[('민수', 90), ('영희', 85), ('철수', 70)]"}],
     "initialCode": "students = [(\"민수\", 90), (\"철수\", 70), (\"영희\", 85)]\n# 점수 기준 내림차순으로 정렬하여 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"[('민수', 90), ('영희', 85), ('철수', 70)]"}],
+    "testCases": [{"input":"코드 실행","expected": "Wygn66+87IiYJywgOTApLCAoJ+yYge2drCcsIDg1KSwgKCfssqDsiJgnLCA3MCld"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2976,7 +2981,7 @@ export const problems: Problem[] = [
     "constraints": ["& 연산자로 교집합을 구하세요.","sorted()로 정렬하세요."],
     "examples": [{"input":"코드 출력 예시","output":"[3, 4]"}],
     "initialCode": "a = {1, 2, 3, 4}\nb = {3, 4, 5, 6}\n# 교집합을 정렬된 리스트로 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"[3, 4]"}],
+    "testCases": [{"input":"코드 실행","expected": "WzMsIDRd"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -2990,7 +2995,7 @@ export const problems: Problem[] = [
     "constraints": ["f\"{변수:.2f}\" 형식을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"3.14"}],
     "initialCode": "pi = 3.14159265\n# 소수점 둘째 자리까지 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"3.14"}],
+    "testCases": [{"input":"코드 실행","expected": "My4xNA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3004,7 +3009,7 @@ export const problems: Problem[] = [
     "constraints": ["zfill()을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"007"}],
     "initialCode": "num = 7\n# 3자리로 0을 채워 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"007"}],
+    "testCases": [{"input":"코드 실행","expected": "MDA3"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3018,7 +3023,7 @@ export const problems: Problem[] = [
     "constraints": ["join()을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"사과, 바나나, 포도"}],
     "initialCode": "fruits = [\"사과\", \"바나나\", \"포도\"]\n# join으로 연결하여 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"사과, 바나나, 포도"}],
+    "testCases": [{"input":"코드 실행","expected": "7IKs6rO8LCDrsJTrgpjrgpgsIO2PrOuPhA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3032,7 +3037,7 @@ export const problems: Problem[] = [
     "constraints": ["재귀 호출을 사용하세요.","factorial(5)를 호출해 출력하세요."],
     "examples": [{"input":"코드 출력 예시","output":"120"}],
     "initialCode": "def factorial(n):\n    # 여기에 코드를 작성하세요\n    pass\n\nprint(factorial(5))\n",
-    "testCases": [{"input":"코드 실행","expected":"120"}],
+    "testCases": [{"input":"코드 실행","expected": "MTIw"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3046,7 +3051,7 @@ export const problems: Problem[] = [
     "constraints": ["low, high, mid 를 이용한 이진 탐색을 구현하세요."],
     "examples": [{"input":"코드 출력 예시","output":"4"}],
     "initialCode": "def binary_search(arr, target):\n    # 여기에 코드를 작성하세요\n    pass\n\nnumbers = [1, 3, 5, 7, 9, 11, 13]\nprint(binary_search(numbers, 9))\n",
-    "testCases": [{"input":"코드 실행","expected":"4"}],
+    "testCases": [{"input":"코드 실행","expected": "NA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3060,7 +3065,7 @@ export const problems: Problem[] = [
     "constraints": ["이중 for문을 사용하세요.","sort()나 sorted()를 사용하지 마세요."],
     "examples": [{"input":"코드 출력 예시","output":"[1, 2, 3, 4, 5]"}],
     "initialCode": "numbers = [5, 2, 4, 1, 3]\n# 버블 정렬로 오름차순 정렬하여 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"[1, 2, 3, 4, 5]"}],
+    "testCases": [{"input":"코드 실행","expected": "WzEsIDIsIDMsIDQsIDVd"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3074,7 +3079,7 @@ export const problems: Problem[] = [
     "constraints": ["max()를 사용하지 마세요.","for문으로 비교하며 찾으세요."],
     "examples": [{"input":"코드 출력 예시","output":"9"}],
     "initialCode": "numbers = [4, 8, 2, 9, 5]\n# max()를 사용하지 않고 최댓값을 찾아 출력하세요\n",
-    "testCases": [{"input":"코드 실행","expected":"9"}],
+    "testCases": [{"input":"코드 실행","expected": "OQ=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3088,7 +3093,7 @@ export const problems: Problem[] = [
     "constraints": ["while b: a, b = b, a % b 형태를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"12"}],
     "initialCode": "def gcd(a, b):\n    # 여기에 코드를 작성하세요\n    pass\n\nprint(gcd(24, 36))\n",
-    "testCases": [{"input":"코드 실행","expected":"12"}],
+    "testCases": [{"input":"코드 실행","expected": "MTI="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3102,7 +3107,7 @@ export const problems: Problem[] = [
     "constraints": ["함수 이름은 is_prime","2부터 n-1까지 나누어떨어지는지 확인하세요."],
     "examples": [{"input":"코드 출력 예시","output":"2\n3\n5\n7\n11\n13\n17\n19"}],
     "initialCode": "def is_prime(n):\n    # 여기에 코드를 작성하세요\n    pass\n\nfor i in range(1, 21):\n    if is_prime(i):\n        print(i)\n",
-    "testCases": [{"input":"코드 실행","expected":"2\n3\n5\n7\n11\n13\n17\n19"}],
+    "testCases": [{"input":"코드 실행","expected": "MgozCjUKNwoxMQoxMwoxNwoxOQ=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3116,7 +3121,7 @@ export const problems: Problem[] = [
     "constraints": ["SELECT와 FROM을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n최수민 | 디자인팀\n정찬희 | 개발팀"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n최수민 | 디자인팀\n정찬희 | 개발팀"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IGRlcHQKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrquYDssqDsiJggfCDqsJzrsJztjIAK7J207JiB7Z2sIHwg6riw7ZqN7YyACuuwleuvvOyImCB8IOqwnOuwnO2MgArstZzsiJjrr7wgfCDrlJTsnpDsnbjtjIAK7KCV7LCs7Z2sIHwg6rCc67Cc7YyA"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3130,7 +3135,7 @@ export const problems: Problem[] = [
     "constraints": ["WHERE score >= 90 조건을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHNjb3JlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rmA7LKg7IiYIHwgOTAK67CV66+87IiYIHwgMTAwCuygleywrO2drCB8IDk1"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3144,7 +3149,7 @@ export const problems: Problem[] = [
     "constraints": ["AND 연산자를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImArrsJXrr7zsiJgK7KCV7LCs7Z2s"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3158,7 +3163,7 @@ export const problems: Problem[] = [
     "constraints": ["OR 연산자를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n이영희\n최수민"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n이영희\n최수민"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuydtOyYge2drArstZzsiJjrr7w="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3172,7 +3177,7 @@ export const problems: Problem[] = [
     "constraints": ["LIKE와 % 와일드카드를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3186,7 +3191,7 @@ export const problems: Problem[] = [
     "constraints": ["BETWEEN을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | age\n----------------------------------------\n김철수 | 20\n이영희 | 25\n박민수 | 22\n정찬희 | 24"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | age\n----------------------------------------\n김철수 | 20\n이영희 | 25\n박민수 | 22\n정찬희 | 24"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IGFnZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IDIwCuydtOyYge2drCB8IDI1CuuwleuvvOyImCB8IDIyCuygleywrO2drCB8IDI0"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3200,7 +3205,7 @@ export const problems: Problem[] = [
     "constraints": ["IN 을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n정찬희 | 개발팀"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | dept\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n정찬희 | 개발팀"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IGRlcHQKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrquYDssqDsiJggfCDqsJzrsJztjIAK7J207JiB7Z2sIHwg6riw7ZqN7YyACuuwleuvvOyImCB8IOqwnOuwnO2MgArsoJXssKztnawgfCDqsJzrsJztjIA="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3214,7 +3219,7 @@ export const problems: Problem[] = [
     "constraints": ["ORDER BY score DESC를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90\n이영희 | 85\n최수민 | 70"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90\n이영희 | 85\n최수민 | 70"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHNjb3JlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K67CV66+87IiYIHwgMTAwCuygleywrO2drCB8IDk1Cuq5gOyyoOyImCB8IDkwCuydtOyYge2drCB8IDg1Cuy1nOyImOuvvCB8IDcw"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3228,7 +3233,7 @@ export const problems: Problem[] = [
     "constraints": ["ORDER BY와 LIMIT을 함께 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n박민수 | 100\n정찬희 | 95\n김철수 | 90"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHNjb3JlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K67CV66+87IiYIHwgMTAwCuygleywrO2drCB8IDk1Cuq5gOyyoOyImCB8IDkw"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3242,7 +3247,7 @@ export const problems: Problem[] = [
     "constraints": ["DISTINCT를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"dept\n----------------------------------------\n개발팀\n기획팀\n디자인팀"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"dept\n----------------------------------------\n개발팀\n기획팀\n디자인팀"}],
+    "testCases": [{"input":"코드 실행","expected": "ZGVwdAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuqwnOuwnO2MgArquLDtmo3tjIAK65SU7J6Q7J247YyA"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3256,7 +3261,7 @@ export const problems: Problem[] = [
     "constraints": ["COUNT(*)를 사용하고 AS cnt로 별칭을 지정하세요."],
     "examples": [{"input":"코드 출력 예시","output":"cnt\n----------------------------------------\n5"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"cnt\n----------------------------------------\n5"}],
+    "testCases": [{"input":"코드 실행","expected": "Y250Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KNQ=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3270,7 +3275,7 @@ export const problems: Problem[] = [
     "constraints": ["AVG()를 사용하고 AS avg_score로 별칭을 지정하세요."],
     "examples": [{"input":"코드 출력 예시","output":"avg_score\n----------------------------------------\n88.0"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"avg_score\n----------------------------------------\n88.0"}],
+    "testCases": [{"input":"코드 실행","expected": "YXZnX3Njb3JlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KODguMA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3284,7 +3289,7 @@ export const problems: Problem[] = [
     "constraints": ["GROUP BY dept를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"dept | cnt\n----------------------------------------\n개발팀 | 3\n기획팀 | 1\n디자인팀 | 1"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"dept | cnt\n----------------------------------------\n개발팀 | 3\n기획팀 | 1\n디자인팀 | 1"}],
+    "testCases": [{"input":"코드 실행","expected": "ZGVwdCB8IGNudAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuqwnOuwnO2MgCB8IDMK6riw7ZqN7YyAIHwgMQrrlJTsnpDsnbjtjIAgfCAx"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3298,7 +3303,7 @@ export const problems: Problem[] = [
     "constraints": ["GROUP BY와 HAVING을 함께 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0"}],
+    "testCases": [{"input":"코드 실행","expected": "ZGVwdCB8IGF2Z19zY29yZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuqwnOuwnO2MgCB8IDk1LjAK6riw7ZqN7YyAIHwgODUuMA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3312,7 +3317,7 @@ export const problems: Problem[] = [
     "constraints": ["MAX(), MIN()을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"max_score | min_score\n----------------------------------------\n100 | 70"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"max_score | min_score\n----------------------------------------\n100 | 70"}],
+    "testCases": [{"input":"코드 실행","expected": "bWF4X3Njb3JlIHwgbWluX3Njb3JlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KMTAwIHwgNzA="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3326,7 +3331,7 @@ export const problems: Problem[] = [
     "constraints": ["INNER JOIN ... ON u.id = o.user_id 형태를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n박민수 | 키보드\n정찬희 | 모니터"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n박민수 | 키보드\n정찬희 | 모니터"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHByb2R1Y3QKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrquYDssqDsiJggfCDrhbjtirjrtoEK6rmA7LKg7IiYIHwg66eI7Jqw7IqkCuuwleuvvOyImCB8IO2CpOuztOuTnArsoJXssKztnawgfCDrqqjri4jthLA="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3340,7 +3345,7 @@ export const problems: Problem[] = [
     "constraints": ["LEFT JOIN을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | NULL\n박민수 | 키보드\n최수민 | NULL\n정찬희 | 모니터"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | NULL\n박민수 | 키보드\n최수민 | NULL\n정찬희 | 모니터"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHByb2R1Y3QKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrquYDssqDsiJggfCDrhbjtirjrtoEK6rmA7LKg7IiYIHwg66eI7Jqw7IqkCuydtOyYge2drCB8IE5VTEwK67CV66+87IiYIHwg7YKk67O065OcCuy1nOyImOuvvCB8IE5VTEwK7KCV7LCs7Z2sIHwg66qo64uI7YSw"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3354,7 +3359,7 @@ export const problems: Problem[] = [
     "constraints": ["JOIN 이후 WHERE로 가격 조건을 추가하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | product | price\n----------------------------------------\n김철수 | 노트북 | 1500000\n박민수 | 키보드 | 120000\n정찬희 | 모니터 | 450000"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | product | price\n----------------------------------------\n김철수 | 노트북 | 1500000\n박민수 | 키보드 | 120000\n정찬희 | 모니터 | 450000"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHByb2R1Y3QgfCBwcmljZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IOuFuO2KuOu2gSB8IDE1MDAwMDAK67CV66+87IiYIHwg7YKk67O065OcIHwgMTIwMDAwCuygleywrO2drCB8IOuqqOuLiO2EsCB8IDQ1MDAwMA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3368,7 +3373,7 @@ export const problems: Problem[] = [
     "constraints": ["서브쿼리로 AVG(score)를 구해 WHERE 조건에 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | score\n----------------------------------------\n김철수 | 90\n박민수 | 100\n정찬희 | 95"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHNjb3JlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rmA7LKg7IiYIHwgOTAK67CV66+87IiYIHwgMTAwCuygleywrO2drCB8IDk1"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3382,7 +3387,7 @@ export const problems: Problem[] = [
     "constraints": ["WHERE id IN (SELECT user_id FROM orders) 형태를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImArrsJXrr7zsiJgK7KCV7LCs7Z2s"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3396,7 +3401,7 @@ export const problems: Problem[] = [
     "constraints": ["상관 서브쿼리와 EXISTS를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImArrsJXrr7zsiJgK7KCV7LCs7Z2s"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3410,7 +3415,7 @@ export const problems: Problem[] = [
     "constraints": ["UNION을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n김철수\n박민수\n정찬희"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImArrsJXrr7zsiJgK7KCV7LCs7Z2s"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3424,7 +3429,7 @@ export const problems: Problem[] = [
     "constraints": ["UNION ALL을 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"dept\n----------------------------------------\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"dept\n----------------------------------------\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀\n개발팀"}],
+    "testCases": [{"input":"코드 실행","expected": "ZGVwdAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuqwnOuwnO2MgArqsJzrsJztjIAK6rCc67Cc7YyACuqwnOuwnO2MgArqsJzrsJztjIAK6rCc67Cc7YyA"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3438,7 +3443,7 @@ export const problems: Problem[] = [
     "constraints": ["RANK() OVER (ORDER BY score DESC)를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | score | rnk\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | score | rnk\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHNjb3JlIHwgcm5rCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K67CV66+87IiYIHwgMTAwIHwgMQrsoJXssKztnawgfCA5NSB8IDIK6rmA7LKg7IiYIHwgOTAgfCAzCuydtOyYge2drCB8IDg1IHwgNArstZzsiJjrr7wgfCA3MCB8IDU="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3452,7 +3457,7 @@ export const problems: Problem[] = [
     "constraints": ["ROW_NUMBER() OVER (ORDER BY score DESC)를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | score | rn\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | score | rn\n----------------------------------------\n박민수 | 100 | 1\n정찬희 | 95 | 2\n김철수 | 90 | 3\n이영희 | 85 | 4\n최수민 | 70 | 5"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHNjb3JlIHwgcm4KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrrsJXrr7zsiJggfCAxMDAgfCAxCuygleywrO2drCB8IDk1IHwgMgrquYDssqDsiJggfCA5MCB8IDMK7J207JiB7Z2sIHwgODUgfCA0Cuy1nOyImOuvvCB8IDcwIHwgNQ=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3466,7 +3471,7 @@ export const problems: Problem[] = [
     "constraints": ["AVG(score) OVER (PARTITION BY dept)를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | dept | score | dept_avg\n----------------------------------------\n김철수 | 개발팀 | 90 | 95.0\n박민수 | 개발팀 | 100 | 95.0\n정찬희 | 개발팀 | 95 | 95.0\n이영희 | 기획팀 | 85 | 85.0\n최수민 | 디자인팀 | 70 | 70.0"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | dept | score | dept_avg\n----------------------------------------\n김철수 | 개발팀 | 90 | 95.0\n박민수 | 개발팀 | 100 | 95.0\n정찬희 | 개발팀 | 95 | 95.0\n이영희 | 기획팀 | 85 | 85.0\n최수민 | 디자인팀 | 70 | 70.0"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IGRlcHQgfCBzY29yZSB8IGRlcHRfYXZnCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rmA7LKg7IiYIHwg6rCc67Cc7YyAIHwgOTAgfCA5NS4wCuuwleuvvOyImCB8IOqwnOuwnO2MgCB8IDEwMCB8IDk1LjAK7KCV7LCs7Z2sIHwg6rCc67Cc7YyAIHwgOTUgfCA5NS4wCuydtOyYge2drCB8IOq4sO2aje2MgCB8IDg1IHwgODUuMArstZzsiJjrr7wgfCDrlJTsnpDsnbjtjIAgfCA3MCB8IDcwLjA="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3480,7 +3485,7 @@ export const problems: Problem[] = [
     "constraints": ["LEFT JOIN 후 주문 쪽 컬럼이 NULL인 행만 WHERE로 필터링하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name\n----------------------------------------\n이영희\n최수민"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name\n----------------------------------------\n이영희\n최수민"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuydtOyYge2drArstZzsiJjrr7w="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3494,7 +3499,7 @@ export const problems: Problem[] = [
     "constraints": ["LEFT JOIN과 COALESCE를 함께 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | 주문없음\n박민수 | 키보드\n최수민 | 주문없음\n정찬희 | 모니터"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | product\n----------------------------------------\n김철수 | 노트북\n김철수 | 마우스\n이영희 | 주문없음\n박민수 | 키보드\n최수민 | 주문없음\n정찬희 | 모니터"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IHByb2R1Y3QKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrquYDssqDsiJggfCDrhbjtirjrtoEK6rmA7LKg7IiYIHwg66eI7Jqw7IqkCuydtOyYge2drCB8IOyjvOusuOyXhuydjArrsJXrr7zsiJggfCDtgqTrs7Trk5wK7LWc7IiY66+8IHwg7KO866y47JeG7J2MCuygleywrO2drCB8IOuqqOuLiO2EsA=="}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3508,7 +3513,7 @@ export const problems: Problem[] = [
     "constraints": ["CASE WHEN ... THEN ... ELSE ... END를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"name | grade\n----------------------------------------\n김철수 | A\n이영희 | B\n박민수 | A\n최수민 | C\n정찬희 | A"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"name | grade\n----------------------------------------\n김철수 | A\n이영희 | B\n박민수 | A\n최수민 | C\n정찬희 | A"}],
+    "testCases": [{"input":"코드 실행","expected": "bmFtZSB8IGdyYWRlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rmA7LKg7IiYIHwgQQrsnbTsmIHtnawgfCBCCuuwleuvvOyImCB8IEEK7LWc7IiY66+8IHwgQwrsoJXssKztnawgfCBB"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3522,7 +3527,7 @@ export const problems: Problem[] = [
     "constraints": ["ROUND(AVG(score), 1)과 ORDER BY dept를 사용하세요."],
     "examples": [{"input":"코드 출력 예시","output":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0\n디자인팀 | 70.0"}],
     "initialCode": "",
-    "testCases": [{"input":"코드 실행","expected":"dept | avg_score\n----------------------------------------\n개발팀 | 95.0\n기획팀 | 85.0\n디자인팀 | 70.0"}],
+    "testCases": [{"input":"코드 실행","expected": "ZGVwdCB8IGF2Z19zY29yZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuqwnOuwnO2MgCB8IDk1LjAK6riw7ZqN7YyAIHwgODUuMArrlJTsnpDsnbjtjIAgfCA3MC4w"}],
     "testRunnerCode": "stdout_match"
   },
   {
@@ -3537,7 +3542,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "자바에서 정수를 저장하는 기본 자료형은?",
     "quizOptions": ["String","int","boolean","void"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "java_quiz_intro_2",
@@ -3551,7 +3556,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "문자열을 저장하는 참조 자료형은?",
     "quizOptions": ["str","char","String","text"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": "Mg=="
   },
   {
     "id": "java_fill_intro_1",
@@ -3564,7 +3569,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "자바 프로그램이 시작되는 메서드 이름은 _____이다.",
-    "correctAnswerText": "main",
+    "correctAnswerText": "bWFpbg==",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3579,7 +3584,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "자바에서 5 / 2 (둘 다 int)의 결과는?",
     "quizOptions": ["2.5","3","2.0","2"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": "Mw=="
   },
   {
     "id": "java_quiz_operator_2",
@@ -3593,7 +3598,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "값을 1 증가시키는 연산자는?",
     "quizOptions": ["++","--","**","//"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "java_fill_operator_1",
@@ -3606,7 +3611,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "문자열 내용을 비교할 때 사용해야 하는 메서드는 _____()이다.",
-    "correctAnswerText": "equals",
+    "correctAnswerText": "ZXF1YWxz",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3621,7 +3626,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "switch문에서 일치하는 case가 없을 때 실행되는 키워드는?",
     "quizOptions": ["else","break","case","default"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": "Mw=="
   },
   {
     "id": "java_quiz_conditional_2",
@@ -3635,7 +3640,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "조건식을 감싸는 기호는?",
     "quizOptions": ["()","[]","{}","<>"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "java_fill_conditional_1",
@@ -3648,7 +3653,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "switch문의 각 case를 끝낼 때 사용하는 키워드는 _____이다.",
-    "correctAnswerText": "break",
+    "correctAnswerText": "YnJlYWs=",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3663,7 +3668,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "배열의 길이를 구할 때 사용하는 것은?",
     "quizOptions": [".length()",".size()",".length",".count()"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": "Mg=="
   },
   {
     "id": "java_quiz_array_2",
@@ -3677,7 +3682,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "배열의 인덱스는 몇 번부터 시작하는가?",
     "quizOptions": ["1","-1","2","0"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": "Mw=="
   },
   {
     "id": "java_fill_array_1",
@@ -3690,7 +3695,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "자바에서 배열 객체를 생성할 때 사용하는 키워드는 _____이다.",
-    "correctAnswerText": "new",
+    "correctAnswerText": "bmV3",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3705,7 +3710,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "조건을 나중에 검사해 최소 1번 실행이 보장되는 반복문은?",
     "quizOptions": ["while","for","switch","do-while"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": "Mw=="
   },
   {
     "id": "java_quiz_loop_2",
@@ -3719,7 +3724,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "반복문을 즉시 종료하는 키워드는?",
     "quizOptions": ["break","continue","return","stop"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "java_fill_loop_1",
@@ -3732,7 +3737,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "반복문에서 이번 반복만 건너뛰고 다음 반복으로 넘어갈 때 사용하는 키워드는 _____이다.",
-    "correctAnswerText": "continue",
+    "correctAnswerText": "Y29udGludWU=",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3747,7 +3752,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "값을 반환하지 않는 메서드의 반환타입은?",
     "quizOptions": ["void","null","none","empty"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "java_quiz_method_2",
@@ -3761,7 +3766,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "같은 이름, 다른 매개변수로 메서드를 여러 개 정의하는 것은?",
     "quizOptions": ["오버라이딩","오버로딩","상속","캡슐화"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "java_fill_method_1",
@@ -3774,7 +3779,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "메서드가 값을 호출한 곳으로 돌려줄 때 사용하는 키워드는 _____이다.",
-    "correctAnswerText": "return",
+    "correctAnswerText": "cmV0dXJu",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3789,7 +3794,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "크기가 자유롭게 변하는 리스트를 제공하는 클래스는?",
     "quizOptions": ["Array","ArrayList","List[]","Vector[]"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "java_quiz_collection_2",
@@ -3803,7 +3808,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "키-값 쌍으로 저장하는 컬렉션은?",
     "quizOptions": ["ArrayList","HashSet","HashMap","LinkedList"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": "Mg=="
   },
   {
     "id": "java_fill_collection_1",
@@ -3816,7 +3821,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "ArrayList에 값을 추가할 때 사용하는 메서드는 _____()이다.",
-    "correctAnswerText": "add",
+    "correctAnswerText": "YWRk",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3831,7 +3836,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "예외가 발생했을 때 처리할 코드를 작성하는 블록은?",
     "quizOptions": ["catch","try","finally","throw"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "java_quiz_exception_2",
@@ -3845,7 +3850,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "예외 발생 여부와 상관없이 항상 실행되는 블록은?",
     "quizOptions": ["try","finally","catch","throws"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "java_fill_exception_1",
@@ -3858,7 +3863,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "예외를 직접 발생시킬 때 사용하는 키워드는 _____이다.",
-    "correctAnswerText": "throw",
+    "correctAnswerText": "dGhyb3c=",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3873,7 +3878,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "객체를 생성할 때 사용하는 키워드는?",
     "quizOptions": ["create","new","make","object"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "java_quiz_class_2",
@@ -3887,7 +3892,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "필드를 외부에서 직접 접근하지 못하게 막는 접근제어자는?",
     "quizOptions": ["public","protected","private","final"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": "Mg=="
   },
   {
     "id": "java_fill_class_1",
@@ -3900,7 +3905,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "현재 객체 자기 자신을 가리키는 키워드는 _____이다.",
-    "correctAnswerText": "this",
+    "correctAnswerText": "dGhpcw==",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3915,7 +3920,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "클래스 상속을 나타낼 때 사용하는 키워드는?",
     "quizOptions": ["extends","implements","inherits","super"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "java_quiz_inherit_2",
@@ -3929,7 +3934,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "부모의 메서드를 자식이 같은 형태로 재정의하는 것은?",
     "quizOptions": ["오버로딩","오버라이딩","캡슐화","인터페이스"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "java_fill_inherit_1",
@@ -3942,7 +3947,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "부모 클래스의 생성자를 호출할 때 사용하는 키워드는 _____이다.",
-    "correctAnswerText": "super",
+    "correctAnswerText": "c3VwZXI=",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3957,7 +3962,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "클래스가 인터페이스를 구현할 때 사용하는 키워드는?",
     "quizOptions": ["extends","interface","implements","abstract"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": "Mg=="
   },
   {
     "id": "java_quiz_interface_2",
@@ -3971,7 +3976,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "미완성 메서드를 포함할 수 있는 클래스를 선언하는 키워드는?",
     "quizOptions": ["interface","final","static","abstract"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": "Mw=="
   },
   {
     "id": "java_fill_interface_1",
@@ -3984,7 +3989,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "인터페이스를 정의할 때 사용하는 키워드는 _____이다.",
-    "correctAnswerText": "interface",
+    "correctAnswerText": "aW50ZXJmYWNl",
     "placeholderText": "정답 입력..."
   },
   {
@@ -3999,7 +4004,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "반복적인 문자열 조합에 효율적인 클래스는?",
     "quizOptions": ["StringBuilder","String","Integer","Object"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "java_quiz_string_2",
@@ -4013,7 +4018,7 @@ export const problems: Problem[] = [
     "examples": [{"input":"보기 중 선택","output":"선택 즉시 정답/오답 확인"}],
     "quizQuestion": "문자열을 정수로 변환하는 메서드는?",
     "quizOptions": ["String.toInt()","Integer.parseInt()","(int)str","Integer.valueOf()"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "java_fill_string_1",
@@ -4026,7 +4031,7 @@ export const problems: Problem[] = [
     "constraints": ["대소문자를 정확히 입력하세요."],
     "examples": [{"input":"빈칸 입력","output":"입력 즉시 정답/오답 확인"}],
     "fillQuestion": "문자열에 문자를 이어 붙일 때 사용하는 연산자는 _____이다.",
-    "correctAnswerText": "+",
+    "correctAnswerText": "Kw==",
     "placeholderText": "정답 입력..."
   },
   {
@@ -4052,7 +4057,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "김철수"
+        "expected": "6rmA7LKg7IiY"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4079,7 +4084,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "12"
+        "expected": "MTI="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4105,7 +4110,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "파이팅! 파이팅! 파이팅! "
+        "expected": "7YyM7J207YyFISDtjIzsnbTtjIUhIO2MjOydtO2MhSEg"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4131,7 +4136,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "홀수"
+        "expected": "7ZmA7IiY"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4157,7 +4162,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "3"
+        "expected": "Mw=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4183,7 +4188,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "40"
+        "expected": "NDA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4210,7 +4215,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "찬희님의 점수는 95점입니다."
+        "expected": "7LCs7Z2s64uY7J2YIOygkOyImOuKlCA5NeygkOyeheuLiOuLpC4="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4236,7 +4241,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "HELLO WORLD"
+        "expected": "SEVMTE8gV09STEQ="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4262,7 +4267,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "Hello World"
+        "expected": "SGVsbG8gV29ybGQ="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4288,7 +4293,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "미성년자"
+        "expected": "66+47ISx64WE7J6Q"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4314,7 +4319,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "55"
+        "expected": "NTU="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4340,7 +4345,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "1, 4, 9, 16, 25"
+        "expected": "MSwgNCwgOSwgMTYsIDI1"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4366,7 +4371,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "2, 4, 6, 8, 10"
+        "expected": "MiwgNCwgNiwgOCwgMTA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4392,7 +4397,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "150"
+        "expected": "MTUw"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4418,7 +4423,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "9"
+        "expected": "OQ=="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4445,7 +4450,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "0으로 나눌 수 없습니다."
+        "expected": "MOycvOuhnCDrgpjriIwg7IiYIOyXhuyKteuLiOuLpC4="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4472,7 +4477,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "12000"
+        "expected": "MTIwMDA="
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4498,7 +4503,7 @@ export const problems: Problem[] = [
     "testCases": [
       {
         "input": "코드 실행",
-        "expected": "완료"
+        "expected": "7JmE66OM"
       }
     ],
     "testRunnerCode": "stdout_match"
@@ -4522,7 +4527,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "자바스크립트에서 재할당이 불가능한 변수를 선언하는 키워드는?",
     "quizOptions": ["let","const","var","static"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "js_quiz_2",
@@ -4543,7 +4548,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "자료형까지 정확히 같아야 true가 되는 비교 연산자는?",
     "quizOptions": ["==","=","===","!="],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": "Mg=="
   },
   {
     "id": "js_quiz_3",
@@ -4564,7 +4569,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "typeof \"안녕\"의 결과는?",
     "quizOptions": ["\"str\"","\"text\"","\"object\"","\"string\""],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": "Mw=="
   },
   {
     "id": "js_quiz_4",
@@ -4585,7 +4590,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "배열의 맨 뒤에 값을 추가하는 메서드는?",
     "quizOptions": ["push()","pop()","shift()","unshift()"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "js_quiz_5",
@@ -4606,7 +4611,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "자바스크립트 삼항 연산자의 올바른 형태는?",
     "quizOptions": ["값1 if 조건 else 값2","조건 ? 값1 : 값2","조건 ? 값1 , 값2","if 조건 then 값1 else 값2"],
-    "correctAnswerIndex": 1
+    "correctAnswerIndex": "MQ=="
   },
   {
     "id": "js_quiz_6",
@@ -4627,7 +4632,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "다음 중 falsy(거짓 취급) 값이 아닌 것은?",
     "quizOptions": ["0","\"\"","\"0\" (문자열)","null"],
-    "correctAnswerIndex": 2
+    "correctAnswerIndex": "Mg=="
   },
   {
     "id": "js_quiz_7",
@@ -4648,7 +4653,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "객체를 JSON 문자열로 변환하는 메서드는?",
     "quizOptions": ["JSON.parse()","JSON.toText()","Object.toString()","JSON.stringify()"],
-    "correctAnswerIndex": 3
+    "correctAnswerIndex": "Mw=="
   },
   {
     "id": "js_quiz_8",
@@ -4669,7 +4674,7 @@ export const problems: Problem[] = [
     ],
     "quizQuestion": "배열의 모든 요소를 순서대로 계산해 하나의 값으로 합칠 때 사용하는 메서드는?",
     "quizOptions": ["reduce()","map()","filter()","find()"],
-    "correctAnswerIndex": 0
+    "correctAnswerIndex": "MA=="
   },
   {
     "id": "js_fill_1",
@@ -4689,7 +4694,7 @@ export const problems: Problem[] = [
       }
     ],
     "fillQuestion": "자바스크립트에서 함수를 선언할 때 사용하는 키워드는 _____이다. (예: _____ add(a, b) {...})",
-    "correctAnswerText": "function",
+    "correctAnswerText": "ZnVuY3Rpb24=",
     "placeholderText": "정답 입력..."
   },
   {
@@ -4710,7 +4715,7 @@ export const problems: Problem[] = [
       }
     ],
     "fillQuestion": "클래스에서 객체가 생성될 때 자동으로 실행되는 특별한 메서드의 이름은 _____이다.",
-    "correctAnswerText": "constructor",
+    "correctAnswerText": "Y29uc3RydWN0b3I=",
     "placeholderText": "정답 입력..."
   },
   {
@@ -4731,7 +4736,7 @@ export const problems: Problem[] = [
       }
     ],
     "fillQuestion": "배열의 맨 뒤에 값을 추가하는 메서드 이름은 _____이다. (예: arr._____(4))",
-    "correctAnswerText": "push",
+    "correctAnswerText": "cHVzaA==",
     "placeholderText": "정답 입력..."
   },
   {
@@ -4752,7 +4757,7 @@ export const problems: Problem[] = [
       }
     ],
     "fillQuestion": "함수 안에서 await를 사용하려면 함수 선언 앞에 _____ 키워드를 붙여야 한다.",
-    "correctAnswerText": "async",
+    "correctAnswerText": "YXN5bmM=",
     "placeholderText": "정답 입력..."
   },
 

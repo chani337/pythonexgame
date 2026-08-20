@@ -2,6 +2,7 @@ import { useState, useEffect, Fragment } from 'react';
 import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { solutionExplanations } from '../data/solutionExplanations';
+import { decodeAnswer } from '../utils/answerObfuscation';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import confetti from 'canvas-confetti';
 import CodeEditor from './CodeEditor';
@@ -130,7 +131,11 @@ export default function ProblemWorkspace({
     try {
       let codeToExecute = code;
 
-      const res = await executeCode(codeToExecute, problem.testCases, problem.testRunnerCode);
+      const decodedTestCases = problem.testCases?.map((tc) => ({
+        ...tc,
+        expected: decodeAnswer(tc.expected),
+      }));
+      const res = await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
       
       setConsoleOutput(res.stdout || (res.success ? '실행 완료 (출력값 없음)' : ''));
       if (res.error) {
@@ -166,7 +171,8 @@ export default function ProblemWorkspace({
     if (selectedQuizIndex === null) return;
     setHasTested(true);
     
-    if (selectedQuizIndex === problem.correctAnswerIndex) {
+    const correctIndex = problem.correctAnswerIndex ? parseInt(decodeAnswer(problem.correctAnswerIndex), 10) : NaN;
+    if (selectedQuizIndex === correctIndex) {
       setWorkspaceSuccess(true);
       setConsoleOutput('정답입니다! 올바른 이론적 추론입니다. 🎉');
       setConsoleError(null);
@@ -188,11 +194,12 @@ export default function ProblemWorkspace({
     if (!fillText.trim()) return;
     setHasTested(true);
     
-    const isCorrect = fillText.trim().toLowerCase() === problem.correctAnswerText?.trim().toLowerCase();
-    
+    const decodedAnswerText = problem.correctAnswerText ? decodeAnswer(problem.correctAnswerText) : undefined;
+    const isCorrect = fillText.trim().toLowerCase() === decodedAnswerText?.trim().toLowerCase();
+
     if (isCorrect) {
       setWorkspaceSuccess(true);
-      setConsoleOutput(`정답입니다! 빈칸에 들어갈 코드는 '${problem.correctAnswerText}' 입니다. 🎉`);
+      setConsoleOutput(`정답입니다! 빈칸에 들어갈 코드는 '${decodedAnswerText}' 입니다. 🎉`);
       setConsoleError(null);
       onMarkSolved(problem.id);
       confetti({
