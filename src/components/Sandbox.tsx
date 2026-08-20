@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Play, FileCode, RefreshCw } from 'lucide-react';
 import type { RunResponse } from '../hooks/usePyodide';
 import CodeEditor from './CodeEditor';
+import { explainError } from '../utils/explainError';
 
 interface SandboxProps {
   runPythonCode: (code: string) => Promise<RunResponse>;
@@ -470,6 +471,21 @@ export default function Sandbox({
               {error && (
                 <div className="console-error" style={{ whiteSpace: 'pre-wrap', marginTop: '0.35rem', fontSize: '0.8rem' }}>
                   {error}
+                </div>
+              )}
+              {error && explainError(error) && (
+                <div
+                  style={{
+                    marginTop: '0.5rem',
+                    padding: '0.7rem 0.9rem',
+                    background: '#fffbeb',
+                    border: '1px solid #fde68a',
+                    fontSize: '0.78rem',
+                    color: '#1a1a1a',
+                    lineHeight: '1.55',
+                  }}
+                >
+                  💡 {explainError(error)}
                 </div>
               )}
             </div>

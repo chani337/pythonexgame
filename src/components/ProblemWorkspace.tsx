@@ -3,6 +3,7 @@ import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare
 import type { Problem } from '../data/problems';
 import { solutionExplanations } from '../data/solutionExplanations';
 import { decodeAnswer } from '../utils/answerObfuscation';
+import { explainError } from '../utils/explainError';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import confetti from 'canvas-confetti';
 import CodeEditor from './CodeEditor';
@@ -684,6 +685,21 @@ export default function ProblemWorkspace({
                 <div className="console-error" style={{ whiteSpace: 'pre-wrap', marginTop: '0.35rem', fontSize: '0.8rem' }}>
                   <AlertCircle size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} />
                   {consoleError}
+                </div>
+              )}
+              {consoleError && explainError(consoleError) && (
+                <div
+                  style={{
+                    marginTop: '0.5rem',
+                    padding: '0.7rem 0.9rem',
+                    background: '#fffbeb',
+                    border: '1px solid #fde68a',
+                    fontSize: '0.78rem',
+                    color: '#1a1a1a',
+                    lineHeight: '1.55',
+                  }}
+                >
+                  💡 {explainError(consoleError)}
                 </div>
               )}
             </div>
