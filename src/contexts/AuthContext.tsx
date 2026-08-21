@@ -181,7 +181,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(newProf);
       } else {
         setProfile(data);
-        mergeLocalStorageProgress(userId);
+        await mergeLocalStorageProgress(userId);
       }
     } catch (err) {
       console.error('Fetch profile error:', err);
@@ -193,7 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const mergeLocalStorageProgress = async (userId: string) => {
     try {
-      const savedSolved = localStorage.getItem(`pyquests_solved_ids_${userId}`) || localStorage.getItem('pyquests_solved_ids');
+      const savedSolved = localStorage.getItem(`pyquests_solved_ids_${userId}`) || localStorage.getItem('pyquests_solved_ids_guest') || localStorage.getItem('pyquests_solved_ids');
       if (savedSolved) {
         const solvedIds: string[] = JSON.parse(savedSolved);
         if (solvedIds.length > 0) {
@@ -229,7 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      const savedQuizAnswers = localStorage.getItem(`pyquests_docs_quiz_answers_${userId}`) || localStorage.getItem('pyquests_docs_quiz_answers');
+      const savedQuizAnswers = localStorage.getItem(`pyquests_docs_quiz_answers_${userId}`) || localStorage.getItem('pyquests_docs_quiz_answers_guest') || localStorage.getItem('pyquests_docs_quiz_answers');
       if (savedQuizAnswers) {
         const quizMap: Record<string, number> = JSON.parse(savedQuizAnswers);
         const records = Object.entries(quizMap)
@@ -320,8 +320,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!isActiveUserAdmin) {
         const existingIndex = formatted.findIndex((u) => u.id === activeUserId || (u.email && activeUserEmail && u.email.toLowerCase() === activeUserEmail.toLowerCase()));
         if (existingIndex !== -1) {
-          formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count || 0, localSolvedCount);
-          formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak || 0, userStreak);
+          // Logged-in users already have a DB row here -- trust it as-is.
+          // Mixing in the local cache via Math.max let a stale/out-of-sync
+          // browser cache push the displayed count above (or pin it below)
+          // the real synced total, which is why the same account's rank
+          // used to flicker between different numbers on every refresh.
+          // Local cache is only meaningful as an optimistic estimate for
+          // guests who have no DB row at all (handled below).
+          if (!user) {
+            formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count || 0, localSolvedCount);
+            formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak || 0, userStreak);
+          }
         } else if (localSolvedCount > 0 || userStreak > 0 || user) {
           formatted.push({
             id: activeUserId,
