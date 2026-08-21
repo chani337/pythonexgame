@@ -17,11 +17,35 @@ import type { Problem } from './data/problems';
 import { usePyodide } from './hooks/usePyodide';
 import { useJsRunner } from './hooks/useJsRunner';
 
+function LoginRequiredGate({ description, onLogin }: { description: string; onLogin: () => void }) {
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '1rem',
+        padding: '4rem 2rem',
+        textAlign: 'center',
+        minHeight: '50vh',
+      }}
+    >
+      <div style={{ fontSize: '2.5rem' }}>🔒</div>
+      <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1a1a1a' }}>로그인이 필요한 기능이에요</h2>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', maxWidth: '360px', lineHeight: 1.6 }}>{description}</p>
+      <button onClick={onLogin} className="btn-primary" style={{ padding: '0.75rem 1.75rem' }}>
+        로그인 / 회원가입
+      </button>
+    </div>
+  );
+}
+
 function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
 
-  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds } = useAuth();
+  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
@@ -201,11 +225,10 @@ print("변환 리스트:", result)
   useEffect(() => {
     const problemLanguage = selectedProblem?.language || (selectedProblem ? 'python' : undefined);
     const needsPyodide =
-      currentView === 'sandbox' ||
-      currentView === 'docs' ||
+      ((currentView === 'sandbox' || currentView === 'docs') && !!user) ||
       (!!selectedProblem && problemLanguage !== 'js');
     if (needsPyodide) setPyodideNeeded(true);
-  }, [currentView, selectedProblem]);
+  }, [currentView, selectedProblem, user]);
   const { loading: isPyodideLoading, runCode } = usePyodide(pyodideNeeded);
   const { runCode: runJsCode } = useJsRunner();
 
@@ -455,24 +478,38 @@ print("변환 리스트:", result)
             initialScrollPos={listScrollPosRef.current}
           />
         ) : currentView === 'sandbox' ? (
-          <Sandbox
-            runPythonCode={runCode}
-            isPyodideLoading={isPyodideLoading}
-            onIncrementSandboxRuns={handleIncrementSandboxRuns}
-            code={sandboxCode}
-            setCode={setSandboxCode}
-          />
+          user ? (
+            <Sandbox
+              runPythonCode={runCode}
+              isPyodideLoading={isPyodideLoading}
+              onIncrementSandboxRuns={handleIncrementSandboxRuns}
+              code={sandboxCode}
+              setCode={setSandboxCode}
+            />
+          ) : (
+            <LoginRequiredGate
+              description="샌드박스는 로그인한 회원만 이용할 수 있어요. 로그인하고 자유롭게 코드를 실행해 보세요."
+              onLogin={() => setAuthModalOpen(true)}
+            />
+          )
         ) : currentView === 'docs' ? (
-          <DocsViewer
-            runPythonCode={runCode}
-            isPyodideLoading={isPyodideLoading}
-            onExportToSandbox={(codeText) => {
-              setSandboxCode(codeText);
-              setCurrentView('sandbox');
-            }}
-            problems={problems}
-            onSelectProblem={handleSelectProblem}
-          />
+          user ? (
+            <DocsViewer
+              runPythonCode={runCode}
+              isPyodideLoading={isPyodideLoading}
+              onExportToSandbox={(codeText) => {
+                setSandboxCode(codeText);
+                setCurrentView('sandbox');
+              }}
+              problems={problems}
+              onSelectProblem={handleSelectProblem}
+            />
+          ) : (
+            <LoginRequiredGate
+              description="학습 가이드는 로그인한 회원만 볼 수 있어요. 로그인하고 학습을 시작해 보세요."
+              onLogin={() => setAuthModalOpen(true)}
+            />
+          )
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center' }}>404 Not Found</div>
         )}
