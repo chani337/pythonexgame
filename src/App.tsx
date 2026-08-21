@@ -10,6 +10,7 @@ const ProblemList = lazy(() => import('./components/ProblemList'));
 const ProblemWorkspace = lazy(() => import('./components/ProblemWorkspace'));
 const Sandbox = lazy(() => import('./components/Sandbox'));
 const DocsViewer = lazy(() => import('./components/DocsViewer'));
+const Board = lazy(() => import('./components/Board'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import { problems, filterProblems } from './data/problems';
@@ -507,6 +508,15 @@ print("변환 리스트:", result)
           ) : (
             <LoginRequiredGate
               description="학습 가이드는 로그인한 회원만 볼 수 있어요. 로그인하고 학습을 시작해 보세요."
+              onLogin={() => setAuthModalOpen(true)}
+            />
+          )
+        ) : currentView === 'board' ? (
+          user ? (
+            <Board />
+          ) : (
+            <LoginRequiredGate
+              description="고객센터는 로그인한 회원만 이용할 수 있어요. 로그인하고 문의를 남겨보세요."
               onLogin={() => setAuthModalOpen(true)}
             />
           )

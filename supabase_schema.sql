@@ -126,6 +126,42 @@ DROP POLICY IF EXISTS "quiz_answers_own" ON public.user_quiz_answers;
 CREATE POLICY "quiz_answers_own" ON public.user_quiz_answers
   FOR ALL USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
+-- 2e. Board Posts Table (1:1 문의하기 -- 고객센터 게시판)
+-- Each member can only read/write their own posts; only the admin account
+-- can see and reply to everyone's. Guests never reach this table at all
+-- (the client gates the whole feature behind login).
+CREATE TABLE IF NOT EXISTS public.board_posts (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  status TEXT DEFAULT '답변대기' NOT NULL,
+  admin_reply TEXT,
+  admin_reply_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE public.board_posts ENABLE ROW LEVEL SECURITY;
+GRANT ALL ON public.board_posts TO anon, authenticated, service_role, postgres;
+
+DROP POLICY IF EXISTS "board_select_own_or_admin" ON public.board_posts;
+CREATE POLICY "board_select_own_or_admin" ON public.board_posts
+  FOR SELECT USING (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da');
+
+DROP POLICY IF EXISTS "board_insert_own" ON public.board_posts;
+CREATE POLICY "board_insert_own" ON public.board_posts
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+DROP POLICY IF EXISTS "board_update_own_or_admin" ON public.board_posts;
+CREATE POLICY "board_update_own_or_admin" ON public.board_posts
+  FOR UPDATE USING (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da')
+  WITH CHECK (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da');
+
+DROP POLICY IF EXISTS "board_delete_own_or_admin" ON public.board_posts;
+CREATE POLICY "board_delete_own_or_admin" ON public.board_posts
+  FOR DELETE USING (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da');
+
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS TRIGGER AS $$
