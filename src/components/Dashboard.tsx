@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb } from 'lucide-react';
 import type { Problem } from '../data/problems';
-import { useAuth, ADMIN_USER_ID } from '../contexts/AuthContext';
+import { useAuth, ADMIN_USER_ID, ADMIN_EMAIL } from '../contexts/AuthContext';
 import type { LeaderboardUser } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
@@ -86,7 +86,7 @@ export default function Dashboard({
   onUnlockAll,
 }: DashboardProps) {
   const { user } = useAuth();
-  const isMasterAdmin = user?.email?.toLowerCase() === 'chani7873@daum.net';
+  const isMasterAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
 
   // 코딩 트리비아: 방문할 때마다 무작위로 하나 뽑고, 버튼으로 다시 뽑을 수 있음
   const [triviaIndex, setTriviaIndex] = useState<number>(() => Math.floor(Math.random() * triviaItems.length));
@@ -331,7 +331,7 @@ export default function Dashboard({
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: '580px', lineHeight: '1.6' }}>
             {isMasterAdmin
-              ? 'chani7873@daum.net 관리자 전용 모드입니다. 아래 버튼을 눌러 모든 문제 클리어 및 뱃지 전체 해금을 1초 만에 실행하실 수 있습니다.'
+              ? `${ADMIN_EMAIL} 관리자 전용 모드입니다. 아래 버튼을 눌러 모든 문제 클리어 및 뱃지 전체 해금을 1초 만에 실행하실 수 있습니다.`
               : '기초부터 차근차근 고급 개념까지! PyQuests와 함께 다양한 프로그래밍 언어를 브라우저에서 직접 실행하며 코딩 마스터 지름길을 걸어보세요.'}
           </p>
         </div>
@@ -339,7 +339,7 @@ export default function Dashboard({
           {isMasterAdmin && onUnlockAll && (
             <button
               onClick={() => {
-                if (window.confirm(isMasterAdmin ? `chani7873@daum.net 계정에 모든 문제(${totalCount}개) 해결 완료 및 뱃지 전체 해금을 적용하시겠습니까?` : `모든 문제(${totalCount}개)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?`)) {
+                if (window.confirm(isMasterAdmin ? `${ADMIN_EMAIL} 계정에 모든 문제(${totalCount}개) 해결 완료 및 뱃지 전체 해금을 적용하시겠습니까?` : `모든 문제(${totalCount}개)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?`)) {
                   onUnlockAll();
                 }
               }}
