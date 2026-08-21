@@ -138,8 +138,17 @@ export default function Board() {
               불러오는 중...
             </div>
           ) : posts.length === 0 ? (
-            <div className="glass-card" style={{ padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem', borderRadius: '0px' }}>
-              {isAdmin ? '아직 접수된 문의가 없습니다.' : '아직 작성한 문의가 없습니다. 궁금한 점이 있으면 편하게 남겨보세요.'}
+            <div className="glass-card" style={{ padding: '3rem 2rem', textAlign: 'center', color: 'var(--text-secondary)', fontSize: '0.9rem', borderRadius: '0px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.5rem' }}>
+              {isAdmin ? (
+                '아직 접수된 문의가 없습니다.'
+              ) : (
+                <>
+                  <Lock size={20} color="var(--text-muted)" />
+                  <span style={{ fontWeight: '700', color: '#1a1a1a' }}>비밀 게시판입니다</span>
+                  <span>본인이 작성한 문의만 여기에 표시돼요. 다른 회원의 글은 볼 수 없어요.</span>
+                  <span>아직 작성한 문의가 없으니, 궁금한 점이 있으면 편하게 남겨보세요.</span>
+                </>
+              )}
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
