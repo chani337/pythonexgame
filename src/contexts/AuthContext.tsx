@@ -193,7 +193,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const mergeLocalStorageProgress = async (userId: string) => {
     try {
-      const savedSolved = localStorage.getItem(`pyquests_solved_ids_${userId}`) || localStorage.getItem('pyquests_solved_ids_guest') || localStorage.getItem('pyquests_solved_ids');
+      const savedSolved = localStorage.getItem(`pyquests_solved_ids_${userId}`) || localStorage.getItem('pyquests_solved_ids_guest');
       if (savedSolved) {
         const solvedIds: string[] = JSON.parse(savedSolved);
         if (solvedIds.length > 0) {
@@ -229,7 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      const savedQuizAnswers = localStorage.getItem(`pyquests_docs_quiz_answers_${userId}`) || localStorage.getItem('pyquests_docs_quiz_answers_guest') || localStorage.getItem('pyquests_docs_quiz_answers');
+      const savedQuizAnswers = localStorage.getItem(`pyquests_docs_quiz_answers_${userId}`) || localStorage.getItem('pyquests_docs_quiz_answers_guest');
       if (savedQuizAnswers) {
         const quizMap: Record<string, number> = JSON.parse(savedQuizAnswers);
         const records = Object.entries(quizMap)
@@ -313,9 +313,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const isActiveUserAdmin = activeUserEmail?.toLowerCase() === ADMIN_EMAIL;
 
       const userKey = `pyquests_solved_ids_${activeUserId}`;
-      const savedLocal = localStorage.getItem(userKey) || localStorage.getItem('pyquests_solved_ids');
+      const savedLocal = localStorage.getItem(userKey);
       const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
-      const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || localStorage.getItem('pyquests_streak') || '0', 10);
+      const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || '0', 10);
 
       if (!isActiveUserAdmin) {
         const existingIndex = formatted.findIndex((u) => u.id === activeUserId || (u.email && activeUserEmail && u.email.toLowerCase() === activeUserEmail.toLowerCase()));

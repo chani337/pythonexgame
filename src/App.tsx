@@ -55,10 +55,13 @@ function MainApp() {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const listScrollPosRef = useRef<number>(0);
 
-  // States with LocalStorage fallback
+  // States with LocalStorage fallback. Always scoped per-account (or
+  // "guest") -- never fall back to the old unscoped `pyquests_*` keys here.
+  // Those were written by long-removed code and reading them back would
+  // leak whichever account last populated them into the current account.
   const [solvedIds, setSolvedIds] = useState<string[]>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
-    const saved = localStorage.getItem(`pyquests_solved_ids_${lastId}`) || localStorage.getItem('pyquests_solved_ids');
+    const saved = localStorage.getItem(`pyquests_solved_ids_${lastId}`);
     return saved ? JSON.parse(saved) : [];
   });
 
@@ -71,18 +74,18 @@ function MainApp() {
 
   const [streak, setStreak] = useState<number>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
-    const saved = localStorage.getItem(`pyquests_streak_${lastId}`) || localStorage.getItem('pyquests_streak');
+    const saved = localStorage.getItem(`pyquests_streak_${lastId}`);
     return saved ? parseInt(saved, 10) : 0;
   });
 
   const [lastSolvedDate, setLastSolvedDate] = useState<string | null>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
-    return localStorage.getItem(`pyquests_last_solved_date_${lastId}`) || localStorage.getItem('pyquests_last_solved_date');
+    return localStorage.getItem(`pyquests_last_solved_date_${lastId}`);
   });
 
   const [sandboxRunCount, setSandboxRunCount] = useState<number>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
-    const saved = localStorage.getItem(`pyquests_sandbox_runs_${lastId}`) || localStorage.getItem('pyquests_sandbox_runs');
+    const saved = localStorage.getItem(`pyquests_sandbox_runs_${lastId}`);
     return saved ? parseInt(saved, 10) : 0;
   });
 
@@ -111,20 +114,20 @@ function MainApp() {
       });
     } else if (!isAuthLoading) {
       // Load local guest progress when not logged in instead of resetting to 0
-      const guestSolved = localStorage.getItem('pyquests_solved_ids_guest') || localStorage.getItem('pyquests_solved_ids');
+      const guestSolved = localStorage.getItem('pyquests_solved_ids_guest');
       const guestSolvedList = guestSolved ? JSON.parse(guestSolved) : [];
       setSolvedIds(guestSolvedList);
 
       const guestReview = localStorage.getItem('pyquests_review_ids_guest');
       setReviewIds(guestReview ? JSON.parse(guestReview) : []);
 
-      const guestStreak = localStorage.getItem('pyquests_streak_guest') || localStorage.getItem('pyquests_streak') || '0';
+      const guestStreak = localStorage.getItem('pyquests_streak_guest') || '0';
       setStreak(parseInt(guestStreak, 10));
 
-      const guestLastDate = localStorage.getItem('pyquests_last_solved_date_guest') || localStorage.getItem('pyquests_last_solved_date');
+      const guestLastDate = localStorage.getItem('pyquests_last_solved_date_guest');
       setLastSolvedDate(guestLastDate);
 
-      const guestSandbox = localStorage.getItem('pyquests_sandbox_runs_guest') || localStorage.getItem('pyquests_sandbox_runs') || '0';
+      const guestSandbox = localStorage.getItem('pyquests_sandbox_runs_guest') || '0';
       setSandboxRunCount(parseInt(guestSandbox, 10));
     }
   }, [user, isAuthLoading]);
@@ -189,6 +192,12 @@ print("변환 리스트:", result)
   }, [sandboxRunCount, user]);
 
   useEffect(() => {
+    if (!lastSolvedDate) return;
+    const storageKey = user ? `pyquests_last_solved_date_${user.id}` : 'pyquests_last_solved_date_guest';
+    localStorage.setItem(storageKey, lastSolvedDate);
+  }, [lastSolvedDate, user]);
+
+  useEffect(() => {
     const storageKey = user ? `pyquests_review_ids_${user.id}` : 'pyquests_review_ids_guest';
     localStorage.setItem(storageKey, JSON.stringify(reviewIds));
   }, [reviewIds, user]);
@@ -236,7 +245,6 @@ print("변환 리스트:", result)
       }
       setStreak(newStreak);
       setLastSolvedDate(today);
-      localStorage.setItem('pyquests_last_solved_date', today);
     }
 
     // Sync to Supabase

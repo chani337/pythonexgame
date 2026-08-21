@@ -119,7 +119,7 @@ export default function DocsViewer({
   // Chapter comprehension-check quiz: answers keyed by `${chapterId}_${questionIndex}`
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number>>(() => {
     const lastId = localStorage.getItem('pyquests_last_user_id') || 'guest';
-    const saved = localStorage.getItem(`pyquests_docs_quiz_answers_${lastId}`) || localStorage.getItem('pyquests_docs_quiz_answers');
+    const saved = localStorage.getItem(`pyquests_docs_quiz_answers_${lastId}`);
     return saved ? JSON.parse(saved) : {};
   });
 
@@ -128,7 +128,7 @@ export default function DocsViewer({
   useEffect(() => {
     const activeUserId = user?.id || 'guest';
     const localKey = `pyquests_docs_quiz_answers_${activeUserId}`;
-    const localSaved = localStorage.getItem(localKey) || localStorage.getItem('pyquests_docs_quiz_answers');
+    const localSaved = localStorage.getItem(localKey);
     const localAnswers: Record<string, number> = localSaved ? JSON.parse(localSaved) : {};
 
     if (user) {
