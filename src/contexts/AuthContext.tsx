@@ -627,7 +627,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const syncSolvedToSupabase = async (problemId: string) => {
-    if (!isSupabaseConfigured || !user) return;
+    console.log('[activity-feed] syncSolvedToSupabase entered. isSupabaseConfigured:', isSupabaseConfigured, 'user:', user?.id || 'NOT LOGGED IN');
+    if (!isSupabaseConfigured || !user) {
+      console.log('[activity-feed] syncSolvedToSupabase bailed out early (not configured or no user)');
+      return;
+    }
     try {
       await ensureProfileExists(user.id, user.email || '');
       const { error: upsertError } = await supabase.from('user_solved_problems').upsert(

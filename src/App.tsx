@@ -224,6 +224,7 @@ print("변환 리스트:", result)
 
   // Mark a problem as solved and compute the streak
   const handleMarkSolved = (problemId: string) => {
+    console.log('[activity-feed] handleMarkSolved called for', problemId, 'user:', user?.id || 'NOT LOGGED IN');
     let newStreak = streak;
     const today = new Date().toISOString().split('T')[0];
 
