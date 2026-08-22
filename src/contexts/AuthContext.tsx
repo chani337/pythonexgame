@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
 import { isProfaneOrForbidden } from '../utils/profanityFilter';
+import { problems } from '../data/problems';
 
 export interface UserProfile {
   id: string;
@@ -21,6 +22,16 @@ export interface LeaderboardUser {
   streak: number;
   solved_count: number;
 }
+
+export interface ActivityEvent {
+  id: string; // `${userId}_${problemId}_${insertedAt}` so re-solves after a delete still get a fresh key
+  displayName: string;
+  problemTitle: string;
+  insertedAt: number;
+}
+
+const PROBLEM_TITLE_BY_ID = new Map(problems.map((p) => [p.id, p.title]));
+const MAX_RECENT_ACTIVITY = 15;
 
 // profiles.email is no longer publicly readable (RLS locks it to the owning
 // row), so the admin's row is excluded from public leaderboards by id
@@ -47,6 +58,7 @@ interface AuthContextType {
   setAuthModalOpen: (open: boolean) => void;
   leaderboard: LeaderboardUser[];
   refreshLeaderboard: () => Promise<void>;
+  recentActivity: ActivityEvent[];
   signUp: (email: string, password: string, displayName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signInWithGoogle: () => Promise<{ error: any }>;
@@ -71,6 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
+  const [recentActivity, setRecentActivity] = useState<ActivityEvent[]>([]);
 
   // Initialize leaderboard state with persistent local cache or empty array
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>(() => {
@@ -150,6 +163,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'user_solved_problems' }, () => {
         refreshLeaderboard();
+      })
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'user_solved_problems' }, (payload) => {
+        handleNewSolveActivity(payload.new as { user_id: string; problem_id: string });
       })
       .subscribe();
 
@@ -353,6 +369,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Leaderboard error:', err);
       updateLeaderboardState([]);
+    }
+  };
+
+  // Turns a raw `user_solved_problems` INSERT into a "OOO님이 방금 '문제'를
+  // 풀었어요!" feed entry for the dashboard. The realtime payload only has
+  // user_id/problem_id, so the display name is looked up from the public
+  // leaderboard view and the problem title from the local bundled data.
+  const handleNewSolveActivity = async (row: { user_id: string; problem_id: string }) => {
+    if (!row?.user_id || !row?.problem_id) return;
+    if (row.user_id === ADMIN_USER_ID) return;
+
+    const problemTitle = PROBLEM_TITLE_BY_ID.get(row.problem_id);
+    if (!problemTitle) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('leaderboard_public')
+        .select('display_name')
+        .eq('id', row.user_id)
+        .single();
+
+      if (error || !data?.display_name) return;
+
+      const entry: ActivityEvent = {
+        id: `${row.user_id}_${row.problem_id}_${Date.now()}`,
+        displayName: data.display_name,
+        problemTitle,
+        insertedAt: Date.now(),
+      };
+
+      setRecentActivity((prev) => [entry, ...prev].slice(0, MAX_RECENT_ACTIVITY));
+    } catch (err) {
+      console.error('Activity feed lookup error:', err);
     }
   };
 
@@ -727,6 +776,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setAuthModalOpen,
         leaderboard,
         refreshLeaderboard,
+        recentActivity,
         signUp,
         signIn,
         signInWithGoogle,
