@@ -89,28 +89,29 @@ function MainApp() {
     return saved ? parseInt(saved, 10) : 0;
   });
 
-  // Fetch solved problem IDs from Supabase when user logs in
+  // Fetch solved problem IDs from Supabase when user logs in. Supabase is
+  // the source of truth once logged in -- local storage is just a mirror of
+  // it, overwritten on every login, never merged. Merging (local ∪ remote)
+  // meant a bad id that once leaked into a browser's local cache could never
+  // be cleared even by deleting the row server-side, since a union can only
+  // grow. (First-time guest progress still makes it into the account via
+  // AuthContext's mergeLocalStorageProgress, which pushes local -> Supabase
+  // on login -- this just stops the read side from re-inflating past that.)
   useEffect(() => {
     if (user) {
       localStorage.setItem('pyquests_last_user_id', user.id);
       const localKey = `pyquests_solved_ids_${user.id}`;
-      const savedLocal = localStorage.getItem(localKey);
-      const localSolved: string[] = savedLocal ? JSON.parse(savedLocal) : [];
 
       fetchUserSolvedIds().then((remoteSolvedIds) => {
-        const merged = Array.from(new Set([...localSolved, ...(remoteSolvedIds || [])]));
-        setSolvedIds(merged);
-        localStorage.setItem(localKey, JSON.stringify(merged));
+        setSolvedIds(remoteSolvedIds || []);
+        localStorage.setItem(localKey, JSON.stringify(remoteSolvedIds || []));
       });
 
       const localReviewKey = `pyquests_review_ids_${user.id}`;
-      const savedLocalReview = localStorage.getItem(localReviewKey);
-      const localReview: string[] = savedLocalReview ? JSON.parse(savedLocalReview) : [];
 
       fetchUserReviewProblemIds().then((remoteReviewIds) => {
-        const merged = Array.from(new Set([...localReview, ...(remoteReviewIds || [])]));
-        setReviewIds(merged);
-        localStorage.setItem(localReviewKey, JSON.stringify(merged));
+        setReviewIds(remoteReviewIds || []);
+        localStorage.setItem(localReviewKey, JSON.stringify(remoteReviewIds || []));
       });
     } else if (!isAuthLoading) {
       // Load local guest progress when not logged in instead of resetting to 0
