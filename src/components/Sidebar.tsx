@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Megaphone, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../hooks/useDarkMode';
 import ProfileEditModal from './ProfileEditModal';
@@ -40,6 +40,7 @@ export default function Sidebar({
     { id: 'sandbox', name: '샌드박스', icon: Terminal },
     { id: 'docs', name: '학습 가이드', icon: GraduationCap },
     { id: 'board', name: '고객센터', icon: MessageCircle },
+    { id: 'changelog', name: '업데이트', icon: Megaphone },
   ];
 
   return (
@@ -399,10 +400,10 @@ export default function Sidebar({
             paddingBottom: 'env(safe-area-inset-bottom, 0.6rem)',
           }}
         >
-          {/* 고객센터 lives in the 더보기 panel instead of the primary row --
-              with icon/text sizes bumped up, a 5th destination here made
-              every label wrap to two lines. */}
-          {menuItems.filter((item) => item.id !== 'board').map((item) => {
+          {/* 고객센터/업데이트 live in the 더보기 panel instead of the primary
+              row -- with icon/text sizes bumped up, a 5th+ destination here
+              made every label wrap to two lines. */}
+          {menuItems.filter((item) => item.id !== 'board' && item.id !== 'changelog').map((item) => {
             const IconComponent = item.icon;
             const isActive = currentView === item.id;
             return (
@@ -484,6 +485,27 @@ export default function Sidebar({
             >
               <MessageCircle size={16} />
               고객센터
+            </button>
+            <button
+              onClick={() => {
+                onViewChange('changelog');
+                setMobileMenuOpen(false);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: currentView === 'changelog' ? '#1a1a1a' : 'transparent',
+                border: '1px solid var(--border-subtle)',
+                padding: '0.6rem 0.75rem',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                color: currentView === 'changelog' ? '#ffffff' : '#1a1a1a',
+                cursor: 'pointer',
+              }}
+            >
+              <Megaphone size={16} />
+              업데이트
             </button>
             <button
               onClick={toggleDark}
