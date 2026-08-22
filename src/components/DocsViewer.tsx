@@ -73,22 +73,21 @@ export default function DocsViewer({
     return saved ? JSON.parse(saved) : [];
   });
 
-  // Reload read-chapter progress when the logged-in user changes (login/logout/guest),
-  // merging any local guest progress with what's already saved in Supabase for this account.
+  // Reload read-chapter progress when the logged-in user changes (login/logout/guest).
+  // Once logged in, Supabase is the source of truth -- local storage just mirrors
+  // it (overwritten, not merged), so a stale/leaked local id can't resurrect itself
+  // after being cleaned up server-side. Guest progress still reaches the account via
+  // AuthContext's mergeLocalStorageProgress push on login.
   useEffect(() => {
-    const activeUserId = user?.id || 'guest';
-    const localKey = `pyquests_read_chapters_${activeUserId}`;
-    const localSaved = localStorage.getItem(localKey);
-    const localIds: string[] = localSaved ? JSON.parse(localSaved) : [];
-
     if (user) {
+      const localKey = `pyquests_read_chapters_${user.id}`;
       fetchUserReadChapterIds().then((remoteIds) => {
-        const merged = Array.from(new Set([...localIds, ...remoteIds]));
-        setReadChapterIds(merged);
-        localStorage.setItem(localKey, JSON.stringify(merged));
+        setReadChapterIds(remoteIds);
+        localStorage.setItem(localKey, JSON.stringify(remoteIds));
       });
     } else {
-      setReadChapterIds(localIds);
+      const localSaved = localStorage.getItem('pyquests_read_chapters_guest');
+      setReadChapterIds(localSaved ? JSON.parse(localSaved) : []);
     }
   }, [user]);
 
@@ -123,22 +122,20 @@ export default function DocsViewer({
     return saved ? JSON.parse(saved) : {};
   });
 
-  // Reload quiz-answer progress when the logged-in user changes (login/logout/guest),
-  // merging any local guest progress with what's already saved in Supabase for this account.
+  // Reload quiz-answer progress when the logged-in user changes (login/logout/guest).
+  // Once logged in, Supabase is the source of truth -- local storage just mirrors it
+  // (overwritten, not merged). Guest progress still reaches the account via
+  // AuthContext's mergeLocalStorageProgress push on login.
   useEffect(() => {
-    const activeUserId = user?.id || 'guest';
-    const localKey = `pyquests_docs_quiz_answers_${activeUserId}`;
-    const localSaved = localStorage.getItem(localKey);
-    const localAnswers: Record<string, number> = localSaved ? JSON.parse(localSaved) : {};
-
     if (user) {
+      const localKey = `pyquests_docs_quiz_answers_${user.id}`;
       fetchUserQuizAnswers().then((remoteAnswers) => {
-        const merged = { ...remoteAnswers, ...localAnswers };
-        setQuizAnswers(merged);
-        localStorage.setItem(localKey, JSON.stringify(merged));
+        setQuizAnswers(remoteAnswers);
+        localStorage.setItem(localKey, JSON.stringify(remoteAnswers));
       });
     } else {
-      setQuizAnswers(localAnswers);
+      const localSaved = localStorage.getItem('pyquests_docs_quiz_answers_guest');
+      setQuizAnswers(localSaved ? JSON.parse(localSaved) : {});
     }
   }, [user]);
 
