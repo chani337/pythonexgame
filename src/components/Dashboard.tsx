@@ -112,16 +112,8 @@ export default function Dashboard({
   const { user, recentActivity } = useAuth();
   const isMasterAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
 
-  // 실시간 풀이 피드: 여러 건이 쌓이면 몇 초마다 하나씩 돌려가며 보여줌
-  const [activityIndex, setActivityIndex] = useState(0);
-  useEffect(() => {
-    if (recentActivity.length <= 1) return;
-    const intervalId = setInterval(() => {
-      setActivityIndex((prev) => (prev + 1) % recentActivity.length);
-    }, 4000);
-    return () => clearInterval(intervalId);
-  }, [recentActivity.length]);
-  const currentActivity = recentActivity[activityIndex % Math.max(recentActivity.length, 1)];
+  // 실시간 풀이 피드: 가장 최근 1건만 표시
+  const currentActivity = recentActivity[0];
 
   // 코딩 트리비아: 방문할 때마다 무작위로 하나 뽑고, 버튼으로 다시 뽑을 수 있음
   const [triviaIndex, setTriviaIndex] = useState<number>(() => Math.floor(Math.random() * triviaItems.length));
