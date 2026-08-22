@@ -23,23 +23,44 @@ const RANKING_TABS: { id: RankingMode; label: string }[] = [
 // Solved-problem counts for the "이번 주"/per-language tabs -- computed
 // on demand (only when that tab is selected) since the default "전체" view
 // already has realtime updates handled by AuthContext's refreshLeaderboard.
+//
+// Language isn't stored server-side (only in the bundled problems.ts), so
+// this can't just read an aggregate view like the "전체" tab does -- it
+// still needs every raw (user_id, problem_id) row to join against the local
+// language map. PostgREST caps a single response at 1000 rows, so this
+// pages through with .range() until a short page signals the end, instead
+// of doing one unbounded select that would silently truncate once the
+// table passed 1000 rows.
+const PAGE_SIZE = 1000;
+async function fetchAllSolvedRows(mode: RankingMode): Promise<{ user_id: string; problem_id: string }[]> {
+  const rows: { user_id: string; problem_id: string }[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    let query = supabase
+      .from('user_solved_problems')
+      .select('user_id, problem_id, solved_at')
+      .order('id', { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
+    if (mode === 'week') {
+      const now = new Date();
+      const daysSinceMonday = (now.getDay() + 6) % 7;
+      const monday = new Date(now);
+      monday.setDate(now.getDate() - daysSinceMonday);
+      monday.setHours(0, 0, 0, 0);
+      query = query.gte('solved_at', monday.toISOString());
+    }
+    const { data, error } = await query;
+    if (error || !data) break;
+    rows.push(...data);
+    if (data.length < PAGE_SIZE) break;
+  }
+  return rows;
+}
+
 async function fetchFilteredLeaderboard(mode: RankingMode, problems: Problem[]): Promise<LeaderboardUser[]> {
   if (mode === 'all') return [];
 
   const langById = new Map(problems.map((p) => [p.id, p.language || 'python']));
-
-  let query = supabase.from('user_solved_problems').select('user_id, problem_id, solved_at');
-  if (mode === 'week') {
-    const now = new Date();
-    const daysSinceMonday = (now.getDay() + 6) % 7;
-    const monday = new Date(now);
-    monday.setDate(now.getDate() - daysSinceMonday);
-    monday.setHours(0, 0, 0, 0);
-    query = query.gte('solved_at', monday.toISOString());
-  }
-
-  const { data, error } = await query;
-  if (error || !data) return [];
+  const data = await fetchAllSolvedRows(mode);
 
   const counts: Record<string, number> = {};
   data.forEach((row: { user_id: string; problem_id: string }) => {
