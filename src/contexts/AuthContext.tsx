@@ -69,10 +69,22 @@ function purgeOtherAccountsLocalStorage(keepId: string) {
 
 // profiles.email is no longer publicly readable (RLS locks it to the owning
 // row), so the admin's row is excluded from public leaderboards by id
-// instead of by email. Exported so other leaderboard views (e.g. the
-// weekly/per-language breakdowns in Dashboard) apply the same exclusion.
+// instead of by email.
 export const ADMIN_EMAIL = 'chani7873@daum.net';
 export const ADMIN_USER_ID = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da';
+
+// Test/dev accounts that solved every problem while building the site and
+// should never show up on the public leaderboard or activity feed, even
+// though they aren't the single ADMIN_USER_ID (used elsewhere for actual
+// admin authorization, e.g. the support board). Add an id here instead of
+// deleting its solved-problem rows if the account is still being used for
+// testing -- deleting rows only hides it until the next test run leaves a
+// new one. Exported so other leaderboard views (e.g. the weekly/per-language
+// breakdowns in Dashboard) apply the same exclusion.
+export const EXCLUDED_LEADERBOARD_IDS = [
+  ADMIN_USER_ID,
+  'b14d9a0d-93df-42b6-81f0-b195f4c0795d', // '비밀' test account
+];
 
 export const DEFAULT_LEADERBOARD: LeaderboardUser[] = [
   { id: 'default-runner-1', display_name: '알고리즘마스터', email: 'algo@pyquests.io', streak: 3, solved_count: 5 },
@@ -342,7 +354,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       // Admin account is excluded from the public leaderboard (recovery/testing data shouldn't rank)
-      let formatted = Object.values(userMap).filter((u) => u.id !== ADMIN_USER_ID);
+      let formatted = Object.values(userMap).filter((u) => !EXCLUDED_LEADERBOARD_IDS.includes(u.id));
 
       // Guarantee active logged-in user OR guest runner is ALWAYS displayed on the leaderboard
       const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
@@ -399,7 +411,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // leaderboard view and the problem title from the local bundled data.
   const handleNewSolveActivity = async (row: { user_id: string; problem_id: string }) => {
     if (!row?.user_id || !row?.problem_id) return;
-    if (row.user_id === ADMIN_USER_ID) return;
+    if (EXCLUDED_LEADERBOARD_IDS.includes(row.user_id)) return;
 
     const problemTitle = PROBLEM_TITLE_BY_ID.get(row.problem_id);
     if (!problemTitle) return;

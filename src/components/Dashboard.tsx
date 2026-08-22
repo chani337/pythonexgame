@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone } from 'lucide-react';
 import type { Problem } from '../data/problems';
-import { useAuth, ADMIN_USER_ID, ADMIN_EMAIL } from '../contexts/AuthContext';
+import { useAuth, EXCLUDED_LEADERBOARD_IDS, ADMIN_EMAIL } from '../contexts/AuthContext';
 import type { LeaderboardUser } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
@@ -69,7 +69,7 @@ async function fetchFilteredLeaderboard(mode: RankingMode, problems: Problem[]):
     counts[row.user_id] = (counts[row.user_id] || 0) + 1;
   });
 
-  const userIds = Object.keys(counts).filter((uid) => uid !== ADMIN_USER_ID);
+  const userIds = Object.keys(counts).filter((uid) => !EXCLUDED_LEADERBOARD_IDS.includes(uid));
   if (userIds.length === 0) return [];
 
   const { data: profs } = await supabase.from('leaderboard_public').select('id, display_name, streak').in('id', userIds);
