@@ -205,13 +205,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
         refreshLeaderboard();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_solved_problems' }, () => {
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_solved_problems' }, (payload) => {
+        console.log('[activity-feed] wildcard binding saw a user_solved_problems change:', payload.eventType);
         refreshLeaderboard();
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'user_solved_problems' }, (payload) => {
+        console.log('[activity-feed] INSERT-specific binding fired');
         handleNewSolveActivity(payload.new as { user_id: string; problem_id: string });
       })
-      .subscribe();
+      .subscribe((status) => {
+        console.log('[activity-feed] realtime channel status:', status);
+      });
 
     return () => {
       clearInterval(intervalId);
@@ -404,11 +408,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // user_id/problem_id, so the display name is looked up from the public
   // leaderboard view and the problem title from the local bundled data.
   const handleNewSolveActivity = async (row: { user_id: string; problem_id: string }) => {
-    if (!row?.user_id || !row?.problem_id) return;
-    if (EXCLUDED_LEADERBOARD_IDS.includes(row.user_id)) return;
+    console.log('[activity-feed] INSERT event received:', row);
+    if (!row?.user_id || !row?.problem_id) {
+      console.log('[activity-feed] dropped: missing user_id/problem_id on payload');
+      return;
+    }
+    if (EXCLUDED_LEADERBOARD_IDS.includes(row.user_id)) {
+      console.log('[activity-feed] dropped: user_id is in EXCLUDED_LEADERBOARD_IDS');
+      return;
+    }
 
     const problemTitle = PROBLEM_TITLE_BY_ID.get(row.problem_id);
-    if (!problemTitle) return;
+    if (!problemTitle) {
+      console.log('[activity-feed] dropped: no title found for problem_id', row.problem_id);
+      return;
+    }
 
     try {
       const { data, error } = await supabase
@@ -417,7 +431,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', row.user_id)
         .single();
 
-      if (error || !data?.display_name) return;
+      if (error || !data?.display_name) {
+        console.log('[activity-feed] dropped: leaderboard_public lookup failed', error);
+        return;
+      }
 
       const entry: ActivityEvent = {
         id: `${row.user_id}_${row.problem_id}_${Date.now()}`,
@@ -426,6 +443,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         insertedAt: Date.now(),
       };
 
+      console.log('[activity-feed] showing entry:', entry);
       setRecentActivity((prev) => [entry, ...prev].slice(0, MAX_RECENT_ACTIVITY));
     } catch (err) {
       console.error('Activity feed lookup error:', err);
