@@ -33,6 +33,40 @@ export interface ActivityEvent {
 const PROBLEM_TITLE_BY_ID = new Map(problems.map((p) => [p.id, p.title]));
 const MAX_RECENT_ACTIVITY = 15;
 
+// Every per-account localStorage key this app writes, keyed by the prefix
+// before the trailing user id / 'guest' suffix.
+const SCOPED_KEY_PREFIXES = [
+  'pyquests_solved_ids_',
+  'pyquests_streak_',
+  'pyquests_last_solved_date_',
+  'pyquests_sandbox_runs_',
+  'pyquests_review_ids_',
+  'pyquests_read_chapters_',
+  'pyquests_docs_quiz_answers_',
+  'pyquests_display_name_',
+];
+
+// On a shared/public computer, whoever logged in before us (or forgot to
+// log out) otherwise leaves their solved-problem history sitting in this
+// browser's localStorage forever. Call this on every login/logout so the
+// only account data left behind is whoever is active right now (or none,
+// once everyone's logged out) -- not a trail of every account that ever
+// touched this browser.
+function purgeOtherAccountsLocalStorage(keepId: string) {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i);
+    if (!key) continue;
+    const prefix = SCOPED_KEY_PREFIXES.find((p) => key.startsWith(p));
+    if (!prefix) continue;
+    const suffix = key.slice(prefix.length);
+    if (suffix !== keepId && suffix !== 'guest') {
+      keysToRemove.push(key);
+    }
+  }
+  keysToRemove.forEach((k) => localStorage.removeItem(k));
+}
+
 // profiles.email is no longer publicly readable (RLS locks it to the owning
 // row), so the admin's row is excluded from public leaderboards by id
 // instead of by email. Exported so other leaderboard views (e.g. the
@@ -120,8 +154,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session.user.email) {
           localStorage.setItem('pyquests_last_user_email', session.user.email);
         }
+        purgeOtherAccountsLocalStorage(session.user.id);
         fetchProfile(session.user.id, session.user.email || '');
       } else {
+        purgeOtherAccountsLocalStorage('guest');
         setLoading(false);
       }
     });
@@ -134,8 +170,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session.user.email) {
           localStorage.setItem('pyquests_last_user_email', session.user.email);
         }
+        purgeOtherAccountsLocalStorage(session.user.id);
         fetchProfile(session.user.id, session.user.email || '');
       } else {
+        purgeOtherAccountsLocalStorage('guest');
         setProfile(null);
         setLoading(false);
       }
