@@ -85,8 +85,19 @@ export default function Dashboard({
   sandboxRunCount,
   onUnlockAll,
 }: DashboardProps) {
-  const { user } = useAuth();
+  const { user, recentActivity } = useAuth();
   const isMasterAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
+
+  // 실시간 풀이 피드: 여러 건이 쌓이면 몇 초마다 하나씩 돌려가며 보여줌
+  const [activityIndex, setActivityIndex] = useState(0);
+  useEffect(() => {
+    if (recentActivity.length <= 1) return;
+    const intervalId = setInterval(() => {
+      setActivityIndex((prev) => (prev + 1) % recentActivity.length);
+    }, 4000);
+    return () => clearInterval(intervalId);
+  }, [recentActivity.length]);
+  const currentActivity = recentActivity[activityIndex % Math.max(recentActivity.length, 1)];
 
   // 코딩 트리비아: 방문할 때마다 무작위로 하나 뽑고, 버튼으로 다시 뽑을 수 있음
   const [triviaIndex, setTriviaIndex] = useState<number>(() => Math.floor(Math.random() * triviaItems.length));
@@ -424,6 +435,29 @@ export default function Dashboard({
           다른 상식 보기
         </button>
       </div>
+
+      {/* Live Solve Activity Feed */}
+      {currentActivity && (
+        <div
+          key={currentActivity.id}
+          className="glass-card"
+          style={{
+            padding: '0.85rem 1.25rem',
+            borderRadius: '0px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.75rem',
+            background: '#f0fff4',
+            border: '1px solid #b8e6c8',
+          }}
+        >
+          <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>🎉</span>
+          <p style={{ fontSize: '0.84rem', color: '#1a1a1a', margin: 0 }}>
+            <strong>{currentActivity.displayName}</strong>님이 방금{' '}
+            <strong>'{currentActivity.problemTitle}'</strong> 문제를 풀었어요!
+          </p>
+        </div>
+      )}
 
       {/* Stats Cards Grid */}
       <div
