@@ -217,17 +217,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       .on('postgres_changes', { event: '*', schema: 'public', table: 'profiles' }, () => {
         refreshLeaderboard();
       })
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_solved_problems' }, (payload) => {
-        console.log('[activity-feed] wildcard binding saw a user_solved_problems change:', payload.eventType);
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'user_solved_problems' }, () => {
         refreshLeaderboard();
       })
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'user_solved_problems' }, (payload) => {
-        console.log('[activity-feed] INSERT-specific binding fired');
         handleNewSolveActivity(payload.new as { user_id: string; problem_id: string });
       })
-      .subscribe((status) => {
-        console.log('[activity-feed] realtime channel status:', status);
-      });
+      .subscribe();
 
     return () => {
       clearInterval(intervalId);
@@ -437,30 +433,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await handleNewSolveActivity(row);
       }
     } catch (err) {
-      console.error('[activity-feed] poll error:', err);
+      console.error('Activity feed poll error:', err);
     }
   };
 
-  // Turns a raw `user_solved_problems` INSERT into a "OOO님이 방금 '문제'를
-  // 풀었어요!" feed entry for the dashboard. The realtime payload only has
-  // user_id/problem_id, so the display name is looked up from the public
-  // leaderboard view and the problem title from the local bundled data.
+  // Turns a raw `user_solved_problems` row into a "OOO님이 방금 '문제'를
+  // 풀었어요!" feed entry for the dashboard. The display name is looked up
+  // from the public leaderboard view and the problem title from the local
+  // bundled data.
   const handleNewSolveActivity = async (row: { user_id: string; problem_id: string }) => {
-    console.log('[activity-feed] INSERT event received:', row);
-    if (!row?.user_id || !row?.problem_id) {
-      console.log('[activity-feed] dropped: missing user_id/problem_id on payload');
-      return;
-    }
-    if (EXCLUDED_LEADERBOARD_IDS.includes(row.user_id)) {
-      console.log('[activity-feed] dropped: user_id is in EXCLUDED_LEADERBOARD_IDS');
-      return;
-    }
+    if (!row?.user_id || !row?.problem_id) return;
+    if (EXCLUDED_LEADERBOARD_IDS.includes(row.user_id)) return;
 
     const problemTitle = PROBLEM_TITLE_BY_ID.get(row.problem_id);
-    if (!problemTitle) {
-      console.log('[activity-feed] dropped: no title found for problem_id', row.problem_id);
-      return;
-    }
+    if (!problemTitle) return;
 
     try {
       const { data, error } = await supabase
@@ -469,10 +455,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         .eq('id', row.user_id)
         .single();
 
-      if (error || !data?.display_name) {
-        console.log('[activity-feed] dropped: leaderboard_public lookup failed', error);
-        return;
-      }
+      if (error || !data?.display_name) return;
 
       const entry: ActivityEvent = {
         id: `${row.user_id}_${row.problem_id}_${Date.now()}`,
@@ -481,7 +464,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         insertedAt: Date.now(),
       };
 
-      console.log('[activity-feed] showing entry:', entry);
       setRecentActivity((prev) => [entry, ...prev].slice(0, MAX_RECENT_ACTIVITY));
     } catch (err) {
       console.error('Activity feed lookup error:', err);
@@ -665,11 +647,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const syncSolvedToSupabase = async (problemId: string) => {
-    console.log('[activity-feed] syncSolvedToSupabase entered. isSupabaseConfigured:', isSupabaseConfigured, 'user:', user?.id || 'NOT LOGGED IN');
-    if (!isSupabaseConfigured || !user) {
-      console.log('[activity-feed] syncSolvedToSupabase bailed out early (not configured or no user)');
-      return;
-    }
+    if (!isSupabaseConfigured || !user) return;
     try {
       await ensureProfileExists(user.id, user.email || '');
       const { error: upsertError } = await supabase.from('user_solved_problems').upsert(
@@ -677,16 +655,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         { onConflict: 'user_id,problem_id' }
       );
       if (upsertError) {
-        console.error('[activity-feed] user_solved_problems upsert failed:', upsertError);
-      } else {
-        console.log('[activity-feed] user_solved_problems upsert succeeded for', problemId);
+        console.error('user_solved_problems upsert failed:', upsertError);
       }
 
       const { error: updateError } = await supabase.from('profiles').update({
         updated_at: new Date().toISOString(),
       }).eq('id', user.id);
       if (updateError) {
-        console.error('[activity-feed] profiles updated_at touch failed:', updateError);
+        console.error('profiles updated_at touch failed:', updateError);
       }
 
       refreshLeaderboard();

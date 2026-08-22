@@ -500,28 +500,43 @@ export default function Dashboard({
         </button>
       </div>
 
-      {/* Live Solve Activity Feed */}
-      {currentActivity && (
-        <div
-          key={currentActivity.id}
-          className="glass-card"
+      {/* Live Solve Activity Feed -- always mounted (not just while there's
+          something to show), so it reads as a permanent fixture rather than
+          a transient toast that flashes and disappears. Rotates through the
+          last few solves when there's more than one. */}
+      <div
+        className="glass-card"
+        style={{
+          padding: '0.85rem 1.25rem',
+          borderRadius: '0px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.75rem',
+          background: '#f0fff4',
+          border: '1px solid #b8e6c8',
+        }}
+      >
+        <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>🎉</span>
+        <p
           style={{
-            padding: '0.85rem 1.25rem',
-            borderRadius: '0px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.75rem',
-            background: '#f0fff4',
-            border: '1px solid #b8e6c8',
+            fontSize: '0.84rem',
+            color: '#1a1a1a',
+            margin: 0,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
           }}
         >
-          <span style={{ fontSize: '1.1rem', flexShrink: 0 }}>🎉</span>
-          <p style={{ fontSize: '0.84rem', color: '#1a1a1a', margin: 0 }}>
-            <strong>{currentActivity.displayName}</strong>님이 방금{' '}
-            <strong>'{currentActivity.problemTitle}'</strong> 문제를 풀었어요!
-          </p>
-        </div>
-      )}
+          {currentActivity ? (
+            <>
+              <strong>{currentActivity.displayName}</strong>님이 방금{' '}
+              <strong>'{currentActivity.problemTitle}'</strong> 문제를 풀었어요!
+            </>
+          ) : (
+            <span style={{ color: 'var(--text-secondary)' }}>아직 오늘의 풀이 소식이 없어요. 첫 번째로 풀어보세요!</span>
+          )}
+        </p>
+      </div>
 
       {/* Stats Cards Grid */}
       <div
