@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import type { User, Session } from '@supabase/supabase-js';
@@ -124,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [recentActivity, setRecentActivity] = useState<ActivityEvent[]>([]);
+  const lastSeenSolvedAtRef = useRef<string>(new Date().toISOString());
 
   // Initialize leaderboard state with persistent local cache or empty array
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>(() => {
@@ -199,6 +200,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshLeaderboard();
     }, 15000);
 
+    // Poll for new solves instead of relying solely on the Realtime
+    // websocket for the activity feed -- postgres_changes events aren't
+    // reaching the client on this project (confirmed: channel reports
+    // SUBSCRIBED with matching bindings, the write itself succeeds, but no
+    // INSERT/UPDATE message ever arrives, even after a project restart).
+    // This achieves the same UX without depending on that delivery.
+    lastSeenSolvedAtRef.current = new Date().toISOString();
+    const activityIntervalId = setInterval(() => {
+      pollRecentActivity();
+    }, 8000);
+
     // Supabase Realtime WebSocket subscription
     const channel = supabase
       .channel('public:realtime_leaderboard')
@@ -219,6 +231,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     return () => {
       clearInterval(intervalId);
+      clearInterval(activityIntervalId);
       supabase.removeChannel(channel);
     };
   }, []);
@@ -400,6 +413,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Leaderboard error:', err);
       updateLeaderboardState([]);
+    }
+  };
+
+  // Polling fallback for the activity feed -- see the comment where this is
+  // scheduled for why this exists alongside the (currently non-functional)
+  // realtime subscription. Only rows solved since the last poll are turned
+  // into feed entries, oldest first, via the same path realtime would use.
+  const pollRecentActivity = async () => {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data, error } = await supabase
+        .from('user_solved_problems')
+        .select('user_id, problem_id, solved_at')
+        .gt('solved_at', lastSeenSolvedAtRef.current)
+        .order('solved_at', { ascending: true })
+        .limit(20);
+
+      if (error || !data || data.length === 0) return;
+
+      lastSeenSolvedAtRef.current = data[data.length - 1].solved_at;
+      for (const row of data) {
+        await handleNewSolveActivity(row);
+      }
+    } catch (err) {
+      console.error('[activity-feed] poll error:', err);
     }
   };
 
