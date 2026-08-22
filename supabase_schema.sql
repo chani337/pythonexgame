@@ -35,12 +35,31 @@ DROP POLICY IF EXISTS "profiles_update_own" ON public.profiles;
 CREATE POLICY "profiles_update_own" ON public.profiles
   FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
--- Public-safe leaderboard view: only id/display_name/streak, no email.
--- Views run with the owner's privileges by default, so this can read
--- across all rows of the now-locked-down profiles table while only ever
--- exposing these three columns.
+-- Public-safe leaderboard view: id/display_name/streak/solved_count, no email.
+-- Views run with the owner's privileges by default, so this can read across
+-- all rows of the now-locked-down profiles table while only ever exposing
+-- these columns.
+--
+-- solved_count is aggregated here (GROUP BY) rather than in the client, which
+-- used to SELECT every row of user_solved_problems and count client-side.
+-- PostgREST caps a single response at 1000 rows by default with no implicit
+-- ORDER BY, so once that table passed ~1000 total rows the client was
+-- silently getting a different arbitrary 1000-row slice on every refresh --
+-- which is why the "전체" leaderboard was reshuffling on every reload.
+-- Aggregating server-side returns exactly one row per profile regardless of
+-- how many solved-problem rows exist underneath, so this can never truncate.
 CREATE OR REPLACE VIEW public.leaderboard_public AS
-  SELECT id, display_name, streak FROM public.profiles;
+  SELECT
+    p.id,
+    p.display_name,
+    p.streak,
+    COALESCE(sc.solved_count, 0)::int AS solved_count
+  FROM public.profiles p
+  LEFT JOIN (
+    SELECT user_id, COUNT(*) AS solved_count
+    FROM public.user_solved_problems
+    GROUP BY user_id
+  ) sc ON sc.user_id = p.id;
 
 GRANT SELECT ON public.leaderboard_public TO anon, authenticated;
 

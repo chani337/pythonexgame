@@ -312,22 +312,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const userMap: Record<string, LeaderboardUser> = {};
 
       if (isSupabaseConfigured) {
-        // Public leaderboard data (nickname + streak only, no email) comes
-        // from a view so it stays readable without exposing profiles.email.
+        // Public leaderboard data (nickname + streak + solved_count, no
+        // email) comes from a view so it stays readable without exposing
+        // profiles.email. solved_count is aggregated server-side in the
+        // view (GROUP BY user_id) instead of being computed here by
+        // fetching every row of user_solved_problems -- that table has
+        // long since passed PostgREST's default 1000-row response cap, so
+        // a raw unbounded select was silently returning a different
+        // arbitrary slice of rows on every call, making counts flap on
+        // every refresh. The view's aggregate always returns exactly one
+        // row per profile, so it can never be truncated like that.
         const { data: profData, error: profErr } = await supabase
           .from('leaderboard_public')
-          .select('id, display_name, streak');
-
-        const { data: solvedData, error: solvedErr } = await supabase
-          .from('user_solved_problems')
-          .select('user_id, problem_id');
-
-        const solvedCounts: Record<string, number> = {};
-        if (solvedData) {
-          solvedData.forEach((row) => {
-            solvedCounts[row.user_id] = (solvedCounts[row.user_id] || 0) + 1;
-          });
-        }
+          .select('id, display_name, streak, solved_count');
 
         if (!profErr && profData) {
           profData.forEach((item: any) => {
@@ -336,26 +333,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               display_name: item.display_name || '익명 러너',
               email: '',
               streak: item.streak || 0,
-              solved_count: solvedCounts[item.id] || 0,
+              solved_count: item.solved_count || 0,
             };
           });
-        } else {
-          if (profErr) console.warn('Supabase profiles fetch notice:', profErr);
-          if (solvedErr) console.warn('Supabase solved fetch notice:', solvedErr);
+        } else if (profErr) {
+          console.warn('Supabase leaderboard fetch notice:', profErr);
         }
-
-        // Include any user_id from user_solved_problems even if profile table row was not created yet
-        Object.keys(solvedCounts).forEach((uid) => {
-          if (!userMap[uid]) {
-            userMap[uid] = {
-              id: uid,
-              display_name: '러너_' + uid.slice(0, 5),
-              email: '',
-              streak: 0,
-              solved_count: solvedCounts[uid],
-            };
-          }
-        });
       }
 
       // Admin account is excluded from the public leaderboard (recovery/testing data shouldn't rank)
