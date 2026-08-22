@@ -11,6 +11,7 @@ const ProblemWorkspace = lazy(() => import('./components/ProblemWorkspace'));
 const Sandbox = lazy(() => import('./components/Sandbox'));
 const DocsViewer = lazy(() => import('./components/DocsViewer'));
 const Board = lazy(() => import('./components/Board'));
+const Changelog = lazy(() => import('./components/Changelog'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import { problems, filterProblems } from './data/problems';
@@ -408,6 +409,7 @@ print("변환 리스트:", result)
             onSelectProblem={handleSelectProblem}
             sandboxRunCount={sandboxRunCount}
             onUnlockAll={handleUnlockAllProblems}
+            onNavigateToChangelog={() => setCurrentView('changelog')}
           />
         ) : currentView === 'problems' ? (
           <ProblemList
@@ -468,6 +470,8 @@ print("변환 리스트:", result)
               onLogin={() => setAuthModalOpen(true)}
             />
           )
+        ) : currentView === 'changelog' ? (
+          <Changelog />
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center' }}>404 Not Found</div>
         )}

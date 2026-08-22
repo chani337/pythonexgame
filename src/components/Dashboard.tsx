@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb } from 'lucide-react';
+import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { useAuth, ADMIN_USER_ID, ADMIN_EMAIL } from '../contexts/AuthContext';
 import type { LeaderboardUser } from '../contexts/AuthContext';
@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
 import LearningRoadmap from './LearningRoadmap';
 import { triviaItems } from '../data/trivia';
+import { changelogEntries } from '../data/changelog';
 
 type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js' | 'algorithm';
 
@@ -95,6 +96,7 @@ interface DashboardProps {
   onSelectProblem: (problem: Problem) => void;
   sandboxRunCount: number;
   onUnlockAll?: () => void;
+  onNavigateToChangelog?: () => void;
 }
 
 export default function Dashboard({
@@ -105,6 +107,7 @@ export default function Dashboard({
   onSelectProblem,
   sandboxRunCount,
   onUnlockAll,
+  onNavigateToChangelog,
 }: DashboardProps) {
   const { user, recentActivity } = useAuth();
   const isMasterAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
@@ -316,8 +319,48 @@ export default function Dashboard({
     );
   };
 
+  const latestChangelogEntry = changelogEntries[0];
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', flex: 1 }}>
+      {/* Changelog Callout -- first thing on the dashboard so users landing
+          on the home screen know an update log exists at all, not just
+          people who happen to open the 더보기 panel. */}
+      {latestChangelogEntry && onNavigateToChangelog && (
+        <button
+          onClick={onNavigateToChangelog}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.6rem',
+            width: '100%',
+            padding: '0.65rem 1rem',
+            background: '#1a1a1a',
+            border: 'none',
+            borderRadius: '0px',
+            cursor: 'pointer',
+            textAlign: 'left',
+          }}
+        >
+          <Megaphone size={15} style={{ color: '#ffffff', flexShrink: 0 }} />
+          <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#ffffff', flexShrink: 0 }}>업데이트 소식</span>
+          <span
+            style={{
+              fontSize: '0.78rem',
+              color: 'rgba(255,255,255,0.75)',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+              flex: 1,
+              minWidth: 0,
+            }}
+          >
+            {latestChangelogEntry.title}
+          </span>
+          <span style={{ fontSize: '0.75rem', color: 'rgba(255,255,255,0.75)', flexShrink: 0 }}>자세히 보기 →</span>
+        </button>
+      )}
+
       {/* Welcome Banner */}
       <div
         className="glass-card"
