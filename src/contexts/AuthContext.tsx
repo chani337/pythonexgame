@@ -630,14 +630,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured || !user) return;
     try {
       await ensureProfileExists(user.id, user.email || '');
-      await supabase.from('user_solved_problems').upsert(
+      const { error: upsertError } = await supabase.from('user_solved_problems').upsert(
         { user_id: user.id, problem_id: problemId },
         { onConflict: 'user_id,problem_id' }
       );
+      if (upsertError) {
+        console.error('[activity-feed] user_solved_problems upsert failed:', upsertError);
+      } else {
+        console.log('[activity-feed] user_solved_problems upsert succeeded for', problemId);
+      }
 
-      await supabase.from('profiles').update({
+      const { error: updateError } = await supabase.from('profiles').update({
         updated_at: new Date().toISOString(),
       }).eq('id', user.id);
+      if (updateError) {
+        console.error('[activity-feed] profiles updated_at touch failed:', updateError);
+      }
 
       refreshLeaderboard();
     } catch (err) {
