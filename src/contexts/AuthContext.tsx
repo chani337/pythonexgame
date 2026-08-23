@@ -210,7 +210,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // SUBSCRIBED with matching bindings, the write itself succeeds, but no
     // INSERT/UPDATE message ever arrives, even after a project restart).
     // This achieves the same UX without depending on that delivery.
-    lastSeenSolvedAtRef.current = new Date().toISOString();
+    seedRecentActivity();
     const activityIntervalId = setInterval(() => {
       pollRecentActivity();
     }, 8000);
@@ -417,6 +417,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       console.error('Leaderboard error:', err);
       updateLeaderboardState([]);
+    }
+  };
+
+  // Runs once when the app loads so the feed isn't empty just because
+  // nothing's been solved since THIS tab opened -- without this, a solve
+  // from a minute before a new visitor's page load would never show up
+  // until someone solves something new. Grabs the most recent few rows
+  // (skipping excluded accounts happens inside handleNewSolveActivity) and
+  // seeds lastSeenSolvedAtRef so the regular poll below only picks up
+  // anything newer than what was just shown.
+  const seedRecentActivity = async () => {
+    if (!isSupabaseConfigured) return;
+    try {
+      const { data, error } = await supabase
+        .from('user_solved_problems')
+        .select('user_id, problem_id, solved_at')
+        .order('solved_at', { ascending: false })
+        .limit(10);
+
+      if (error || !data || data.length === 0) {
+        lastSeenSolvedAtRef.current = new Date().toISOString();
+        return;
+      }
+
+      lastSeenSolvedAtRef.current = data[0].solved_at;
+      for (const row of [...data].reverse()) {
+        await handleNewSolveActivity(row);
+      }
+    } catch (err) {
+      console.error('Activity feed seed error:', err);
+      lastSeenSolvedAtRef.current = new Date().toISOString();
     }
   };
 
