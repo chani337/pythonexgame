@@ -8,6 +8,13 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-24',
+    title: 'SQL 문제에 테이블 구조 표시',
+    items: [
+      'SQL 문제 화면에 users/orders 테이블의 컬럼과 실제 데이터를 바로 볼 수 있는 표를 추가했어요.',
+    ],
+  },
+  {
     date: '2026-08-23',
     title: '정답 코드 보기 기능 추가',
     items: [
