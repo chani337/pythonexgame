@@ -370,14 +370,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Guarantee active logged-in user OR guest runner is ALWAYS displayed on the leaderboard
       const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
       const activeUserEmail = user?.email || localStorage.getItem('pyquests_last_user_email') || 'local@pyquests.local';
-      const isActiveUserAdmin = activeUserEmail?.toLowerCase() === ADMIN_EMAIL;
+      // Was email-only (ADMIN_EMAIL), so logging in as any OTHER excluded
+      // account (e.g. a test account with no special email) let this "always
+      // show me" block re-add that account right after the DB-row filter
+      // above had just removed it.
+      const isActiveUserExcluded = activeUserEmail?.toLowerCase() === ADMIN_EMAIL || EXCLUDED_LEADERBOARD_IDS.includes(activeUserId);
 
       const userKey = `pyquests_solved_ids_${activeUserId}`;
       const savedLocal = localStorage.getItem(userKey);
       const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
       const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || '0', 10);
 
-      if (!isActiveUserAdmin) {
+      if (!isActiveUserExcluded) {
         const existingIndex = formatted.findIndex((u) => u.id === activeUserId || (u.email && activeUserEmail && u.email.toLowerCase() === activeUserEmail.toLowerCase()));
         if (existingIndex !== -1) {
           // Logged-in users already have a DB row here -- trust it as-is.
