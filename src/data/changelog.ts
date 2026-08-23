@@ -8,6 +8,15 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-23',
+    title: '정답 코드 보기 기능 추가',
+    items: [
+      '문제 화면에 "정답 코드 보기" 버튼을 추가했어요. 테스트를 안 해봐도 바로 정답 코드를 확인할 수 있어요.',
+      '정답 코드를 확인한 문제는 그 이후 통과해도 해결 기록/스트릭/랭킹에는 반영되지 않아요.',
+      '실시간 풀이 피드가 최신 1건만 보여주도록 정리했어요.',
+    ],
+  },
+  {
     date: '2026-08-22',
     title: '실시간 랭킹 정확도 개선',
     items: [
