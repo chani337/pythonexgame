@@ -78,7 +78,11 @@ export const ADMIN_USER_ID = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da';
 // for actual admin authorization, e.g. the support board). Exported so
 // other leaderboard views (e.g. the weekly/per-language breakdowns in
 // Dashboard) apply the same exclusion.
-export const EXCLUDED_LEADERBOARD_IDS = [ADMIN_USER_ID];
+export const EXCLUDED_LEADERBOARD_IDS = [
+  ADMIN_USER_ID,
+  '5eb2fb93-7238-4f04-90b5-8d5706fd4c01', // '히히' (rksk252539) test account
+  'b14d9a0d-93df-42b6-81f0-b195f4c0795d', // '비밀' test account
+];
 
 export const DEFAULT_LEADERBOARD: LeaderboardUser[] = [
   { id: 'default-runner-1', display_name: '알고리즘마스터', email: 'algo@pyquests.io', streak: 3, solved_count: 5 },
