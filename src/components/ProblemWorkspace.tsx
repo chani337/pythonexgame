@@ -411,6 +411,71 @@ export default function ProblemWorkspace({
             </div>
           </div>
 
+          {/* SQL Table Schema Reference -- every SQL problem runs against this
+              same fixed users/orders seed data (see usePyodide.ts), but
+              nothing showed students the columns or rows, so writing a query
+              meant guessing or remembering it from elsewhere. */}
+          {problemLanguage === 'sql' && (
+            <div>
+              <h3 style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '0.05em' }}>
+                테이블 구조
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {[
+                  {
+                    name: 'users',
+                    columns: 'id, name, age, score, dept',
+                    rows: [
+                      ['1', '김철수', '20', '90', '개발팀'],
+                      ['2', '이영희', '25', '85', '기획팀'],
+                      ['3', '박민수', '22', '100', '개발팀'],
+                      ['4', '최수민', '28', '70', '디자인팀'],
+                      ['5', '정찬희', '24', '95', '개발팀'],
+                    ],
+                  },
+                  {
+                    name: 'orders',
+                    columns: 'order_id, user_id, product, price',
+                    rows: [
+                      ['101', '1', '노트북', '1500000'],
+                      ['102', '1', '마우스', '30000'],
+                      ['103', '3', '키보드', '120000'],
+                      ['104', '5', '모니터', '450000'],
+                    ],
+                  },
+                ].map((table) => (
+                  <div key={table.name} style={{ border: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
+                    <div style={{ padding: '0.4rem 0.75rem', background: '#f4f4f6', fontSize: '0.75rem', fontWeight: '700', color: '#1a1a1a', fontFamily: 'var(--font-mono)' }}>
+                      {table.name} ({table.columns})
+                    </div>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
+                      <thead>
+                        <tr>
+                          {table.columns.split(', ').map((col) => (
+                            <th key={col} style={{ textAlign: 'left', padding: '0.35rem 0.75rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-subtle)', fontWeight: '600' }}>
+                              {col}
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {table.rows.map((row, i) => (
+                          <tr key={i}>
+                            {row.map((cell, j) => (
+                              <td key={j} style={{ padding: '0.3rem 0.75rem', color: '#1a1a1a', borderBottom: i === table.rows.length - 1 ? 'none' : '1px solid var(--border-subtle)' }}>
+                                {cell}
+                              </td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Constraints/Conditions */}
           <div>
             <h3 style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '0.05em' }}>
