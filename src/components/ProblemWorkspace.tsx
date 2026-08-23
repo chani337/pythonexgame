@@ -67,6 +67,11 @@ export default function ProblemWorkspace({
   const [mobileTab, setMobileTab] = useState<'desc' | 'editor'>('desc');
   const [showExplanation, setShowExplanation] = useState<boolean>(false);
   const [showAnswer, setShowAnswer] = useState<boolean>(false);
+  // Sticks once true for this problem-workspace session (doesn't reset on
+  // toggling the panel closed) -- viewing the answer disqualifies this
+  // attempt from counting toward solved/streak/leaderboard, so passing
+  // afterward should still work as practice but not credit progress.
+  const [viewedAnswer, setViewedAnswer] = useState<boolean>(false);
 
   // Auto-scroll the console to the bottom whenever a run finishes, so the
   // error explanation (rendered last) is visible without the user having to
@@ -161,7 +166,9 @@ export default function ProblemWorkspace({
 
         if (res.success) {
           setWorkspaceSuccess(true);
-          onMarkSolved(problem.id);
+          if (!viewedAnswer) {
+            onMarkSolved(problem.id);
+          }
           confetti({
             particleCount: 100,
             spread: 70,
@@ -779,7 +786,10 @@ export default function ProblemWorkspace({
                   )}
                   {solutionCode[problem.id] && (
                     <button
-                      onClick={() => setShowAnswer((prev) => !prev)}
+                      onClick={() => {
+                        setShowAnswer((prev) => !prev);
+                        setViewedAnswer(true);
+                      }}
                       style={{
                         background: 'transparent',
                         border: '1px solid #1a7f37',
@@ -843,7 +853,9 @@ export default function ProblemWorkspace({
           <div style={{ color: '#1a1a1a' }}>
             <strong style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '0.02em', textTransform: 'uppercase' }}>Congratulations! Clear!</strong>
             <span style={{ fontSize: '0.75rem', opacity: 0.8, color: 'var(--text-secondary)' }}>
-              해당 문제가 성공적으로 해결되었습니다.
+              {viewedAnswer
+                ? '정답 코드를 확인한 문제라 해결 기록에는 반영되지 않아요.'
+                : '해당 문제가 성공적으로 해결되었습니다.'}
             </span>
           </div>
           <div style={{ display: 'flex', gap: '0.5rem' }}>
