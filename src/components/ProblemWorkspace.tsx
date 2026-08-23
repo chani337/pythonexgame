@@ -2,6 +2,7 @@ import { useState, useEffect, useRef, Fragment } from 'react';
 import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { solutionExplanations } from '../data/solutionExplanations';
+import { solutionCode } from '../data/solutionCode';
 import { decodeAnswer } from '../utils/answerObfuscation';
 import { explainError } from '../utils/explainError';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
@@ -65,6 +66,7 @@ export default function ProblemWorkspace({
   const [workspaceSuccess, setWorkspaceSuccess] = useState<boolean>(false);
   const [mobileTab, setMobileTab] = useState<'desc' | 'editor'>('desc');
   const [showExplanation, setShowExplanation] = useState<boolean>(false);
+  const [showAnswer, setShowAnswer] = useState<boolean>(false);
 
   // Auto-scroll the console to the bottom whenever a run finishes, so the
   // error explanation (rendered last) is visible without the user having to
@@ -753,29 +755,51 @@ export default function ProblemWorkspace({
               </div>
             )}
 
-            {solutionExplanations[problem.id] && (
-              <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
-                <button
-                  onClick={() => setShowExplanation((prev) => !prev)}
-                  style={{
-                    background: 'transparent',
-                    border: '1px solid #8250df',
-                    color: '#8250df',
-                    padding: '0.4rem 0.75rem',
-                    fontSize: '0.75rem',
-                    fontWeight: '700',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.35rem',
-                  }}
-                >
-                  💡 {showExplanation ? '해설 접기' : '해설 보기'}
-                </button>
-                {showExplanation && (
+            {(solutionExplanations[problem.id] || solutionCode[problem.id]) && (
+              <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {solutionExplanations[problem.id] && (
+                    <button
+                      onClick={() => setShowExplanation((prev) => !prev)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid #8250df',
+                        color: '#8250df',
+                        padding: '0.4rem 0.75rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                    >
+                      💡 {showExplanation ? '해설 접기' : '해설 보기'}
+                    </button>
+                  )}
+                  {solutionCode[problem.id] && (
+                    <button
+                      onClick={() => setShowAnswer((prev) => !prev)}
+                      style={{
+                        background: 'transparent',
+                        border: '1px solid #1a7f37',
+                        color: '#1a7f37',
+                        padding: '0.4rem 0.75rem',
+                        fontSize: '0.75rem',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.35rem',
+                      }}
+                    >
+                      📄 {showAnswer ? '정답 코드 접기' : '정답 코드 보기'}
+                    </button>
+                  )}
+                </div>
+                {showExplanation && solutionExplanations[problem.id] && (
                   <div
                     style={{
-                      marginTop: '0.5rem',
                       padding: '0.85rem 1rem',
                       background: '#faf5ff',
                       border: '1px solid #e2d4fb',
@@ -787,6 +811,24 @@ export default function ProblemWorkspace({
                   >
                     {solutionExplanations[problem.id]}
                   </div>
+                )}
+                {showAnswer && solutionCode[problem.id] && (
+                  <pre
+                    style={{
+                      margin: 0,
+                      padding: '0.85rem 1rem',
+                      background: '#f0fbf4',
+                      border: '1px solid #c8e9d3',
+                      fontSize: '0.78rem',
+                      color: '#1a1a1a',
+                      lineHeight: '1.6',
+                      overflowX: 'auto',
+                      fontFamily: 'var(--font-mono, monospace)',
+                      whiteSpace: 'pre',
+                    }}
+                  >
+                    {solutionCode[problem.id]}
+                  </pre>
                 )}
               </div>
             )}
