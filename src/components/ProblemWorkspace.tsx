@@ -753,7 +753,7 @@ export default function ProblemWorkspace({
               </div>
             )}
 
-            {hasTested && solutionExplanations[problem.id] && (
+            {solutionExplanations[problem.id] && (
               <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
                 <button
                   onClick={() => setShowExplanation((prev) => !prev)}
