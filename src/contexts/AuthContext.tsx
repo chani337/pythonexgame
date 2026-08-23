@@ -442,8 +442,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       lastSeenSolvedAtRef.current = data[0].solved_at;
-      for (const row of [...data].reverse()) {
-        await handleNewSolveActivity(row);
+
+      // Only the single latest gets shown (Dashboard renders recentActivity[0]
+      // only), so just resolve that one instead of feeding all 10 through
+      // handleNewSolveActivity in a loop -- that used to fire 10 sequential
+      // lookups + state updates on every page load, which was visible as the
+      // banner flickering through old names before landing on the real one.
+      const latestValid = data.find(
+        (row) => !EXCLUDED_LEADERBOARD_IDS.includes(row.user_id) && PROBLEM_TITLE_BY_ID.has(row.problem_id)
+      );
+      if (latestValid) {
+        await handleNewSolveActivity(latestValid);
       }
     } catch (err) {
       console.error('Activity feed seed error:', err);
