@@ -8,7 +8,7 @@ const BARE_WORDS = new Set([
   'lambda', 'return', 'import', 'and', 'or', 'not', 'in', 'is', 'pass', 'super', 'isinstance',
   'break', 'continue', 'yield', 'with', 'as', 'global', 'nonlocal', 'assert', 'del',
   // SQL
-  'where', 'limit', 'distinct', 'having', 'exists', 'union', 'over', 'case',
+  'where', 'distinct', 'having', 'exists', 'union', 'over', 'case',
 ]);
 
 function escapeRegExp(s: string): string {
