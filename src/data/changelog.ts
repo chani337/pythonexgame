@@ -8,6 +8,14 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-08-25',
+    title: 'SQL 문제를 오라클 문법으로 전환',
+    items: [
+      'SQL 문제 중 LIMIT, COALESCE, JOIN...ON 같은 표준 SQL 문법을 오라클 문법(FETCH FIRST, NVL, WHERE절 (+) 외부 조인)으로 바꿨어요.',
+      '조인 문제(16, 17, 18, 27, 28번)는 오라클 수업에서 배우는 방식대로 FROM절에 테이블을 나열하고 WHERE절에서 연결하도록 정답과 힌트를 모두 수정했어요.',
+    ],
+  },
+  {
     date: '2026-08-24',
     title: 'SQL 문제에 테이블 구조 표시',
     items: [
