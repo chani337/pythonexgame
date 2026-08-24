@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone } from 'lucide-react';
+import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone, Users, Activity } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { useAuth, EXCLUDED_LEADERBOARD_IDS, ADMIN_EMAIL } from '../contexts/AuthContext';
 import type { LeaderboardUser } from '../contexts/AuthContext';
@@ -88,6 +88,38 @@ async function fetchFilteredLeaderboard(mode: RankingMode, problems: Problem[]):
 }
 
 
+// Member-count and solved-count-distribution stats for the admin-only
+// dashboard section. leaderboard_public returns exactly one row per profile
+// (see the view's own comment in supabase_schema.sql), so a plain unfiltered
+// select is a safe, unbounded-free total -- no pagination needed at this scale.
+interface AdminStats {
+  total: number;
+  active: number;
+  avgSolved: number;
+  buckets: { label: string; count: number }[];
+}
+
+async function fetchAdminStats(): Promise<AdminStats | null> {
+  const { data, error } = await supabase.from('leaderboard_public').select('id, solved_count');
+  if (error || !data) return null;
+
+  const counts = data.map((u: any) => u.solved_count || 0);
+  const total = counts.length;
+  const active = counts.filter((n) => n > 0).length;
+  const avgSolved = total > 0 ? counts.reduce((sum, n) => sum + n, 0) / total : 0;
+
+  const bucketDefs: { label: string; test: (n: number) => boolean }[] = [
+    { label: '0개', test: (n) => n === 0 },
+    { label: '1~5개', test: (n) => n >= 1 && n <= 5 },
+    { label: '6~10개', test: (n) => n >= 6 && n <= 10 },
+    { label: '11~20개', test: (n) => n >= 11 && n <= 20 },
+    { label: '21개+', test: (n) => n >= 21 },
+  ];
+  const buckets = bucketDefs.map((b) => ({ label: b.label, count: counts.filter(b.test).length }));
+
+  return { total, active, avgSolved, buckets };
+}
+
 interface DashboardProps {
   problems: Problem[];
   solvedIds: string[];
@@ -111,6 +143,19 @@ export default function Dashboard({
 }: DashboardProps) {
   const { user, recentActivity } = useAuth();
   const isMasterAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
+
+  // 관리자 전용 통계 (전체 회원수 / 활동 회원 / 해결 분포)
+  const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
+  useEffect(() => {
+    if (!isMasterAdmin) return;
+    let cancelled = false;
+    fetchAdminStats().then((stats) => {
+      if (!cancelled) setAdminStats(stats);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isMasterAdmin]);
 
   // 실시간 풀이 피드: 가장 최근 1건만 표시
   const currentActivity = recentActivity[0];
@@ -433,6 +478,86 @@ export default function Dashboard({
           </button>
         </div>
       </div>
+
+      {/* Admin Stats (관리자 전용) */}
+      {isMasterAdmin && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+          <h3 style={{ fontSize: '0.85rem', fontWeight: '700', letterSpacing: '0.05em', color: 'var(--text-secondary)', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Users size={15} /> 관리자 통계
+          </h3>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
+            <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', borderRadius: '0px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '0px', background: '#f4f4f6', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Users style={{ color: '#1a1a1a' }} size={20} />
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', fontWeight: '600', letterSpacing: '0.05em' }}>전체 회원수</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1a1a1a' }}>
+                  {adminStats ? adminStats.total : '···'} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>명</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', borderRadius: '0px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '0px', background: '#f4f4f6', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Activity style={{ color: '#1a1a1a' }} size={20} />
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', fontWeight: '600', letterSpacing: '0.05em' }}>활동 회원 (1문제+)</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1a1a1a' }}>
+                  {adminStats ? adminStats.active : '···'} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>명</span>
+                </span>
+              </div>
+            </div>
+
+            <div className="glass-card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1.25rem', borderRadius: '0px' }}>
+              <div style={{ width: '44px', height: '44px', borderRadius: '0px', background: '#f4f4f6', border: '1px solid var(--border-subtle)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <TrendingUp style={{ color: '#1a1a1a' }} size={20} />
+              </div>
+              <div>
+                <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'block', fontWeight: '600', letterSpacing: '0.05em' }}>평균 해결 문제 수</span>
+                <span style={{ fontSize: '1.4rem', fontWeight: '700', color: '#1a1a1a' }}>
+                  {adminStats ? adminStats.avgSolved.toFixed(1) : '···'} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>개</span>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="glass-card" style={{ padding: '1.75rem', borderRadius: '0px' }}>
+            <h4 style={{ fontSize: '0.85rem', fontWeight: '700', color: '#1a1a1a', marginBottom: '1.25rem', letterSpacing: '0.02em' }}>
+              회원별 문제 해결 분포
+            </h4>
+            {adminStats ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.65rem' }}>
+                {(() => {
+                  const max = Math.max(...adminStats.buckets.map((b) => b.count), 1);
+                  const colors = ['#86b6ef', '#5598e7', '#2a78d6', '#1c5cab', '#104281'];
+                  return adminStats.buckets.map((b, i) => (
+                    <div key={b.label} title={`${b.label}: ${b.count}명`} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                      <span style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', width: '56px', flexShrink: 0, fontWeight: '600' }}>{b.label}</span>
+                      <div style={{ flex: 1, height: '20px', background: 'var(--bg-dark)' }}>
+                        <div
+                          style={{
+                            height: '100%',
+                            width: `${(b.count / max) * 100}%`,
+                            background: colors[i],
+                            borderRadius: '0 4px 4px 0',
+                            transition: 'width 0.4s ease-out',
+                          }}
+                        />
+                      </div>
+                      <span style={{ fontSize: '0.78rem', fontWeight: '700', color: '#1a1a1a', width: '28px', textAlign: 'right', flexShrink: 0 }}>{b.count}</span>
+                    </div>
+                  ));
+                })()}
+              </div>
+            ) : (
+              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>불러오는 중...</span>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Coding Trivia Card */}
       <div
