@@ -1,10 +1,10 @@
 // Lightweight anti-cheat check derived directly from each problem's own
 // constraints (the ones already shown on the problem screen) -- if a
-// constraint names a specific technique (`for`, `len()`, ...) as required or
-// forbidden, the submitted code is checked for it too, not just the printed
-// output. Only covers problems whose constraints name an unambiguous code
-// keyword/call -- most problems only constrain variable names or literal
-// values, which this intentionally leaves unchecked.
+// constraint names a specific technique (`for`, `len()`, `BETWEEN`, ...) as
+// required or forbidden, the submitted code is checked for it too, not just
+// the printed output. Only covers problems whose constraints name an
+// unambiguous code keyword/call -- most problems only constrain variable
+// names or literal values, which this intentionally leaves unchecked.
 export const requiredKeywords: Record<string, string[]> = {
   "basic_part2_q4": ["len("],
   "basic_part2_q8": ["upper("],
@@ -38,6 +38,35 @@ export const requiredKeywords: Record<string, string[]> = {
   "numpy_q1": ["np.array("],
   "lambda_q1": ["list("],
   "algorithm_q4": ["set(", "sorted("],
+  "sql_q2": ["WHERE"],
+  "sql_q3": ["AND"],
+  "sql_q4": ["OR"],
+  "sql_q5": ["LIKE"],
+  "sql_q6": ["BETWEEN"],
+  "sql_q7": ["IN"],
+  "sql_q8": ["ORDER BY"],
+  "sql_q9": ["ORDER BY", "LIMIT"],
+  "sql_q10": ["DISTINCT"],
+  "sql_q11": ["COUNT("],
+  "sql_q12": ["AVG("],
+  "sql_q13": ["GROUP BY"],
+  "sql_q14": ["GROUP BY", "HAVING"],
+  "sql_q15": ["MAX(", "MIN("],
+  "sql_q16": ["JOIN"],
+  "sql_q17": ["LEFT JOIN"],
+  "sql_q18": ["JOIN"],
+  "sql_q19": ["SELECT", "AVG("],
+  "sql_q20": ["IN"],
+  "sql_q21": ["EXISTS"],
+  "sql_q22": ["UNION"],
+  "sql_q23": ["UNION ALL"],
+  "sql_q24": ["RANK("],
+  "sql_q25": ["ROW_NUMBER("],
+  "sql_q26": ["OVER", "PARTITION BY"],
+  "sql_q27": ["LEFT JOIN", "WHERE"],
+  "sql_q28": ["LEFT JOIN", "COALESCE("],
+  "sql_q29": ["CASE"],
+  "sql_q30": ["ROUND("],
 };
 
 export const forbiddenKeywords: Record<string, string[]> = {
