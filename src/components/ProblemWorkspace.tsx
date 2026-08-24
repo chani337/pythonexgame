@@ -3,6 +3,8 @@ import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare
 import type { Problem } from '../data/problems';
 import { solutionExplanations } from '../data/solutionExplanations';
 import { solutionCode } from '../data/solutionCode';
+import { requiredKeywords, forbiddenKeywords } from '../data/requiredKeywords';
+import { checkKeywords } from '../utils/checkKeywords';
 import { decodeAnswer } from '../utils/answerObfuscation';
 import { explainError } from '../utils/explainError';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
@@ -72,6 +74,7 @@ export default function ProblemWorkspace({
   // attempt from counting toward solved/streak/leaderboard, so passing
   // afterward should still work as practice but not credit progress.
   const [viewedAnswer, setViewedAnswer] = useState<boolean>(false);
+  const [keywordWarning, setKeywordWarning] = useState<string | null>(null);
 
   // Auto-scroll the console to the bottom whenever a run finishes, so the
   // error explanation (rendered last) is visible without the user having to
@@ -145,6 +148,7 @@ export default function ProblemWorkspace({
     setConsoleOutput(problemLanguage === 'js' ? '자바스크립트 코드를 실행 중...' : '파이썬 코드를 컴파일하고 실행 중...');
     setConsoleError(null);
     setWorkspaceSuccess(false);
+    setKeywordWarning(null);
 
     try {
       let codeToExecute = code;
@@ -165,15 +169,27 @@ export default function ProblemWorkspace({
         setHasTested(true);
 
         if (res.success) {
-          setWorkspaceSuccess(true);
-          if (!viewedAnswer) {
-            onMarkSolved(problem.id);
+          const kwCheck = checkKeywords(codeToExecute, requiredKeywords[problem.id], forbiddenKeywords[problem.id]);
+          if (!kwCheck.ok) {
+            const bits: string[] = [];
+            if (kwCheck.missingRequired.length > 0) {
+              bits.push(`이 문제는 ${kwCheck.missingRequired.join(', ')}을(를) 사용해야 해요.`);
+            }
+            if (kwCheck.presentForbidden.length > 0) {
+              bits.push(`이 문제는 ${kwCheck.presentForbidden.join(', ')}을(를) 사용하면 안 돼요.`);
+            }
+            setKeywordWarning(`출력은 맞았지만, 조건에 명시된 방식을 사용하지 않아서 해결로 인정되지 않았어요. ${bits.join(' ')}`);
+          } else {
+            setWorkspaceSuccess(true);
+            if (!viewedAnswer) {
+              onMarkSolved(problem.id);
+            }
+            confetti({
+              particleCount: 100,
+              spread: 70,
+              origin: { y: 0.6 }
+            });
           }
-          confetti({
-            particleCount: 100,
-            spread: 70,
-            origin: { y: 0.6 }
-          });
         } else {
           onWrongAttempt?.(problem.id);
         }
@@ -784,6 +800,22 @@ export default function ProblemWorkspace({
                   }}
                 >
                   💡 {explainError(consoleError)}
+                </div>
+              )}
+              {keywordWarning && (
+                <div
+                  style={{
+                    marginTop: '0.5rem',
+                    padding: '0.7rem 0.9rem',
+                    background: '#fff5f5',
+                    border: '1px solid #f3c6c6',
+                    fontSize: '0.78rem',
+                    color: '#1a1a1a',
+                    lineHeight: '1.55',
+                  }}
+                >
+                  <AlertCircle size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} />
+                  {keywordWarning}
                 </div>
               )}
             </div>
