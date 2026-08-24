@@ -1,8 +1,37 @@
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Megaphone, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useAuth, ADMIN_USER_ID } from '../contexts/AuthContext';
 import { useDarkMode } from '../hooks/useDarkMode';
+import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
+
+// 관리자에게만 보이는, 답변 대기 중인 고객센터 문의 수 배지.
+function NotificationBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span
+      style={{
+        position: 'absolute',
+        top: '-6px',
+        right: '-8px',
+        minWidth: '16px',
+        height: '16px',
+        padding: '0 4px',
+        borderRadius: '999px',
+        background: 'var(--accent-danger)',
+        color: '#ffffff',
+        fontSize: '0.62rem',
+        fontWeight: '700',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        lineHeight: 1,
+      }}
+    >
+      {count > 9 ? '9+' : count}
+    </span>
+  );
+}
 
 interface SidebarProps {
   currentView: string;
@@ -33,6 +62,26 @@ export default function Sidebar({
   }, [isCollapsed]);
 
   const { user, profile, setAuthModalOpen, signOut } = useAuth();
+  const isAdmin = user?.id === ADMIN_USER_ID;
+
+  // 답변 대기 중인(status='답변대기') 고객센터 문의 수 -- 관리자가 답변을 달면
+  // status가 '답변완료'로 바뀌므로 별도 read/unread 컬럼 없이 그대로 배지로 씀.
+  // 뷰를 옮길 때마다(특히 게시판에서 나올 때) 다시 세어 답변 직후 숫자가 바로 줄어들게 함.
+  const [pendingBoardCount, setPendingBoardCount] = useState(0);
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+    supabase
+      .from('board_posts')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', '답변대기')
+      .then(({ count }) => {
+        if (!cancelled) setPendingBoardCount(count || 0);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin, currentView]);
 
   const menuItems = [
     { id: 'dashboard', name: '대시보드', icon: LayoutDashboard },
@@ -192,14 +241,17 @@ export default function Sidebar({
                     }
                   }}
                 >
-                  <IconComponent
-                    size={18}
-                    style={{
-                      color: isActive ? '#ffffff' : 'var(--text-secondary)',
-                      transition: 'color 0.2s ease',
-                      flexShrink: 0,
-                    }}
-                  />
+                  <span style={{ position: 'relative', display: 'inline-flex', flexShrink: 0 }}>
+                    <IconComponent
+                      size={18}
+                      style={{
+                        color: isActive ? '#ffffff' : 'var(--text-secondary)',
+                        transition: 'color 0.2s ease',
+                        flexShrink: 0,
+                      }}
+                    />
+                    {item.id === 'board' && <NotificationBadge count={pendingBoardCount} />}
+                  </span>
                   {!isCollapsed && <span style={{ whiteSpace: 'nowrap' }}>{item.name}</span>}
                 </button>
               );
@@ -448,7 +500,10 @@ export default function Sidebar({
               color: mobileMenuOpen ? '#1a1a1a' : 'var(--text-muted)',
             }}
           >
-            {mobileMenuOpen ? <X size={25} /> : <Menu size={25} />}
+            <span style={{ position: 'relative', display: 'inline-flex' }}>
+              {mobileMenuOpen ? <X size={25} /> : <Menu size={25} />}
+              <NotificationBadge count={pendingBoardCount} />
+            </span>
             <span style={{ fontSize: '0.7rem', fontWeight: '500' }}>더보기</span>
           </button>
         </nav>
@@ -483,7 +538,10 @@ export default function Sidebar({
                 cursor: 'pointer',
               }}
             >
-              <MessageCircle size={16} />
+              <span style={{ position: 'relative', display: 'inline-flex' }}>
+                <MessageCircle size={16} />
+                <NotificationBadge count={pendingBoardCount} />
+              </span>
               고객센터
             </button>
             <button
