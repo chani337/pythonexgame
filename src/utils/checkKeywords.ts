@@ -1,10 +1,14 @@
 // Bare-word tokens need a word-boundary match -- a plain substring check
 // would make e.g. "in" trivially match inside "print" or "join", or "or"
-// inside "for", defeating the check for almost any real code.
+// inside "for", defeating the check for almost any real code. SQL is
+// case-insensitive and problems' constraint text always writes its
+// keywords in caps, so the whole check is done case-insensitively.
 const BARE_WORDS = new Set([
   'for', 'while', 'if', 'elif', 'else', 'def', 'class', 'try', 'except', 'finally', 'raise',
   'lambda', 'return', 'import', 'and', 'or', 'not', 'in', 'is', 'pass', 'super', 'isinstance',
   'break', 'continue', 'yield', 'with', 'as', 'global', 'nonlocal', 'assert', 'del',
+  // SQL
+  'where', 'limit', 'distinct', 'having', 'exists', 'union', 'over', 'case',
 ]);
 
 function escapeRegExp(s: string): string {
@@ -12,10 +16,12 @@ function escapeRegExp(s: string): string {
 }
 
 function tokenPresent(token: string, code: string): boolean {
-  if (BARE_WORDS.has(token)) {
-    return new RegExp(`\\b${escapeRegExp(token)}\\b`).test(code);
+  const tokenLower = token.toLowerCase();
+  const codeLower = code.toLowerCase();
+  if (BARE_WORDS.has(tokenLower)) {
+    return new RegExp(`\\b${escapeRegExp(tokenLower)}\\b`).test(codeLower);
   }
-  return code.includes(token);
+  return codeLower.includes(tokenLower);
 }
 
 export interface KeywordCheckResult {
