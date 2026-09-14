@@ -9,7 +9,7 @@ import LearningRoadmap from './LearningRoadmap';
 import { triviaItems } from '../data/trivia';
 import { changelogEntries } from '../data/changelog';
 
-type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js' | 'algorithm';
+type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js' | 'c' | 'algorithm';
 
 const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'all', label: '전체' },
@@ -18,6 +18,7 @@ const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'sql', label: 'SQL' },
   { id: 'java', label: 'Java' },
   { id: 'js', label: 'JS' },
+  { id: 'c', label: 'C' },
   { id: 'algorithm', label: '알고리즘' },
 ];
 
@@ -192,9 +193,9 @@ export default function Dashboard({
   // Scope badge counting to a single language so adding SQL/Java problems doesn't
   // silently inflate Python-named badges (or vice versa). Problems without an
   // explicit `language` field are treated as Python (the original 99 problems).
-  const problemsByLanguage = (lang: 'python' | 'sql' | 'java' | 'js') =>
+  const problemsByLanguage = (lang: 'python' | 'sql' | 'java' | 'js' | 'c') =>
     problems.filter((p) => (p.language || 'python') === lang);
-  const solvedIdsByLanguage = (lang: 'python' | 'sql' | 'java' | 'js') => {
+  const solvedIdsByLanguage = (lang: 'python' | 'sql' | 'java' | 'js' | 'c') => {
     const ids = new Set(problemsByLanguage(lang).map((p) => p.id));
     return solvedIds.filter((id) => ids.has(id));
   };
@@ -206,6 +207,7 @@ export default function Dashboard({
   const sqlSolvedCount = solvedIdsByLanguage('sql').length;
   const javaSolvedCount = solvedIdsByLanguage('java').length;
   const jsSolvedCount = solvedIdsByLanguage('js').length;
+  const cSolvedCount = solvedIdsByLanguage('c').length;
 
   // Badge data
   const badges = [
@@ -280,6 +282,15 @@ export default function Dashboard({
       color: '#1a1a1a',
       shadow: 'none',
       unlocked: jsSolvedCount >= 5,
+    },
+    {
+      id: 'c_starter',
+      name: 'C 입문자',
+      description: 'C 문제를 5개 이상 해결하세요.',
+      icon: '🛠️',
+      color: '#1a1a1a',
+      shadow: 'none',
+      unlocked: cSolvedCount >= 5,
     },
     {
       id: 'sandbox_explorer',
