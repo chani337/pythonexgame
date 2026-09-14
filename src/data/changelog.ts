@@ -9,6 +9,14 @@ export interface ChangelogEntry {
 export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-09-14',
+    title: 'C 언어 커리큘럼 추가',
+    items: [
+      '변수, 연산자, 조건문, 배열, 반복문, 함수, 포인터, 구조체, 문자열, 동적 메모리 할당, 전처리기, 파일 입출력까지 총 36개의 C 언어 퀴즈/빈칸 문제를 새로 추가했어요.',
+      '문제 목록의 언어 필터, 대시보드 랭킹, 학습 로드맵, 뱃지에도 C가 반영됐어요.',
+    ],
+  },
+  {
+    date: '2026-09-14',
     title: '"다음 문제" 단축키 추가',
     items: [
       '문제를 맞히면 코드 실행 단축키(Ctrl+Enter, Shift+Enter)가 그대로 "다음 문제로 이동" 단축키가 돼요. 마우스로 버튼을 누르지 않아도 바로 다음 문제로 넘어갈 수 있어요.',
