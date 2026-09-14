@@ -13,7 +13,7 @@ export interface Problem {
   id: string;
   title: string;
   category: string;
-  difficulty: 'basic' | 'intermediate' | 'advanced';
+  difficulty: 'basic' | 'intermediate' | 'advanced' | 'expert';
   type: ProblemType;
   language?: ProblemLanguage;
   description: string;
@@ -7194,4 +7194,458 @@ export const problems: Problem[] = [
   "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
 },
 
+  {
+  "id": "algo_expert_backtrack_n_queens",
+  "title": "챌린지 1. N-Queens 해의 개수",
+  "category": "백트래킹",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 n이 주어질 때, n x n 체스판에 n개의 퀸을 서로 공격하지 않도록 배치하는 방법의 개수를 백트래킹으로 구하는 solution 함수를 작성하세요. (퀸은 같은 행, 같은 열, 대각선에 있으면 서로 공격합니다.)",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(n)`으로 작성하세요.",
+      "백트래킹(가지치기)으로 모든 배치를 탐색하세요."
+],
+  "examples": [{"input": "solution(4)", "output": "2"}],
+  "initialCode": "def solution(n):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution(4)",
+          "expected": "Mg=="
+      },
+      {
+          "input": "solution(1)",
+          "expected": "MQ=="
+      },
+      {
+          "input": "solution(6)",
+          "expected": "NA=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_backtrack_combination_sum",
+  "title": "챌린지 2. 조합의 합 개수 세기",
+  "category": "백트래킹",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "양의 정수 리스트 candidates와 정수 target이 주어질 때, candidates의 숫자를 중복해서 여러 번 사용해 합이 target이 되는 서로 다른 조합의 개수를 구하는 solution 함수를 작성하세요. (숫자를 고르는 순서만 다른 조합은 같은 조합으로 취급합니다. 예: [2,2,3]과 [2,3,2]는 같은 조합입니다.)",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(candidates, target)`으로 작성하세요.",
+      "같은 숫자를 여러 번 사용할 수 있습니다.",
+      "백트래킹으로 탐색하며, 조합 내에서 숫자를 오름차순으로만 선택하면 중복 조합을 자연스럽게 피할 수 있습니다."
+],
+  "examples": [{"input": "solution([2, 3, 6, 7], 7)", "output": "2"}],
+  "initialCode": "def solution(candidates, target):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([2, 3, 6, 7], 7)",
+          "expected": "Mg=="
+      },
+      {
+          "input": "solution([2, 3, 5], 8)",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution([2], 1)",
+          "expected": "MA=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_dp_lcs",
+  "title": "챌린지 3. 최장 공통 부분 수열 (LCS)",
+  "category": "DP",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "두 문자열 text1, text2가 주어질 때, 두 문자열에 공통으로 등장하는 부분 수열(순서는 유지하되 연속하지 않아도 됨) 중 가장 긴 것의 길이를 DP로 구하는 solution 함수를 작성하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(text1, text2)`으로 작성하세요.",
+      "2차원 DP 테이블을 사용하세요."
+],
+  "examples": [{"input": "solution(\"abcde\", \"ace\")", "output": "3"}],
+  "initialCode": "def solution(text1, text2):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution(\"abcde\", \"ace\")",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution(\"abc\", \"abc\")",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution(\"abc\", \"def\")",
+          "expected": "MA=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_dp_edit_distance",
+  "title": "챌린지 4. 편집 거리 (Edit Distance)",
+  "category": "DP",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "두 문자열 word1, word2가 주어질 때, word1을 word2로 바꾸는 데 필요한 최소 연산(삽입, 삭제, 교체) 횟수를 DP로 구하는 solution 함수를 작성하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(word1, word2)`으로 작성하세요.",
+      "삽입/삭제/교체 연산은 각각 1번의 연산으로 취급합니다."
+],
+  "examples": [{"input": "solution(\"horse\", \"ros\")", "output": "3"}],
+  "initialCode": "def solution(word1, word2):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution(\"horse\", \"ros\")",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution(\"intention\", \"execution\")",
+          "expected": "NQ=="
+      },
+      {
+          "input": "solution(\"abc\", \"abc\")",
+          "expected": "MA=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_dp_knapsack",
+  "title": "챌린지 5. 0/1 배낭 문제",
+  "category": "DP",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "물건들의 무게 리스트 weights, 가치 리스트 values와 배낭의 최대 무게 capacity가 주어질 때, 배낭에 담을 수 있는 물건 가치의 최댓값을 DP로 구하는 solution 함수를 작성하세요. (각 물건은 한 번씩만 담을 수 있습니다.)",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(weights, values, capacity)`으로 작성하세요.",
+      "각 물건은 담거나 안 담거나 둘 중 하나입니다 (쪼갤 수 없음)."
+],
+  "examples": [{"input": "solution([1, 3, 4, 5], [1, 4, 5, 7], 7)", "output": "9"}],
+  "initialCode": "def solution(weights, values, capacity):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([1, 3, 4, 5], [1, 4, 5, 7], 7)",
+          "expected": "OQ=="
+      },
+      {
+          "input": "solution([2, 3, 4], [3, 4, 5], 5)",
+          "expected": "Nw=="
+      },
+      {
+          "input": "solution([5], [10], 3)",
+          "expected": "MA=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_dp_lis",
+  "title": "챌린지 6. 최장 증가 부분 수열 (LIS)",
+  "category": "DP",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums가 주어질 때, 엄격하게 증가하는 부분 수열(연속하지 않아도 됨) 중 가장 긴 것의 길이를 구하는 solution 함수를 작성하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+      "부분 수열은 반드시 엄격하게 증가해야 합니다 (같은 값은 이어질 수 없음)."
+],
+  "examples": [{"input": "solution([10, 9, 2, 5, 3, 7, 101, 18])", "output": "4"}],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([10, 9, 2, 5, 3, 7, 101, 18])",
+          "expected": "NA=="
+      },
+      {
+          "input": "solution([0, 1, 0, 3, 2, 3])",
+          "expected": "NA=="
+      },
+      {
+          "input": "solution([7, 7, 7, 7])",
+          "expected": "MQ=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_graph_dijkstra",
+  "title": "챌린지 7. 다익스트라 최단 거리",
+  "category": "그래프",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "노드 개수 n, 간선 리스트 edges(각 원소는 (u, v, w) 형태의 튜플로 u-v를 잇는 가중치 w의 무방향 간선), 시작 노드 start, 도착 노드 end가 주어질 때, start에서 end까지의 최단 거리를 다익스트라 알고리즘으로 구하는 solution 함수를 작성하세요. 도달할 수 없다면 -1을 반환하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(n, edges, start, end)`으로 작성하세요.",
+      "노드 번호는 0부터 n-1까지입니다.",
+      "간선은 무방향(양방향)이며 가중치는 모두 양수입니다."
+],
+  "examples": [{"input": "solution(5, [(0,1,2),(0,2,4),(1,2,1),(1,3,7),(2,4,3),(3,4,1)], 0, 4)", "output": "6"}],
+  "initialCode": "def solution(n, edges, start, end):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution(5, [(0,1,2),(0,2,4),(1,2,1),(1,3,7),(2,4,3),(3,4,1)], 0, 4)",
+          "expected": "Ng=="
+      },
+      {
+          "input": "solution(3, [(0,1,5)], 0, 2)",
+          "expected": "LTE="
+      },
+      {
+          "input": "solution(4, [(0,1,1),(1,2,1),(2,3,1),(0,3,10)], 0, 3)",
+          "expected": "Mw=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_graph_course_schedule",
+  "title": "챌린지 8. 수강 신청 가능 여부 (사이클 탐지)",
+  "category": "그래프",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "전체 과목 수 numCourses와 선수과목 목록 prerequisites(각 원소는 (a, b) 형태로 'b를 먼저 들어야 a를 들을 수 있음'을 의미)가 주어질 때, 모든 과목을 수강할 수 있는지(선수 관계에 사이클이 없는지) 판별하는 solution 함수를 작성하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(numCourses, prerequisites)`으로 작성하세요.",
+      "과목 번호는 0부터 numCourses-1까지입니다.",
+      "그래프 순회(DFS)로 사이클이 있는지 탐지하세요."
+],
+  "examples": [{"input": "solution(2, [(1, 0)])", "output": "True"}],
+  "initialCode": "def solution(numCourses, prerequisites):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution(2, [(1, 0)])",
+          "expected": "VHJ1ZQ=="
+      },
+      {
+          "input": "solution(2, [(1, 0), (0, 1)])",
+          "expected": "RmFsc2U="
+      },
+      {
+          "input": "solution(4, [(1, 0), (2, 1), (3, 2)])",
+          "expected": "VHJ1ZQ=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_graph_provinces",
+  "title": "챌린지 9. 도시 그룹 개수 (Union-Find)",
+  "category": "그래프",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "n개의 도시에 대한 n x n 연결 행렬 isConnected가 주어집니다 (isConnected[i][j] == 1이면 i와 j가 직접 연결됨). 직접 또는 간접적으로 연결된 도시들을 하나의 그룹으로 볼 때, 전체 그룹(province)의 개수를 구하는 solution 함수를 작성하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(isConnected)`으로 작성하세요.",
+      "DFS/BFS 또는 Union-Find로 연결 요소의 개수를 구하세요."
+],
+  "examples": [{"input": "solution([[1,1,0],[1,1,0],[0,0,1]])", "output": "2"}],
+  "initialCode": "def solution(isConnected):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([[1,1,0],[1,1,0],[0,0,1]])",
+          "expected": "Mg=="
+      },
+      {
+          "input": "solution([[1,0,0],[0,1,0],[0,0,1]])",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution([[1,1,0,0],[1,1,1,0],[0,1,1,0],[0,0,0,1]])",
+          "expected": "Mg=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_graph_mst_kruskal",
+  "title": "챌린지 10. 최소 신장 트리 (Kruskal)",
+  "category": "그래프",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "노드 개수 n과 간선 리스트 edges((u, v, w) 형태, 무방향 가중치 간선)가 주어질 때, 모든 노드를 최소 비용으로 연결하는 최소 신장 트리(MST)의 총 가중치를 크루스칼 알고리즘으로 구하는 solution 함수를 작성하세요. 모든 노드를 연결할 수 없다면 -1을 반환하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(n, edges)`으로 작성하세요.",
+      "Union-Find(서로소 집합)를 이용해 사이클을 판별하세요.",
+      "간선을 가중치 오름차순으로 정렬한 뒤 그리디하게 선택하세요."
+],
+  "examples": [{"input": "solution(4, [(0,1,1),(0,2,4),(1,2,2),(1,3,5),(2,3,1)])", "output": "4"}],
+  "initialCode": "def solution(n, edges):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution(4, [(0,1,1),(0,2,4),(1,2,2),(1,3,5),(2,3,1)])",
+          "expected": "NA=="
+      },
+      {
+          "input": "solution(3, [(0,1,3),(1,2,1),(0,2,2)])",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution(4, [(0,1,1),(2,3,1)])",
+          "expected": "LTE="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_trie_prefix_count",
+  "title": "챌린지 11. 접두사로 시작하는 단어 개수 (Trie)",
+  "category": "트라이",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 리스트 words와 문자열 prefix가 주어질 때, words 중 prefix로 시작하는 단어의 개수를 구하는 solution 함수를 작성하세요. 트라이(Trie) 자료구조를 직접 구성해서 접두사를 검색하는 방식으로 구현해 보세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(words, prefix)`으로 작성하세요.",
+      "트라이를 구성해 접두사 탐색 방식으로 구현하는 것을 권장합니다 (단순 반복문으로도 정답은 통과합니다)."
+],
+  "examples": [{"input": "solution([\"apple\", \"app\", \"application\", \"banana\"], \"app\")", "output": "3"}],
+  "initialCode": "def solution(words, prefix):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([\"apple\", \"app\", \"application\", \"banana\"], \"app\")",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution([\"cat\", \"car\", \"dog\"], \"ca\")",
+          "expected": "Mg=="
+      },
+      {
+          "input": "solution([\"hello\", \"world\"], \"z\")",
+          "expected": "MA=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_string_longest_palindrome",
+  "title": "챌린지 12. 가장 긴 회문 부분 문자열",
+  "category": "문자열",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "문자열 s가 주어질 때, s의 부분 문자열 중 회문(앞뒤로 읽어도 같은 문자열)이면서 가장 긴 것을 구하는 solution 함수를 작성하세요. 정답이 여러 개라면 그중 아무거나 반환해도 되지만, 테스트는 유일한 최장 회문이 존재하는 경우로만 구성되어 있습니다.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(s)`으로 작성하세요.",
+      "중심 확장(expand around center) 또는 DP로 구현하세요."
+],
+  "examples": [{"input": "solution(\"cbbd\")", "output": "bb"}],
+  "initialCode": "def solution(s):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution(\"cbbd\")",
+          "expected": "YmI="
+      },
+      {
+          "input": "solution(\"racecar\")",
+          "expected": "cmFjZWNhcg=="
+      },
+      {
+          "input": "solution(\"forgeeksskeegfor\")",
+          "expected": "Z2Vla3Nza2VlZw=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_greedy_interval_scheduling",
+  "title": "챌린지 13. 최대 겹치지 않는 구간 개수",
+  "category": "그리디",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "구간(시작, 끝)들의 리스트 intervals가 주어질 때, 서로 겹치지 않게 선택할 수 있는 구간의 최대 개수를 그리디 알고리즘으로 구하는 solution 함수를 작성하세요. 끝나는 시각과 다음 시작 시각이 같은 경우는 겹치지 않는 것으로 취급합니다.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(intervals)`으로 작성하세요.",
+      "구간을 끝나는 시각 기준으로 정렬한 뒤 그리디하게 선택하세요."
+],
+  "examples": [{"input": "solution([(1,3),(2,4),(3,5),(7,9)])", "output": "3"}],
+  "initialCode": "def solution(intervals):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([(1,3),(2,4),(3,5),(7,9)])",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution([(1,2),(2,3),(3,4),(1,3)])",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution([(1,10),(2,3),(4,5),(6,7)])",
+          "expected": "Mw=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_prefix_sum_range_queries",
+  "title": "챌린지 14. 구간 합 쿼리 (Prefix Sum)",
+  "category": "누적합",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums와 구간 쿼리 리스트 queries(각 원소는 (l, r) 형태, l부터 r까지 inclusive 구간)가 주어질 때, 각 쿼리에 대한 구간 합을 리스트로 반환하는 solution 함수를 작성하세요. 접두사 합(prefix sum)을 미리 계산해서 각 쿼리를 O(1)에 처리하세요.",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(nums, queries)`으로 작성하세요.",
+      "각 쿼리마다 nums를 처음부터 다시 더하지 말고, 미리 계산한 누적합 배열을 활용하세요."
+],
+  "examples": [{"input": "solution([1, 2, 3, 4, 5], [(0, 2), (1, 3), (0, 4)])", "output": "[6, 9, 15]"}],
+  "initialCode": "def solution(nums, queries):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([1, 2, 3, 4, 5], [(0, 2), (1, 3), (0, 4)])",
+          "expected": "WzYsIDksIDE1XQ=="
+      },
+      {
+          "input": "solution([4, 4, 4, 4], [(0, 0), (0, 3)])",
+          "expected": "WzQsIDE2XQ=="
+      },
+      {
+          "input": "solution([10, -2, 3, 5], [(1, 2), (0, 3)])",
+          "expected": "WzEsIDE2XQ=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+},
+  {
+  "id": "algo_expert_bit_single_number",
+  "title": "챌린지 15. 딱 한 번 등장하는 수 (비트 조작)",
+  "category": "비트조작",
+  "difficulty": "expert",
+  "type": "coding",
+  "language": "algorithm",
+  "description": "정수 리스트 nums에서 하나의 숫자만 딱 한 번 등장하고 나머지 숫자는 모두 정확히 3번씩 등장합니다. 딱 한 번 등장하는 숫자를 비트 연산만으로 구하는 solution 함수를 작성하세요. (추가 메모리 없이, 리스트를 정렬하거나 딕셔너리로 개수를 세지 않고 비트 연산으로 구현해 보세요.)",
+  "constraints": [
+      "함수 이름은 `solution`, 매개변수는 `(nums)`으로 작성하세요.",
+      "가능하다면 딕셔너리/Counter 없이 비트 연산자(&, |, ^, ~)만으로 구현해 보세요 (딕셔너리로 풀어도 정답은 통과합니다)."
+],
+  "examples": [{"input": "solution([2, 2, 3, 2])", "output": "3"}],
+  "initialCode": "def solution(nums):\n    # 코드를 작성하세요\n    pass\n",
+  "testCases": [
+      {
+          "input": "solution([2, 2, 3, 2])",
+          "expected": "Mw=="
+      },
+      {
+          "input": "solution([0, 1, 0, 1, 0, 1, 99])",
+          "expected": "OTk="
+      },
+      {
+          "input": "solution([-2, -2, 1, -2])",
+          "expected": "MQ=="
+      }
+  ],
+  "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n"
+}
 ];

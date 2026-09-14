@@ -177,6 +177,7 @@ export default function ProblemList({
               { id: 'basic', name: '기초' },
               { id: 'intermediate', name: '중급' },
               { id: 'advanced', name: '고급' },
+              { id: 'expert', name: '챌린지' },
             ].map((diff) => (
               <button
                 key={diff.id}
@@ -310,6 +311,7 @@ export default function ProblemList({
               if (problem.difficulty === 'basic') diffBorderColor = '#0f766e';
               else if (problem.difficulty === 'intermediate') diffBorderColor = '#a66908';
               else if (problem.difficulty === 'advanced') diffBorderColor = '#cf222e';
+              else if (problem.difficulty === 'expert') diffBorderColor = '#1a1a1a';
             }
 
             return (

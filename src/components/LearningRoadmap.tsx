@@ -63,6 +63,13 @@ export default function LearningRoadmap({ problems, solvedIds, onNavigate }: Lea
       current: countSolved(problems, solvedIds, undefined, 'advanced'),
       difficulty: 'advanced',
     },
+    {
+      title: '6단계 · 챌린지 문제로 실력 증명하기',
+      description: '백트래킹, 그래프 최단경로, 고급 DP 등 코딩테스트 수준의 챌린지 문제에 도전해 보세요.',
+      target: 10,
+      current: countSolved(problems, solvedIds, undefined, 'expert'),
+      difficulty: 'expert',
+    },
   ];
 
   return (
