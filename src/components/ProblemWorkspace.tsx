@@ -141,6 +141,23 @@ export default function ProblemWorkspace({
     return () => clearTimeout(timer);
   }, [workspaceSuccess]);
 
+  // Quiz/fill problems have no CodeEditor to own a keymap, so once solved we
+  // listen globally for the same Ctrl/Cmd+Enter shortcut coding problems use
+  // and jump to the next problem. Coding problems handle this themselves via
+  // handleEditorShortcut below, so skip here to avoid double-advancing.
+  useEffect(() => {
+    if (problem.type === 'coding') return;
+    if (!workspaceSuccess || !onNextProblem) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        onNextProblem();
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [problem.type, workspaceSuccess, onNextProblem]);
+
   // Handle run/test action
   const handleRun = async () => {
     if (isRuntimeLoading) return;
@@ -199,6 +216,17 @@ export default function ProblemWorkspace({
       onWrongAttempt?.(problem.id);
     } finally {
       setIsRunning(false);
+    }
+  };
+
+  // Ctrl/Cmd+Enter and Shift+Enter inside the editor normally (re-)run the
+  // code. Once the problem is already solved, re-running is redundant, so
+  // the same shortcut instead advances to the next problem.
+  const handleEditorShortcut = () => {
+    if (workspaceSuccess && onNextProblem) {
+      onNextProblem();
+    } else {
+      handleRun();
     }
   };
 
@@ -586,7 +614,7 @@ export default function ProblemWorkspace({
                   language={problemLanguage as EditorLanguage}
                   placeholder={editorPlaceholder}
                   disabled={isRuntimeLoading}
-                  onSubmitShortcut={handleRun}
+                  onSubmitShortcut={handleEditorShortcut}
                 />
               </div>
 
@@ -607,7 +635,7 @@ export default function ProblemWorkspace({
                   className="btn-secondary"
                   style={{ padding: '0.6rem 1.2rem', fontSize: '0.78rem', background: '#0a080f', color: '#cbd5e1', borderColor: '#2e2d3d' }}
                   disabled={isRunning || isRuntimeLoading}
-                  title="코드 실행 (Ctrl + Enter 또는 Shift + Enter)"
+                  title={workspaceSuccess ? '다음 문제로 이동 (Ctrl + Enter 또는 Shift + Enter)' : '코드 실행 (Ctrl + Enter 또는 Shift + Enter)'}
                 >
                   <Play size={14} />
                   코드 실행 <span style={{ fontSize: '0.68rem', opacity: 0.65, marginLeft: '0.2rem' }}>(Ctrl+Enter)</span>
@@ -617,7 +645,7 @@ export default function ProblemWorkspace({
                   className="btn-primary"
                   style={{ padding: '0.6rem 1.4rem', fontSize: '0.78rem', background: '#ffffff', color: '#000000', borderColor: '#ffffff' }}
                   disabled={isRunning || isRuntimeLoading}
-                  title="제출하기 (Ctrl + Enter 또는 Shift + Enter)"
+                  title={workspaceSuccess ? '다음 문제로 이동 (Ctrl + Enter 또는 Shift + Enter)' : '제출하기 (Ctrl + Enter 또는 Shift + Enter)'}
                 >
                   <Send size={14} />
                   제출하기
@@ -960,12 +988,13 @@ export default function ProblemWorkspace({
               <button
                 onClick={onNextProblem}
                 className="btn-primary"
+                title="다음 문제로 이동 (Ctrl + Enter)"
                 style={{
                   padding: '0.5rem 1rem',
                   fontSize: '0.75rem',
                 }}
               >
-                다음 문제 풀기
+                다음 문제 풀기 <span style={{ fontSize: '0.68rem', opacity: 0.65, marginLeft: '0.2rem' }}>(Ctrl+Enter)</span>
               </button>
             )}
             <button
