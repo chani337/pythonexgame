@@ -19,7 +19,7 @@ interface RoadmapStage {
 function countSolved(problems: Problem[], solvedIds: string[], language?: string, difficulty?: string) {
   return problems.filter((p) => {
     const lang = p.language || 'python';
-    const matchesLang = !language || lang === language || (language === 'java_or_js' && (lang === 'java' || lang === 'js'));
+    const matchesLang = !language || lang === language || (language === 'java_js_c' && (lang === 'java' || lang === 'js' || lang === 'c'));
     const matchesDiff = !difficulty || p.difficulty === difficulty;
     return matchesLang && matchesDiff && solvedIds.includes(p.id);
   }).length;
@@ -51,10 +51,10 @@ export default function LearningRoadmap({ problems, solvedIds, onNavigate }: Lea
       language: 'sql',
     },
     {
-      title: '4단계 · Java 또는 JavaScript 시작하기',
-      description: '둘 중 관심 있는 언어 하나를 골라 기초 문제부터 풀어보세요.',
+      title: '4단계 · Java, JavaScript 또는 C 시작하기',
+      description: '셋 중 관심 있는 언어 하나를 골라 기초 문제부터 풀어보세요.',
       target: 10,
-      current: countSolved(problems, solvedIds, 'java_or_js'),
+      current: countSolved(problems, solvedIds, 'java_js_c'),
     },
     {
       title: '5단계 · 고급 문제로 완성하기',

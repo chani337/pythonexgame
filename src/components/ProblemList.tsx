@@ -105,6 +105,8 @@ export default function ProblemList({
         return { text: 'JS', color: '#8a6d00', bg: '#f0db4f' };
       case 'algorithm':
         return { text: '알고리즘', color: '#cf222e', bg: '#ffebe9' };
+      case 'c':
+        return { text: 'C', color: '#5c6bc0', bg: '#e8eaf6' };
       default:
         return { text: 'Python', color: '#1a7f37', bg: '#dafbe1' };
     }
@@ -145,6 +147,7 @@ export default function ProblemList({
               { id: 'sql', name: 'SQL' },
               { id: 'java', name: 'Java' },
               { id: 'js', name: 'JS' },
+              { id: 'c', name: 'C' },
               { id: 'algorithm', name: '알고리즘' },
             ].map((lang) => (
               <button
