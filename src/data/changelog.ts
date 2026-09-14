@@ -8,6 +8,13 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-09-14',
+    title: '"다음 문제" 단축키 추가',
+    items: [
+      '문제를 맞히면 코드 실행 단축키(Ctrl+Enter, Shift+Enter)가 그대로 "다음 문제로 이동" 단축키가 돼요. 마우스로 버튼을 누르지 않아도 바로 다음 문제로 넘어갈 수 있어요.',
+    ],
+  },
+  {
     date: '2026-08-25',
     title: 'SQL 문제를 오라클 문법으로 전환',
     items: [
