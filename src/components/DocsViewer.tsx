@@ -20,10 +20,10 @@ interface DocsViewerProps {
 // same language. Best-effort: chapters with no matching problems (e.g. the
 // NumPy/Pandas/ML chapters) simply show no related-problems section.
 function getRelatedProblems(chapter: DocChapter, allProblems: Problem[]): Problem[] {
-  const lang = chapter.category === 'sql' ? 'sql' : chapter.category === 'java' ? 'java' : chapter.category === 'js' ? 'js' : 'python';
+  const lang = chapter.category === 'sql' ? 'sql' : chapter.category === 'java' ? 'java' : chapter.category === 'js' ? 'js' : chapter.category === 'c' ? 'c' : 'python';
 
   const cleanTitle = chapter.title
-    .replace(/^(SQL|Java|JS)\s*\d+\.\s*/i, '')
+    .replace(/^(SQL|Java|JS|C)\s*\d+\.\s*/i, '')
     .replace(/^\d+[.\-]\s*/, '')
     .replace(/[()&/,]/g, ' ')
     .replace(/(정리|기초|입문|마스터|핵심)/g, '')
@@ -48,9 +48,9 @@ export default function DocsViewer({
   // Remember the last-viewed category/chapter so returning here (e.g. via a
   // related-problem's "back" button, which unmounts this component) restores
   // where the reader left off instead of resetting to Python chapter 1.
-  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java' | 'js'>(() => {
+  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java' | 'js' | 'c'>(() => {
     const saved = localStorage.getItem('pyquests_docs_last_category');
-    return saved === 'sql' || saved === 'java' || saved === 'js' || saved === 'python' ? saved : 'python';
+    return saved === 'sql' || saved === 'java' || saved === 'js' || saved === 'c' || saved === 'python' ? saved : 'python';
   });
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(() => {
     const saved = localStorage.getItem('pyquests_docs_last_chapter_idx');
@@ -164,7 +164,10 @@ export default function DocsViewer({
     if (selectedCategory === 'js') {
       return ch.category === 'js';
     }
-    return ch.category !== 'sql' && ch.category !== 'java' && ch.category !== 'js';
+    if (selectedCategory === 'c') {
+      return ch.category === 'c';
+    }
+    return ch.category !== 'sql' && ch.category !== 'java' && ch.category !== 'js' && ch.category !== 'c';
   });
 
   // Chapter TOC search: matches by title or cell content, but keeps each entry's
@@ -857,6 +860,25 @@ export default function DocsViewer({
               >
                 JS
               </button>
+              <button
+                onClick={() => {
+                  setSelectedCategory('c');
+                  setSelectedChapterIdx(0);
+                  setCodeOutputs({});
+                  setChapterSearchQuery('');
+                }}
+                style={{
+                  background: selectedCategory === 'c' ? '#38bdf8' : 'transparent',
+                  color: selectedCategory === 'c' ? '#000000' : '#cbd5e1',
+                  border: 'none',
+                  padding: '0.3rem 0.6rem',
+                  fontSize: '0.75rem',
+                  fontWeight: '700',
+                  cursor: 'pointer',
+                }}
+              >
+                C
+              </button>
             </div>
 
             {/* Chapter Selection Dropdown */}
@@ -1013,13 +1035,15 @@ export default function DocsViewer({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-            {selectedCategory === 'python' ? '파이썬 학습 가이드' : selectedCategory === 'sql' ? 'SQL 데이터베이스 학습 가이드' : selectedCategory === 'js' ? '자바스크립트 학습 가이드' : 'Java 학습 가이드'}
+            {selectedCategory === 'python' ? '파이썬 학습 가이드' : selectedCategory === 'sql' ? 'SQL 데이터베이스 학습 가이드' : selectedCategory === 'js' ? '자바스크립트 학습 가이드' : selectedCategory === 'c' ? 'C 언어 학습 가이드' : 'Java 학습 가이드'}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
             {selectedCategory === 'java'
               ? '자바 기초 문법부터 객체지향까지 핵심 파트별 문서를 열람해 보세요. (자바는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)'
               : selectedCategory === 'js'
               ? '변수부터 비동기까지 핵심 파트별 문서를 열람해 보세요. (자바스크립트도 "문제 학습" 페이지에서 실제로 실행 및 채점할 수 있어요!)'
+              : selectedCategory === 'c'
+              ? '변수와 자료형부터 포인터, 구조체, 파일 입출력까지 핵심 파트별 문서를 열람해 보세요. (C는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)'
               : 'Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.'}
           </p>
         </div>
@@ -1168,6 +1192,31 @@ export default function DocsViewer({
         >
           자바스크립트 (JS)
         </button>
+        <button
+          onClick={() => {
+            setSelectedCategory('c');
+            setSelectedChapterIdx(0);
+            setCodeOutputs({});
+            setChapterSearchQuery('');
+          }}
+          style={{
+            padding: '0.65rem 1.4rem',
+            fontSize: '0.85rem',
+            fontWeight: '700',
+            background: selectedCategory === 'c' ? '#5c6bc0' : '#ffffff',
+            color: selectedCategory === 'c' ? '#ffffff' : 'var(--text-secondary)',
+            border: '1px solid #5c6bc0',
+            borderRadius: '0px',
+            cursor: 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.45rem',
+            boxShadow: selectedCategory === 'c' ? '0 2px 8px rgba(92,107,192,0.25)' : 'none',
+            transition: 'all 0.2s ease',
+          }}
+        >
+          C 언어
+        </button>
       </div>
 
       {/* Main split layout */}
@@ -1191,7 +1240,7 @@ export default function DocsViewer({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: '700', letterSpacing: '0.05em' }}>
-                {selectedCategory === 'python' ? '파이썬' : selectedCategory === 'sql' ? 'SQL' : selectedCategory === 'js' ? 'JS' : 'Java'} 학습 목차
+                {selectedCategory === 'python' ? '파이썬' : selectedCategory === 'sql' ? 'SQL' : selectedCategory === 'js' ? 'JS' : selectedCategory === 'c' ? 'C' : 'Java'} 학습 목차
               </h3>
               <button
                 onClick={() => setIsTocOpen(false)}
