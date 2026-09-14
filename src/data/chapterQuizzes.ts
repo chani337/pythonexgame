@@ -692,4 +692,208 @@ export const chapterQuizzes: ChapterQuiz[] = [
       },
     ],
   },
+  {
+    chapterId: 'C_1_INTRO_VARIABLE',
+    questions: [
+      {
+        question: 'C 프로그램이 실행을 시작하는 함수는?',
+        options: ['main', 'start', 'run', 'init'],
+        correctIndex: 0,
+        explanation: 'C 프로그램은 항상 int main(void) 함수에서 시작합니다.',
+      },
+      {
+        question: 'printf에서 정수를 출력할 때 사용하는 서식 지정자는?',
+        options: ['%d', '%f', '%c', '%s'],
+        correctIndex: 0,
+        explanation: '%d는 int, %f는 실수, %c는 문자, %s는 문자열을 출력할 때 사용합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_2_OPERATOR',
+    questions: [
+      {
+        question: 'int a = 7, b = 2;일 때 a / b의 결과는?',
+        options: ['3', '3.5', '4', '오류'],
+        correctIndex: 0,
+        explanation: '정수끼리의 나눗셈은 소수점이 버려지므로 3이 됩니다.',
+      },
+      {
+        question: '값을 비교할 때 =가 아니라 사용해야 하는 연산자는?',
+        options: ['==', ':=', '=?', '<>'],
+        correctIndex: 0,
+        explanation: '=는 대입 연산자이고, 두 값이 같은지 비교할 때는 ==를 사용해야 합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_3_CONDITIONAL',
+    questions: [
+      {
+        question: 'switch문에서 각 case 처리 후 다음 case로 넘어가지 않게 막는 키워드는?',
+        options: ['break', 'continue', 'return', 'stop'],
+        correctIndex: 0,
+        explanation: 'break가 없으면 다음 case로 실행이 계속 흘러 내려갑니다(fall-through).',
+      },
+      {
+        question: 'C의 switch문 조건으로 사용할 수 없는 자료형은?',
+        options: ['double', 'int', 'char', '모두 사용 가능'],
+        correctIndex: 0,
+        explanation: 'switch문은 정수(또는 정수로 변환 가능한 char 등)만 비교할 수 있고, 실수는 사용할 수 없습니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_4_ARRAY',
+    questions: [
+      {
+        question: 'int arr[5];로 선언했을 때 유효한 인덱스 범위는?',
+        options: ['0 ~ 4', '1 ~ 5', '0 ~ 5', '-1 ~ 4'],
+        correctIndex: 0,
+        explanation: 'C 배열의 인덱스는 0부터 시작해서 (크기-1)까지가 유효한 범위입니다.',
+      },
+      {
+        question: '배열의 요소 개수를 구하는 올바른 방법은?',
+        options: ['sizeof(arr) / sizeof(arr[0])', 'len(arr)', 'arr.length', 'sizeof(arr)'],
+        correctIndex: 0,
+        explanation: 'C 배열은 len() 같은 기능이 없어서, 전체 크기를 요소 하나의 크기로 나눠서 개수를 구합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_5_LOOP',
+    questions: [
+      {
+        question: '조건과 상관없이 최소 한 번은 실행되는 반복문은?',
+        options: ['do-while', 'while', 'for', 'switch'],
+        correctIndex: 0,
+        explanation: 'do-while은 코드를 먼저 실행한 뒤에 조건을 검사하므로 최소 한 번은 실행됩니다.',
+      },
+      {
+        question: '반복문에서 이번 반복만 건너뛰고 다음 반복으로 넘어갈 때 사용하는 키워드는?',
+        options: ['continue', 'break', 'pass', 'skip'],
+        correctIndex: 0,
+        explanation: 'continue는 현재 반복의 나머지를 건너뛰고 다음 반복으로 넘어갑니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_6_FUNCTION',
+    questions: [
+      {
+        question: 'C에서 함수에 인자를 전달하는 기본 방식은?',
+        options: ['값에 의한 전달(call by value)', '참조에 의한 전달(call by reference)', '이름에 의한 전달', '전달 방식이 없음'],
+        correctIndex: 0,
+        explanation: 'C는 기본적으로 인자의 값을 복사해서 전달하므로, 함수 안에서 매개변수를 바꿔도 원본은 그대로입니다.',
+      },
+      {
+        question: '함수를 정의보다 먼저 호출하려면 무엇이 필요한가?',
+        options: ['함수 원형(prototype) 선언', '매크로 정의', '헤더 가드', '전역 변수 선언'],
+        correctIndex: 0,
+        explanation: '함수 원형을 미리 선언해두면 실제 정의가 코드 아래쪽에 있어도 컴파일러가 함수를 인식할 수 있습니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_7_POINTER',
+    questions: [
+      {
+        question: '변수의 메모리 주소를 얻을 때 사용하는 연산자는?',
+        options: ['&', '*', '#', '@'],
+        correctIndex: 0,
+        explanation: '&(주소 연산자)는 변수의 메모리 주소를 얻을 때 사용합니다.',
+      },
+      {
+        question: '함수 안에서 포인터를 이용해 원본 변수의 값을 바꾸는 방식을 무엇이라 하는가?',
+        options: ['call by reference', 'call by value', 'call by name', 'call by copy'],
+        correctIndex: 0,
+        explanation: '포인터로 주소를 전달하면 함수 안에서 그 주소의 값을 직접 수정할 수 있어 원본이 바뀝니다 (call by reference).',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_8_STRUCT',
+    questions: [
+      {
+        question: '서로 다른 자료형을 하나로 묶어 새로운 자료형을 정의할 때 사용하는 키워드는?',
+        options: ['struct', 'array', 'class', 'union'],
+        correctIndex: 0,
+        explanation: 'struct는 서로 다른 자료형의 변수들을 묶어 새로운 자료형을 정의합니다.',
+      },
+      {
+        question: '구조체 포인터를 통해 멤버에 접근할 때 사용하는 연산자는?',
+        options: ['->', '.', '::', '&'],
+        correctIndex: 0,
+        explanation: '포인터로 구조체 멤버에 접근할 때는 -> 연산자를 사용합니다 (일반 변수는 . 사용).',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_9_STRING',
+    questions: [
+      {
+        question: 'C에서 문자열의 끝을 표시하는 특수 문자는?',
+        options: ['\\0', '\\n', 'EOF', 'NULL'],
+        correctIndex: 0,
+        explanation: 'C 문자열은 끝에 널 문자(\\0)가 자동으로 붙습니다.',
+      },
+      {
+        question: '두 문자열의 내용이 같은지 비교할 때 사용해야 하는 함수는?',
+        options: ['strcmp()', '==', 'strcat()', 'strcpy()'],
+        correctIndex: 0,
+        explanation: '문자열을 ==로 비교하면 주소를 비교하게 되므로, 내용 비교는 strcmp()를 사용해야 합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_10_MEMORY',
+    questions: [
+      {
+        question: '힙 영역에 메모리를 동적으로 할당할 때 사용하는 함수는?',
+        options: ['malloc', 'free', 'sizeof', 'new'],
+        correctIndex: 0,
+        explanation: 'malloc(바이트 수)로 힙 영역에서 메모리를 할당받을 수 있습니다.',
+      },
+      {
+        question: 'malloc으로 할당한 메모리를 다 쓰고 난 후 반드시 호출해야 하는 함수는?',
+        options: ['free', 'delete', 'clear', 'release'],
+        correctIndex: 0,
+        explanation: 'free()를 호출하지 않으면 메모리 누수(memory leak)가 발생합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_11_PREPROCESSOR',
+    questions: [
+      {
+        question: '다른 파일의 내용을 현재 파일에 포함시킬 때 사용하는 전처리 지시문은?',
+        options: ['#include', '#define', 'import', 'using'],
+        correctIndex: 0,
+        explanation: '#include는 지정한 파일의 내용을 그 위치에 포함시킵니다.',
+      },
+      {
+        question: '헤더 파일의 중복 포함을 막기 위한 패턴(헤더 가드)에 사용되지 않는 것은?',
+        options: ['#endwhile', '#ifndef', '#define', '#endif'],
+        correctIndex: 0,
+        explanation: '헤더 가드는 #ifndef, #define, #endif 세 가지 지시문으로 구성됩니다. #endwhile은 존재하지 않는 지시문입니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'C_12_FILE_IO',
+    questions: [
+      {
+        question: '파일을 열 때 사용하는 표준 라이브러리 함수는?',
+        options: ['fopen', 'open', 'fread', 'new File'],
+        correctIndex: 0,
+        explanation: 'fopen(파일이름, 모드)으로 파일을 열고 FILE* 포인터를 받습니다.',
+      },
+      {
+        question: '파일에서 한 줄씩 문자열을 읽어올 때 사용하는 함수는?',
+        options: ['fgets', 'fputs', 'fopen', 'fclose'],
+        correctIndex: 0,
+        explanation: 'fgets(저장할곳, 최대크기, 파일)은 파일에서 한 줄을 읽어옵니다.',
+      },
+    ],
+  },
 ];
