@@ -187,6 +187,9 @@ export default function Dashboard({
   const advProblems = problems.filter((p) => p.difficulty === 'advanced');
   const advSolved = advProblems.filter((p) => solvedIds.includes(p.id));
 
+  const expertProblems = problems.filter((p) => p.difficulty === 'expert');
+  const expertSolved = expertProblems.filter((p) => solvedIds.includes(p.id));
+
   // Determine next recommended problem
   const nextProblem = problems.find((p) => !solvedIds.includes(p.id));
 
@@ -255,6 +258,15 @@ export default function Dashboard({
       color: '#1a1a1a',
       shadow: 'none',
       unlocked: pythonAdvSolved.length >= 5,
+    },
+    {
+      id: 'challenge_solver',
+      name: '챌린지 정복자',
+      description: '챌린지 단계 문제를 5개 이상 해결하세요.',
+      icon: '🏆',
+      color: '#1a1a1a',
+      shadow: 'none',
+      unlocked: expertSolved.length >= 5,
     },
     {
       id: 'sql_explorer',
@@ -851,6 +863,7 @@ export default function Dashboard({
             <CircularProgress solved={basicSolved.length} total={basicProblems.length} color="#0f766e" label="기초" />
             <CircularProgress solved={interSolved.length} total={interProblems.length} color="#a66908" label="중급" />
             <CircularProgress solved={advSolved.length} total={advProblems.length} color="#cf222e" label="고급" />
+            <CircularProgress solved={expertSolved.length} total={expertProblems.length} color="#1a1a1a" label="챌린지" />
           </div>
         </div>
       </div>

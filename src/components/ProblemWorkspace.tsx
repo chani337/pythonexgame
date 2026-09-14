@@ -436,7 +436,7 @@ export default function ProblemWorkspace({
           <div>
             <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', marginBottom: '0.75rem' }}>
               <span className={`badge badge-${problem.difficulty}`}>
-                {problem.difficulty === 'basic' ? '기초' : problem.difficulty === 'intermediate' ? '중급' : '고급'}
+                {problem.difficulty === 'basic' ? '기초' : problem.difficulty === 'intermediate' ? '중급' : problem.difficulty === 'advanced' ? '고급' : '챌린지'}
               </span>
               <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
                 {problem.category}
