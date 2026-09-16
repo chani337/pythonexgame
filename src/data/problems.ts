@@ -1627,7 +1627,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q1",
     "title": "반복문 문제 1. 1부터 5까지 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "`for`문을 사용하여 1부터 5까지 출력하세요.",
     "constraints": [
@@ -1653,7 +1653,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q2",
     "title": "반복문 문제 2. 과일 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "리스트의 과일을 하나씩 출력하세요.",
     "constraints": [
@@ -1679,7 +1679,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q3",
     "title": "반복문 문제 3. 1부터 10까지 짝수 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "1부터 10까지 숫자 중 짝수만 출력하세요.",
     "constraints": [
@@ -1704,7 +1704,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q4",
     "title": "반복문 문제 4. 1부터 5까지 합 구하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "1부터 5까지 모든 숫자의 합을 구하세요.",
     "constraints": [
@@ -1730,7 +1730,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q5",
     "title": "반복문 문제 5. 문자열 반복 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "`\"파이썬\"`이라는 문자열을 5번 출력하세요.",
     "constraints": [
@@ -1755,7 +1755,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q6",
     "title": "반복문 문제 6. 5부터 1까지 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "숫자를 5부터 1까지 역순으로 출력하세요.",
     "constraints": [
@@ -1780,7 +1780,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q7",
     "title": "반복문 문제 7. 구구단 2단 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "반복문을 사용하여 구구단 2단을 출력하세요.",
     "constraints": [
@@ -1805,7 +1805,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q8",
     "title": "반복문 문제 8. 3의 배수 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "1부터 20까지 숫자 중 3의 배수만 출력하세요.",
     "constraints": [
@@ -1830,7 +1830,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q9",
     "title": "반복문 문제 9. while문으로 숫자 출력하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "`while`문을 사용하여 1부터 5까지 출력하세요.",
     "constraints": [
@@ -1856,7 +1856,7 @@ export const problems: Problem[] = [
     "id": "advanced_part7_q10",
     "title": "반복문 문제 10. 리스트 숫자의 합 구하기",
     "category": "반복문",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "리스트에 들어 있는 모든 숫자의 합을 반복문으로 구하세요.",
     "constraints": [
@@ -1883,7 +1883,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q1",
     "title": "함수 문제 1. 인사 함수 만들기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "호출하면 `\"안녕하세요\"`를 출력하는 함수를 만드세요.",
     "constraints": [
@@ -1909,7 +1909,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q2",
     "title": "함수 문제 2. 이름을 받아 인사하기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "이름을 전달받아 인사하는 함수를 만드세요.",
     "constraints": [
@@ -1936,7 +1936,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q3",
     "title": "함수 문제 3. 두 숫자 더하기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "두 숫자를 전달받아 더한 결과를 반환하는 함수를 만드세요.",
     "constraints": [
@@ -1964,7 +1964,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q4",
     "title": "함수 문제 4. 숫자 제곱하기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "숫자 하나를 받아 제곱한 값을 반환하는 함수를 만드세요.",
     "constraints": [
@@ -1990,7 +1990,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q5",
     "title": "함수 문제 5. 성인 여부 확인하기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "나이를 전달받아 성인인지 확인하는 함수를 만드세요.",
     "constraints": [
@@ -2018,7 +2018,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q6",
     "title": "함수 문제 6. 홀짝 확인 함수 만들기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "숫자를 전달받아 홀수인지 짝수인지 반환하세요.",
     "constraints": [
@@ -2046,7 +2046,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q7",
     "title": "함수 문제 7. 두 숫자 중 큰 값 찾기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "두 숫자를 전달받아 더 큰 값을 반환하는 함수를 만드세요.",
     "constraints": [
@@ -2072,7 +2072,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q8",
     "title": "함수 문제 8. 가격 할인 함수 만들기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "상품 가격을 전달받아 10% 할인된 가격을 반환하세요.",
     "constraints": [
@@ -2099,7 +2099,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q9",
     "title": "함수 문제 9. 리스트 값 출력 함수 만들기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "리스트를 전달받아 리스트의 값을 하나씩 출력하는 함수를 만드세요.",
     "constraints": [
@@ -2126,7 +2126,7 @@ export const problems: Problem[] = [
     "id": "advanced_part8_q10",
     "title": "함수 문제 10. 점수 등급 함수 만들기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "점수를 전달받아 등급을 반환하는 함수를 만드세요.",
     "constraints": [
@@ -2156,7 +2156,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q1",
     "title": "딕셔너리 문제 1. 학생 정보 만들기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "이름과 나이를 딕셔너리에 저장하고 출력하세요.",
     "constraints": [
@@ -2183,7 +2183,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q2",
     "title": "딕셔너리 문제 2. 특정 값 출력하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "학생 딕셔너리에서 이름만 출력하세요.",
     "constraints": [
@@ -2209,7 +2209,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q3",
     "title": "딕셔너리 문제 3. 새로운 값 추가하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "학생 딕셔너리에 `\"major\"` 정보를 추가하세요.",
     "constraints": [
@@ -2235,7 +2235,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q4",
     "title": "딕셔너리 문제 4. 값 변경하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "학생의 나이를 `20`에서 `21`로 변경하세요.",
     "constraints": [
@@ -2260,7 +2260,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q5",
     "title": "딕셔너리 문제 5. 값 삭제하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "딕셔너리에서 나이 정보를 삭제하세요.",
     "constraints": [
@@ -2286,7 +2286,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q6",
     "title": "딕셔너리 문제 6. 모든 키 출력하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "학생 정보 딕셔너리의 모든 키를 출력하세요.",
     "constraints": [
@@ -2312,7 +2312,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q7",
     "title": "딕셔너리 문제 7. 모든 값 출력하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "학생 정보 딕셔너리의 모든 값을 출력하세요.",
     "constraints": [
@@ -2338,7 +2338,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q8",
     "title": "딕셔너리 문제 8. 키와 값 함께 출력하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "딕셔너리의 키와 값을 하나씩 출력하세요.",
     "constraints": [
@@ -2364,7 +2364,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q9",
     "title": "딕셔너리 문제 9. 상품 가격 조회하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "상품 이름을 키로, 가격을 값으로 저장한 딕셔너리에서 `\"키보드\"`의 가격을 출력하세요.",
     "constraints": [
@@ -2391,7 +2391,7 @@ export const problems: Problem[] = [
     "id": "advanced_part9_q10",
     "title": "딕셔너리 문제 10. 학생 점수 확인하기",
     "category": "딕셔너리",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "학생별 점수를 딕셔너리에 저장하고, 80점 이상인 학생의 이름만 출력하세요.",
     "constraints": [
@@ -2498,7 +2498,7 @@ export const problems: Problem[] = [
     "id": "pandas_q2",
     "title": "Pandas 실전 2. 90점 이상 필터링",
     "category": "Pandas",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "학생 데이터프레임에서 점수가 90점 이상인 데이터의 `\"이름\"` 열을 리스트로 출력하세요.",
     "constraints": [
@@ -2551,7 +2551,7 @@ export const problems: Problem[] = [
     "id": "algorithm_q1",
     "title": "알고리즘 1. 회문(Palindrome) 판별하기",
     "category": "문자열",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "단어가 거꾸로 읽어도 같은 회문(Palindrome)인지 판별하는 함수 `is_palindrome(word)`를 작성하고, `\"kayak\"`과 `\"python\"`에 대해 실행한 결과를 각각 출력하세요.",
     "constraints": [
@@ -2577,7 +2577,7 @@ export const problems: Problem[] = [
     "id": "algorithm_q2",
     "title": "알고리즘 2. 피보나치 수열 10번째 항 구하기",
     "category": "함수",
-    "difficulty": "advanced",
+    "difficulty": "intermediate",
     "type": "coding",
     "description": "피보나치 수열(1, 1, 2, 3, 5, 8, 13, 21, 34, 55...)의 10번째 항의 값을 출력하는 코드를 작성하세요.",
     "constraints": [
