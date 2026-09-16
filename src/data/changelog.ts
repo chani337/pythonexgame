@@ -8,6 +8,14 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-09-16',
+    title: '파이썬 문제 난이도 라벨 정정',
+    items: [
+      '"1부터 5까지 출력하기", "두 숫자 더하기", "학생 정보 만들기"처럼 실제로는 기초 수준인 반복문/함수/딕셔너리 문제 30개가 "고급"으로 잘못 표시되어 있던 것을 "중급"으로 바로잡았어요.',
+      'Pandas 필터링, 팩토리얼/피보나치 응용 문제 3개도 같은 이유로 "중급"으로 조정했어요. 이제 "고급"은 재귀, 이진 탐색, 정렬 구현, 다형성 같은 진짜 고급 문제만 남았어요.',
+    ],
+  },
+  {
     date: '2026-09-14',
     title: '"챌린지" 난이도 단계 신설',
     items: [
