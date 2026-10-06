@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone, Users, Activity } from 'lucide-react';
 import type { Problem } from '../data/problems';
-import { useAuth, EXCLUDED_LEADERBOARD_IDS, ADMIN_EMAIL } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import type { LeaderboardUser } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
@@ -22,72 +22,49 @@ const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'algorithm', label: '알고리즘' },
 ];
 
-// Solved-problem counts for the "이번 주"/per-language tabs -- computed
-// on demand (only when that tab is selected) since the default "전체" view
-// already has realtime updates handled by AuthContext's refreshLeaderboard.
+// Solved-problem counts for the "이번 주"/per-language tabs, read from
+// server-side aggregate views (migration 001).
 //
-// Language isn't stored server-side (only in the bundled problems.ts), so
-// this can't just read an aggregate view like the "전체" tab does -- it
-// still needs every raw (user_id, problem_id) row to join against the local
-// language map. PostgREST caps a single response at 1000 rows, so this
-// pages through with .range() until a short page signals the end, instead
-// of doing one unbounded select that would silently truncate once the
-// table passed 1000 rows.
-const PAGE_SIZE = 1000;
-async function fetchAllSolvedRows(mode: RankingMode): Promise<{ user_id: string; problem_id: string }[]> {
-  const rows: { user_id: string; problem_id: string }[] = [];
-  for (let from = 0; ; from += PAGE_SIZE) {
-    let query = supabase
-      .from('user_solved_problems')
-      .select('user_id, problem_id, solved_at')
-      .order('id', { ascending: true })
-      .range(from, from + PAGE_SIZE - 1);
-    if (mode === 'week') {
-      const now = new Date();
-      const daysSinceMonday = (now.getDay() + 6) % 7;
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - daysSinceMonday);
-      monday.setHours(0, 0, 0, 0);
-      query = query.gte('solved_at', monday.toISOString());
-    }
-    const { data, error } = await query;
-    if (error || !data) break;
-    rows.push(...data);
-    if (data.length < PAGE_SIZE) break;
-  }
-  return rows;
-}
-
-async function fetchFilteredLeaderboard(mode: RankingMode, problems: Problem[]): Promise<LeaderboardUser[]> {
+// This used to page through every row of user_solved_problems with .range()
+// and count client-side, because `language` only existed in the bundled
+// problems.ts and there was nothing to join against in the database. Two
+// problems with that: it needed a public SELECT policy on the raw table (so
+// anyone could enumerate who solved what and when), and an anonymous visitor
+// downloaded the entire table on every tab switch. public.problems now
+// mirrors problems.ts including `language`, so the grouping happens in the
+// view and each tab is a single bounded request.
+//
+// Hidden accounts (admin/test/manipulation) are filtered inside the views, so
+// EXCLUDED_LEADERBOARD_IDS is no longer consulted here -- a client-side list
+// could always be edited away in devtools anyway.
+async function fetchFilteredLeaderboard(mode: RankingMode): Promise<LeaderboardUser[]> {
   if (mode === 'all') return [];
 
-  const langById = new Map(problems.map((p) => [p.id, p.language || 'python']));
-  const data = await fetchAllSolvedRows(mode);
+  const query =
+    mode === 'week'
+      ? supabase
+          .from('weekly_leaderboard_public')
+          .select('id, display_name, streak, solved_count')
+      : supabase
+          .from('language_leaderboard_public')
+          .select('id, display_name, streak, solved_count')
+          .eq('language', mode);
 
-  const counts: Record<string, number> = {};
-  data.forEach((row: { user_id: string; problem_id: string }) => {
-    if (mode !== 'week' && langById.get(row.problem_id) !== mode) return;
-    counts[row.user_id] = (counts[row.user_id] || 0) + 1;
-  });
+  const { data, error } = await query
+    .order('solved_count', { ascending: false })
+    .order('streak', { ascending: false })
+    .limit(10);
 
-  const userIds = Object.keys(counts).filter((uid) => !EXCLUDED_LEADERBOARD_IDS.includes(uid));
-  if (userIds.length === 0) return [];
+  if (error || !data) return [];
 
-  const { data: profs } = await supabase.from('leaderboard_public').select('id, display_name, streak').in('id', userIds);
-  const profMap = new Map((profs || []).map((p: any) => [p.id, p]));
-
-  return userIds
-    .map((uid) => ({
-      id: uid,
-      display_name: profMap.get(uid)?.display_name || '러너_' + uid.slice(0, 5),
-      email: '',
-      streak: profMap.get(uid)?.streak || 0,
-      solved_count: counts[uid],
-    }))
-    .sort((a, b) => b.solved_count - a.solved_count || b.streak - a.streak)
-    .slice(0, 10);
+  return data.map((row: any) => ({
+    id: row.id,
+    display_name: row.display_name || '러너_' + String(row.id).slice(0, 5),
+    email: '',
+    streak: row.streak || 0,
+    solved_count: row.solved_count || 0,
+  }));
 }
-
 
 // Member-count and solved-count-distribution stats for the admin-only
 // dashboard section. leaderboard_public returns exactly one row per profile
@@ -142,8 +119,10 @@ export default function Dashboard({
   onUnlockAll,
   onNavigateToChangelog,
 }: DashboardProps) {
-  const { user, recentActivity } = useAuth();
-  const isMasterAdmin = user?.email?.toLowerCase() === ADMIN_EMAIL;
+  const { user, profile, recentActivity } = useAuth();
+  // UI convenience only; the admin stats come from a view anyone may read,
+  // and board moderation is enforced by RLS.
+  const isMasterAdmin = profile?.is_admin === true;
 
   // 관리자 전용 통계 (전체 회원수 / 활동 회원 / 해결 분포)
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
@@ -466,7 +445,7 @@ export default function Dashboard({
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.88rem', maxWidth: '580px', lineHeight: '1.6' }}>
             {isMasterAdmin
-              ? `${ADMIN_EMAIL} 관리자 전용 모드입니다. 아래 버튼을 눌러 모든 문제 클리어 및 뱃지 전체 해금을 1초 만에 실행하실 수 있습니다.`
+              ? `${user?.email ?? '관리자'} 관리자 전용 모드입니다. 아래 버튼을 눌러 모든 문제 클리어 및 뱃지 전체 해금을 1초 만에 실행하실 수 있습니다.`
               : '기초부터 차근차근 고급 개념까지! PyQuests와 함께 다양한 프로그래밍 언어를 브라우저에서 직접 실행하며 코딩 마스터 지름길을 걸어보세요.'}
           </p>
         </div>
@@ -474,7 +453,7 @@ export default function Dashboard({
           {isMasterAdmin && onUnlockAll && (
             <button
               onClick={() => {
-                if (window.confirm(isMasterAdmin ? `${ADMIN_EMAIL} 계정에 모든 문제(${totalCount}개) 해결 완료 및 뱃지 전체 해금을 적용하시겠습니까?` : `모든 문제(${totalCount}개)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?`)) {
+                if (window.confirm(`모든 문제(${totalCount}개)를 해결 완료하고 모든 학습 뱃지를 해금하시겠습니까?`)) {
                   onUnlockAll();
                 }
               }}
@@ -938,12 +917,12 @@ export default function Dashboard({
       </div>
 
       {/* Global Leaderboard Section */}
-      <LeaderboardWidget problems={problems} />
+      <LeaderboardWidget />
     </div>
   );
 }
 
-function LeaderboardWidget({ problems }: { problems: Problem[] }) {
+function LeaderboardWidget() {
   const { leaderboard, isConfigured, setAuthModalOpen, user } = useAuth();
   const [profileEditOpen, setProfileEditOpen] = useState(false);
   const [mode, setMode] = useState<RankingMode>('all');
@@ -954,7 +933,7 @@ function LeaderboardWidget({ problems }: { problems: Problem[] }) {
     if (mode === 'all') return;
     let cancelled = false;
     setIsLoadingFiltered(true);
-    fetchFilteredLeaderboard(mode, problems).then((result) => {
+    fetchFilteredLeaderboard(mode).then((result) => {
       if (!cancelled) {
         setFilteredList(result);
         setIsLoadingFiltered(false);
@@ -963,7 +942,7 @@ function LeaderboardWidget({ problems }: { problems: Problem[] }) {
     return () => {
       cancelled = true;
     };
-  }, [mode, problems]);
+  }, [mode]);
 
   const displayList = mode === 'all' ? leaderboard : filteredList;
 

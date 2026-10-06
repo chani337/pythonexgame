@@ -27,6 +27,12 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS solved_count INT DEFAULT 0;
 -- the client chose to filter.
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS hidden BOOLEAN NOT NULL DEFAULT false;
 
+-- Grants support-board moderation and the admin dashboard. Replaces an
+-- ADMIN_USER_ID UUID that was hardcoded in three source files and three RLS
+-- policies in a public repository. Write-protected like the stat columns --
+-- only service_role (the SQL editor) can set it.
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS is_admin BOOLEAN NOT NULL DEFAULT false;
+
 -- streak / last_solved_date / solved_count are DERIVED, not client-reported.
 -- refresh_solver_stats() recomputes them from user_solved_problems on every
 -- insert/delete; protect_profile_stats() discards whatever a client sends.
@@ -187,6 +193,44 @@ CREATE OR REPLACE VIEW public.recent_activity_public AS
 
 GRANT SELECT ON public.recent_activity_public TO anon, authenticated;
 
+-- Dashboard's per-language and weekly ranking tabs used to page through every
+-- row of user_solved_problems with .range() and count client-side -- which
+-- needed the public SELECT policy that STEP 7 removes, and meant anonymous
+-- visitors downloaded the whole table on every tab switch. public.problems
+-- (STEP 1) carries `language`, so the join can finally happen server-side.
+CREATE OR REPLACE VIEW public.language_leaderboard_public AS
+  SELECT
+    pr.id,
+    pr.display_name,
+    pr.streak,
+    p.language,
+    COUNT(*)::int AS solved_count
+  FROM public.user_solved_problems s
+  JOIN public.problems p  ON p.id  = s.problem_id
+  JOIN public.profiles pr ON pr.id = s.user_id
+  WHERE pr.hidden = false
+  GROUP BY pr.id, pr.display_name, pr.streak, p.language;
+
+GRANT SELECT ON public.language_leaderboard_public TO anon, authenticated;
+
+-- date_trunc('week') starts weeks on Monday, matching the client's previous
+-- "days since Monday" arithmetic. Evaluated in Asia/Seoul so the week rolls
+-- over at local midnight rather than UTC.
+CREATE OR REPLACE VIEW public.weekly_leaderboard_public AS
+  SELECT
+    pr.id,
+    pr.display_name,
+    pr.streak,
+    COUNT(*)::int AS solved_count
+  FROM public.user_solved_problems s
+  JOIN public.profiles pr ON pr.id = s.user_id
+  WHERE pr.hidden = false
+    AND (s.solved_at AT TIME ZONE 'Asia/Seoul')
+        >= date_trunc('week', NOW() AT TIME ZONE 'Asia/Seoul')
+  GROUP BY pr.id, pr.display_name, pr.streak;
+
+GRANT SELECT ON public.weekly_leaderboard_public TO anon, authenticated;
+
 -- 2b. User Read Chapters Table (학습 가이드 챕터 완료 진도)
 CREATE TABLE IF NOT EXISTS public.user_read_chapters (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -270,9 +314,25 @@ REVOKE ALL ON public.board_posts FROM anon, authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.board_posts TO authenticated;
 GRANT ALL ON public.board_posts TO service_role;
 
+-- Reads the caller's own flag. SECURITY DEFINER so it doesn't depend on
+-- profiles' SELECT policy, STABLE so the planner calls it once per statement
+-- instead of once per row.
+CREATE OR REPLACE FUNCTION public.is_admin()
+RETURNS BOOLEAN
+LANGUAGE sql
+STABLE
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+  SELECT COALESCE((SELECT p.is_admin FROM public.profiles p WHERE p.id = auth.uid()), false);
+$$;
+
+REVOKE ALL ON FUNCTION public.is_admin() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.is_admin() TO anon, authenticated;
+
 DROP POLICY IF EXISTS "board_select_own_or_admin" ON public.board_posts;
 CREATE POLICY "board_select_own_or_admin" ON public.board_posts
-  FOR SELECT USING (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da');
+  FOR SELECT USING (auth.uid() = user_id OR public.is_admin());
 
 DROP POLICY IF EXISTS "board_insert_own" ON public.board_posts;
 CREATE POLICY "board_insert_own" ON public.board_posts
@@ -280,12 +340,12 @@ CREATE POLICY "board_insert_own" ON public.board_posts
 
 DROP POLICY IF EXISTS "board_update_own_or_admin" ON public.board_posts;
 CREATE POLICY "board_update_own_or_admin" ON public.board_posts
-  FOR UPDATE USING (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da')
-  WITH CHECK (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da');
+  FOR UPDATE USING (auth.uid() = user_id OR public.is_admin())
+  WITH CHECK (auth.uid() = user_id OR public.is_admin());
 
 DROP POLICY IF EXISTS "board_delete_own_or_admin" ON public.board_posts;
 CREATE POLICY "board_delete_own_or_admin" ON public.board_posts
-  FOR DELETE USING (auth.uid() = user_id OR auth.uid() = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da');
+  FOR DELETE USING (auth.uid() = user_id OR public.is_admin());
 
 -- 3. Automatic Profile Creation Trigger on Auth Signup
 CREATE OR REPLACE FUNCTION public.handle_new_user()
@@ -379,7 +439,19 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
-  -- refresh_solver_stats() sets this flag before its own UPDATE.
+  -- Only the client roles are untrusted. PostgREST sets the role per request
+  -- (anon / authenticated / service_role), and the Supabase SQL editor runs
+  -- as postgres -- so an administrator fixing a row by hand, and the
+  -- service_role key, both still work. Without this check the trigger also
+  -- silently swallowed `UPDATE profiles SET hidden = true` from the SQL
+  -- editor, which is exactly how an account gets hidden or made admin.
+  IF current_user NOT IN ('anon', 'authenticated') THEN
+    RETURN NEW;
+  END IF;
+
+  -- refresh_solver_stats() sets this flag before its own UPDATE. It is
+  -- SECURITY DEFINER so current_user is already the owner there, but the
+  -- flag keeps the intent explicit and covers the backfill block too.
   IF COALESCE(current_setting('pyquests.trusted_stats_write', true), 'off') = 'on' THEN
     RETURN NEW;
   END IF;
@@ -388,6 +460,9 @@ BEGIN
   NEW.last_solved_date := OLD.last_solved_date;
   NEW.solved_count     := OLD.solved_count;
   NEW.hidden           := OLD.hidden;
+  -- Without this, `update({ is_admin: true })` would hand anyone moderation
+  -- over every support-board post.
+  NEW.is_admin         := OLD.is_admin;
   RETURN NEW;
 END;
 $$;

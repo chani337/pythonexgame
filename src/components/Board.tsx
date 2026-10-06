@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { MessageCircle, Plus, ArrowLeft, Send, Lock } from 'lucide-react';
-import { useAuth, ADMIN_USER_ID } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 
 interface BoardPost {
@@ -20,8 +20,11 @@ function formatDate(iso: string) {
 }
 
 export default function Board() {
-  const { user } = useAuth();
-  const isAdmin = user?.id === ADMIN_USER_ID;
+  const { user, profile } = useAuth();
+  // UI convenience only -- the real boundary is the board_posts RLS
+  // policies, which call public.is_admin(). Flipping this in devtools shows
+  // the admin controls but every request still comes back empty or denied.
+  const isAdmin = profile?.is_admin === true;
 
   const [posts, setPosts] = useState<BoardPost[]>([]);
   const [authorNames, setAuthorNames] = useState<Record<string, string>>({});

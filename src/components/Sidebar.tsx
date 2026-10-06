@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Megaphone, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon } from 'lucide-react';
-import { useAuth, ADMIN_USER_ID } from '../contexts/AuthContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
@@ -62,7 +62,8 @@ export default function Sidebar({
   }, [isCollapsed]);
 
   const { user, profile, setAuthModalOpen, signOut } = useAuth();
-  const isAdmin = user?.id === ADMIN_USER_ID;
+  // UI convenience only; board_posts RLS is what actually enforces this.
+  const isAdmin = profile?.is_admin === true;
 
   // 답변 대기 중인(status='답변대기') 고객센터 문의 수 -- 관리자가 답변을 달면
   // status가 '답변완료'로 바뀌므로 별도 read/unread 컬럼 없이 그대로 배지로 씀.

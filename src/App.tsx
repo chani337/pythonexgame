@@ -256,22 +256,26 @@ print("변환 리스트:", result)
     syncSolvedToSupabase(problemId);
   };
 
+  // Admin-only shortcut that marks everything solved. It goes through the
+  // merge_guest_progress RPC rather than a direct upsert for two reasons:
+  // the 30-inserts-per-minute trigger from migration 001 would reject 377
+  // rows outright, and streak/last_solved_date are server-derived now, so
+  // the old `setStreak(30)` + stat upsert was writing values the database
+  // discards.
   const handleUnlockAllProblems = async () => {
     const allIds = problems.map((p) => p.id);
     setSolvedIds(allIds);
-    setStreak(30);
     setSandboxRunCount(50);
-    const today = new Date().toISOString().split('T')[0];
-    setLastSolvedDate(today);
 
-    // Batch sync to Supabase if logged in
     if (user) {
       try {
-        const records = allIds.map((pid) => ({
-          user_id: user.id,
-          problem_id: pid,
-        }));
-        await supabase.from('user_solved_problems').upsert(records, { onConflict: 'user_id,problem_id' });
+        const { error } = await supabase.rpc('merge_guest_progress', {
+          p_problem_ids: allIds,
+        });
+        if (error) {
+          console.error('Unlock all failed:', error);
+          return;
+        }
         await syncSandboxRunsToSupabase(50);
       } catch (err) {
         console.error('Unlock all sync error:', err);

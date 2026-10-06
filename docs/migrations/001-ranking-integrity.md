@@ -156,7 +156,7 @@ WHERE id IN (
 );
 ```
 
-`hidden`은 `protect_profile_stats` 트리거가 보호하므로 클라이언트가 스스로 해제할 수 없습니다. **SQL Editor(service_role)에서만** 변경됩니다.
+`hidden`은 `protect_profile_stats` 트리거가 보호하므로 **클라이언트(anon/authenticated)는 스스로 해제할 수 없고**, SQL Editor(postgres)와 service_role 키에서만 변경됩니다.
 
 ### 2-5. 클라이언트 배포
 
@@ -221,7 +221,8 @@ UPDATE profiles SET streak = 9999 WHERE email = 'cheater@test.local';
 |---|---|---|
 | 1 | 존재하지 않는 `problem_id` INSERT | FK 위반으로 거부 |
 | 2 | 정상 `problem_id` INSERT | 통과, `solved_count`/`streak`/`last_solved_date` 자동 갱신 |
-| 3 | `UPDATE profiles SET streak=9999, solved_count=9999, hidden=true` | **에러 없이 무시**, 원래 값 유지 |
+| 3 | `authenticated` 역할로 `UPDATE profiles SET streak=9999, solved_count=9999, hidden=true` | **에러 없이 무시**, 원래 값 유지 |
+| 3b | `postgres` 역할(SQL 에디터)로 같은 UPDATE | 정상 반영 — 관리자는 손으로 고칠 수 있어야 함 |
 | 4 | `UPDATE profiles SET display_name=...` | 정상 동작 (보호 대상 아님) |
 | 5 | 오늘·어제·그제 연속 | streak 3 |
 | 6 | 어제·그제만 (오늘 미해결) | streak 2 — 아침에 0으로 리셋되지 않음 |
@@ -274,10 +275,24 @@ VALUES ('<본인 UUID>', 'definitely_not_a_real_problem');
 
 ```sql
 -- (2) 스트릭이 클라이언트 값을 무시하는지
+--
+-- 주의: SQL 에디터는 postgres 역할로 실행되고, 트리거는 anon/authenticated
+-- 역할만 막습니다. 그냥 UPDATE 하면 성공하는 것이 정상입니다 (관리자가
+-- hidden/is_admin 을 손으로 고칠 수 있어야 하므로). 클라이언트 입장을
+-- 재현하려면 역할을 바꿔서 테스트하세요.
+SET ROLE authenticated;
+SELECT set_config('request.jwt.claim.sub', '<본인 UUID>', false);
 UPDATE public.profiles SET streak = 9999 WHERE id = '<본인 UUID>';
+RESET ROLE;
 SELECT streak FROM public.profiles WHERE id = '<본인 UUID>';
 -- 기대: 9999가 아니라 원래 값 (에러 없이 무시됨)
 ```
+
+> `protect_profile_stats` 트리거는 `current_user NOT IN ('anon','authenticated')`
+> 이면 통과시킵니다. PostgREST가 요청마다 역할을 설정하므로 브라우저에서 온
+> 요청은 전부 anon/authenticated이고, SQL 에디터(postgres)와 service_role 키는
+> 예외입니다. **이 예외가 없으면 아래 2-4의 `hidden = true` 설정이 조용히
+> 무시됩니다** — 실제로 그렇게 만들었다가 테스트에서 잡았습니다.
 
 ```sql
 -- (3) 스트릭 계산이 맞는지

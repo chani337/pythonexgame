@@ -82,6 +82,16 @@ RETURNS TRIGGER
 LANGUAGE plpgsql
 AS $$
 BEGIN
+  -- Only the client roles are untrusted. PostgREST sets the role per request
+  -- (anon / authenticated / service_role) and the Supabase SQL editor runs as
+  -- postgres, so an administrator fixing a row by hand and the service_role
+  -- key both still work. Without this the trigger also silently swallowed
+  -- `UPDATE profiles SET hidden = true` from the SQL editor -- which is
+  -- exactly how an account gets hidden.
+  IF current_user NOT IN ('anon', 'authenticated') THEN
+    RETURN NEW;
+  END IF;
+
   -- refresh_solver_stats() sets this before its own UPDATE.
   IF COALESCE(current_setting('pyquests.trusted_stats_write', true), 'off') = 'on' THEN
     RETURN NEW;
@@ -364,6 +374,44 @@ GRANT SELECT ON public.recent_activity_public TO anon, authenticated;
 
 COMMENT ON VIEW public.recent_activity_public IS
   'Last 50 solves with display_name only, no user_id. Exists so user_solved_problems does not need a public SELECT policy.';
+
+-- Dashboard's per-language and weekly ranking tabs used to page through every
+-- row of user_solved_problems with .range() and count client-side -- which
+-- needed the public SELECT policy that STEP 7 removes, and meant anonymous
+-- visitors downloaded the whole table on every tab switch. public.problems
+-- (STEP 1) carries `language`, so the join can finally happen server-side.
+CREATE OR REPLACE VIEW public.language_leaderboard_public AS
+  SELECT
+    pr.id,
+    pr.display_name,
+    pr.streak,
+    p.language,
+    COUNT(*)::int AS solved_count
+  FROM public.user_solved_problems s
+  JOIN public.problems p  ON p.id  = s.problem_id
+  JOIN public.profiles pr ON pr.id = s.user_id
+  WHERE pr.hidden = false
+  GROUP BY pr.id, pr.display_name, pr.streak, p.language;
+
+GRANT SELECT ON public.language_leaderboard_public TO anon, authenticated;
+
+-- date_trunc('week') starts weeks on Monday, matching the client's previous
+-- "days since Monday" arithmetic. Evaluated in Asia/Seoul so the week rolls
+-- over at local midnight rather than UTC.
+CREATE OR REPLACE VIEW public.weekly_leaderboard_public AS
+  SELECT
+    pr.id,
+    pr.display_name,
+    pr.streak,
+    COUNT(*)::int AS solved_count
+  FROM public.user_solved_problems s
+  JOIN public.profiles pr ON pr.id = s.user_id
+  WHERE pr.hidden = false
+    AND (s.solved_at AT TIME ZONE 'Asia/Seoul')
+        >= date_trunc('week', NOW() AT TIME ZONE 'Asia/Seoul')
+  GROUP BY pr.id, pr.display_name, pr.streak;
+
+GRANT SELECT ON public.weekly_leaderboard_public TO anon, authenticated;
 
 
 -- ---------------------------------------------------------------------

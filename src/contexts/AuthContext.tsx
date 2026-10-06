@@ -13,6 +13,14 @@ export interface UserProfile {
   last_solved_date: string | null;
   sandbox_runs: number;
   solvedCount?: number;
+  // Both are server-owned (migrations 001/002): write-protected by the
+  // profiles_protect_stats trigger, so the client only ever reads them.
+  // `hidden` keeps an account out of the public leaderboard and activity
+  // feed; `is_admin` grants support-board moderation and the admin
+  // dashboard. These replaced a hardcoded ADMIN_USER_ID and a hardcoded
+  // list of test-account UUIDs that sat in a public repository.
+  hidden?: boolean;
+  is_admin?: boolean;
 }
 
 export interface LeaderboardUser {
@@ -77,22 +85,15 @@ function purgeOtherAccountsLocalStorage(keepId: string) {
   keysToRemove.forEach((k) => localStorage.removeItem(k));
 }
 
-// profiles.email is no longer publicly readable (RLS locks it to the owning
-// row), so the admin's row is excluded from public leaderboards by id
-// instead of by email.
-export const ADMIN_EMAIL = 'chani7873@daum.net';
-export const ADMIN_USER_ID = 'cf1c67dd-2b5e-4f86-9a0b-d0dda805f3da';
-
-// Accounts that should never show up on the public leaderboard or activity
-// feed, even though they aren't the single ADMIN_USER_ID (used elsewhere
-// for actual admin authorization, e.g. the support board). Exported so
-// other leaderboard views (e.g. the weekly/per-language breakdowns in
-// Dashboard) apply the same exclusion.
-export const EXCLUDED_LEADERBOARD_IDS = [
-  ADMIN_USER_ID,
-  '5eb2fb93-7238-4f04-90b5-8d5706fd4c01', // '히히' (rksk252539) test account
-  'b14d9a0d-93df-42b6-81f0-b195f4c0795d', // '비밀' test account
-];
+// ADMIN_EMAIL / ADMIN_USER_ID and the EXCLUDED_LEADERBOARD_IDS list used to
+// live here. They named the exact account worth attacking (plus two test
+// accounts) in a public repository, and changing who the admin is meant
+// editing three RLS policies as well as three source files.
+//
+// Both are database flags now -- profiles.is_admin and profiles.hidden,
+// write-protected server-side (migrations 001/002). Read them off `profile`.
+// The leaderboard and activity-feed views filter `hidden` themselves, so
+// nothing client-side has to maintain an exclusion list any more.
 
 export const DEFAULT_LEADERBOARD: LeaderboardUser[] = [
   { id: 'default-runner-1', display_name: '알고리즘마스터', email: 'algo@pyquests.io', streak: 3, solved_count: 5 },
@@ -379,17 +380,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       }
 
-      // Admin account is excluded from the public leaderboard (recovery/testing data shouldn't rank)
-      let formatted = Object.values(userMap).filter((u) => !EXCLUDED_LEADERBOARD_IDS.includes(u.id));
+      // leaderboard_public already drops rows with profiles.hidden = true,
+      // so there is nothing left to filter here -- this used to re-apply a
+      // client-side UUID list that devtools could edit away.
+      let formatted = Object.values(userMap);
 
       // Guarantee active logged-in user OR guest runner is ALWAYS displayed on the leaderboard
       const activeUserId = user?.id || localStorage.getItem('pyquests_last_user_id') || 'local_runner';
       const activeUserEmail = user?.email || localStorage.getItem('pyquests_last_user_email') || 'local@pyquests.local';
-      // Was email-only (ADMIN_EMAIL), so logging in as any OTHER excluded
-      // account (e.g. a test account with no special email) let this "always
-      // show me" block re-add that account right after the DB-row filter
-      // above had just removed it.
-      const isActiveUserExcluded = activeUserEmail?.toLowerCase() === ADMIN_EMAIL || EXCLUDED_LEADERBOARD_IDS.includes(activeUserId);
+      // A hidden account must not be re-added by the "always show me" block
+      // below, which would otherwise put it back right after the view had
+      // filtered it out. Read from the profile rather than a hardcoded list,
+      // so hiding an account is a DB update with no deploy.
+      const isActiveUserExcluded = profile?.hidden === true;
 
       const userKey = `pyquests_solved_ids_${activeUserId}`;
       const savedLocal = localStorage.getItem(userKey);
