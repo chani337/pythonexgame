@@ -47,7 +47,7 @@ function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
 
-  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncStatsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen } = useAuth();
+  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncSandboxRunsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
@@ -249,9 +249,11 @@ print("변환 리스트:", result)
       setLastSolvedDate(today);
     }
 
-    // Sync to Supabase
+    // Sync to Supabase. The streak computed above is an optimistic local
+    // value for immediate feedback only -- migration 001 derives streak,
+    // last_solved_date and solved_count from user_solved_problems, and
+    // syncSolvedToSupabase re-reads the authoritative values afterwards.
     syncSolvedToSupabase(problemId);
-    syncStatsToSupabase(newStreak, today, sandboxRunCount);
   };
 
   const handleUnlockAllProblems = async () => {
@@ -270,7 +272,7 @@ print("변환 리스트:", result)
           problem_id: pid,
         }));
         await supabase.from('user_solved_problems').upsert(records, { onConflict: 'user_id,problem_id' });
-        await syncStatsToSupabase(30, today, 50);
+        await syncSandboxRunsToSupabase(50);
       } catch (err) {
         console.error('Unlock all sync error:', err);
       }
@@ -280,9 +282,7 @@ print("변환 리스트:", result)
   const handleIncrementSandboxRuns = () => {
     const newCount = sandboxRunCount + 1;
     setSandboxRunCount(newCount);
-    if (lastSolvedDate) {
-      syncStatsToSupabase(streak, lastSolvedDate, newCount);
-    }
+    syncSandboxRunsToSupabase(newCount);
   };
 
   const handleSelectProblem = (problem: Problem) => {

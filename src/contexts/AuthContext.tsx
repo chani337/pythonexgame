@@ -24,10 +24,20 @@ export interface LeaderboardUser {
 }
 
 export interface ActivityEvent {
-  id: string; // `${userId}_${problemId}_${insertedAt}` so re-solves after a delete still get a fresh key
+  id: string; // `${displayName}_${problemId}_${solvedAt}` -- stable per solve, and user_id is no longer exposed
   displayName: string;
   problemTitle: string;
   insertedAt: number;
+}
+
+// One row of public.recent_activity_public: the last 50 solves with a
+// display name already joined on and hidden accounts filtered out. Replaces
+// reading user_solved_problems directly, which needed a public SELECT policy
+// on that table and let anyone enumerate who solved what.
+interface RecentActivityRow {
+  problem_id: string;
+  solved_at: string;
+  display_name: string | null;
 }
 
 const PROBLEM_TITLE_BY_ID = new Map(problems.map((p) => [p.id, p.title]));
@@ -108,7 +118,7 @@ interface AuthContextType {
   signInWithGoogle: () => Promise<{ error: any }>;
   signOut: () => Promise<void>;
   syncSolvedToSupabase: (problemId: string) => Promise<void>;
-  syncStatsToSupabase: (streak: number, lastSolvedDate: string, sandboxRuns: number) => Promise<void>;
+  syncSandboxRunsToSupabase: (sandboxRuns: number) => Promise<void>;
   fetchUserSolvedIds: () => Promise<string[]>;
   syncReadChapterToSupabase: (chapterId: string, isRead: boolean) => Promise<void>;
   fetchUserReadChapterIds: () => Promise<string[]>;
@@ -204,12 +214,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       refreshLeaderboard();
     }, 15000);
 
-    // Poll for new solves instead of relying solely on the Realtime
-    // websocket for the activity feed -- postgres_changes events aren't
-    // reaching the client on this project (confirmed: channel reports
-    // SUBSCRIBED with matching bindings, the write itself succeeds, but no
-    // INSERT/UPDATE message ever arrives, even after a project restart).
-    // This achieves the same UX without depending on that delivery.
+    // The activity feed is poll-only. Realtime postgres_changes never
+    // delivered on this project (channel reports SUBSCRIBED with matching
+    // bindings, the write succeeds, no message ever arrives), and after
+    // migration 001 an anonymous visitor can't SELECT user_solved_problems
+    // at all -- the feed reads public.recent_activity_public instead, and a
+    // view can't be a replication source. So there's nothing to fall back
+    // to and the INSERT binding was removed rather than left as dead code.
     seedRecentActivity();
     const activityIntervalId = setInterval(() => {
       pollRecentActivity();
@@ -223,9 +234,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       })
       .on('postgres_changes', { event: '*', schema: 'public', table: 'user_solved_problems' }, () => {
         refreshLeaderboard();
-      })
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'user_solved_problems' }, (payload) => {
-        handleNewSolveActivity(payload.new as { user_id: string; problem_id: string });
       })
       .subscribe();
 
@@ -254,7 +262,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           last_solved_date: null,
           sandbox_runs: 0,
         };
-        await supabase.from('profiles').upsert(newProf, { onConflict: 'id' });
+        // streak / last_solved_date / solved_count are derived server-side
+        // from user_solved_problems (migration 001) -- sending them is
+        // ignored by the profiles_protect_stats trigger, so only write the
+        // columns this client actually owns.
+        await supabase.from('profiles').upsert(
+          { id: userId, email: userEmail, display_name: newProf.display_name, sandbox_runs: 0 },
+          { onConflict: 'id' }
+        );
         setProfile(newProf);
       } else {
         setProfile(data);
@@ -431,8 +446,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured) return;
     try {
       const { data, error } = await supabase
-        .from('user_solved_problems')
-        .select('user_id, problem_id, solved_at')
+        .from('recent_activity_public')
+        .select('problem_id, solved_at, display_name')
         .order('solved_at', { ascending: false })
         .limit(10);
 
@@ -448,11 +463,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // handleNewSolveActivity in a loop -- that used to fire 10 sequential
       // lookups + state updates on every page load, which was visible as the
       // banner flickering through old names before landing on the real one.
-      const latestValid = data.find(
-        (row) => !EXCLUDED_LEADERBOARD_IDS.includes(row.user_id) && PROBLEM_TITLE_BY_ID.has(row.problem_id)
-      );
+      // Hidden accounts are already filtered out by the view; all that's
+      // left to skip is a problem id this build doesn't know the title for.
+      const latestValid = data.find((row) => PROBLEM_TITLE_BY_ID.has(row.problem_id));
       if (latestValid) {
-        await handleNewSolveActivity(latestValid);
+        handleNewSolveActivity(latestValid);
       }
     } catch (err) {
       console.error('Activity feed seed error:', err);
@@ -468,8 +483,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured) return;
     try {
       const { data, error } = await supabase
-        .from('user_solved_problems')
-        .select('user_id, problem_id, solved_at')
+        .from('recent_activity_public')
+        .select('problem_id, solved_at, display_name')
         .gt('solved_at', lastSeenSolvedAtRef.current)
         .order('solved_at', { ascending: true })
         .limit(20);
@@ -478,44 +493,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       lastSeenSolvedAtRef.current = data[data.length - 1].solved_at;
       for (const row of data) {
-        await handleNewSolveActivity(row);
+        handleNewSolveActivity(row);
       }
     } catch (err) {
       console.error('Activity feed poll error:', err);
     }
   };
 
-  // Turns a raw `user_solved_problems` row into a "OOO님이 방금 '문제'를
-  // 풀었어요!" feed entry for the dashboard. The display name is looked up
-  // from the public leaderboard view and the problem title from the local
-  // bundled data.
-  const handleNewSolveActivity = async (row: { user_id: string; problem_id: string }) => {
-    if (!row?.user_id || !row?.problem_id) return;
-    if (EXCLUDED_LEADERBOARD_IDS.includes(row.user_id)) return;
+  // Turns one public.recent_activity_public row into a "OOO님이 방금 '문제'를
+  // 풀었어요!" feed entry. The view joins display_name on and drops hidden
+  // accounts, so this no longer needs a per-row leaderboard lookup (it used
+  // to fire one extra request per feed entry) and never sees a user_id.
+  const handleNewSolveActivity = (row: RecentActivityRow) => {
+    if (!row?.problem_id || !row.display_name) return;
 
     const problemTitle = PROBLEM_TITLE_BY_ID.get(row.problem_id);
     if (!problemTitle) return;
 
-    try {
-      const { data, error } = await supabase
-        .from('leaderboard_public')
-        .select('display_name')
-        .eq('id', row.user_id)
-        .single();
+    const entry: ActivityEvent = {
+      id: `${row.display_name}_${row.problem_id}_${row.solved_at}`,
+      displayName: row.display_name,
+      problemTitle,
+      insertedAt: Date.now(),
+    };
 
-      if (error || !data?.display_name) return;
-
-      const entry: ActivityEvent = {
-        id: `${row.user_id}_${row.problem_id}_${Date.now()}`,
-        displayName: data.display_name,
-        problemTitle,
-        insertedAt: Date.now(),
-      };
-
-      setRecentActivity((prev) => [entry, ...prev].slice(0, MAX_RECENT_ACTIVITY));
-    } catch (err) {
-      console.error('Activity feed lookup error:', err);
-    }
+    setRecentActivity((prev) => [entry, ...prev].slice(0, MAX_RECENT_ACTIVITY));
   };
 
   const fetchUserSolvedIds = async (): Promise<string[]> => {
@@ -634,7 +636,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         id: res.data.user.id,
         email,
         display_name: cleanName,
-        streak: 0,
         sandbox_runs: 0,
       });
       refreshLeaderboard();
@@ -713,6 +714,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         console.error('profiles updated_at touch failed:', updateError);
       }
 
+      // streak / solved_count / last_solved_date are recomputed by the
+      // refresh_solver_stats trigger on the insert above, so re-read the row
+      // to show the authoritative values instead of the optimistic ones the
+      // UI computed locally.
+      await refreshProfileStats();
       refreshLeaderboard();
     } catch (err) {
       console.error('Sync solved error:', err);
@@ -772,23 +778,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const syncStatsToSupabase = async (streak: number, lastSolvedDate: string, sandboxRuns: number) => {
+  // Re-reads the server-derived stat columns after a solve. They are owned
+  // by the refresh_solver_stats trigger, not by this client.
+  const refreshProfileStats = async () => {
     if (!isSupabaseConfigured || !user) return;
     try {
-      await supabase.from('profiles').upsert({
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('streak, last_solved_date, sandbox_runs')
+        .eq('id', user.id)
+        .single();
+
+      if (error || !data) return;
+      setProfile((prev) => (prev ? { ...prev, ...data } : prev));
+    } catch (err) {
+      console.error('Refresh profile stats error:', err);
+    }
+  };
+
+  // Sandbox run count is the only stat this client still owns -- it has no
+  // server-side source to derive from. streak / last_solved_date /
+  // solved_count used to be written here from client-side arithmetic, which
+  // meant anyone could set them to whatever they liked; migration 001 derives
+  // them from user_solved_problems and ignores client writes.
+  const syncSandboxRunsToSupabase = async (sandboxRuns: number) => {
+    if (!isSupabaseConfigured || !user) return;
+    try {
+      const { error } = await supabase.from('profiles').upsert({
         id: user.id,
         email: user.email || '',
         display_name: profile?.display_name || user.email?.split('@')[0] || '러너',
-        streak,
-        last_solved_date: lastSolvedDate,
         sandbox_runs: sandboxRuns,
         updated_at: new Date().toISOString(),
       }, { onConflict: 'id' });
 
-      setProfile((prev) => prev ? { ...prev, streak, last_solved_date: lastSolvedDate, sandbox_runs: sandboxRuns } : null);
-      refreshLeaderboard();
+      if (error) {
+        console.error('profiles sandbox_runs sync failed:', error);
+        return;
+      }
+
+      setProfile((prev) => prev ? { ...prev, sandbox_runs: sandboxRuns } : null);
     } catch (err) {
-      console.error('Sync stats error:', err);
+      console.error('Sync sandbox runs error:', err);
     }
   };
 
@@ -901,7 +932,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signInWithGoogle,
         signOut,
         syncSolvedToSupabase,
-        syncStatsToSupabase,
+        syncSandboxRunsToSupabase,
         fetchUserSolvedIds,
         syncReadChapterToSupabase,
         fetchUserReadChapterIds,

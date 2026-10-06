@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "oxlint",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "sync:problems": "node scripts/extract-problem-ids.mjs",
+    "check:problems": "node scripts/extract-problem-ids.mjs --check"
   },
   "dependencies": {
     "@codemirror/lang-java": "^6.0.2",
