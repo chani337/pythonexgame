@@ -265,7 +265,33 @@ the following Content Security Policy directive: "script-src ..."
 | `connect-src` 위반 | Supabase URL 오타 또는 `wss://` 누락 |
 | `style-src` 위반 | `'unsafe-inline'`이 이미 있으므로 나오지 않아야 합니다. 나오면 폰트 CDN 경로 확인 |
 
-### 5-3. 강제 전환
+### 5-3. 강제 전환 — 2026-10-06 적용 완료
+
+Report-Only 관찰에서 위반 0건을 확인한 뒤 전환했습니다. 실제 브라우저에서 거친 경로:
+
+| 확인한 것 | 결과 |
+|---|---|
+| 메인 / 랭킹 / 이번주 / 언어별 탭 | 위반 없음 |
+| 로그인 | 위반 없음 |
+| **Python 문제 실행** | `[PyQuests] Pyodide v0.26.2 로드 성공 — jsDelivr CDN` — SRI 통과, wasm 13MB 다운로드 정상 |
+| **SQL 문제 실행** | `Loading sqlite3` / `Loaded sqlite3` — 휠 지연 로드 정상 |
+| **JavaScript 문제 실행** | 출력·채점 정상(`TEST 1 PASS`), 샌드박스 과도 차단 없음 |
+| 학습 가이드 집중 모드 (전체화면) | 정상 |
+| 다크모드 토글 → 새로고침 | 깜빡임 없음 — 인라인 스크립트 해시 유효 |
+| 고객센터 / 오답노트 / 업데이트 로그 / 닉네임 변경 | 위반 없음 |
+
+`'unsafe-eval'` 은 **남겨뒀습니다.** Report-Only 에서 Pyodide 가 이걸 요구하는지 판별할 방법이 없었고(위반이 안 났다는 것은 허용돼 있었기 때문), 빼고 시험하면 Python 실행이 전면 중단될 위험이 있습니다. 3절의 **워커 정적 파일 분리**를 먼저 적용한 뒤 제거를 시도하는 것이 안전한 순서입니다.
+
+#### 되돌리는 방법
+
+`vercel.json` 에서 키 이름만 되돌리고 재배포하면 즉시 관찰 모드로 돌아갑니다.
+
+```diff
+- "key": "Content-Security-Policy",
++ "key": "Content-Security-Policy-Report-Only",
+```
+
+### 5-3b. 원래 전환 절차 (참고)
 
 위반이 **0건**인 것을 확인한 뒤, `vercel.json`에서 키 이름만 바꿉니다.
 
