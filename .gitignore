@@ -31,3 +31,7 @@ build_out*.log
 .env
 .env.*
 !.env.example
+
+# Pyodide core runtime, fetched at build time (npm run fetch:pyodide).
+# 13MB of binaries -- a build artifact, not source. See scripts/fetch-pyodide-core.mjs.
+public/pyodide/

@@ -12,7 +12,11 @@
     "check:problems": "node scripts/extract-problem-ids.mjs --check",
     "verify:sandbox": "node scripts/verify-js-sandbox.mjs",
     "csp:hash": "node scripts/csp-inline-hash.mjs",
-    "verify:csp": "node scripts/verify-csp.mjs"
+    "verify:csp": "node scripts/verify-csp.mjs",
+    "fetch:pyodide": "node scripts/fetch-pyodide-core.mjs --force",
+    "prebuild": "node scripts/fetch-pyodide-core.mjs",
+    "verify:pyodide": "node scripts/verify-pyodide-loader.mjs",
+    "verify:pyodide-core": "node scripts/verify-pyodide-core.mjs"
   },
   "dependencies": {
     "@codemirror/lang-java": "^6.0.2",

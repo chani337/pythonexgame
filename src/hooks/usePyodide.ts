@@ -2,9 +2,131 @@ import { useState, useEffect } from 'react';
 
 declare global {
   interface Window {
-    loadPyodide: (config?: { indexURL?: string }) => Promise<any>;
+    loadPyodide?: (config?: { indexURL?: string }) => Promise<any>;
   }
 }
+
+export const PYODIDE_VERSION = '0.26.2';
+
+// Where to try loading the runtime from, in order.
+//
+// jsDelivr first: it is a real CDN with edge caching, and serving the 13MB
+// core from Vercel would put that traffic on this project's own bandwidth.
+// The self-hosted copy exists because school and corporate networks commonly
+// block CDNs outright -- which this app's audience sits behind -- and without
+// a fallback the site loads fine but Python silently never works.
+//
+// `npm run fetch:pyodide` populates public/pyodide/ (gitignored, 13.15MB) and
+// prints the SRI hash below; `prebuild` runs it on every build.
+const PYODIDE_SOURCES: { label: string; indexURL: string; integrity: string | null }[] = [
+  {
+    label: 'jsDelivr CDN',
+    indexURL: `https://cdn.jsdelivr.net/pyodide/v${PYODIDE_VERSION}/full/`,
+    // sha384 of pyodide.js at v0.26.2. Without this, a compromised CDN gets
+    // arbitrary script execution on every visitor. Regenerate when bumping
+    // the version: npm run fetch:pyodide
+    integrity: 'sha384-tVslJOEkg7nVRW3Y3/ReGX0NnonNrbcmt1R5qFbQXQdGa2chRkoJYHAjAsv3zoTq',
+  },
+  {
+    label: '자체 호스팅',
+    indexURL: '/pyodide/',
+    // Same-origin, so SRI adds nothing -- and pinning a hash here would break
+    // the moment the version is bumped without re-running the fetch script.
+    integrity: null,
+  },
+];
+
+// Long enough to not give up on a slow school connection mid-download, short
+// enough that a blocked CDN doesn't look like a hang. The old code polled for
+// window.loadPyodide every 200ms up to 30 times, so a blocked CDN took a full
+// 6 seconds to even be noticed -- and a slow-but-working one was declared
+// failed at exactly the same point.
+const SCRIPT_TIMEOUT_MS = 8000;
+
+function injectPyodideScript(source: { indexURL: string; integrity: string | null }): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = `${source.indexURL}pyodide.js`;
+    script.async = true;
+    if (source.integrity) {
+      script.integrity = source.integrity;
+      // Required for SRI on a cross-origin script: without it the response is
+      // opaque and the browser cannot verify the hash.
+      script.crossOrigin = 'anonymous';
+    }
+
+    const timer = setTimeout(() => {
+      cleanup();
+      script.remove();
+      reject(new Error(`${SCRIPT_TIMEOUT_MS / 1000}초 안에 응답하지 않았습니다`));
+    }, SCRIPT_TIMEOUT_MS);
+
+    function cleanup() {
+      clearTimeout(timer);
+      script.onload = null;
+      script.onerror = null;
+    }
+
+    // onload/onerror give an immediate verdict -- no polling, and an SRI
+    // mismatch surfaces here as an error rather than a mysterious timeout.
+    script.onload = () => { cleanup(); resolve(); };
+    script.onerror = () => {
+      cleanup();
+      script.remove();
+      reject(new Error('스크립트를 불러올 수 없습니다 (차단, 오프라인 또는 SRI 불일치)'));
+    };
+
+    document.head.appendChild(script);
+  });
+}
+
+// Read through a function call so TypeScript does not carry the `undefined`
+// narrowing from `delete window.loadPyodide` below into the call site.
+const readPyodideLoader = (): Window['loadPyodide'] => window.loadPyodide;
+
+async function bootPyodide(): Promise<any> {
+  const failures: string[] = [];
+
+  for (const source of PYODIDE_SOURCES) {
+    try {
+      // Reset so a half-successful previous attempt (script loaded, wasm
+      // blocked) cannot leave a stale loader behind for this one.
+      delete window.loadPyodide;
+      await injectPyodideScript(source);
+
+      const loader = readPyodideLoader();
+      if (!loader) {
+        throw new Error('스크립트가 loadPyodide 를 등록하지 않았습니다');
+      }
+
+      // indexURL must match where the loader came from, otherwise it would
+      // fetch the wasm and stdlib from the other origin.
+      const py = await loader({ indexURL: source.indexURL });
+      console.info(`[PyQuests] Pyodide v${PYODIDE_VERSION} 로드 성공 — ${source.label} (${source.indexURL})`);
+      return py;
+    } catch (err: any) {
+      const reason = err?.message || String(err);
+      console.warn(`[PyQuests] Pyodide 로드 실패 — ${source.label}: ${reason}`);
+      failures.push(`${source.label}: ${reason}`);
+    }
+  }
+
+  throw new Error(
+    '파이썬 실행 엔진을 불러오지 못했습니다.\n' +
+    '인터넷 연결을 확인해 주세요. 학교나 회사 네트워크에서 차단된 경우일 수도 있습니다.\n' +
+    `(${failures.join(' / ')})`
+  );
+}
+
+// Exported for scripts/verify-pyodide-loader.mjs, which drives it with a fake
+// document to check the fallback ordering, the timeout and the SRI attributes
+// without needing a browser.
+export const __bootPyodideForTests = bootPyodide;
+
+// Pyodide's loadPackage is idempotent but still does an await round-trip and
+// logs on every call. Tracking what is loaded keeps repeat runs instant and
+// lets the UI show the "preparing numpy" message only on the first one.
+const loadedPackages = new Set<string>();
 
 export interface TestResult {
   input: string;
@@ -69,36 +191,19 @@ export function usePyodide(enabled: boolean = true) {
   const [pyodide, setPyodide] = useState<any>(null);
   const [loading, setLoading] = useState(enabled);
   const [error, setError] = useState<string | null>(null);
+  // Non-null while a package wheel is downloading mid-run. numpy is 11MB and
+  // pandas pulls 35MB with its dependencies, so without this the run button
+  // just sits there looking broken for ten seconds or more.
+  const [status, setStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!enabled) return;
     let isMounted = true;
     setLoading(true);
 
-    async function initPyodide() {
+    (async () => {
       try {
-        // Wait a small moment to ensure index.html script tag loaded
-        let attempts = 0;
-        while (!window.loadPyodide && attempts < 30) {
-          await new Promise((resolve) => setTimeout(resolve, 200));
-          attempts++;
-        }
-
-        if (!window.loadPyodide) {
-          throw new Error('Pyodide CDN 스크립트를 로드할 수 없습니다. 인터넷 연결을 확인해 주세요.');
-        }
-
-        const py = await window.loadPyodide({
-          indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.2/full/',
-        });
-
-        // Preload common packages (numpy, pandas) for seamless problem solving
-        try {
-          await py.loadPackage(['numpy', 'pandas']);
-        } catch (pkgErr) {
-          console.warn('Package preload notice:', pkgErr);
-        }
-
+        const py = await bootPyodide();
         if (isMounted) {
           setPyodide(py);
           setLoading(false);
@@ -110,14 +215,39 @@ export function usePyodide(enabled: boolean = true) {
           setLoading(false);
         }
       }
-    }
+    })();
 
-    initPyodide();
+    // NOTE: numpy and pandas are deliberately NOT preloaded here any more.
+    // Only 4 of 377 problems import them (numpy_q1/q2, pandas_q1/q2) and the
+    // two wheels are ~35MB together on top of the 13MB core, so every visitor
+    // who opened any Python screen was downloading ~48MB to run `print()`.
+    // ensurePackage() below fetches them on first actual use instead.
 
     return () => {
       isMounted = false;
     };
   }, [enabled]);
+
+  // Loads a wheel on first use and reports progress. Cached across runs and
+  // across problems, so only the first numpy/pandas problem in a session
+  // pays the download.
+  const ensurePackage = async (py: any, name: string, label: string) => {
+    if (loadedPackages.has(name)) return;
+    setStatus(`${label}를 준비하는 중입니다... (최초 1회만 내려받습니다)`);
+    try {
+      await py.loadPackage(name);
+      loadedPackages.add(name);
+    } catch (err) {
+      // Most likely cause: jsDelivr is blocked and the core came from the
+      // self-hosted copy, which deliberately does not ship the wheels.
+      console.warn(`[PyQuests] ${name} 패키지 로드 실패:`, err);
+      throw new Error(
+        `${label} 패키지를 불러올 수 없습니다. 네트워크에서 cdn.jsdelivr.net 이 차단되어 있을 수 있습니다.`
+      );
+    } finally {
+      setStatus(null);
+    }
+  };
 
   const runCode = async (
     code: string,
@@ -201,16 +331,22 @@ try:
 except Exception as e:
     print(f"SQL \uC2E4\uD589 \uC624\uB958: {e}")
 `;
-        // sqlite3 is unvendored from Pyodide's standard library and must be loaded explicitly
-        try { await pyodide.loadPackage('sqlite3'); } catch (e) {}
+        // sqlite3 is unvendored from Pyodide's standard library and must be
+        // loaded explicitly. Stays lazy -- only SQL problems pay for it.
+        await ensurePackage(pyodide, 'sqlite3', 'SQL 실행 엔진');
       }
 
-      // Dynamically load numpy or pandas if used in code
+      // Loaded on demand rather than preloaded at init. The patterns below
+      // were checked against every reference solution and every runnable doc
+      // cell that touches these packages -- all of them match (the scan is in
+      // the task notes), so nothing silently misses its import.
+      //   `numpy`  catches: import numpy, import numpy as np, from numpy import x
+      //   `np.`    catches: np.array(...) when the import line is elsewhere
       if (normalizedCode.includes('numpy') || normalizedCode.includes('np.')) {
-        try { await pyodide.loadPackage('numpy'); } catch (e) {}
+        await ensurePackage(pyodide, 'numpy', 'numpy');
       }
       if (normalizedCode.includes('pandas') || normalizedCode.includes('pd.')) {
-        try { await pyodide.loadPackage('pandas'); } catch (e) {}
+        await ensurePackage(pyodide, 'pandas', 'pandas');
       }
 
       // Clear python globals cache (except builtins) to avoid state pollution between runs
@@ -316,5 +452,5 @@ import sys
     }
   };
 
-  return { loading, error, runCode, pyodide };
+  return { loading, error, status, runCode, pyodide };
 }

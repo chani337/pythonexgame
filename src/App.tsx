@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { RefreshCw } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
 
@@ -174,7 +175,7 @@ print("변환 리스트:", result)
       (!!selectedProblem && problemLanguage !== 'js');
     if (needsPyodide) setPyodideNeeded(true);
   }, [currentView, selectedProblem, user]);
-  const { loading: isPyodideLoading, runCode } = usePyodide(pyodideNeeded);
+  const { loading: isPyodideLoading, status: pyodideStatus, runCode } = usePyodide(pyodideNeeded);
   const { runCode: runJsCode } = useJsRunner();
 
   // Save changes to localStorage scoped to user
@@ -481,6 +482,41 @@ print("변환 리스트:", result)
         )}
         </Suspense>
       </main>
+
+      {pyodideStatus && <RuntimeStatusPill message={pyodideStatus} />}
+    </div>
+  );
+}
+
+// Shown while a Python package wheel downloads mid-run. numpy is 11MB and
+// pandas pulls ~35MB with dependencies, so the run button would otherwise sit
+// there looking broken. One fixed element here instead of the same prop
+// threaded into ProblemWorkspace, Sandbox and DocsViewer.
+function RuntimeStatusPill({ message }: { message: string }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: 'fixed',
+        bottom: '1.25rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        padding: '0.6rem 1.1rem',
+        background: '#1a1a1a',
+        color: '#ffffff',
+        fontSize: '0.82rem',
+        fontWeight: 600,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+        maxWidth: 'calc(100vw - 2rem)',
+      }}
+    >
+      <RefreshCw size={14} style={{ animation: 'spin 2s linear infinite', flexShrink: 0 }} />
+      <span>{message}</span>
     </div>
   );
 }
