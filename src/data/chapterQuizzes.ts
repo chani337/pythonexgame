@@ -896,4 +896,434 @@ export const chapterQuizzes: ChapterQuiz[] = [
       },
     ],
   },
+  {
+    chapterId: 'HTML_1_BASIC_STRUCTURE',
+    questions: [
+      {
+        question: '한글이 깨지지 않게 하려면 head에 반드시 넣어야 하는 태그는?',
+        options: ['<meta charset="UTF-8">', '<meta name="viewport">', '<title>', '<!DOCTYPE html>'],
+        correctIndex: 0,
+        explanation: 'charset으로 문자 인코딩을 UTF-8로 지정해야 한글이 정상적으로 표시됩니다.',
+      },
+      {
+        question: '닫는 태그가 없는 "빈 요소"가 아닌 것은?',
+        options: ['<div>', '<br>', '<img>', '<input>'],
+        correctIndex: 0,
+        explanation: 'div는 내용을 담는 태그이므로 </div>로 닫아야 합니다. br, img, input은 빈 요소입니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'HTML_2_TEXT_TAG',
+    questions: [
+      {
+        question: '여러 줄 코드의 공백과 줄바꿈을 그대로 보존해서 보여주는 태그는?',
+        options: ['pre', 'p', 'span', 'blockquote'],
+        correctIndex: 0,
+        explanation: 'pre는 preformatted text로, 공백과 줄바꿈을 그대로 유지합니다. 보통 code와 함께 씁니다.',
+      },
+      {
+        question: 'strong과 b의 차이에 대한 설명으로 옳은 것은?',
+        options: [
+          'strong은 중요성을 나타내고 b는 모양만 굵게 한다',
+          'strong은 기울임, b는 굵게 표시한다',
+          'b는 HTML5에서 삭제되었다',
+          '둘은 완전히 동일하다',
+        ],
+        correctIndex: 0,
+        explanation: '화면 모양은 같지만 strong은 "중요하다"는 의미를 전달하고 b는 의미 없이 굵게만 표시합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'HTML_3_LIST_TABLE',
+    questions: [
+      {
+        question: '표에서 가로로 2칸을 합칠 때 사용하는 속성은?',
+        options: ['colspan', 'rowspan', 'colgroup', 'align'],
+        correctIndex: 0,
+        explanation: 'colspan은 가로(열) 방향으로, rowspan은 세로(행) 방향으로 칸을 합칩니다.',
+      },
+      {
+        question: '목록을 중첩할 때 안쪽 ul이 들어가야 하는 위치는?',
+        options: ['바깥 li 안쪽', '바깥 ul 바로 아래', 'li와 li 사이', 'ol 안쪽에만 가능'],
+        correctIndex: 0,
+        explanation: 'ul 바로 아래에는 li만 올 수 있으므로, 중첩 목록은 바깥 li 안쪽에 넣어야 합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'HTML_4_LINK_MEDIA',
+    questions: [
+      {
+        question: 'target="_blank"로 새 탭을 열 때 보안을 위해 함께 쓰는 속성은?',
+        options: ['rel="noopener noreferrer"', 'download', 'referrerpolicy="origin"', 'loading="lazy"'],
+        correctIndex: 0,
+        explanation: 'noopener는 새 탭이 원래 페이지를 조작하지 못하게 막고, noreferrer는 출처 정보를 보내지 않습니다.',
+      },
+      {
+        question: 'img 태그의 alt 속성에 대한 설명으로 옳은 것은?',
+        options: [
+          '장식용 이미지라면 alt=""처럼 빈 값이라도 적어야 한다',
+          '이미지가 보이면 필요 없으므로 생략해도 된다',
+          '마우스를 올렸을 때 표시되는 설명이다',
+          '이미지 크기를 지정하는 속성이다',
+        ],
+        correctIndex: 0,
+        explanation: 'alt는 필수 속성입니다. 장식용이면 alt=""로 비워 두어 스크린 리더가 건너뛰게 합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'HTML_5_FORM',
+    questions: [
+      {
+        question: '입력값이 서버로 전송되기 위해 input에 반드시 필요한 속성은?',
+        options: ['name', 'id', 'class', 'placeholder'],
+        correctIndex: 0,
+        explanation: 'name이 전송되는 키가 됩니다. id는 label 연결이나 CSS/JS용이며 전송과는 무관합니다.',
+      },
+      {
+        question: 'form 안의 button에서 type을 생략하면 어떻게 되나요?',
+        options: [
+          'type="submit"으로 동작해서 폼이 전송된다',
+          'type="button"으로 동작해서 아무 일도 없다',
+          '오류가 발생해 버튼이 표시되지 않는다',
+          'type="reset"으로 동작해 입력값이 초기화된다',
+        ],
+        correctIndex: 0,
+        explanation: 'button의 기본 type은 submit입니다. JS 처리용 버튼에는 type="button"을 반드시 명시해야 합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'HTML_6_SEMANTIC',
+    questions: [
+      {
+        question: '한 페이지에 하나만 쓰는 것이 원칙인 시맨틱 태그는?',
+        options: ['main', 'section', 'article', 'aside'],
+        correctIndex: 0,
+        explanation: 'main은 페이지의 핵심 본문을 나타내므로 페이지당 하나만 사용합니다.',
+      },
+      {
+        question: 'article과 section의 차이로 가장 적절한 설명은?',
+        options: [
+          'article은 떼어내도 의미가 통하는 독립 콘텐츠, section은 제목이 있는 주제 구역이다',
+          'article은 블록, section은 인라인 요소다',
+          'section은 article 안에 들어갈 수 없다',
+          '둘은 완전히 동일하며 이름만 다르다',
+        ],
+        correctIndex: 0,
+        explanation: '블로그 글이나 상품 카드처럼 독립적인 콘텐츠는 article, 제목이 있는 주제 구역은 section입니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'HTML_7_ATTRIBUTE_A11Y',
+    questions: [
+      {
+        question: '화면에 코드를 글자로 보여주기 위해 꺾쇠 여는 기호를 대체하는 엔티티는?',
+        options: ['&lt;', '&gt;', '&amp;', '&nbsp;'],
+        correctIndex: 0,
+        explanation: '&lt;는 less than으로 여는 꺾쇠를, &gt;는 닫는 꺾쇠를 표시합니다.',
+      },
+      {
+        question: '접근성을 위해 가장 먼저 지켜야 할 원칙은?',
+        options: [
+          '의미에 맞는 태그를 쓰는 것 (div 대신 button)',
+          '모든 요소에 role 속성을 붙이는 것',
+          'tabindex를 높은 숫자로 지정하는 것',
+          'outline: none으로 포커스 표시를 지우는 것',
+        ],
+        correctIndex: 0,
+        explanation: '올바른 태그를 쓰는 것이 접근성의 대부분을 해결합니다. ARIA는 기본 태그로 표현할 수 없을 때만 보조로 씁니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'HTML_8_TAG_CHEATSHEET',
+    questions: [
+      {
+        question: '기본 display가 inline이어서 width와 height가 적용되지 않는 태그는?',
+        options: ['span', 'div', 'p', 'section'],
+        correctIndex: 0,
+        explanation: 'span은 인라인 요소라 width/height가 무시됩니다. inline-block이나 block으로 바꿔야 적용됩니다.',
+      },
+      {
+        question: '지금은 쓰지 않는(deprecated) 태그는?',
+        options: ['center', 'section', 'details', 'figure'],
+        correctIndex: 0,
+        explanation: 'center는 폐기되었고, 가운데 정렬은 CSS의 text-align이나 margin: auto로 처리합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_1_SELECTOR',
+    questions: [
+      {
+        question: '.card > p와 .card p의 차이는?',
+        options: [
+          '>는 바로 아래 자식만, 공백은 안쪽 모든 자손을 선택한다',
+          '>는 형제를, 공백은 자식을 선택한다',
+          '두 선택자는 완전히 동일하다',
+          '>는 클래스에만, 공백은 태그에만 쓸 수 있다',
+        ],
+        correctIndex: 0,
+        explanation: '>는 자식 조합자로 한 단계 아래만 선택하고, 공백은 자손 조합자로 깊이에 상관없이 모두 선택합니다.',
+      },
+      {
+        question: '명시도(우선순위)가 가장 높은 것은?',
+        options: ['#아이디 선택자', '.클래스 선택자', '태그 선택자', '전체 선택자(*)'],
+        correctIndex: 0,
+        explanation: '인라인 스타일(1000) > id(100) > class(10) > 태그(1) > 전체 선택자(0) 순입니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_2_BOX_MODEL',
+    questions: [
+      {
+        question: 'width에 padding과 border를 포함시키려면 어떤 속성을 써야 하나요?',
+        options: ['box-sizing: border-box', 'box-sizing: content-box', 'overflow: hidden', 'display: block'],
+        correctIndex: 0,
+        explanation: 'border-box는 padding과 border를 width 안쪽에 포함시켜 크기 계산을 편하게 만들어 줍니다.',
+      },
+      {
+        question: 'calc()를 올바르게 쓴 것은?',
+        options: ['calc(100% - 40px)', 'calc(100%-40px)', 'calc(100% -40px)', 'calc(100%- 40px)'],
+        correctIndex: 0,
+        explanation: 'calc()의 연산자 앞뒤에는 반드시 공백이 있어야 합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_3_TEXT_BACKGROUND',
+    questions: [
+      {
+        question: 'line-height를 단위 없는 숫자(예: 1.6)로 쓰는 이유는?',
+        options: [
+          '글자 크기에 대한 비율로 상속되어 크기가 달라도 자연스럽기 때문',
+          'px보다 성능이 좋기 때문',
+          '단위를 쓰면 문법 오류가 나기 때문',
+          '브라우저가 px을 지원하지 않기 때문',
+        ],
+        correctIndex: 0,
+        explanation: '단위 없는 숫자는 비율로 상속되므로, 자식의 글자 크기가 달라도 줄간격이 함께 조정됩니다.',
+      },
+      {
+        question: '배경만 반투명하게 하고 글자는 선명하게 유지하려면?',
+        options: [
+          'background: rgba(0, 0, 0, 0.5)를 쓴다',
+          'opacity: 0.5를 쓴다',
+          'visibility: hidden을 쓴다',
+          'filter: blur()를 쓴다',
+        ],
+        correctIndex: 0,
+        explanation: 'opacity는 자식 요소까지 전부 투명하게 만들므로, 배경색에 직접 투명도를 주어야 합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_4_FLEXBOX',
+    questions: [
+      {
+        question: 'flex-direction이 row일 때 주축(main axis) 정렬을 담당하는 속성은?',
+        options: ['justify-content', 'align-items', 'align-content', 'place-items'],
+        correctIndex: 0,
+        explanation: 'justify-content는 주축을, align-items는 교차축을 담당합니다. column이면 둘의 역할이 바뀝니다.',
+      },
+      {
+        question: 'flex 아이템이 많아져도 줄바꿈이 되지 않고 찌그러지는 이유는?',
+        options: [
+          'flex-wrap의 기본값이 nowrap이기 때문',
+          'gap을 지정하지 않았기 때문',
+          'flex-grow가 0이기 때문',
+          'align-items가 stretch이기 때문',
+        ],
+        correctIndex: 0,
+        explanation: '기본값이 nowrap이라 한 줄에 억지로 넣습니다. flex-wrap: wrap을 명시해야 줄바꿈됩니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_5_GRID',
+    questions: [
+      {
+        question: '미디어 쿼리 없이 반응형 카드 그리드를 만드는 대표적인 코드는?',
+        options: [
+          'grid-template-columns: repeat(auto-fit, minmax(260px, 1fr))',
+          'grid-template-columns: repeat(3, 1fr)',
+          'grid-template-columns: 33.33% 33.33% 33.33%',
+          'grid-auto-flow: column',
+        ],
+        correctIndex: 0,
+        explanation: 'auto-fit과 minmax를 조합하면 화면 너비에 따라 열 개수가 자동으로 조절됩니다.',
+      },
+      {
+        question: 'grid 아이템이 전체 너비를 차지하게 만드는 값은?',
+        options: ['grid-column: 1 / -1', 'grid-column: 1 / 2', 'width: 100%', 'grid-row: span 1'],
+        correctIndex: 0,
+        explanation: '-1은 마지막 선을 뜻하므로, 1 / -1은 열 개수와 상관없이 처음부터 끝까지 차지합니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_6_POSITION_RESPONSIVE',
+    questions: [
+      {
+        question: '자식을 position: absolute로 배치할 때 부모에 필요한 설정은?',
+        options: ['position: relative', 'display: flex', 'overflow: hidden', 'z-index: 1'],
+        correctIndex: 0,
+        explanation: 'absolute는 가장 가까운 non-static 조상을 기준으로 배치되므로, 기준 부모에 relative를 줘야 합니다.',
+      },
+      {
+        question: 'position: sticky가 동작하지 않는 가장 흔한 원인은?',
+        options: [
+          'top 값이 없거나 조상에 overflow: hidden이 있어서',
+          'z-index를 지정하지 않아서',
+          'display: flex를 쓰지 않아서',
+          'margin이 0이어서',
+        ],
+        correctIndex: 0,
+        explanation: 'sticky는 top 등의 위치 값이 반드시 필요하고, 조상의 overflow가 hidden/auto면 동작하지 않습니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_7_TRANSITION_ANIMATION',
+    questions: [
+      {
+        question: '애니메이션 성능을 위해 주로 사용하도록 권장되는 속성 조합은?',
+        options: ['transform과 opacity', 'width와 height', 'top과 left', 'margin과 padding'],
+        correctIndex: 0,
+        explanation: 'transform과 opacity는 레이아웃 재계산 없이 GPU가 처리하므로 가장 부드럽습니다.',
+      },
+      {
+        question: '애니메이션이 끝난 뒤 마지막 상태를 유지하게 하는 속성은?',
+        options: [
+          'animation-fill-mode: forwards',
+          'animation-iteration-count: infinite',
+          'animation-direction: alternate',
+          'animation-play-state: paused',
+        ],
+        correctIndex: 0,
+        explanation: 'forwards가 없으면 애니메이션이 끝나는 순간 원래 상태로 되돌아갑니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_8_VARIABLE_MODERN',
+    questions: [
+      {
+        question: 'CSS 변수를 올바르게 선언하고 사용한 것은?',
+        options: [
+          '--main: red; 선언 후 color: var(--main);',
+          'main: red; 선언 후 color: var(main);',
+          '$main: red; 선언 후 color: $main;',
+          '@main: red; 선언 후 color: @main;',
+        ],
+        correctIndex: 0,
+        explanation: 'CSS 변수는 --로 시작하고 var()로 사용합니다. $는 Sass, @는 Less 문법입니다.',
+      },
+      {
+        question: '자식의 상태를 보고 부모를 선택할 수 있게 해주는 가상 클래스는?',
+        options: [':has()', ':is()', ':where()', ':not()'],
+        correctIndex: 0,
+        explanation: ':has()는 조건에 맞는 자손을 가진 부모를 선택합니다. 예: .card:has(img)',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_9_CSS_KINDS',
+    questions: [
+      {
+        question: 'BEM 네이밍 규칙을 올바르게 적용한 것은?',
+        options: ['card__title--large', 'card-title-large', 'cardTitleLarge', 'card.title.large'],
+        correctIndex: 0,
+        explanation: 'BEM은 블록__요소--변형 형태로, 요소는 밑줄 2개, 변형은 하이픈 2개로 구분합니다.',
+      },
+      {
+        question: 'CSS Modules가 해결해 주는 가장 큰 문제는?',
+        options: [
+          '클래스 이름이 전역에서 충돌하는 문제',
+          'CSS 파일 용량이 큰 문제',
+          '브라우저 호환성 문제',
+          '애니메이션 성능 문제',
+        ],
+        correctIndex: 0,
+        explanation: '빌드 도구가 클래스 이름을 고유하게 바꿔주어 다른 파일의 같은 클래스명과 충돌하지 않습니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_10_TAILWIND',
+    questions: [
+      {
+        question: 'Tailwind에서 "모바일은 1열, 768px 이상은 3열"을 올바르게 쓴 것은?',
+        options: [
+          'grid-cols-1 md:grid-cols-3',
+          'md:grid-cols-1 grid-cols-3',
+          'grid-cols-1 max-md:grid-cols-3',
+          'sm:grid-cols-1 grid-cols-3',
+        ],
+        correctIndex: 0,
+        explanation: 'Tailwind는 모바일 퍼스트입니다. 접두사 없는 값이 기본(모바일)이고 md:가 768px 이상을 덮어씁니다.',
+      },
+      {
+        question: '부모에 마우스를 올렸을 때 자식 스타일을 바꾸려면?',
+        options: [
+          '부모에 group, 자식에 group-hover: 를 쓴다',
+          '자식에 peer-hover: 를 쓴다',
+          '부모와 자식 모두에 hover: 를 쓴다',
+          '자식에 parent-hover: 를 쓴다',
+        ],
+        correctIndex: 0,
+        explanation: 'group/group-hover는 부모 호버에, peer/peer-checked는 형제 상태에 반응할 때 씁니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_11_SASS_MODULES',
+    questions: [
+      {
+        question: 'SCSS에서 &__title은 무엇으로 컴파일되나요? (부모가 .card일 때)',
+        options: ['.card__title', '.card .title', '.card > .title', '.card, .title'],
+        correctIndex: 0,
+        explanation: '&는 현재 선택자를 문자열로 이어 붙이므로 .card__title이 됩니다. BEM과 궁합이 좋습니다.',
+      },
+      {
+        question: '다크 모드 테마 전환에 Sass 변수($) 대신 CSS 변수(--)를 써야 하는 이유는?',
+        options: [
+          'Sass 변수는 빌드할 때 값으로 고정되어 런타임에 바꿀 수 없기 때문',
+          'Sass 변수는 색상을 저장할 수 없기 때문',
+          'CSS 변수가 더 짧게 쓸 수 있기 때문',
+          'Sass 변수는 브라우저가 지원하지 않기 때문',
+        ],
+        correctIndex: 0,
+        explanation: 'Sass 변수는 컴파일 시점에 치환되고, CSS 변수는 브라우저에서 실시간으로 동작해 JS로도 바꿀 수 있습니다.',
+      },
+    ],
+  },
+  {
+    chapterId: 'CSS_12_FRAMEWORKS',
+    questions: [
+      {
+        question: 'Bootstrap의 그리드 시스템은 화면을 몇 칸으로 나누나요?',
+        options: ['12칸', '10칸', '16칸', '24칸'],
+        correctIndex: 0,
+        explanation: '12열 그리드를 사용하며, col-md-6은 768px 이상에서 12칸 중 6칸(절반)을 차지합니다.',
+      },
+      {
+        question: 'Bootstrap과 Tailwind를 한 프로젝트에 함께 쓰지 않는 것이 좋은 이유는?',
+        options: [
+          '리셋 CSS가 충돌하고 간격 체계가 달라 혼동되며 용량도 커지기 때문',
+          '라이선스가 서로 충돌하기 때문',
+          '둘 다 jQuery를 필요로 하기 때문',
+          '브라우저가 CSS 파일을 두 개 이상 못 읽기 때문',
+        ],
+        correctIndex: 0,
+        explanation: '기본 스타일 초기화가 겹치고 p-3(Bootstrap)과 p-4(Tailwind)처럼 간격 숫자 체계도 달라 혼란스럽습니다.',
+      },
+    ],
+  },
 ];

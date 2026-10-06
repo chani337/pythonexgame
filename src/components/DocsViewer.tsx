@@ -15,11 +15,57 @@ interface DocsViewerProps {
   onSelectProblem: (problem: Problem) => void;
 }
 
+export type DocCategory = 'python' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css';
+
+// Category tabs for the 학습 가이드. `label` is shown in the normal layout's tab
+// row, `shortLabel` in focus mode and the TOC heading, and the colors theme the
+// tab when it's the active one.
+const DOC_CATEGORIES: {
+  key: DocCategory;
+  label: string;
+  shortLabel: string;
+  accent: string;
+  border: string;
+  activeText: string;
+  shadow: string;
+}[] = [
+  { key: 'python', label: '파이썬 (Python)', shortLabel: '파이썬', accent: '#1a1a1a', border: '#1a1a1a', activeText: '#ffffff', shadow: 'rgba(0,0,0,0.15)' },
+  { key: 'sql', label: 'SQL 데이터베이스 (Database)', shortLabel: 'SQL', accent: '#0969da', border: '#0969da', activeText: '#ffffff', shadow: 'rgba(9,105,218,0.2)' },
+  { key: 'java', label: '자바 (Java)', shortLabel: 'Java', accent: '#b07219', border: '#b07219', activeText: '#ffffff', shadow: 'rgba(176,114,25,0.2)' },
+  { key: 'js', label: '자바스크립트 (JS)', shortLabel: 'JS', accent: '#f0db4f', border: '#d4b83a', activeText: '#1a1a1a', shadow: 'rgba(212,184,58,0.3)' },
+  { key: 'c', label: 'C 언어', shortLabel: 'C', accent: '#5c6bc0', border: '#5c6bc0', activeText: '#ffffff', shadow: 'rgba(92,107,192,0.25)' },
+  { key: 'html', label: 'HTML', shortLabel: 'HTML', accent: '#e34f26', border: '#e34f26', activeText: '#ffffff', shadow: 'rgba(227,79,38,0.25)' },
+  { key: 'css', label: 'CSS & Tailwind', shortLabel: 'CSS', accent: '#1572b6', border: '#1572b6', activeText: '#ffffff', shadow: 'rgba(21,114,182,0.25)' },
+];
+
+const DOC_CATEGORY_TITLES: Record<DocCategory, string> = {
+  python: '파이썬 학습 가이드',
+  sql: 'SQL 데이터베이스 학습 가이드',
+  java: 'Java 학습 가이드',
+  js: '자바스크립트 학습 가이드',
+  c: 'C 언어 학습 가이드',
+  html: 'HTML 학습 가이드',
+  css: 'CSS 학습 가이드',
+};
+
+const DOC_CATEGORY_DESCRIPTIONS: Record<DocCategory, string> = {
+  python: 'Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.',
+  sql: 'Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.',
+  java: '자바 기초 문법부터 객체지향까지 핵심 파트별 문서를 열람해 보세요. (자바는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)',
+  js: '변수부터 비동기까지 핵심 파트별 문서를 열람해 보세요. (자바스크립트도 "문제 학습" 페이지에서 실제로 실행 및 채점할 수 있어요!)',
+  c: '변수와 자료형부터 포인터, 구조체, 파일 입출력까지 핵심 파트별 문서를 열람해 보세요. (C는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)',
+  html: '문서 구조부터 텍스트, 목록/표, 링크/미디어, 폼, 시맨틱 태그까지 역할별로 정리했어요. 각 챕터의 실습 코드를 .html 파일로 저장해 브라우저에서 바로 확인해 보세요.',
+  css: '선택자와 박스 모델부터 Flexbox, Grid, 애니메이션까지의 기본기와 Tailwind CSS, Sass, CSS Modules, Bootstrap 같은 여러 CSS 작성 방식을 정리했어요.',
+};
+
 // Suggests practice problems related to a chapter by matching keywords extracted
 // from the chapter title against each problem's category/title, scoped to the
 // same language. Best-effort: chapters with no matching problems (e.g. the
 // NumPy/Pandas/ML chapters) simply show no related-problems section.
 function getRelatedProblems(chapter: DocChapter, allProblems: Problem[]): Problem[] {
+  // HTML/CSS are read-only guides -- there are no practice problems to link to yet.
+  if (chapter.category === 'html' || chapter.category === 'css') return [];
+
   const lang = chapter.category === 'sql' ? 'sql' : chapter.category === 'java' ? 'java' : chapter.category === 'js' ? 'js' : chapter.category === 'c' ? 'c' : 'python';
 
   const cleanTitle = chapter.title
@@ -48,9 +94,9 @@ export default function DocsViewer({
   // Remember the last-viewed category/chapter so returning here (e.g. via a
   // related-problem's "back" button, which unmounts this component) restores
   // where the reader left off instead of resetting to Python chapter 1.
-  const [selectedCategory, setSelectedCategory] = useState<'python' | 'sql' | 'java' | 'js' | 'c'>(() => {
+  const [selectedCategory, setSelectedCategory] = useState<DocCategory>(() => {
     const saved = localStorage.getItem('pyquests_docs_last_category');
-    return saved === 'sql' || saved === 'java' || saved === 'js' || saved === 'c' || saved === 'python' ? saved : 'python';
+    return DOC_CATEGORIES.some((cat) => cat.key === saved) ? (saved as DocCategory) : 'python';
   });
   const [selectedChapterIdx, setSelectedChapterIdx] = useState<number>(() => {
     const saved = localStorage.getItem('pyquests_docs_last_chapter_idx');
@@ -154,21 +200,19 @@ export default function DocsViewer({
   const viewerRef = useRef<HTMLDivElement>(null);
   const focusViewerRef = useRef<HTMLDivElement>(null);
 
-  const filteredChapters = docChapters.filter((ch) => {
-    if (selectedCategory === 'sql') {
-      return ch.category === 'sql';
-    }
-    if (selectedCategory === 'java') {
-      return ch.category === 'java';
-    }
-    if (selectedCategory === 'js') {
-      return ch.category === 'js';
-    }
-    if (selectedCategory === 'c') {
-      return ch.category === 'c';
-    }
-    return ch.category !== 'sql' && ch.category !== 'java' && ch.category !== 'js' && ch.category !== 'c';
-  });
+  // The Python chapters predate the `category` field, so a missing category means Python.
+  const filteredChapters = docChapters.filter((ch) =>
+    selectedCategory === 'python'
+      ? ch.category === undefined || ch.category === 'python'
+      : ch.category === selectedCategory
+  );
+
+  const selectCategory = (category: DocCategory) => {
+    setSelectedCategory(category);
+    setSelectedChapterIdx(0);
+    setCodeOutputs({});
+    setChapterSearchQuery('');
+  };
 
   // Chapter TOC search: matches by title or cell content, but keeps each entry's
   // original index within filteredChapters so selection stays correct after filtering.
@@ -784,101 +828,23 @@ export default function DocsViewer({
 
             {/* Category Selector */}
             <div style={{ display: 'flex', gap: '0.25rem', background: '#0a080f', padding: '0.2rem', border: '1px solid #334155' }}>
-              <button
-                onClick={() => {
-                  setSelectedCategory('python');
-                  setSelectedChapterIdx(0);
-                  setCodeOutputs({});
-                  setChapterSearchQuery('');
-                }}
-                style={{
-                  background: selectedCategory === 'python' ? '#38bdf8' : 'transparent',
-                  color: selectedCategory === 'python' ? '#000000' : '#cbd5e1',
-                  border: 'none',
-                  padding: '0.3rem 0.6rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                }}
-              >
-                파이썬
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedCategory('sql');
-                  setSelectedChapterIdx(0);
-                  setCodeOutputs({});
-                  setChapterSearchQuery('');
-                }}
-                style={{
-                  background: selectedCategory === 'sql' ? '#38bdf8' : 'transparent',
-                  color: selectedCategory === 'sql' ? '#000000' : '#cbd5e1',
-                  border: 'none',
-                  padding: '0.3rem 0.6rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                }}
-              >
-                SQL
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedCategory('java');
-                  setSelectedChapterIdx(0);
-                  setCodeOutputs({});
-                  setChapterSearchQuery('');
-                }}
-                style={{
-                  background: selectedCategory === 'java' ? '#38bdf8' : 'transparent',
-                  color: selectedCategory === 'java' ? '#000000' : '#cbd5e1',
-                  border: 'none',
-                  padding: '0.3rem 0.6rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                }}
-              >
-                JAVA
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedCategory('js');
-                  setSelectedChapterIdx(0);
-                  setCodeOutputs({});
-                  setChapterSearchQuery('');
-                }}
-                style={{
-                  background: selectedCategory === 'js' ? '#38bdf8' : 'transparent',
-                  color: selectedCategory === 'js' ? '#000000' : '#cbd5e1',
-                  border: 'none',
-                  padding: '0.3rem 0.6rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                }}
-              >
-                JS
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedCategory('c');
-                  setSelectedChapterIdx(0);
-                  setCodeOutputs({});
-                  setChapterSearchQuery('');
-                }}
-                style={{
-                  background: selectedCategory === 'c' ? '#38bdf8' : 'transparent',
-                  color: selectedCategory === 'c' ? '#000000' : '#cbd5e1',
-                  border: 'none',
-                  padding: '0.3rem 0.6rem',
-                  fontSize: '0.75rem',
-                  fontWeight: '700',
-                  cursor: 'pointer',
-                }}
-              >
-                C
-              </button>
+              {DOC_CATEGORIES.map((cat) => (
+                <button
+                  key={cat.key}
+                  onClick={() => selectCategory(cat.key)}
+                  style={{
+                    background: selectedCategory === cat.key ? '#38bdf8' : 'transparent',
+                    color: selectedCategory === cat.key ? '#000000' : '#cbd5e1',
+                    border: 'none',
+                    padding: '0.3rem 0.6rem',
+                    fontSize: '0.75rem',
+                    fontWeight: '700',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {cat.shortLabel.toUpperCase()}
+                </button>
+              ))}
             </div>
 
             {/* Chapter Selection Dropdown */}
@@ -973,7 +939,7 @@ export default function DocsViewer({
           <div style={{ marginBottom: '2.5rem', borderBottom: '2px solid #1a1a1a', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
             <div>
               <span style={{ fontSize: '0.8rem', color: '#0969da', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                제 {selectedChapterIdx + 1} 장 / 총 {docChapters.length} 장
+                제 {selectedChapterIdx + 1} 장 / 총 {filteredChapters.length} 장
               </span>
               <h1 style={{ fontSize: '2rem', fontWeight: '800', color: '#1a1a1a', marginTop: '0.2rem' }}>
                 {activeChapter.title}
@@ -1010,7 +976,7 @@ export default function DocsViewer({
                 ◀ 이전 챕터
               </button>
               <button
-                disabled={selectedChapterIdx === docChapters.length - 1}
+                disabled={selectedChapterIdx >= filteredChapters.length - 1}
                 onClick={() => {
                   setSelectedChapterIdx((prev) => prev + 1);
                   setCodeOutputs({});
@@ -1035,16 +1001,10 @@ export default function DocsViewer({
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h2 style={{ fontSize: '1.5rem', fontWeight: '700', fontFamily: 'var(--font-display)', marginBottom: '0.25rem', color: '#1a1a1a' }}>
-            {selectedCategory === 'python' ? '파이썬 학습 가이드' : selectedCategory === 'sql' ? 'SQL 데이터베이스 학습 가이드' : selectedCategory === 'js' ? '자바스크립트 학습 가이드' : selectedCategory === 'c' ? 'C 언어 학습 가이드' : 'Java 학습 가이드'}
+            {DOC_CATEGORY_TITLES[selectedCategory]}
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-            {selectedCategory === 'java'
-              ? '자바 기초 문법부터 객체지향까지 핵심 파트별 문서를 열람해 보세요. (자바는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)'
-              : selectedCategory === 'js'
-              ? '변수부터 비동기까지 핵심 파트별 문서를 열람해 보세요. (자바스크립트도 "문제 학습" 페이지에서 실제로 실행 및 채점할 수 있어요!)'
-              : selectedCategory === 'c'
-              ? '변수와 자료형부터 포인터, 구조체, 파일 입출력까지 핵심 파트별 문서를 열람해 보세요. (C는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)'
-              : 'Jupyter Notebook 기반 핵심 파트별 문서를 열람하고 파이썬 & SQL 예제 코드를 즉석에서 실행해 보세요.'}
+            {DOC_CATEGORY_DESCRIPTIONS[selectedCategory]}
           </p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
@@ -1091,132 +1051,33 @@ export default function DocsViewer({
       </div>
 
       {/* Category Tabs */}
-      <div className="docs-category-tabs" style={{ display: 'flex', gap: '0.5rem' }}>
-        <button
-          onClick={() => {
-            setSelectedCategory('python');
-            setSelectedChapterIdx(0);
-            setCodeOutputs({});
-            setChapterSearchQuery('');
-          }}
-          style={{
-            padding: '0.65rem 1.4rem',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            background: selectedCategory === 'python' ? '#1a1a1a' : '#ffffff',
-            color: selectedCategory === 'python' ? '#ffffff' : 'var(--text-secondary)',
-            border: '1px solid #1a1a1a',
-            borderRadius: '0px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            boxShadow: selectedCategory === 'python' ? '0 2px 8px rgba(0,0,0,0.15)' : 'none',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          파이썬 (Python)
-        </button>
-        <button
-          onClick={() => {
-            setSelectedCategory('sql');
-            setSelectedChapterIdx(0);
-            setCodeOutputs({});
-            setChapterSearchQuery('');
-          }}
-          style={{
-            padding: '0.65rem 1.4rem',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            background: selectedCategory === 'sql' ? '#0969da' : '#ffffff',
-            color: selectedCategory === 'sql' ? '#ffffff' : 'var(--text-secondary)',
-            border: '1px solid #0969da',
-            borderRadius: '0px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            boxShadow: selectedCategory === 'sql' ? '0 2px 8px rgba(9,105,218,0.2)' : 'none',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          SQL 데이터베이스 (Database)
-        </button>
-        <button
-          onClick={() => {
-            setSelectedCategory('java');
-            setSelectedChapterIdx(0);
-            setCodeOutputs({});
-            setChapterSearchQuery('');
-          }}
-          style={{
-            padding: '0.65rem 1.4rem',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            background: selectedCategory === 'java' ? '#b07219' : '#ffffff',
-            color: selectedCategory === 'java' ? '#ffffff' : 'var(--text-secondary)',
-            border: '1px solid #b07219',
-            borderRadius: '0px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            boxShadow: selectedCategory === 'java' ? '0 2px 8px rgba(176,114,25,0.2)' : 'none',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          자바 (Java)
-        </button>
-        <button
-          onClick={() => {
-            setSelectedCategory('js');
-            setSelectedChapterIdx(0);
-            setCodeOutputs({});
-            setChapterSearchQuery('');
-          }}
-          style={{
-            padding: '0.65rem 1.4rem',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            background: selectedCategory === 'js' ? '#f0db4f' : '#ffffff',
-            color: selectedCategory === 'js' ? '#1a1a1a' : 'var(--text-secondary)',
-            border: '1px solid #d4b83a',
-            borderRadius: '0px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            boxShadow: selectedCategory === 'js' ? '0 2px 8px rgba(212,184,58,0.3)' : 'none',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          자바스크립트 (JS)
-        </button>
-        <button
-          onClick={() => {
-            setSelectedCategory('c');
-            setSelectedChapterIdx(0);
-            setCodeOutputs({});
-            setChapterSearchQuery('');
-          }}
-          style={{
-            padding: '0.65rem 1.4rem',
-            fontSize: '0.85rem',
-            fontWeight: '700',
-            background: selectedCategory === 'c' ? '#5c6bc0' : '#ffffff',
-            color: selectedCategory === 'c' ? '#ffffff' : 'var(--text-secondary)',
-            border: '1px solid #5c6bc0',
-            borderRadius: '0px',
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.45rem',
-            boxShadow: selectedCategory === 'c' ? '0 2px 8px rgba(92,107,192,0.25)' : 'none',
-            transition: 'all 0.2s ease',
-          }}
-        >
-          C 언어
-        </button>
+      <div className="docs-category-tabs" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+        {DOC_CATEGORIES.map((cat) => {
+          const isActive = selectedCategory === cat.key;
+          return (
+            <button
+              key={cat.key}
+              onClick={() => selectCategory(cat.key)}
+              style={{
+                padding: '0.65rem 1.4rem',
+                fontSize: '0.85rem',
+                fontWeight: '700',
+                background: isActive ? cat.accent : '#ffffff',
+                color: isActive ? cat.activeText : 'var(--text-secondary)',
+                border: `1px solid ${cat.border}`,
+                borderRadius: '0px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.45rem',
+                boxShadow: isActive ? `0 2px 8px ${cat.shadow}` : 'none',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              {cat.label}
+            </button>
+          );
+        })}
       </div>
 
       {/* Main split layout */}
@@ -1240,7 +1101,7 @@ export default function DocsViewer({
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '0.5rem' }}>
               <h3 style={{ fontSize: '0.9rem', fontWeight: '700', letterSpacing: '0.05em' }}>
-                {selectedCategory === 'python' ? '파이썬' : selectedCategory === 'sql' ? 'SQL' : selectedCategory === 'js' ? 'JS' : selectedCategory === 'c' ? 'C' : 'Java'} 학습 목차
+                {DOC_CATEGORIES.find((cat) => cat.key === selectedCategory)?.shortLabel} 학습 목차
               </h3>
               <button
                 onClick={() => setIsTocOpen(false)}

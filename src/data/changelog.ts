@@ -8,6 +8,17 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-06',
+    title: 'HTML & CSS 학습 가이드 추가',
+    items: [
+      '"학습 가이드"에 HTML 탭과 CSS 탭이 새로 생겼어요. HTML은 문서 구조, 텍스트 태그, 목록/표, 링크/이미지/미디어, 폼 태그 총정리, 시맨틱 태그, 전역 속성·엔티티·접근성/SEO, 그리고 태그 종류를 역할별로 모아 둔 치트시트까지 8개 챕터로 정리했어요.',
+      'CSS는 선택자와 우선순위, 박스 모델·단위·색상, 텍스트/배경/그림자, Flexbox, Grid, position과 반응형, 전환·애니메이션, CSS 변수와 다크 모드까지 기본기 8챕터를 담았어요.',
+      '여기에 "CSS를 작성하는 방식의 종류"(순수 CSS·Sass·BEM·CSS Modules·CSS-in-JS·유틸리티 퍼스트·컴포넌트 프레임워크 비교), "Tailwind CSS 입문", "Sass/SCSS & CSS Modules 실전", "Bootstrap & 그 외 프레임워크 둘러보기" 4챕터를 더해 CSS는 총 12개 챕터예요.',
+      '모든 챕터에 브라우저에서 바로 따라 할 수 있는 실습 코드와 자주 하는 실수 모음, 그리고 이해도를 점검하는 미니 퀴즈를 함께 넣었어요. (HTML/CSS는 예제 코드 실행 없이 읽기 전용으로 제공됩니다.)',
+      '집중 학습 모드의 "제 n 장 / 총 n 장" 표시가 전체 챕터 수가 아니라 선택한 언어의 챕터 수를 기준으로 나오도록 바로잡았어요.',
+    ],
+  },
+  {
     date: '2026-09-16',
     title: '파이썬 문제 난이도 라벨 정정',
     items: [
