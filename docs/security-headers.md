@@ -160,9 +160,67 @@ worker-src 'self';     ← blob: 도 불필요
 
 ---
 
-## 4. 적용 순서
+## 4. Report-Only 1차 관찰 결과 (2026-10-06, 실제 배포)
 
-### 4-1. 지금 상태 (이 커밋)
+브라우저에서 확인한 위반과 조치입니다. **세 건 모두 정적 검증으로는 잡을 수 없었습니다.**
+
+### (1) `connect-src` 위반 — 서비스워커가 Google Fonts 를 fetch
+
+```
+Connecting to 'https://fonts.googleapis.com/css2?family=Inter...' violates
+the following Content Security Policy directive: "connect-src 'self' ..."
+  at workbox-ebc1056e.js:1
+```
+
+원인은 이 작업이 아니라 **5번 작업에서 추가한 `runtimeCaching`** 입니다. 서비스워커가 폰트를 캐시하려고 `fetch()` 하는데, **서비스워커의 fetch 는 `style-src`/`font-src` 가 아니라 `connect-src` 로 검사**됩니다. 페이지가 `<link>` 로 불러올 때는 `style-src` 로 검사되므로, 같은 URL 이 지시어를 두 개 걸칩니다.
+
+→ `connect-src` 에 `https://fonts.googleapis.com https://fonts.gstatic.com` 추가.
+→ `verify:csp` 에 이 검사를 넣어 회귀를 막았습니다.
+
+### (2) `Permissions-Policy` 미인식 기능
+
+```
+Error with Permissions-Policy header: Unrecognized feature: 'ambient-light-sensor'.
+Error with Permissions-Policy header: Unrecognized feature: 'battery'.
+Error with Permissions-Policy header: Unrecognized feature: 'document-domain'.
+```
+
+Chrome 이 모르는 기능명이라 **아무것도 보호하지 못하면서 콘솔 에러만** 냅니다. 제거해서 27개 → 24개.
+
+### (3) `upgrade-insecure-requests` 경고 — 조치 불필요
+
+```
+The Content Security Policy directive 'upgrade-insecure-requests' is ignored
+when delivered in a report-only policy.
+```
+
+**정상입니다.** 이 지시어는 Report-Only 에서 동작하지 않고 강제 모드에서만 적용됩니다. 그대로 두면 전환 시 작동하므로 손대지 않았습니다. Report-Only 기간에는 이 경고가 계속 보입니다.
+
+### 함께 정리한 것 (이 작업 범위 밖이지만 콘솔 노이즈)
+
+```
+<meta name="apple-mobile-web-app-capable"> is deprecated.
+Please include <meta name="mobile-web-app-capable">
+```
+
+표준 이름을 추가하고, 구형 iOS Safari 가 `apple-` 접두사만 인식하므로 기존 것도 함께 남겼습니다.
+
+### 아직 고치지 않은 것 — Google Fonts 중복 로드
+
+CSP 위반을 추적하다 발견했습니다. 폰트 스타일시트를 **두 번** 불러오고 있고, 가중치가 서로 다릅니다.
+
+| 위치 | 요청 |
+|---|---|
+| `index.html` | `Inter:300..700` + `Outfit:300..900` + `JetBrains Mono:400;500;600` |
+| `src/index.css` 2번 줄 `@import` | `Outfit:300..800` + `Inter:300..800` + `JetBrains Mono:400;500;700` |
+
+같은 세 패밀리를 중복으로 받고 있어 렌더 블로킹 요청이 하나 더 있습니다. **합치면 가중치 집합이 달라 글자 두께가 바뀔 수 있어** 이번에는 건드리지 않았습니다. 9번 작업(SEO/성능)에서 어느 가중치가 실제로 쓰이는지 확인한 뒤 정리하는 것이 안전합니다.
+
+---
+
+## 5. 적용 순서
+
+### 5-1. 지금 상태
 
 보안 헤더 5개는 **바로 적용**됩니다 (위험 없음). CSP는 `Content-Security-Policy-Report-Only`라서 **아무것도 차단하지 않고 위반만 콘솔에 보고**합니다.
 
@@ -198,7 +256,7 @@ the following Content Security Policy directive: "script-src ..."
 | 프로필 닉네임 변경 | 저장 |
 | 다크 모드 토글 후 **새로고침** | 인라인 스크립트 해시 (깜빡임 없이 다크로 떠야 함) |
 
-### 4-2. 위반이 나왔을 때
+### 5-2. 위반이 나왔을 때
 
 | 위반 내용 | 조치 |
 |---|---|
@@ -207,7 +265,7 @@ the following Content Security Policy directive: "script-src ..."
 | `connect-src` 위반 | Supabase URL 오타 또는 `wss://` 누락 |
 | `style-src` 위반 | `'unsafe-inline'`이 이미 있으므로 나오지 않아야 합니다. 나오면 폰트 CDN 경로 확인 |
 
-### 4-3. 강제 전환
+### 5-3. 강제 전환
 
 위반이 **0건**인 것을 확인한 뒤, `vercel.json`에서 키 이름만 바꿉니다.
 
@@ -220,7 +278,7 @@ the following Content Security Policy directive: "script-src ..."
 
 `npm run verify:csp`가 현재 모드를 출력하므로 어느 상태인지 헷갈리지 않습니다.
 
-### 4-4. 강제 전환 후 선택적 강화
+### 5-4. 강제 전환 후 선택적 강화
 
 1. `'unsafe-eval'` 제거를 시도해 보고, Python 실행이 깨지면 되돌립니다 (Pyodide가 필요로 한다는 뜻)
 2. 3절의 **워커 정적 파일 분리**를 적용해 `'unsafe-eval'`을 워커 경로로 격리
@@ -228,7 +286,7 @@ the following Content Security Policy directive: "script-src ..."
 
 ---
 
-## 5. 자동 검증이 잡아주는 것
+## 6. 자동 검증이 잡아주는 것
 
 ```bash
 npm run build && npm run verify:csp

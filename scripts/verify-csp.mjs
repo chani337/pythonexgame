@@ -99,6 +99,12 @@ const RUNTIME = [
   ['connect-src', 'https://cdn.jsdelivr.net', 'Pyodide 가 받는 wasm / 패키지 휠'],
   ['connect-src', process.env.VITE_SUPABASE_URL || '', 'Supabase REST'],
   ['font-src', 'https://fonts.gstatic.com', 'Google Fonts 폰트 파일'],
+  // The service worker caches Google Fonts via workbox runtimeCaching, and a
+  // fetch() from a service worker is checked against connect-src -- not
+  // style-src or font-src. Found only by reading Report-Only violations in a
+  // real browser; nothing static could have predicted it.
+  ['connect-src', 'https://fonts.googleapis.com', '서비스워커가 폰트 스타일시트를 fetch'],
+  ['connect-src', 'https://fonts.gstatic.com', '서비스워커가 폰트 파일을 fetch'],
 ];
 
 for (const [directive, origin, why] of RUNTIME) {
