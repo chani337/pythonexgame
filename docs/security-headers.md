@@ -24,7 +24,32 @@ $ grep -rn "Access-Control\|cors\|CORS" src/ vite.config.ts index.html
 
 **정적 SPA에는 아무 역할이 없습니다.** 자기 출처로 보내는 요청은 CORS 검사를 받지 않고, 외부에서 이 사이트의 HTML/JS를 `fetch`로 읽어갈 수 있게 열어주는 것 외에 효과가 없습니다. Supabase·jsDelivr·Google Fonts는 **각자의 서버**가 CORS 헤더를 보내는 쪽이라 이 사이트의 헤더와 무관합니다.
 
-→ 전부 제거했습니다. 나중에 외부에서 호출할 API 경로가 생기면 **그 경로에만** 특정 출처를 지정하세요 (`"source": "/api/(.*)"`).
+### ⚠️ 그런데 `vercel.json` 에서 빼는 것만으로는 제거되지 않습니다
+
+처음에 `vercel.json` 에서 해당 항목을 **삭제**했는데, 배포 후 확인해 보니 헤더가 그대로 남아 있었습니다.
+
+```
+$ curl -sI https://pyquests.vercel.app/favicon.svg | grep -i access-control
+access-control-allow-origin: *
+$ curl -sI https://pyquests.vercel.app/favicon.svg | grep -i x-vercel-cache
+x-vercel-cache: MISS          ← 캐시가 아니라 오리진에서 갓 받은 응답
+```
+
+**Vercel 이 정상 서빙되는 정적 파일에 `*` 를 기본으로 붙이고, `vercel.json` 의 headers 는 가산(additive) 방식**이라 키를 생략하면 그 기본값이 살아남습니다. 404 응답에는 제 헤더(`X-Frame-Options`)만 붙고 ACAO 는 없는 것으로 교차 확인했습니다.
+
+→ **값을 명시해서 덮어써야 합니다.**
+
+```json
+{ "key": "Access-Control-Allow-Origin", "value": "https://pyquests.vercel.app" }
+```
+
+자기 출처를 지정하는 것이 가장 제한적인 선택입니다. 동일 출처 요청은 애초에 CORS 를 거치지 않으므로, 실질적으로 **교차 출처 읽기를 차단**하는 효과입니다.
+
+> **커스텀 도메인을 붙이면(9번 작업) 이 값도 바꿔야 합니다.** 안 바꿔도 보안상 더 느슨해지지는 않지만(여전히 교차 출처가 막힘), 엉뚱한 출처를 가리키게 됩니다.
+
+`npm run verify:csp` 가 이 항목을 검사합니다 — 생략했거나 `*` 면 실패합니다.
+
+나중에 외부에서 호출할 API 경로가 생기면 **그 경로에만** 별도 규칙으로 출처를 지정하세요 (`"source": "/api/(.*)"`).
 
 ---
 

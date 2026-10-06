@@ -155,10 +155,19 @@ for (const key of ['X-Content-Type-Options', 'Referrer-Policy', 'X-Frame-Options
   else problems.push(`${key} 헤더가 없습니다`);
 }
 
-if (byKey['Access-Control-Allow-Origin']) {
-  problems.push(`Access-Control-Allow-Origin 이 아직 설정되어 있습니다 (${byKey['Access-Control-Allow-Origin']})`);
+// Vercel adds `access-control-allow-origin: *` to every static file it
+// serves, and vercel.json headers are additive -- omitting the key leaves
+// that default in place (verified against the live deployment). So the
+// header must be PRESENT with a restrictive value, not absent.
+const acao = byKey['Access-Control-Allow-Origin'];
+if (!acao) {
+  problems.push(
+    'Access-Control-Allow-Origin 을 명시해야 합니다 — 생략하면 Vercel 기본값 * 이 그대로 남습니다'
+  );
+} else if (acao === '*') {
+  problems.push('Access-Control-Allow-Origin 이 * 입니다 — 자기 출처로 좁히세요');
 } else {
-  console.log('OK   Access-Control-Allow-Origin 없음');
+  console.log(`OK   Access-Control-Allow-Origin ${acao} (Vercel 기본값 * 를 덮어씀)`);
 }
 
 // fullscreen must stay allowed -- DocsViewer's 집중 모드 uses it
