@@ -27,11 +27,39 @@ await supabase.from('user_solved_problems').upsert(rows);
 
 스트릭도 같은 문제였습니다. `profiles_update_own`이 `streak` 쓰기를 허용하고 `syncStatsToSupabase`가 클라이언트 계산값을 그대로 써서, `supabase.from('profiles').update({ streak: 9999 })` 한 줄로 설정 가능했습니다.
 
-### 핵심: FK 하나가 조작을 원천 차단합니다
+### 핵심: problem_id 검증 하나가 조작을 원천 차단합니다
 
-`problem_id`가 `public.problems`(377개)에 존재해야 한다는 제약이 걸리면, **달성 가능한 최대 `solved_count`가 377**이 됩니다. 이는 모든 문제를 정직하게 푼 사용자와 동일한 값입니다. 가짜 id 전략이 통째로 무의미해집니다.
+`problem_id`가 `public.problems`(377개)에 있어야만 집계되면, **달성 가능한 최대 `solved_count`가 377**이 됩니다. 모든 문제를 정직하게 푼 사용자와 동일한 값이라, 가짜 id 전략이 통째로 무의미해집니다.
 
 속도 제한은 그 위에 얹는 2차 방어이며, 랭킹 인플레보다는 **DB 쓰기 남용**을 막는 장치입니다.
+
+### ⚠️ 이 마이그레이션은 데이터를 삭제하지 않습니다
+
+처음 설계는 외래 키(FK)였습니다. **그 설계를 폐기했습니다.**
+
+FK는 위반 행이 남아 있으면 추가할 수 없습니다. 즉 `problem_id`가 현재 목록에 없는 모든 행을 **먼저 지우거나 옮겨야** 합니다. 그런데 그런 행이 조작인지, **과거에 이름이 바뀐 문제를 정상적으로 푼 기록**인지는 데이터베이스 안에서 구분할 방법이 없습니다. 추측으로 학생의 학습 기록을 지우는 것은 참조 정합성과 바꿀 만한 가치가 없습니다.
+
+그래서 이렇게 바꿨습니다.
+
+| | 폐기한 설계 (FK) | 적용한 설계 (트리거) |
+|---|---|---|
+| 신규 쓰기 차단 | FK 위반 | `enforce_known_problem_id` 트리거 |
+| 기존 미등록 행 | **삭제/격리 필요** | **그대로 둠** |
+| 집계 반영 | — | `public.problems`와 JOIN해 **집계에서만 제외** |
+| 이름 바뀐 문제 복구 | 격리 테이블에서 복원 | **id를 `problems`에 다시 넣으면 끝** |
+| 도달 가능한 최대치 | 377 | 377 (동일) |
+
+`migrations/001_ranking_integrity.sql`과 `002_admin_flag.sql`의 **`DELETE` 문 개수는 0입니다.**
+
+```bash
+$ grep -c "^DELETE FROM" migrations/001_ranking_integrity.sql migrations/002_admin_flag.sql
+migrations/001_ranking_integrity.sql:0
+migrations/002_admin_flag.sql:0
+```
+
+`problems_seed.sql`에 `DELETE`가 하나 있지만, 사용자 행이 참조하지 않는 문제만 지우도록 이중으로 가드되어 있습니다.
+
+바뀌는 값은 `profiles`의 `streak` / `solved_count` / `last_solved_date` **세 컬럼뿐**이고, 이건 실제 해결 기록에서 다시 계산한 값입니다. 그래도 되돌릴 수 있게 `phase1b-backup.sql`로 스냅샷을 먼저 뜹니다.
 
 ---
 
@@ -107,29 +135,33 @@ SELECT language, COUNT(*) FROM public.problems GROUP BY language ORDER BY 2 DESC
 
 **377이 아니면 멈추세요.** 시드가 불완전한 상태로 STEP 3을 실행하면 정상 진도가 격리됩니다.
 
-### 2-2. 유효하지 않은 problem_id 확인
+### 2-2. 유효하지 않은 problem_id 확인 — 2단계가 자동으로 보고합니다
+
+2단계(`phase2-core.sql`)의 STEP 3이 **아무것도 바꾸지 않고** 세 가지를 출력합니다.
+
+1. **요약** — 미등록 행 수 / 미등록 id 수 / 영향받은 사용자 수
+2. **`users > 1` 목록** — 두 명 이상이 푼 미등록 id. **이름이 바뀐 문제는 여기 뜹니다.** 한 사람이 대량 생성한 가짜 id는 여기 안 뜨므로, 수천 개 노이즈 속에서도 중요한 것만 보입니다
+3. **단독 사용자 목록 (최대 30개)** — 대량 생성 id가 여기 몰립니다
+
+테스트에서 가짜 id 3002개 속에 섞인 `old_renamed_q1`(2명이 푼 것)이 2번 목록에 **단독으로** 떴습니다.
+
+**2번 목록에 실제 문제처럼 보이는 id가 있으면** 이렇게 되살립니다. 급하지 않습니다 — 행은 그대로 있으니 나중에 해도 됩니다.
 
 ```sql
-SELECT s.problem_id, COUNT(*) AS rows, COUNT(DISTINCT s.user_id) AS users
-FROM public.user_solved_problems s
-WHERE NOT EXISTS (SELECT 1 FROM public.problems p WHERE p.id = s.problem_id)
-GROUP BY s.problem_id
-ORDER BY rows DESC;
+-- 방법 A: 새 id 로 매핑
+UPDATE public.user_solved_problems SET problem_id = '<새 id>' WHERE problem_id = '<옛 id>';
+
+-- 방법 B: 옛 id 를 problems 에 되살리기 (문제 자체를 복원하는 경우)
+INSERT INTO public.problems (id, language, difficulty, type)
+VALUES ('<옛 id>', 'python', 'basic', 'coding');
+
+-- 둘 중 무엇을 했든 집계를 다시 계산
+SELECT public.recompute_solver_stats();
 ```
 
-여기 나오는 id를 판단하세요.
+`recompute_solver_stats()`가 필요한 이유는, 재계산 트리거가 `user_solved_problems` 변경에만 반응하기 때문입니다. `problems`만 고치면 스스로 갱신되지 않습니다.
 
-- `fake_1`, `aaa` 같은 무의미한 문자열 → 조작. 그대로 격리
-- **과거에 존재했지만 이름이 바뀐 id** → 정상 진도입니다. STEP 3 실행 **전에** 매핑해서 되살리세요:
-
-```sql
--- 예: 이름이 바뀐 경우
-UPDATE public.user_solved_problems
-SET problem_id = 'new_id'
-WHERE problem_id = 'old_id';
-```
-
-> 과거 커밋에서 `fa40f17`(난이도 라벨 정정)은 id를 바꾸지 않았고, C/챌린지 추가도 전부 신규 id였습니다. 따라서 이름 변경은 없었을 가능성이 높지만, 직접 확인하세요.
+> 과거 커밋 확인 결과 `fa40f17`(난이도 라벨 정정)은 id를 바꾸지 않았고 C/챌린지 추가도 전부 신규 id였습니다. 이름 변경은 없었을 가능성이 높습니다. 다만 **이제는 틀려도 데이터가 사라지지 않으므로** 추측에 의존하지 않아도 됩니다.
 
 ### 2-3. STEP 2 ~ STEP 6 실행
 
@@ -138,7 +170,7 @@ WHERE problem_id = 'old_id';
 이 단계에서 일어나는 일:
 - `profiles.hidden` 컬럼 추가
 - 클라이언트의 `streak`/`solved_count`/`last_solved_date`/`hidden` 쓰기가 무시됨 (에러가 아니라 무시 — 구 클라이언트가 계속 동작)
-- 유효하지 않은 행이 `quarantined_solved_problems`로 이동 후 FK 추가 ← **조작 차단 지점**
+- `enforce_known_problem_id` 트리거 추가 ← **조작 차단 지점**. 기존 행은 건드리지 않고, 집계에서만 제외됩니다
 - 전 사용자 스트릭·solved_count를 실제 기록으로 재계산
 - 분당 30건 insert 제한
 - `leaderboard_public`이 `hidden` 계정 제외, `recent_activity_public` 뷰 신설

@@ -3,13 +3,11 @@
 -- =====================================================================
 -- Returns the database to its pre-001 behaviour. Run top to bottom.
 --
--- What this does NOT undo:
---   * Rows moved to public.quarantined_solved_problems. They are left in
---     place deliberately. STEP 4 below shows how to put them back.
---   * profiles.streak / solved_count / last_solved_date values, which have
---     been recomputed from real data. The old client-reported values are
---     not recoverable -- but the recomputed ones are the correct ones, so
---     there is nothing to restore.
+-- 001 deletes nothing, so there is no data to put back. The only thing this
+-- cannot undo is the recomputed profiles.streak / solved_count /
+-- last_solved_date -- the old client-reported values are gone. Those were the
+-- untrusted ones the migration existed to replace, and the recomputed values
+-- are derived from the solve rows, which are untouched.
 -- =====================================================================
 
 
@@ -42,21 +40,15 @@ DROP FUNCTION IF EXISTS public.merge_guest_progress(TEXT[]);
 DROP FUNCTION IF EXISTS public.calculate_streak(UUID);
 
 
--- STEP 3 — drop the FK so invented problem_ids are accepted again
-ALTER TABLE public.user_solved_problems
-  DROP CONSTRAINT IF EXISTS user_solved_problems_problem_id_fkey;
-ALTER TABLE public.user_review_problems
-  DROP CONSTRAINT IF EXISTS user_review_problems_problem_id_fkey;
+-- STEP 3 — drop the problem_id validation so any id is accepted again
+DROP TRIGGER IF EXISTS solved_known_problem ON public.user_solved_problems;
+DROP TRIGGER IF EXISTS review_known_problem ON public.user_review_problems;
+DROP FUNCTION IF EXISTS public.enforce_known_problem_id();
 
-
--- STEP 4 — (optional) replay quarantined rows
--- Only do this if STEP 0's pre-flight showed the rows were real progress
--- against renamed problems, not manipulation. Map the old ids first.
---
--- INSERT INTO public.user_solved_problems (id, user_id, problem_id, solved_at)
--- SELECT id, user_id, problem_id, solved_at
--- FROM public.quarantined_solved_problems
--- ON CONFLICT (user_id, problem_id) DO NOTHING;
+-- There is no quarantine to replay: STEP 3 never removed a row. Rows with an
+-- unknown problem_id are still in user_solved_problems exactly as they were,
+-- and after this rollback they count toward solved_count again (the old
+-- behaviour).
 
 
 -- STEP 5 — restore the previous views
@@ -76,11 +68,15 @@ CREATE OR REPLACE VIEW public.leaderboard_public AS
 GRANT SELECT ON public.leaderboard_public TO anon, authenticated;
 
 DROP VIEW IF EXISTS public.recent_activity_public;
+DROP VIEW IF EXISTS public.language_leaderboard_public;
+DROP VIEW IF EXISTS public.weekly_leaderboard_public;
 
 
--- STEP 6 — (optional) drop the new tables
--- Leaving them costs nothing and keeps the quarantine audit trail.
+-- STEP 6 — (optional) drop the new objects
+-- Leaving them costs nothing. public.problems is just a mirror of
+-- src/data/problems.ts and `hidden` defaults to false.
 --
--- DROP TABLE IF EXISTS public.quarantined_solved_problems;
+-- DROP VIEW  IF EXISTS public.language_leaderboard_public;
+-- DROP VIEW  IF EXISTS public.weekly_leaderboard_public;
 -- DROP TABLE IF EXISTS public.problems;
 -- ALTER TABLE public.profiles DROP COLUMN IF EXISTS hidden;

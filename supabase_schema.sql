@@ -117,36 +117,24 @@ DROP POLICY IF EXISTS "problems_select_public" ON public.problems;
 CREATE POLICY "problems_select_public" ON public.problems
   FOR SELECT USING (true);
 
--- Rows pulled out of user_solved_problems because their problem_id was not
--- in public.problems. Moved rather than deleted so a renamed problem can be
--- replayed instead of costing someone real progress.
-CREATE TABLE IF NOT EXISTS public.quarantined_solved_problems (
-  id             UUID PRIMARY KEY,
-  user_id        UUID NOT NULL,
-  problem_id     TEXT NOT NULL,
-  solved_at      TIMESTAMPTZ,
-  quarantined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  reason         TEXT NOT NULL
-);
-
-ALTER TABLE public.quarantined_solved_problems ENABLE ROW LEVEL SECURITY;
-REVOKE ALL ON public.quarantined_solved_problems FROM anon, authenticated;
-GRANT ALL ON public.quarantined_solved_problems TO service_role;
-
 -- 2. User Solved Problems Table
--- problem_id references public.problems (see section 5). Without that FK,
--- any logged-in user could INSERT thousands of invented problem_ids and top
--- the leaderboard, because solved_count is just a count of these rows and
--- unique_user_problem only blocks repeats of the SAME id. With it, the
--- highest reachable count is the real problem total -- the same number
--- someone who legitimately finished everything has.
+-- problem_id is validated against public.problems by the
+-- enforce_known_problem_id trigger (section 5), NOT by a foreign key.
 --
--- ON DELETE RESTRICT, not CASCADE: retiring a problem must never silently
--- delete a user's progress.
+-- Without any validation, a logged-in user could INSERT thousands of invented
+-- problem_ids and top the leaderboard -- solved_count is just a count of
+-- these rows, and unique_user_problem only blocks repeats of the SAME id.
+--
+-- A FK would enforce the same thing, but it cannot be added while existing
+-- rows violate it, which would force deleting or moving any row whose
+-- problem_id isn't current. From inside the database there is no way to tell
+-- such a row apart from real progress against a problem that was later
+-- renamed, so the trigger validates new writes while existing rows are left
+-- alone and simply excluded from the aggregates.
 CREATE TABLE IF NOT EXISTS public.user_solved_problems (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  problem_id TEXT NOT NULL REFERENCES public.problems(id) ON DELETE RESTRICT,
+  problem_id TEXT NOT NULL,
   solved_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT unique_user_problem UNIQUE (user_id, problem_id)
 );
@@ -186,6 +174,7 @@ CREATE OR REPLACE VIEW public.recent_activity_public AS
     s.solved_at,
     pr.display_name
   FROM public.user_solved_problems s
+  JOIN public.problems pb ON pb.id = s.problem_id
   JOIN public.profiles pr ON pr.id = s.user_id
   WHERE pr.hidden = false
   ORDER BY s.solved_at DESC
@@ -223,6 +212,7 @@ CREATE OR REPLACE VIEW public.weekly_leaderboard_public AS
     pr.streak,
     COUNT(*)::int AS solved_count
   FROM public.user_solved_problems s
+  JOIN public.problems p  ON p.id = s.problem_id
   JOIN public.profiles pr ON pr.id = s.user_id
   WHERE pr.hidden = false
     AND (s.solved_at AT TIME ZONE 'Asia/Seoul')
@@ -255,7 +245,7 @@ CREATE POLICY "read_chapters_own" ON public.user_read_chapters
 CREATE TABLE IF NOT EXISTS public.user_review_problems (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES public.profiles(id) ON DELETE CASCADE NOT NULL,
-  problem_id TEXT NOT NULL REFERENCES public.problems(id) ON DELETE RESTRICT,
+  problem_id TEXT NOT NULL,  -- validated by enforce_known_problem_id (section 5)
   added_at TIMESTAMPTZ DEFAULT NOW(),
   CONSTRAINT unique_user_review_problem UNIQUE (user_id, problem_id)
 );
@@ -402,6 +392,9 @@ AS $$
   solve_days AS (
     SELECT DISTINCT (s.solved_at AT TIME ZONE 'Asia/Seoul')::date AS d
     FROM public.user_solved_problems s
+    -- Only solves of real problems build a streak, so a day fabricated with
+    -- invented ids contributes nothing.
+    JOIN public.problems p ON p.id = s.problem_id
     WHERE s.user_id = p_user_id
       AND (s.solved_at AT TIME ZONE 'Asia/Seoul')::date <= (SELECT d FROM today)
   ),
@@ -503,9 +496,15 @@ BEGIN
       updated_at       = NOW()
   FROM (
     SELECT u.id,
-           (SELECT COUNT(*) FROM public.user_solved_problems s WHERE s.user_id = u.id) AS cnt,
+           -- Joined to public.problems so a leftover invented id inflates
+           -- nothing, without those rows having to be deleted.
+           (SELECT COUNT(*) FROM public.user_solved_problems s
+              JOIN public.problems p2 ON p2.id = s.problem_id
+            WHERE s.user_id = u.id) AS cnt,
            (SELECT TO_CHAR(MAX(s.solved_at AT TIME ZONE 'Asia/Seoul'), 'YYYY-MM-DD')
-              FROM public.user_solved_problems s WHERE s.user_id = u.id) AS last_day
+              FROM public.user_solved_problems s
+              JOIN public.problems p2 ON p2.id = s.problem_id
+            WHERE s.user_id = u.id) AS last_day
     FROM UNNEST(affected) AS u(id)
   ) agg
   WHERE p.id = agg.id;
@@ -527,7 +526,79 @@ CREATE TRIGGER solved_refresh_stats_delete
   REFERENCING OLD TABLE AS deleted
   FOR EACH STATEMENT EXECUTE FUNCTION public.refresh_solver_stats();
 
--- Secondary defence only: the FK on problem_id already caps the reachable
+-- Lets an admin force a stat recompute without touching a solve row. Needed
+-- after fixing a renamed problem id: putting the id back into public.problems
+-- makes the rows countable again, but refresh_solver_stats only fires on
+-- changes to user_solved_problems, so nothing would recompute on its own.
+--
+--   SELECT public.recompute_solver_stats();                 -- everyone
+--   SELECT public.recompute_solver_stats('<uuid>'::uuid);    -- one account
+CREATE OR REPLACE FUNCTION public.recompute_solver_stats(p_user_id UUID DEFAULT NULL)
+RETURNS TABLE (user_id UUID, display_name TEXT, solved_count INT, streak INT)
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  PERFORM set_config('pyquests.trusted_stats_write', 'on', true);
+
+  UPDATE public.profiles p
+  SET streak           = public.calculate_streak(p.id),
+      solved_count     = COALESCE((SELECT COUNT(*) FROM public.user_solved_problems s
+                                     JOIN public.problems p2 ON p2.id = s.problem_id
+                                   WHERE s.user_id = p.id), 0),
+      last_solved_date = (SELECT TO_CHAR(MAX(s.solved_at AT TIME ZONE 'Asia/Seoul'), 'YYYY-MM-DD')
+                            FROM public.user_solved_problems s
+                            JOIN public.problems p2 ON p2.id = s.problem_id
+                          WHERE s.user_id = p.id),
+      updated_at       = NOW()
+  WHERE p_user_id IS NULL OR p.id = p_user_id;
+
+  PERFORM set_config('pyquests.trusted_stats_write', 'off', true);
+
+  RETURN QUERY
+    SELECT p.id, p.display_name, p.solved_count, p.streak
+    FROM public.profiles p
+    WHERE p_user_id IS NULL OR p.id = p_user_id
+    ORDER BY p.solved_count DESC;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.recompute_solver_stats(UUID) FROM PUBLIC, anon, authenticated;
+GRANT EXECUTE ON FUNCTION public.recompute_solver_stats(UUID) TO service_role;
+
+COMMENT ON FUNCTION public.recompute_solver_stats(UUID) IS
+  'Admin-only stat recompute. Use after changing public.problems (e.g. restoring a renamed id) since refresh_solver_stats only triggers on solve-row changes.';
+
+-- Validates problem_id on write. Used instead of a foreign key so that no
+-- existing row ever has to be deleted to add the constraint -- see the comment
+-- on user_solved_problems above.
+CREATE OR REPLACE FUNCTION public.enforce_known_problem_id()
+RETURNS TRIGGER
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM public.problems p WHERE p.id = NEW.problem_id) THEN
+    RAISE EXCEPTION 'pyquests_unknown_problem: "%" 는 존재하지 않는 문제 id 입니다', NEW.problem_id
+      USING ERRCODE = 'foreign_key_violation';
+  END IF;
+  RETURN NEW;
+END;
+$$;
+
+DROP TRIGGER IF EXISTS solved_known_problem ON public.user_solved_problems;
+CREATE TRIGGER solved_known_problem
+  BEFORE INSERT OR UPDATE OF problem_id ON public.user_solved_problems
+  FOR EACH ROW EXECUTE FUNCTION public.enforce_known_problem_id();
+
+DROP TRIGGER IF EXISTS review_known_problem ON public.user_review_problems;
+CREATE TRIGGER review_known_problem
+  BEFORE INSERT OR UPDATE OF problem_id ON public.user_review_problems
+  FOR EACH ROW EXECUTE FUNCTION public.enforce_known_problem_id();
+
+-- Secondary defence only: the validation above already caps the reachable
 -- total at the real problem count, so this is about stopping write-flood
 -- abuse rather than rank inflation.
 --

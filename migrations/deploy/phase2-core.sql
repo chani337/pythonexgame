@@ -1,60 +1,12 @@
 -- =====================================================================
--- 001 — Ranking integrity
+-- PyQuests 배포 2단계 — 무결성 핵심 (001 STEP 2~6, 8)
 -- =====================================================================
--- Closes the leaderboard manipulation hole and moves streak/solved_count
--- from client-reported values to server-derived ones.
+-- Supabase 대시보드 → SQL Editor 에 이 파일 전체를 붙여넣고 실행하세요.
+-- !! problems 가 377개인 것을 먼저 확인. STEP 3 의 "users > 1" 리포트를 꼭 읽으세요.
 --
--- Apply the steps IN ORDER. Steps 1-6 are safe to apply before the matching
--- client deploy; STEP 7 MUST NOT be applied until the new client is live
--- (it narrows user_solved_problems SELECT, which today's client still reads
--- directly for the activity feed). See docs/migrations/001-ranking-integrity.md.
---
--- Every step is idempotent -- re-running the file is safe.
+-- 001 과 002 는 어떤 행도 삭제하지 않습니다 (DELETE 문 0개).
+-- 상세: docs/migrations/001-ranking-integrity.md
 -- =====================================================================
-
-
--- ---------------------------------------------------------------------
--- STEP 0 — Pre-flight. Read the output before continuing.
--- ---------------------------------------------------------------------
--- Rows whose problem_id does not exist in the shipped problem set. These
--- are either manipulation or problems that were renamed/retired. STEP 3
--- quarantines them; look at them first so you know which it is.
-
--- (run after STEP 1 has seeded public.problems -- see the doc)
-
-
--- ---------------------------------------------------------------------
--- STEP 1 — Reference table for problem ids
--- ---------------------------------------------------------------------
--- The canonical problem list lives in src/data/problems.ts. This table is
--- its database mirror, so the FK in STEP 3 can reject ids that don't exist.
--- Seed/refresh it with migrations/problems_seed.sql (npm run sync:problems).
-
-CREATE TABLE IF NOT EXISTS public.problems (
-  id         TEXT PRIMARY KEY,
-  language   TEXT NOT NULL,
-  difficulty TEXT NOT NULL,
-  type       TEXT NOT NULL,
-  synced_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-COMMENT ON TABLE public.problems IS
-  'Mirror of src/data/problems.ts. Regenerate the seed with `npm run sync:problems`; never edit by hand.';
-
--- Readable by everyone (it is already in the client bundle), writable by
--- nobody but the service role running the seed.
-ALTER TABLE public.problems ENABLE ROW LEVEL SECURITY;
-
-REVOKE ALL ON public.problems FROM anon, authenticated;
-GRANT SELECT ON public.problems TO anon, authenticated;
-GRANT ALL ON public.problems TO service_role;
-
-DROP POLICY IF EXISTS "problems_select_public" ON public.problems;
-CREATE POLICY "problems_select_public" ON public.problems
-  FOR SELECT USING (true);
--- No INSERT/UPDATE/DELETE policy: with RLS on, that means clients cannot
--- write at all. service_role bypasses RLS and runs the seed.
-
 
 -- ---------------------------------------------------------------------
 -- STEP 2 — profiles: hidden flag + server-owned stat columns
@@ -110,6 +62,8 @@ CREATE TRIGGER profiles_protect_stats
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW EXECUTE FUNCTION public.protect_profile_stats();
 
+
+-- ---------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------
 -- STEP 3 — Reject unknown problem_ids on new writes (NON-DESTRUCTIVE)
@@ -263,6 +217,8 @@ LIMIT 30;
 
 
 -- ---------------------------------------------------------------------
+
+-- ---------------------------------------------------------------------
 -- STEP 4 — Server-computed streak / last_solved_date / solved_count
 -- ---------------------------------------------------------------------
 
@@ -395,6 +351,8 @@ $$;
 
 
 -- ---------------------------------------------------------------------
+
+-- ---------------------------------------------------------------------
 -- STEP 5 — Insert rate limit
 -- ---------------------------------------------------------------------
 -- Secondary defence. The FK in STEP 3 already caps the reachable total, so
@@ -441,6 +399,8 @@ CREATE TRIGGER solved_rate_limit
   BEFORE INSERT ON public.user_solved_problems
   FOR EACH ROW EXECUTE FUNCTION public.enforce_solve_rate_limit();
 
+
+-- ---------------------------------------------------------------------
 
 -- ---------------------------------------------------------------------
 -- STEP 6 — Views: exclude hidden accounts, add a public activity feed
@@ -524,50 +484,6 @@ GRANT SELECT ON public.weekly_leaderboard_public TO anon, authenticated;
 
 
 -- ---------------------------------------------------------------------
--- STEP 7 — Narrow GRANTs and the public SELECT policy
--- ---------------------------------------------------------------------
--- !! DO NOT APPLY UNTIL THE NEW CLIENT IS DEPLOYED !!
--- The current client reads user_solved_problems directly for the activity
--- feed, as an anonymous visitor, every 8 seconds. Applying this before the
--- client switches to recent_activity_public silently empties that feed.
-
--- Replace blanket GRANT ALL with the operations the client actually performs.
-REVOKE ALL ON public.profiles                 FROM anon, authenticated;
-REVOKE ALL ON public.user_solved_problems     FROM anon, authenticated;
-REVOKE ALL ON public.user_read_chapters       FROM anon, authenticated;
-REVOKE ALL ON public.user_review_problems     FROM anon, authenticated;
-REVOKE ALL ON public.user_quiz_answers        FROM anon, authenticated;
-REVOKE ALL ON public.board_posts              FROM anon, authenticated;
-
--- anon reads nothing directly -- only the two public views, which run with
--- the view owner's privileges and so need no table grant here.
-GRANT SELECT, INSERT, UPDATE ON public.profiles             TO authenticated;
-GRANT SELECT, INSERT         ON public.user_solved_problems  TO authenticated;
-GRANT SELECT, INSERT, DELETE ON public.user_read_chapters    TO authenticated;
-GRANT SELECT, INSERT, DELETE ON public.user_review_problems  TO authenticated;
-GRANT SELECT, INSERT, UPDATE ON public.user_quiz_answers     TO authenticated;
-GRANT SELECT, INSERT, UPDATE, DELETE ON public.board_posts   TO authenticated;
-
-GRANT ALL ON public.profiles, public.user_solved_problems, public.user_read_chapters,
-             public.user_review_problems, public.user_quiz_answers, public.board_posts
-  TO service_role;
-
--- No DELETE for authenticated on user_solved_problems: nothing in the client
--- un-solves a problem, and withholding it means a compromised session cannot
--- wipe someone's progress. Account deletion goes through the FK cascade from
--- profiles instead.
-
--- Scope the solved-rows read to the owner. The leaderboard and activity feed
--- both go through views now.
-DROP POLICY IF EXISTS "solved_select_public" ON public.user_solved_problems;
-DROP POLICY IF EXISTS "solved_select_own" ON public.user_solved_problems;
-CREATE POLICY "solved_select_own" ON public.user_solved_problems
-  FOR SELECT USING (auth.uid() = user_id);
-
--- Nothing in the client updates a solved row (insert-only, unique per
--- user+problem), so drop the UPDATE policy rather than leave it open.
-DROP POLICY IF EXISTS "solved_update_own" ON public.user_solved_problems;
-
 
 -- ---------------------------------------------------------------------
 -- STEP 8 — merge_guest_progress RPC (used by backlog item 7)
