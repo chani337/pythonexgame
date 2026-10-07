@@ -10,9 +10,12 @@
  */
 
 :root {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Outfit', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  /* Pretendard first: it covers Latin and Hangul, so a line mixing the two is
+     one typeface instead of two. Inter is the fallback when jsDelivr is
+     unreachable. */
+  --font-sans: 'Pretendard Variable', Pretendard, 'Inter', system-ui, -apple-system, sans-serif;
+  --font-display: 'Pretendard Variable', Pretendard, 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Nanum Gothic Coding', ui-monospace, monospace;
 
   --bg: #fafafa;
   --bg-alt: #f4f4f6;

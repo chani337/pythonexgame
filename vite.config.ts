@@ -101,6 +101,18 @@ export default defineConfig({
             },
           },
           {
+            // Pretendard's dynamic subset: one small woff2 per unicode-range
+            // block, fetched as the page shows those syllables. Versioned in
+            // the URL (@v1.3.9), so a long cache is safe.
+            urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/gh\/orioncactus\/pretendard@/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'pretendard-v1.3.9',
+              expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
             // Font files change ~never; the stylesheet that references them
             // is revalidated instead so a family swap isn't stuck for a year.
             urlPattern: /^https:\/\/fonts\.gstatic\.com\//,

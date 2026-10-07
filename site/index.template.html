@@ -9,7 +9,21 @@
   <meta name="theme-color" content="#121212" media="(prefers-color-scheme: dark)" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <!-- Pretendard carries the Korean, which is nearly all of this page. Inter,
+       Outfit and JetBrains Mono are Latin-only, so every Hangul character was
+       falling back to whatever the OS had and looked different on every
+       machine. The dynamic subset is split by unicode-range, so only the
+       syllable blocks this page shows get downloaded. -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css" />
+  <!-- Inter is the fallback for a network that blocks jsDelivr. Outfit is
+       gone: headings are Pretendard now, so a Korean heading and an English
+       one are the same typeface. -->
+  <!-- Nanum Gothic Coding gives the code panes a fixed-width Hangul. The
+       examples contain Korean ("김철수", the SQL result table), and JetBrains
+       Mono has no Hangul -- nor does the generic monospace fallback -- so
+       those characters were being set proportionally inside <pre>. -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Nanum+Gothic+Coding:wght@400;700&display=swap" rel="stylesheet" />
   <!-- The only script on this page. It marks the splash as already seen for
        this tab so a refresh doesn't replay it, and runs before the stylesheet
        so the panel is never painted on a repeat visit. CSP allows exactly
