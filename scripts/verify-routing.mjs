@@ -45,6 +45,24 @@ const vercel = JSON.parse(await readFile(join(ROOT, 'vercel.json'), 'utf8'));
 
 console.log('\n[1] vercel.json 라우팅 설정');
 
+// Vercel validates vercel.json against a schema and fails the deploy on an
+// unknown top-level property. From outside that is invisible -- the previous
+// build simply stays up -- so a config-only commit looks deployed and isn't.
+// This cost two wrong diagnoses: a '//' comment key was added here, the
+// deploys silently failed, and production kept answering with the old config
+// while the fixes appeared to have no effect.
+const ALLOWED_TOP_LEVEL = new Set([
+  'rewrites', 'redirects', 'headers', 'cleanUrls', 'trailingSlash',
+  'buildCommand', 'outputDirectory', 'installCommand', 'framework',
+  'devCommand', 'regions', 'functions', 'crons', 'images', 'public', 'git',
+]);
+const unknownKeys = Object.keys(vercel).filter((k) => !ALLOWED_TOP_LEVEL.has(k));
+check(unknownKeys.length === 0, 'vercel.json 에 알 수 없는 최상위 키가 없음',
+      `알 수 없는 키: ${unknownKeys.join(', ')}\n`
+      + '       Vercel 이 스키마 검증에 실패해 배포가 거부되고, 이전 빌드가\n'
+      + '       그대로 서비스됩니다 — 밖에서는 "배포됐는데 효과가 없는" 것처럼 보입니다.\n'
+      + '       주석이 필요하면 docs/ 에 쓰세요.');
+
 const rewrites = vercel.rewrites ?? [];
 const catchAll = rewrites.find((r) => r.source === '/(.*)' || r.source === '/:path*');
 check(Boolean(catchAll), 'SPA catch-all rewrite 존재',

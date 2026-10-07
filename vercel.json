@@ -1,5 +1,4 @@
 {
-  "//": "SPA fallback. destination is '/' and not '/index.html': Vercel canonicalises /index.html to / with a 308 by default, so an /index.html destination resolves to a redirect rather than a file and every deep path 404s. Confirmed against production -- see npm run verify:routing, which probes the deployed host because vite preview has its own SPA fallback and answers 200 regardless.",
   "rewrites": [
     {
       "source": "/(.*)",
