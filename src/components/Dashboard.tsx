@@ -160,8 +160,7 @@ function LandingSiteCard() {
           <ExternalLink size={16} /> 소개 페이지
         </h3>
         <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
-          PyQuests가 어떤 사이트인지 한 장으로 정리해 둔 페이지예요.
-          친구나 선생님에게 소개할 때 이 주소를 보내시면 됩니다.
+          PyQuests가 어떤 사이트인지 한 페이지로 정리해뒀습니다.
         </p>
         <code
           style={{

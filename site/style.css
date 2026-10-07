@@ -312,8 +312,8 @@ h1 {
    it should read as one block, just with controlled breaks. text-wrap: pretty
    handles the inside of a sentence that is still too long for one line
    (it avoids leaving a single word stranded on the last line). */
-.lede, .band-text, .sec-sub, .note { text-wrap: pretty; }
-.lede p, .band-text p, .sec-sub p, .note p { margin: 0; }
+.lede, .band-text, .sec-sub, .note, .card-body { text-wrap: pretty; }
+.lede p, .band-text p, .sec-sub p, .note p, .card-body p { margin: 0; }
 
 .lede {
   margin-top: 1.5rem;
@@ -401,7 +401,10 @@ h1 {
   letter-spacing: -0.02em; text-transform: none;
   margin: 0.3rem 0 0.7rem;
 }
-.card p { font-size: 0.875rem; color: var(--ink-2); text-wrap: pretty; }
+.card p { font-size: 0.875rem; color: var(--ink-2); }
+/* The card bodies used to be one run-on paragraph, so sentences started
+   mid-line while every other block on the page broke at sentence ends. */
+.card-body p + p { margin-top: 0.15rem; }
 
 /* ── demos ──────────────────────────────────────────────────── */
 
