@@ -119,6 +119,94 @@ code {
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+/* ── mobile splash ──────────────────────────────────────────── */
+/*
+ * Shown only on phones, and only when motion is welcome. Default is
+ * display:none, so anything that doesn't match the two queries below -- a
+ * desktop, a reduced-motion setting, a browser that never applies them --
+ * simply never sees a panel, rather than being left under one that failed to
+ * animate away.
+ *
+ * The content underneath is already painted; this just covers it for ~0.85s
+ * and leaves. No JavaScript, so no CSP exception, and no risk of the page
+ * being stuck behind a splash whose script failed to load.
+ */
+.splash { display: none; }
+
+@media (max-width: 768px) and (prefers-reduced-motion: no-preference) {
+  .splash {
+    display: grid;
+    place-items: center;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: var(--ink);
+    animation: splash-leave 0.42s cubic-bezier(0.65, 0, 0.35, 1) 0.52s forwards;
+  }
+
+  .splash-in {
+    display: grid;
+    justify-items: center;
+    gap: 0.85rem;
+  }
+
+  /* The favicon's chevron, drawn rather than fetched -- an <img> here would
+     be a second request racing the animation it belongs to. */
+  .splash-chevron {
+    width: 15px;
+    height: 15px;
+    border-right: 2.5px solid var(--bg);
+    border-bottom: 2.5px solid var(--bg);
+    transform: translateY(5px) rotate(-45deg);
+    opacity: 0;
+    animation: splash-chevron-in 0.3s ease-out 0.04s forwards;
+  }
+
+  .splash-mark {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    /* The tracking adds trailing space after the last letter; this pulls the
+       block back so it reads as optically centred. */
+    text-indent: 0.22em;
+    color: var(--bg);
+    opacity: 0;
+    animation: splash-mark 0.34s ease-out 0.08s forwards;
+  }
+
+  /* A hairline drawing itself across -- the same rule-based vocabulary the
+     rest of the page is built from, rather than a spinner. */
+  .splash-rule {
+    width: 104px;
+    height: 1px;
+    background: var(--bg);
+    transform: scaleX(0);
+    transform-origin: center;
+    opacity: 0.45;
+    animation: splash-rule 0.42s cubic-bezier(0.22, 1, 0.36, 1) 0.2s forwards;
+  }
+}
+
+@keyframes splash-mark {
+  from { opacity: 0; transform: translateY(5px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+/* The chevron needs its own keyframes: transform is one property, so reusing
+   splash-mark would animate the rotation away. translateY comes first so the
+   5px rise is in screen space rather than along the rotated axis. */
+@keyframes splash-chevron-in {
+  from { opacity: 0; transform: translateY(5px) rotate(-45deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(-45deg); }
+}
+@keyframes splash-rule {
+  to { transform: scaleX(1); }
+}
+@keyframes splash-leave {
+  to { transform: translateY(-100%); visibility: hidden; }
+}
+
 /* ── header ─────────────────────────────────────────────────── */
 
 .top {
@@ -278,9 +366,13 @@ h1 {
 
 /* ── cards ──────────────────────────────────────────────────── */
 
+/* minmax(min(Npx, 100%), 1fr) rather than minmax(Npx, 1fr): a grid track with
+   a fixed minimum cannot shrink below it, so on a 320px phone the track stayed
+   at its minimum and pushed the card past the viewport. Capping the minimum at
+   100% lets the last column collapse to whatever is actually available. */
 .grid3 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(255px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(255px, 100%), 1fr));
   gap: 1px;
   margin-top: 2.25rem;
   background: var(--line);
@@ -305,7 +397,7 @@ h1 {
 
 .grid2 {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr));
   gap: 1.5rem;
   margin-top: 2.25rem;
 }
@@ -371,7 +463,7 @@ h1 {
 
 .guide {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(128px, 100%), 1fr));
   gap: 1px;
   list-style: none;
   margin-top: 2.25rem;

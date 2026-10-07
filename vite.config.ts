@@ -39,7 +39,11 @@ export default defineConfig({
         // (46KB) but not sql-wasm.wasm (658KB), so precaching it would charge
         // every first-time visitor for the loader while leaving the part that
         // matters to a runtime fetch anyway.
-        globIgnores: ['pyodide/**', 'sql-js/**'],
+        // splash/ is 24 iOS launch screens (134KB). iOS reads them when the
+        // app is added to the home screen and at launch -- the running app
+        // never requests one -- so precaching them would charge every visitor
+        // for bytes only iOS home-screen users ever need.
+        globIgnores: ['pyodide/**', 'sql-js/**', 'splash/**'],
 
         // 9.62MB wasm is over Workbox's 2MB default. This only affects
         // precaching, which pyodide is excluded from, but leaving the default
