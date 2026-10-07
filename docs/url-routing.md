@@ -109,7 +109,69 @@ routeForState('docs', 'sql_q1', 'sql')  // → { view: 'problems', problemId: 's
 | **문제 id 377개 전부 왕복** | `problems.test.ts` 가 id 가 `[a-z0-9_]+` 임을 보장하는데, 그게 **URL 왕복까지 안전하다는 뜻인지**를 여기서 확인합니다 |
 | `nextHistoryAction` 의 none/push/replace 분기 | §2 |
 
-## 7. 브라우저에서 확인한 것
+## 7. 프로덕션에서 전부 404 였습니다
+
+라우팅을 배포하고 확인해 보니 `/` 만 200 이고 **나머지 전부 404** 였습니다.
+
+```
+/                            200
+/problems                    404
+/problems/basic_part1_q3     404
+/docs/css                    404
+```
+
+### 원인
+
+`vercel.json` 의 SPA rewrite 는 **처음부터 거기 있었고, 처음부터 동작하지 않았습니다.**
+
+```json
+{
+  "cleanUrls": true,
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
+```
+
+`cleanUrls: true` 는 정적 사이트에서 `.html` 확장자를 떼는 옵션입니다. 그 결과 **`/index.html` 이 `/` 로 308 리다이렉트**됩니다.
+
+```
+$ curl -I https://pyquests.vercel.app/index.html
+HTTP/2 308
+location: https://pyquests.vercel.app/
+```
+
+즉 rewrite 의 destination 이 **파일이 아니라 리다이렉트**를 가리키고 있었고, Vercel 은 그 경로를 404 로 처리했습니다.
+
+깊은 링크가 없던 동안에는 아무도 `/` 외의 경로를 열지 않았으니 드러날 일이 없었습니다.
+
+### 수정
+
+`cleanUrls` 를 **제거**했습니다. 우회하지 않고 원인을 없앴습니다 — 이 옵션은 여러 `.html` 페이지가 있는 사이트에서 확장자를 떼기 위한 것이고, `dist/` 에는 `index.html` **하나뿐**입니다. 여기서 관측 가능한 유일한 효과가 rewrite 를 깨뜨리는 것이었습니다.
+
+> 소개 사이트(`site/vercel.json`)는 `cleanUrls` 를 **유지**합니다. 거기는 rewrite 가 없고, `/index.html` → `/` 리다이렉트는 정규 주소를 하나로 모아 주므로 오히려 바람직합니다.
+
+### 왜 못 잡았나 — 검증의 구멍
+
+로컬에서 13개 경로를 전부 200 으로 확인했는데도 놓쳤습니다. **`vite preview` 에는 자체 SPA 폴백이 있습니다.** `vercel.json` 에 뭐가 적혀 있든 개발 기기에서는 200 이 나옵니다.
+
+이걸 잡을 수 있는 검사는 **배포된 호스트에 직접 물어보는 것** 하나뿐입니다.
+
+```bash
+PYQUESTS_URL=https://pyquests.vercel.app npm run verify:routing
+```
+
+`scripts/verify-routing.mjs` 가 두 층으로 확인합니다.
+
+| 층 | 검사 | CI |
+|---|---|---|
+| 설정 | catch-all rewrite 존재 | ✓ |
+| 설정 | **`cleanUrls` + `.html` destination 조합 금지** ← 이번 버그 | ✓ |
+| 설정 | `redirects` 가 앱 경로를 가로채지 않음 | ✓ |
+| 설정 | `staticPaths()` 전부 해석 가능 · 정규형 | ✓ |
+| 배포본 | 각 경로가 실제로 200 | 배포 후 수동 |
+
+배포본 확인이 CI 에 없는 이유는, CI 시점에 **그 커밋의 배포가 아직 없기** 때문입니다. 배포 후에 돌려야 의미가 있습니다. 고쳤는지 확인할 때 이 명령이 그대로 증거가 됩니다.
+
+## 8. 브라우저에서 확인한 것
 
 빌드본을 실제로 띄워 확인했습니다.
 
@@ -132,7 +194,7 @@ routeForState('docs', 'sql_q1', 'sql')  // → { view: 'problems', problemId: 's
 5. `/problems/basic_part1_q3` 를 **새 탭에 붙여넣기** → 그 문제가 열림
 6. 주소창에 아무 경로나 → 대시보드, 주소가 `/` 로 바뀜
 
-## 8. 다음 (9번 작업)
+## 9. 다음 (9번 작업)
 
 이제 sitemap 이 가능합니다. `routes.ts` 에 `staticPaths()` 를 넣어 뒀습니다 — 화면 6개 + 가이드 7개를 반환하고, 문제 377개는 `problems.ts` 에서 만들면 됩니다.
 

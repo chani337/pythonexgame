@@ -23,9 +23,10 @@
     "verify:shared-pc": "node scripts/verify-shared-pc.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify:all": "npm run lint && tsc -b && npm run test && npm run check:problems && npm run verify:sandbox && npm run verify:pyodide && npm run verify:sql && npm run verify:guest-merge && npm run verify:shared-pc && npm run check:site",
+    "verify:all": "npm run lint && tsc -b && npm run test && npm run check:problems && npm run verify:sandbox && npm run verify:pyodide && npm run verify:sql && npm run verify:guest-merge && npm run verify:shared-pc && npm run check:site && npm run verify:routing",
     "build:site": "node scripts/build-site.mjs",
-    "check:site": "node scripts/build-site.mjs --check"
+    "check:site": "node scripts/build-site.mjs --check",
+    "verify:routing": "node scripts/verify-routing.mjs"
   },
   "dependencies": {
     "@codemirror/lang-java": "^6.0.2",

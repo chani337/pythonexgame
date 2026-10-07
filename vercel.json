@@ -1,5 +1,5 @@
 {
-  "cleanUrls": true,
+  "//": "cleanUrls was removed, not just reconfigured. With it on, Vercel 308-redirects /index.html to /, so the rewrite below resolved to a redirect rather than a file and every deep path 404'd. cleanUrls exists to strip .html from multi-page sites; dist/ has exactly one .html, so its only observable effect here was breaking the rewrite. Checked by npm run verify:routing.",
   "rewrites": [
     {
       "source": "/(.*)",

@@ -63,6 +63,12 @@ jobs:
       - name: Landing page in sync
         run: npm run check:site
 
+      # Config-level only here. The deployed-host probe needs a live URL for
+      # this commit, which CI doesn't have -- run it after a deploy:
+      #   PYQUESTS_URL=https://pyquests.vercel.app npm run verify:routing
+      - name: Routing config
+        run: npm run verify:routing
+
       - name: Shared-computer sessions
         run: npm run verify:shared-pc
 
