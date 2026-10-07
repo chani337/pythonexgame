@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, CloudUpload, X } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
 
@@ -14,6 +14,7 @@ const DocsViewer = lazy(() => import('./components/DocsViewer'));
 const Board = lazy(() => import('./components/Board'));
 const Changelog = lazy(() => import('./components/Changelog'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import type { GuestMergeResult } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import { problems, filterProblems } from './data/problems';
 import type { Problem } from './data/problems';
@@ -49,7 +50,7 @@ function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
 
-  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncSandboxRunsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen } = useAuth();
+  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncSandboxRunsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen, guestMergeResult, clearGuestMergeResult } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
@@ -57,6 +58,11 @@ function MainApp() {
   const [selectedType, setSelectedType] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const listScrollPosRef = useRef<number>(0);
+
+  // Login nudge for guests. Dismissal is per-session (plain state, not
+  // localStorage) so it reappears on a later visit without nagging within one.
+  // Deliberately a banner and not a modal -- nothing should block solving.
+  const [loginNudgeDismissed, setLoginNudgeDismissed] = useState(false);
 
   // States with LocalStorage fallback. Always scoped per-account (or
   // "guest") -- never fall back to the old unscoped `pyquests_*` keys here.
@@ -486,7 +492,114 @@ print("변환 리스트:", result)
         </Suspense>
       </main>
 
+      {guestMergeResult && (
+        <GuestMergeToast result={guestMergeResult} onClose={clearGuestMergeResult} />
+      )}
+
+      {/* Three solves is enough to have something worth losing, and late
+          enough that it doesn't greet a first-time visitor. */}
+      {!user && !isAuthLoading && solvedIds.length >= 3 && !loginNudgeDismissed && (
+        <LoginNudgeBanner
+          solvedCount={solvedIds.length}
+          onLogin={() => { setLoginNudgeDismissed(true); setAuthModalOpen(true); }}
+          onDismiss={() => setLoginNudgeDismissed(true)}
+        />
+      )}
+
       {pyodideStatus && <RuntimeStatusPill message={pyodideStatus} />}
+    </div>
+  );
+}
+
+// Confirms that progress made before signing in was carried over. Guests who
+// solve problems and then register used to lose everything, silently -- the
+// merge only ran for accounts that already had a profile row.
+function GuestMergeToast({ result, onClose }: { result: GuestMergeResult; onClose: () => void }) {
+  const failed = result.failed;
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: 'fixed',
+        top: '1rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.6rem',
+        padding: '0.75rem 1rem 0.75rem 1.1rem',
+        maxWidth: 'calc(100vw - 2rem)',
+        background: failed ? '#fef2f2' : '#ffffff',
+        border: `1px solid ${failed ? '#dc2626' : '#16a34a'}`,
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        fontSize: '0.85rem',
+        fontWeight: 600,
+        color: '#1a1a1a',
+      }}
+    >
+      <CloudUpload size={16} color={failed ? '#dc2626' : '#16a34a'} style={{ flexShrink: 0 }} />
+      <span>
+        {failed
+          ? '진도를 계정에 저장하지 못했어요. 다음 로그인에 다시 시도합니다.'
+          : `이전에 푼 ${result.mergedSolved}개 문제를 계정에 저장했어요!`}
+        {!failed && result.skippedSolved > 0 && (
+          <span style={{ color: 'var(--text-muted)', fontWeight: 500 }}>
+            {` (지금은 없는 문제 ${result.skippedSolved}개는 제외)`}
+          </span>
+        )}
+      </span>
+      <button
+        onClick={onClose}
+        aria-label="알림 닫기"
+        style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.15rem', display: 'flex', color: 'var(--text-secondary)' }}
+      >
+        <X size={15} />
+      </button>
+    </div>
+  );
+}
+
+// Guest progress lives only in this browser's localStorage, so clearing the
+// cache or switching devices loses it. This says so once the guest has enough
+// invested to care, without blocking anything.
+function LoginNudgeBanner({ solvedCount, onLogin, onDismiss }: { solvedCount: number; onLogin: () => void; onDismiss: () => void }) {
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        bottom: '1.25rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 99998,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.85rem',
+        padding: '0.7rem 0.85rem 0.7rem 1.1rem',
+        maxWidth: 'calc(100vw - 2rem)',
+        background: '#1a1a1a',
+        color: '#ffffff',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.25)',
+        fontSize: '0.82rem',
+      }}
+    >
+      <span>
+        <strong>{solvedCount}개</strong>를 푸셨어요. 진도를 저장하려면 로그인하세요 — 다른 기기에서도 이어서 풀 수 있어요.
+      </span>
+      <button
+        onClick={onLogin}
+        style={{ background: '#ffffff', color: '#1a1a1a', border: 'none', padding: '0.4rem 0.9rem', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer', flexShrink: 0 }}
+      >
+        로그인
+      </button>
+      <button
+        onClick={onDismiss}
+        aria-label="안내 닫기"
+        style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.15rem', display: 'flex', color: '#94a3b8', flexShrink: 0 }}
+      >
+        <X size={15} />
+      </button>
     </div>
   );
 }

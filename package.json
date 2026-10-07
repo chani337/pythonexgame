@@ -18,7 +18,8 @@
     "prebuild": "node scripts/fetch-pyodide-core.mjs && node scripts/fetch-sqljs.mjs",
     "verify:pyodide": "node scripts/verify-pyodide-loader.mjs",
     "verify:pyodide-core": "node scripts/verify-pyodide-core.mjs",
-    "verify:sql": "node scripts/verify-sql-runner.mjs"
+    "verify:sql": "node scripts/verify-sql-runner.mjs",
+    "verify:guest-merge": "node scripts/verify-guest-merge.mjs"
   },
   "dependencies": {
     "@codemirror/lang-java": "^6.0.2",

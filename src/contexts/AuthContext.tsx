@@ -49,6 +49,22 @@ interface RecentActivityRow {
 }
 
 const PROBLEM_TITLE_BY_ID = new Map(problems.map((p) => [p.id, p.title]));
+
+// Used to drop stale ids out of a guest's localStorage before writing them.
+// Migration 001 validates problem_id on insert, and one unknown id aborts the
+// whole statement -- so filtering here is what keeps a single retired problem
+// from costing someone their entire merge.
+const KNOWN_PROBLEM_IDS = new Set(problems.map((p) => p.id));
+
+/** Outcome of merging guest progress into an account on login. */
+export interface GuestMergeResult {
+  /** Problems newly saved to the account by this merge. */
+  mergedSolved: number;
+  /** Ids dropped because they are no longer in the problem set. */
+  skippedSolved: number;
+  /** True when the solve merge failed; guest keys are kept for a retry. */
+  failed: boolean;
+}
 const MAX_RECENT_ACTIVITY = 15;
 
 // Every per-account localStorage key this app writes, keyed by the prefix
@@ -120,6 +136,9 @@ interface AuthContextType {
   signOut: () => Promise<void>;
   syncSolvedToSupabase: (problemId: string) => Promise<void>;
   syncSandboxRunsToSupabase: (sandboxRuns: number) => Promise<void>;
+  /** Non-null right after a login that moved guest progress into the account. */
+  guestMergeResult: GuestMergeResult | null;
+  clearGuestMergeResult: () => void;
   fetchUserSolvedIds: () => Promise<string[]>;
   syncReadChapterToSupabase: (chapterId: string, isRead: boolean) => Promise<void>;
   fetchUserReadChapterIds: () => Promise<string[]>;
@@ -140,6 +159,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
   const [recentActivity, setRecentActivity] = useState<ActivityEvent[]>([]);
   const lastSeenSolvedAtRef = useRef<string>(new Date().toISOString());
+
+  // Result of the guest-progress merge, so a screen can tell the user what was
+  // saved. Cleared once acknowledged.
+  const [guestMergeResult, setGuestMergeResult] = useState<GuestMergeResult | null>(null);
+  // fetchProfile runs on every auth state change -- including token refresh
+  // and returning to the tab -- so without this the merge would re-run and
+  // re-announce itself all session. The RPC is idempotent, but
+  // "23개를 저장했어요" popping up on every refresh is not acceptable.
+  const mergedForUserRef = useRef<string | null>(null);
 
   // Initialize leaderboard state with persistent local cache or empty array
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>(() => {
@@ -274,7 +302,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(newProf);
       } else {
         setProfile(data);
-        await mergeLocalStorageProgress(userId);
+      }
+
+      // Runs on both paths. It used to live only in the `else`, so a brand-new
+      // signup -- which has no profile row yet and therefore takes the branch
+      // above -- never merged at all: someone who solved problems as a guest
+      // and then registered lost every one of them.
+      if (mergedForUserRef.current !== userId) {
+        mergedForUserRef.current = userId;
+        const result = await mergeLocalStorageProgress(userId);
+        if (result && (result.mergedSolved > 0 || result.failed)) {
+          setGuestMergeResult(result);
+        }
+        if (result?.failed) {
+          // Let the next login try again rather than pinning the failure.
+          mergedForUserRef.current = null;
+        }
       }
     } catch (err) {
       console.error('Fetch profile error:', err);
@@ -284,65 +327,150 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const mergeLocalStorageProgress = async (userId: string) => {
+  // Pushes progress made before (or outside of) a server round-trip into the
+  // account on login.
+  //
+  // Rewritten for migration 001. The previous version bulk-upserted straight
+  // into user_solved_problems, which now breaks in two ways:
+  //
+  //   * the 30-inserts-per-minute trigger rejects row 31, and because that
+  //     aborts the whole statement a guest with more than 30 solves lost the
+  //     entire merge -- exactly the people this feature exists for
+  //   * an unknown problem_id (a renamed or removed problem still sitting in
+  //     someone's localStorage) aborts the statement too
+  //
+  // merge_guest_progress handles both: it filters ids against public.problems,
+  // sets the rate-limit bypass, and is idempotent, so a repeat login reports 0
+  // merged instead of failing or double-counting.
+  //
+  // Both the guest key and the user-scoped key are read. The user-scoped one is
+  // normally just a mirror of the server, but if a solve was recorded while
+  // offline it is the only copy -- and the RPC makes re-sending known ids free.
+  const mergeLocalStorageProgress = async (userId: string): Promise<GuestMergeResult | null> => {
+    if (!isSupabaseConfigured) return null;
+
+    const readIds = (prefix: string): string[] => {
+      const seen = new Set<string>();
+      for (const key of [`${prefix}${userId}`, `${prefix}guest`]) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) parsed.forEach((v) => typeof v === 'string' && seen.add(v));
+        } catch {
+          // A corrupted entry shouldn't take the whole merge down with it.
+        }
+      }
+      return [...seen];
+    };
+
+    let mergedSolved = 0;
+    let skippedSolved = 0;
+    let solvedFailed = false;
+
     try {
-      const savedSolved = localStorage.getItem(`pyquests_solved_ids_${userId}`) || localStorage.getItem('pyquests_solved_ids_guest');
-      if (savedSolved) {
-        const solvedIds: string[] = JSON.parse(savedSolved);
-        if (solvedIds.length > 0) {
-          const records = solvedIds.map((pid) => ({
-            user_id: userId,
-            problem_id: pid,
-          }));
-          await supabase.from('user_solved_problems').upsert(records, { onConflict: 'user_id,problem_id' });
+      const solvedIds = readIds('pyquests_solved_ids_');
+      if (solvedIds.length > 0) {
+        const { data, error } = await supabase.rpc('merge_guest_progress', {
+          p_problem_ids: solvedIds,
+        });
+        if (error) {
+          console.error('merge_guest_progress failed:', error);
+          solvedFailed = true;
+        } else {
+          // RETURNS TABLE, so supabase-js hands back an array of one row.
+          const row = Array.isArray(data) ? data[0] : data;
+          mergedSolved = row?.merged_count ?? 0;
+          skippedSolved = row?.skipped_count ?? 0;
         }
       }
 
-      const savedReadChapters = localStorage.getItem(`pyquests_read_chapters_${userId}`) || localStorage.getItem('pyquests_read_chapters_guest');
-      if (savedReadChapters) {
-        const readChapterIds: string[] = JSON.parse(savedReadChapters);
-        if (readChapterIds.length > 0) {
-          const records = readChapterIds.map((cid) => ({
-            user_id: userId,
-            chapter_id: cid,
-          }));
-          await supabase.from('user_read_chapters').upsert(records, { onConflict: 'user_id,chapter_id' });
-        }
+      // Review rows have no rate limit, but the same problem_id validation
+      // applies -- so filter against the bundled problem list before writing
+      // rather than letting one stale id abort the statement.
+      const reviewIds = readIds('pyquests_review_ids_').filter((id) => KNOWN_PROBLEM_IDS.has(id));
+      if (reviewIds.length > 0) {
+        const { error } = await supabase.from('user_review_problems').upsert(
+          reviewIds.map((pid) => ({ user_id: userId, problem_id: pid })),
+          { onConflict: 'user_id,problem_id' }
+        );
+        if (error) console.error('user_review_problems merge failed:', error);
       }
 
-      const savedReview = localStorage.getItem(`pyquests_review_ids_${userId}`) || localStorage.getItem('pyquests_review_ids_guest');
-      if (savedReview) {
-        const reviewIds: string[] = JSON.parse(savedReview);
-        if (reviewIds.length > 0) {
-          const records = reviewIds.map((pid) => ({
-            user_id: userId,
-            problem_id: pid,
-          }));
-          await supabase.from('user_review_problems').upsert(records, { onConflict: 'user_id,problem_id' });
-        }
+      // Chapters and quiz answers reference chapter ids, which have no FK and
+      // no rate limit, so a plain upsert is still correct for them.
+      const chapterIds = readIds('pyquests_read_chapters_');
+      if (chapterIds.length > 0) {
+        const { error } = await supabase.from('user_read_chapters').upsert(
+          chapterIds.map((cid) => ({ user_id: userId, chapter_id: cid })),
+          { onConflict: 'user_id,chapter_id' }
+        );
+        if (error) console.error('user_read_chapters merge failed:', error);
       }
 
-      const savedQuizAnswers = localStorage.getItem(`pyquests_docs_quiz_answers_${userId}`) || localStorage.getItem('pyquests_docs_quiz_answers_guest');
-      if (savedQuizAnswers) {
-        const quizMap: Record<string, number> = JSON.parse(savedQuizAnswers);
-        const records = Object.entries(quizMap)
-          .map(([key, answerIndex]) => {
-            const match = key.match(/^(.+)_(\d+)$/);
-            if (!match) return null;
-            return {
+      const quizRecords: { user_id: string; chapter_id: string; question_index: number; answer_index: number }[] = [];
+      for (const key of [`pyquests_docs_quiz_answers_${userId}`, 'pyquests_docs_quiz_answers_guest']) {
+        try {
+          const raw = localStorage.getItem(key);
+          if (!raw) continue;
+          for (const [composite, answerIndex] of Object.entries(JSON.parse(raw) as Record<string, number>)) {
+            const match = composite.match(/^(.+)_(\d+)$/);
+            if (!match) continue;
+            quizRecords.push({
               user_id: userId,
               chapter_id: match[1],
               question_index: parseInt(match[2], 10),
               answer_index: answerIndex,
-            };
-          })
-          .filter((r): r is NonNullable<typeof r> => r !== null);
-        if (records.length > 0) {
-          await supabase.from('user_quiz_answers').upsert(records, { onConflict: 'user_id,chapter_id,question_index' });
+            });
+          }
+        } catch { /* ignore a corrupted entry */ }
+      }
+      if (quizRecords.length > 0) {
+        const { error } = await supabase.from('user_quiz_answers').upsert(quizRecords, {
+          onConflict: 'user_id,chapter_id,question_index',
+        });
+        if (error) console.error('user_quiz_answers merge failed:', error);
+      }
+
+      // Sandbox runs are a counter, not a set, so they add rather than union.
+      const guestRuns = parseInt(localStorage.getItem('pyquests_sandbox_runs_guest') || '0', 10);
+      if (Number.isFinite(guestRuns) && guestRuns > 0) {
+        const { data: profileRow } = await supabase
+          .from('profiles')
+          .select('sandbox_runs')
+          .eq('id', userId)
+          .single();
+        const { error } = await supabase
+          .from('profiles')
+          .update({ sandbox_runs: (profileRow?.sandbox_runs ?? 0) + guestRuns })
+          .eq('id', userId);
+        if (error) console.error('sandbox_runs merge failed:', error);
+      }
+
+      // Guest keys are cleared only once the solve merge is known to have
+      // landed. If it failed, they stay put and the next login retries.
+      //
+      // streak and last_solved_date are deliberately NOT merged: migration 001
+      // derives them from user_solved_problems, so they recompute themselves
+      // from the rows just inserted.
+      if (!solvedFailed) {
+        for (const key of [
+          'pyquests_solved_ids_guest',
+          'pyquests_review_ids_guest',
+          'pyquests_read_chapters_guest',
+          'pyquests_docs_quiz_answers_guest',
+          'pyquests_sandbox_runs_guest',
+          'pyquests_streak_guest',
+          'pyquests_last_solved_date_guest',
+        ]) {
+          localStorage.removeItem(key);
         }
       }
+
+      return { mergedSolved, skippedSolved, failed: solvedFailed };
     } catch (err) {
       console.error('Merge local storage progress error:', err);
+      return { mergedSolved, skippedSolved, failed: true };
     }
   };
 
@@ -674,6 +802,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (isSupabaseConfigured) {
       await supabase.auth.signOut();
     }
+    mergedForUserRef.current = null;
+    setGuestMergeResult(null);
     setUser(null);
     setSession(null);
     setProfile(null);
@@ -936,6 +1066,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signOut,
         syncSolvedToSupabase,
         syncSandboxRunsToSupabase,
+        guestMergeResult,
+        clearGuestMergeResult: () => setGuestMergeResult(null),
         fetchUserSolvedIds,
         syncReadChapterToSupabase,
         fetchUserReadChapterIds,
