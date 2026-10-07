@@ -128,10 +128,10 @@ routeForState('docs', 'sql_q1', 'sql')  // → { view: 'problems', problemId: 's
 "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 ```
 
-**Vercel 은 `/index.html` 을 `/` 로 308 리다이렉트합니다.**
+`cleanUrls: true` 가 켜져 있었고, 그 옵션은 **`/index.html` 을 `/` 로 308 리다이렉트**합니다.
 
 ```
-$ curl -I https://pyquests.vercel.app/index.html
+$ curl -I https://pyquests.vercel.app/index.html     # 당시
 HTTP/2 308
 location: https://pyquests.vercel.app/
 ```
@@ -166,13 +166,22 @@ location: https://pyquests.vercel.app/
 
 `verify:routing` 이 알 수 없는 최상위 키를 검사합니다. 실패 시 메시지가 이 함정을 그대로 설명합니다.
 
-### 첫 번째 수정 시도의 진단도 틀렸습니다
+### 중간에 제가 적은 틀린 결론
 
-308 리다이렉트를 보고 `cleanUrls: true` 때문이라고 판단해서 그 옵션을 제거했습니다. **배포해 보니 `cleanUrls` 가 없는데도 `/index.html` 은 여전히 308 이었고, 깊은 경로는 그대로 404 였습니다.**
+배포 실패를 모르는 상태에서, `cleanUrls` 를 지웠는데도 `/index.html` 이 308 인 것을 보고 **"그 정규화는 Vercel 기본 동작"** 이라고 단정해 커밋 메시지와 이 문서에 사실처럼 적었습니다.
 
-그 정규화는 `cleanUrls` 가 아니라 **Vercel 의 기본 동작**입니다. 메커니즘("destination 이 리다이렉트를 가리킨다")은 맞았지만 원인 지목이 틀렸습니다.
+**틀렸습니다.** 배포가 성공한 뒤 다시 재 보니:
 
-`cleanUrls` 제거는 되돌리지 않았습니다 — `dist/` 에 `.html` 이 하나뿐이라 이 앱에서는 아무 일도 하지 않는 옵션이고, 없는 편이 추론할 거리가 하나 줄어듭니다. 다만 **그게 버그의 원인은 아니었습니다.**
+```
+$ curl -I https://pyquests.vercel.app/index.html
+HTTP/2 200
+```
+
+`cleanUrls` 가 실제로 제거된 지금은 **200** 입니다. 즉 그 308 은 `cleanUrls` 가 맞았고, 첫 진단이 옳았는데 **배포가 안 돼서 확인할 수 없었던 것**뿐입니다.
+
+측정하지 않은 것을 결론으로 쓴 게 문제였습니다. 관측(`308`)은 같아도 설명은 두 가지였고, 배포가 실패 중이라는 세 번째 가능성을 고려하지 않았습니다.
+
+`cleanUrls` 제거는 유지합니다 — `.html` 이 하나뿐인 앱에서 하는 일이 없고, rewrite destination 이 `/` 인 지금은 어느 쪽이든 동작하지만 추론할 거리가 하나 줄어듭니다.
 
 > 소개 사이트(`site/vercel.json`)는 `cleanUrls` 를 **유지**합니다. 거기는 rewrite 가 없고, `/index.html` → `/` 정규화는 주소를 하나로 모아 주므로 바람직합니다.
 

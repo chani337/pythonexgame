@@ -150,4 +150,4 @@ PYQUESTS_APP_URL=https://app.example.com npm run build:site
 
 ## 7. 현재 배포
 
-앱과 별개의 Vercel 프로젝트로 올라가 있습니다 (`pythonexgame-site.vercel.app`). `main` 에 푸시하면 자동 배포되므로, **배포를 원하지 않을 때는 푸시하지 말고 브랜치에 두세요.**
+앱과 별개의 Vercel 프로젝트로 올라가 있습니다 (`pyquests-site.vercel.app`). `main` 에 푸시하면 자동 배포되므로, **배포를 원하지 않을 때는 푸시하지 말고 브랜치에 두세요.**
