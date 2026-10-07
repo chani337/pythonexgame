@@ -18,6 +18,18 @@ import type { GuestMergeResult } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
 import { problems, filterProblems } from './data/problems';
 import type { Problem } from './data/problems';
+import { parsePath, routeForState, nextHistoryAction } from './lib/routes';
+import type { ViewName } from './lib/routes';
+import type { DocCategory } from './data/docs';
+
+// Resolving /problems/<id> back to a Problem. Built once rather than a
+// find() per navigation.
+const PROBLEM_BY_ID = new Map(problems.map((p) => [p.id, p]));
+
+// The entry URL, read once per page load rather than on every render. Only
+// the useState initialisers below consult it; after that the state is the
+// source of truth and the address bar follows it.
+const INITIAL_ROUTE = parsePath(window.location.pathname);
 import { usePyodide } from './hooks/usePyodide';
 import { useJsRunner } from './hooks/useJsRunner';
 import { useSqlRunner } from './hooks/useSqlRunner';
@@ -47,8 +59,18 @@ function LoginRequiredGate({ description, onLogin }: { description: string; onLo
 }
 
 function MainApp() {
-  const [currentView, setCurrentView] = useState<string>('dashboard');
-  const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
+  // The screen used to be plain state with no URL, so every view shared one
+  // address: the back button left the site, a problem couldn't be linked, and
+  // there was a single page for search engines to index. The state still
+  // lives here -- routes.ts only keeps the address bar in step with it.
+  const [currentView, setCurrentView] = useState<string>(INITIAL_ROUTE.view);
+  const [selectedProblem, setSelectedProblem] = useState<Problem | null>(
+    INITIAL_ROUTE.problemId ? PROBLEM_BY_ID.get(INITIAL_ROUTE.problemId) ?? null : null
+  );
+  // Which guide language is open, lifted out of DocsViewer so /docs/css can
+  // be a real address. Undefined means "whatever the reader last had open",
+  // which is what DocsViewer did on its own before.
+  const [docCategory, setDocCategory] = useState<DocCategory | undefined>(INITIAL_ROUTE.docCategory);
 
   const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncSandboxRunsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen, guestMergeResult, clearGuestMergeResult, idleLoggedOut, clearIdleLoggedOut, idleLimitMinutes } = useAuth();
 
@@ -298,6 +320,47 @@ print("변환 리스트:", result)
     syncSandboxRunsToSupabase(newCount);
   };
 
+  // ── URL <-> state ───────────────────────────────────────────────────────
+  // One direction each, and they can't ping-pong: the writer only acts when
+  // the address bar actually differs from the state, and popstate sets state
+  // to what the address bar already says.
+  const didFirstUrlSyncRef = useRef(false);
+
+  useEffect(() => {
+    // The app restores the problem-list scroll position itself
+    // (listScrollPosRef), so the browser doing it too fights that.
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+  }, []);
+
+  useEffect(() => {
+    const isFirstRun = !didFirstUrlSyncRef.current;
+    didFirstUrlSyncRef.current = true;
+
+    const action = nextHistoryAction(
+      window.location.pathname,
+      routeForState(currentView as ViewName, selectedProblem?.id, docCategory),
+      isFirstRun
+    );
+
+    if (action.kind === 'push') window.history.pushState(null, '', action.path);
+    else if (action.kind === 'replace') window.history.replaceState(null, '', action.path);
+  }, [currentView, selectedProblem, docCategory]);
+
+  useEffect(() => {
+    const onPopState = () => {
+      const route = parsePath(window.location.pathname);
+      setCurrentView(route.view);
+      setSelectedProblem(
+        route.problemId ? PROBLEM_BY_ID.get(route.problemId) ?? null : null
+      );
+      setDocCategory(route.docCategory);
+    };
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
+  }, []);
+
   const handleSelectProblem = (problem: Problem) => {
     const mainEl = document.querySelector('.main-content');
     if (mainEl) {
@@ -468,6 +531,8 @@ print("변환 리스트:", result)
               }}
               problems={problems}
               onSelectProblem={handleSelectProblem}
+              category={docCategory}
+              onCategoryChange={setDocCategory}
             />
           ) : (
             <LoginRequiredGate

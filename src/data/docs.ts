@@ -5,11 +5,16 @@ export interface DocCell {
   content: string;
 }
 
+// The guide's language tabs. Lives here rather than in DocsViewer because
+// routes.ts needs it too, and a routing module importing a .tsx file drags
+// JSX config into every project that touches it.
+export type DocCategory = 'python' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css';
+
 export interface DocChapter {
   id: string;
   filename: string;
   title: string;
-  category?: 'python' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css';
+  category?: DocCategory;
   cells: DocCell[];
 }
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { docChapters } from '../data/docs';
+import type { DocCategory } from '../data/docs';
 import type { DocChapter } from '../data/docs';
 import type { RunResponse } from '../hooks/usePyodide';
 import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles, CheckCircle2, Circle, HelpCircle, X, Search, ChevronRight } from 'lucide-react';
@@ -13,9 +14,19 @@ interface DocsViewerProps {
   onExportToSandbox: (code: string) => void;
   problems: Problem[];
   onSelectProblem: (problem: Problem) => void;
+  /**
+   * Which language tab to open, from the URL (/docs/css). Undefined means
+   * "whatever was last open", which is what this component did on its own
+   * before routing existed.
+   */
+  category?: DocCategory;
+  /** Reports a tab change up so the address bar follows it. */
+  onCategoryChange?: (category: DocCategory) => void;
 }
 
-export type DocCategory = 'python' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css';
+// Re-exported so existing imports from this module keep working; the type is
+// defined alongside the chapter data in src/data/docs.ts.
+export type { DocCategory };
 
 // Category tabs for the 학습 가이드. `label` is shown in the normal layout's tab
 // row, `shortLabel` in focus mode and the TOC heading, and the colors theme the
@@ -90,11 +101,16 @@ export default function DocsViewer({
   onExportToSandbox,
   problems,
   onSelectProblem,
+  category,
+  onCategoryChange,
 }: DocsViewerProps) {
   // Remember the last-viewed category/chapter so returning here (e.g. via a
   // related-problem's "back" button, which unmounts this component) restores
   // where the reader left off instead of resetting to Python chapter 1.
   const [selectedCategory, setSelectedCategory] = useState<DocCategory>(() => {
+    // The URL wins when it names a category, so /docs/css opens CSS even if
+    // the reader was last in Python.
+    if (category) return category;
     const saved = localStorage.getItem('pyquests_docs_last_category');
     return DOC_CATEGORIES.some((cat) => cat.key === saved) ? (saved as DocCategory) : 'python';
   });
@@ -207,12 +223,26 @@ export default function DocsViewer({
       : ch.category === selectedCategory
   );
 
-  const selectCategory = (category: DocCategory) => {
+  const selectCategory = (next: DocCategory) => {
+    setSelectedCategory(next);
+    setSelectedChapterIdx(0);
+    setCodeOutputs({});
+    setChapterSearchQuery('');
+    onCategoryChange?.(next);
+  };
+
+  // Back/forward can change the category under us. Reset the chapter too, or
+  // the reader lands on chapter 7 of a language that has four.
+  useEffect(() => {
+    if (!category || category === selectedCategory) return;
     setSelectedCategory(category);
     setSelectedChapterIdx(0);
     setCodeOutputs({});
     setChapterSearchQuery('');
-  };
+    // selectedCategory is deliberately not a dependency: this should run when
+    // the prop changes, not when a click changes local state.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [category]);
 
   // Chapter TOC search: matches by title or cell content, but keeps each entry's
   // original index within filteredChapters so selection stays correct after filtering.
