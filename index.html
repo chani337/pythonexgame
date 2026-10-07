@@ -17,7 +17,12 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- One request, and the weights are the ones the app actually sets
+         (400/500/600/700/800 across the three families). src/index.css used
+         to @import a second, overlapping stylesheet: between the two, Inter
+         800 and JetBrains Mono 700 were requested by neither, so the browser
+         was synthesising them. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <!-- Pyodide is injected on demand by src/hooks/usePyodide.ts, not loaded
          here. A static tag downloaded the loader on every single visit
          including the dashboard and problem list, had no integrity attribute

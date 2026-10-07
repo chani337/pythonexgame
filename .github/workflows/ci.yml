@@ -1,0 +1,76 @@
+# There was no CI at all: 377 problems across three browser runtimes, with
+# seven verification scripts that only ran when someone remembered to type
+# them. This runs all of it on every push and PR.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx tsc -b
+
+      # The highest-value check: problem-data invariants the app relies on at
+      # runtime without verifying, plus unit tests for the pure functions.
+      - name: Tests
+        run: npm run test
+
+      # problems.ts must stay in sync with the problem_id reference table the
+      # ranking triggers validate against. Out of sync means a newly added
+      # problem is rejected server-side the first time anyone solves it.
+      - name: Problem id sync
+        run: npm run check:problems
+
+      # Actually tries 21 escapes (fetch, importScripts, WebSocket, caches,
+      # Function('return this')()) inside node:vm.
+      - name: JS sandbox
+        run: npm run verify:sandbox
+
+      - name: Pyodide loader
+        run: npm run verify:pyodide
+
+      # Runs all 36 SQL reference solutions through the real sql.js and
+      # compares output byte-for-byte against the stored answers.
+      - name: SQL runner
+        run: npm run verify:sql
+
+      - name: Guest progress merge
+        run: npm run verify:guest-merge
+
+      - name: Shared-computer sessions
+        run: npm run verify:shared-pc
+
+      # Downloads the Pyodide core and sql.js via prebuild. Both failures are
+      # non-fatal by design (the deploy just ships without the self-hosted
+      # fallback), so a CDN hiccup can't turn this red on its own.
+      - name: Build
+        run: npm run build
+
+      # Needs dist/: checks the CSP in vercel.json against the inline script
+      # hash and the origins the built bundle actually reaches.
+      - name: Security headers
+        run: npm run verify:csp
+
+      # Boots the self-hosted Pyodide copy to prove those files alone can run
+      # Python. Exits 0 if the download above didn't land.
+      - name: Pyodide self-hosted copy
+        run: npm run verify:pyodide-core

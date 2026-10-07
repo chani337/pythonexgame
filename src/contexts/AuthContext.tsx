@@ -165,13 +165,15 @@ function purgeSignedOutAccountLocalStorage(userId: string | null, sharedSession:
 // The leaderboard and activity-feed views filter `hidden` themselves, so
 // nothing client-side has to maintain an exclusion list any more.
 
-export const DEFAULT_LEADERBOARD: LeaderboardUser[] = [
-  { id: 'default-runner-1', display_name: '알고리즘마스터', email: 'algo@pyquests.io', streak: 3, solved_count: 5 },
-  { id: 'default-runner-2', display_name: '코드파이썬', email: 'code@pyquests.io', streak: 2, solved_count: 3 },
-  { id: 'default-runner-3', display_name: '파이썬러너', email: 'runner@pyquests.io', streak: 2, solved_count: 2 },
-  { id: 'default-runner-4', display_name: '디버깅왕', email: 'debug@pyquests.io', streak: 1, solved_count: 1 },
-  { id: 'default-runner-5', display_name: '코딩스타', email: 'star@pyquests.io', streak: 1, solved_count: 1 },
-];
+// Five fake accounts (알고리즘마스터, 코드파이썬, ... @pyquests.io) used to be
+// seeded here as a placeholder leaderboard. Nothing imported them -- both
+// read paths below filter any id starting with 'default-runner-' -- so they
+// rendered nowhere while sitting in a public repository looking like the
+// ranking was padded. Removed.
+//
+// The two filters stay: a returning visitor's pyquests_cached_leaderboard may
+// still hold those rows from an older build, and that cache is read before any
+// network request.
 
 interface AuthContextType {
   user: User | null;
