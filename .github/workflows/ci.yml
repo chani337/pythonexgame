@@ -56,6 +56,13 @@ jobs:
       - name: Guest progress merge
         run: npm run verify:guest-merge
 
+      # site/index.html is generated from problem data, so a problem added
+      # without rebuilding leaves the landing page quoting a stale count --
+      # which is exactly how the old "5개 언어를 브라우저에서 바로 실행" copy
+      # ended up being untrue.
+      - name: Landing page in sync
+        run: npm run check:site
+
       - name: Shared-computer sessions
         run: npm run verify:shared-pc
 

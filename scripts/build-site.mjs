@@ -1,0 +1,219 @@
+// Generates site/index.html from site/index.template.html.
+//
+// Every number and code sample on the landing page is read out of the app's
+// own data files. The brief for this project called out that the existing
+// marketing copy was wrong -- "5개 언어를 브라우저에서 바로 실행" when Java
+// and C never reach a runtime -- and hand-typed figures on a separate site
+// are exactly how that happens again. Counts drift the moment someone adds
+// a problem; generated counts can't.
+//
+//   npm run build:site
+//
+import { build } from 'esbuild';
+import { mkdtemp, rm, readFile, writeFile } from 'node:fs/promises';
+import { join, resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
+
+const ROOT = resolve(import.meta.dirname, '..');
+const SITE = join(ROOT, 'site');
+
+// The deployed app. The landing page is a separate Vercel project, so it
+// links across rather than routing internally.
+const APP_URL = process.env.PYQUESTS_APP_URL || 'https://pyquests.vercel.app';
+
+const dir = await mkdtemp(join(ROOT, 'node_modules', '.site-'));
+async function load(rel, name) {
+  const out = join(dir, name + '.mjs');
+  await build({
+    entryPoints: [join(ROOT, rel)], outfile: out,
+    format: 'esm', platform: 'node', bundle: true, logLevel: 'silent',
+    external: ['react'],
+  });
+  return import(pathToFileURL(out).href);
+}
+
+const { problems } = await load('src/data/problems.ts', 'problems');
+const { docChapters } = await load('src/data/docs.ts', 'docs');
+const solutionsMod = await load('src/data/solutionCode.ts', 'solutions');
+const { decodeAnswer } = await load('src/utils/answerObfuscation.ts', 'obf');
+const { changelogEntries } = await load('src/data/changelog.ts', 'changelog');
+await rm(dir, { recursive: true, force: true });
+const solutionCode = solutionsMod.solutionCode || solutionsMod.default;
+
+// --- counts ---------------------------------------------------------------
+// `language` is optional and absent on 99 of the Python problems, so the
+// default has to match filterProblems' (`problem.language || 'python'`).
+const lang = (p) => p.language ?? 'python';
+
+const LANG_META = [
+  { key: 'python',    label: 'Python',     runtime: 'Pyodide (WASM Python)' },
+  { key: 'algorithm', label: '알고리즘',    runtime: 'Pyodide (WASM Python)' },
+  { key: 'sql',       label: 'SQL',        runtime: 'sql.js (SQLite WASM)' },
+  { key: 'js',        label: 'JavaScript', runtime: 'Web Worker' },
+  { key: 'java',      label: 'Java',       runtime: null },
+  { key: 'c',         label: 'C',          runtime: null },
+];
+
+const rows = LANG_META.map((m) => {
+  const own = problems.filter((p) => lang(p) === m.key);
+  const byType = { coding: 0, quiz: 0, fill: 0 };
+  own.forEach((p) => byType[p.type]++);
+  return { ...m, total: own.length, ...byType };
+});
+
+const totalProblems = problems.length;
+// Problems whose code actually executes: coding type on a language that has a
+// runtime. This is the number the old copy got wrong.
+const executable = rows.filter((r) => r.runtime).reduce((a, r) => a + r.coding, 0);
+
+const difficulty = ['basic', 'intermediate', 'advanced', 'expert'].map((d) => ({
+  key: d,
+  label: { basic: '기초', intermediate: '중급', advanced: '고급', expert: '챌린지' }[d],
+  n: problems.filter((p) => p.difficulty === d).length,
+}));
+
+const DOC_META = [
+  ['python', 'Python'], ['sql', 'SQL'], ['java', 'Java'],
+  ['js', 'JavaScript'], ['c', 'C'], ['html', 'HTML'], ['css', 'CSS'],
+];
+const docCounts = DOC_META.map(([key, label]) => ({
+  label,
+  n: docChapters.filter((c) => (c.category ?? 'python') === key).length,
+}));
+
+// --- example problems -----------------------------------------------------
+// Real problems, pulled by id. If either is ever renamed this script fails
+// loudly instead of shipping a page that describes a problem nobody can find.
+function example(id) {
+  const p = problems.find((x) => x.id === id);
+  if (!p) throw new Error(`예제 문제 '${id}' 가 problems.ts 에 없습니다 — 이름이 바뀌었는지 확인하세요.`);
+  const solution = solutionCode[p.id];
+  if (!solution) throw new Error(`예제 문제 '${id}' 의 정답 코드가 없습니다.`);
+  return {
+    id: p.id,
+    title: p.title,
+    description: p.description,
+    constraints: p.constraints ?? [],
+    solution: solution.replace(/\n+$/, ''),
+    expected: decodeAnswer(p.testCases[0].expected),
+  };
+}
+
+const pyExample = example('basic_part1_q3');
+const sqlExample = example('sql_q1');
+
+// --- latest update --------------------------------------------------------
+const latest = changelogEntries[0];
+
+// --- render ---------------------------------------------------------------
+const esc = (s) => String(s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;');
+
+// Problem descriptions and constraints use `backticks` for inline code.
+const inlineCode = (s) => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>');
+
+const langTable = rows.map((r) => {
+  const detail = [
+    r.coding && `실행 ${r.coding}`,
+    r.quiz && `객관식 ${r.quiz}`,
+    r.fill && `빈칸 ${r.fill}`,
+  ].filter(Boolean).join(' · ');
+  return `          <tr>
+            <th scope="row">${esc(r.label)}</th>
+            <td class="num">${r.total}</td>
+            <td>${esc(detail)}</td>
+            <td class="runtime">${r.runtime ? esc(r.runtime) : '<span class="muted">코드 실행 없음</span>'}</td>
+          </tr>`;
+}).join('\n');
+
+const difficultyStrip = difficulty.map((d) =>
+  `          <li><span class="d-n">${d.n}</span><span class="d-l">${esc(d.label)}</span></li>`
+).join('\n');
+
+const docList = docCounts.map((d) =>
+  `          <li><span class="g-l">${esc(d.label)}</span><span class="g-n">${d.n}</span></li>`
+).join('\n');
+
+const constraintList = pyExample.constraints.map((c) => `<li>${inlineCode(c)}</li>`).join('');
+
+const latestItems = latest.items.slice(0, 3).map((i) => `          <li>${esc(i)}</li>`).join('\n');
+
+const VALUES = {
+  APP_URL,
+  TOTAL_PROBLEMS: String(totalProblems),
+  EXECUTABLE: String(executable),
+  DOC_CHAPTERS: String(docChapters.length),
+  LANG_COUNT: String(LANG_META.length),
+  LANG_TABLE: langTable,
+  DIFFICULTY_STRIP: difficultyStrip,
+  DOC_LIST: docList,
+  PY_TITLE: esc(pyExample.title),
+  PY_DESC: inlineCode(pyExample.description),
+  PY_CONSTRAINTS: constraintList,
+  PY_SOLUTION: esc(pyExample.solution),
+  PY_EXPECTED: esc(pyExample.expected),
+  SQL_TITLE: esc(sqlExample.title),
+  SQL_DESC: inlineCode(sqlExample.description),
+  SQL_SOLUTION: esc(sqlExample.solution),
+  SQL_EXPECTED: esc(sqlExample.expected),
+  LATEST_DATE: latest.date.replace(/-/g, '.'),
+  LATEST_TITLE: esc(latest.title),
+  LATEST_ITEMS: latestItems,
+  BUILD_DATE: latest.date,
+};
+
+let html = await readFile(join(SITE, 'index.template.html'), 'utf8');
+for (const [key, value] of Object.entries(VALUES)) {
+  html = html.replaceAll(`{{${key}}}`, value);
+}
+
+const unresolved = [...html.matchAll(/\{\{([A-Z_]+)\}\}/g)].map((m) => m[1]);
+if (unresolved.length) {
+  throw new Error(`치환되지 않은 자리표시자: ${[...new Set(unresolved)].join(', ')}`);
+}
+
+// --- self-checks ----------------------------------------------------------
+// The page ships zero JavaScript and site/vercel.json sets script-src 'none',
+// so a <script> tag added later would be blocked at runtime with no local
+// symptom. Catch it here instead.
+if (/<script[\s>]/i.test(html)) {
+  throw new Error("템플릿에 <script> 가 있습니다. site/vercel.json 의 CSP 가 script-src 'none' 이라 브라우저에서 차단됩니다.");
+}
+
+// The brief for this project called out that the old copy claimed every
+// language runs in the browser. Java and C never reach a runtime, so that
+// phrasing must not come back.
+for (const banned of ['5개 언어를 브라우저에서 바로 실행', '6개 언어를 브라우저에서 바로 실행']) {
+  if (html.includes(banned)) {
+    throw new Error(`"${banned}" 는 사실이 아닙니다 (Java·C 는 실행되지 않습니다).`);
+  }
+}
+
+// --check regenerates and compares instead of writing, so CI fails when
+// index.html was hand-edited or problem counts changed without a rebuild.
+if (process.argv.includes('--check')) {
+  let current = '';
+  try {
+    current = await readFile(join(SITE, 'index.html'), 'utf8');
+  } catch {
+    console.error('site/index.html 이 없습니다. npm run build:site 를 실행하세요.');
+    process.exit(1);
+  }
+  if (current !== html) {
+    console.error('site/index.html 이 최신이 아닙니다.');
+    console.error('템플릿이나 문제 데이터가 바뀐 뒤 재생성하지 않았거나, index.html 을 직접 수정했습니다.');
+    console.error('  npm run build:site');
+    process.exit(1);
+  }
+  console.log(`site/index.html 최신 상태 — 문제 ${totalProblems}개 / 실행 ${executable}개 / 가이드 ${docChapters.length}챕터`);
+  process.exit(0);
+}
+
+await writeFile(join(SITE, 'index.html'), html);
+
+console.log('site/index.html 생성됨');
+console.log(`  문제 ${totalProblems}개 (실제 코드 실행 ${executable}개)`);
+console.log(`  학습 가이드 ${docChapters.length}챕터`);
+console.log(`  앱 주소 ${APP_URL}`);
+console.log(`  예제 ${pyExample.id}, ${sqlExample.id}`);
