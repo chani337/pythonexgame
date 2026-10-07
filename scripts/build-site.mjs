@@ -61,16 +61,13 @@ const rows = LANG_META.map((m) => {
   return { ...m, total: own.length, ...byType };
 });
 
+// Computed for the summary this script prints, not for the page: the landing
+// page deliberately states no problem counts. Both are intentionally absent
+// from VALUES below, so putting {{TOTAL_PROBLEMS}} back into the template
+// fails the unresolved-placeholder check instead of quietly reintroducing a
+// number that would then need keeping accurate.
 const totalProblems = problems.length;
-// Problems whose code actually executes: coding type on a language that has a
-// runtime. This is the number the old copy got wrong.
 const executable = rows.filter((r) => r.runtime).reduce((a, r) => a + r.coding, 0);
-
-const difficulty = ['basic', 'intermediate', 'advanced', 'expert'].map((d) => ({
-  key: d,
-  label: { basic: '기초', intermediate: '중급', advanced: '고급', expert: '챌린지' }[d],
-  n: problems.filter((p) => p.difficulty === d).length,
-}));
 
 const DOC_META = [
   ['python', 'Python'], ['sql', 'SQL'], ['java', 'Java'],
@@ -113,24 +110,6 @@ const esc = (s) => String(s)
 // Problem descriptions and constraints use `backticks` for inline code.
 const inlineCode = (s) => esc(s).replace(/`([^`]+)`/g, '<code>$1</code>');
 
-const langTable = rows.map((r) => {
-  const detail = [
-    r.coding && `실행 ${r.coding}`,
-    r.quiz && `객관식 ${r.quiz}`,
-    r.fill && `빈칸 ${r.fill}`,
-  ].filter(Boolean).join(' · ');
-  return `          <tr>
-            <th scope="row">${esc(r.label)}</th>
-            <td class="num">${r.total}</td>
-            <td>${esc(detail)}</td>
-            <td class="runtime">${r.runtime ? esc(r.runtime) : '<span class="muted">코드 실행 없음</span>'}</td>
-          </tr>`;
-}).join('\n');
-
-const difficultyStrip = difficulty.map((d) =>
-  `          <li><span class="d-n">${d.n}</span><span class="d-l">${esc(d.label)}</span></li>`
-).join('\n');
-
 const docList = docCounts.map((d) =>
   `          <li><span class="g-l">${esc(d.label)}</span><span class="g-n">${d.n}</span></li>`
 ).join('\n');
@@ -141,12 +120,7 @@ const latestItems = latest.items.slice(0, 3).map((i) => `          <li>${esc(i)}
 
 const VALUES = {
   APP_URL,
-  TOTAL_PROBLEMS: String(totalProblems),
-  EXECUTABLE: String(executable),
   DOC_CHAPTERS: String(docChapters.length),
-  LANG_COUNT: String(LANG_META.length),
-  LANG_TABLE: langTable,
-  DIFFICULTY_STRIP: difficultyStrip,
   DOC_LIST: docList,
   PY_TITLE: esc(pyExample.title),
   PY_DESC: inlineCode(pyExample.description),

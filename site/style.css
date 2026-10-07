@@ -195,7 +195,11 @@ h1 {
   line-height: 1.08;
   letter-spacing: -0.035em;
   text-transform: none;
-  max-width: 20ch;
+  max-width: 22ch;
+  /* Splits the lines evenly instead of filling the first one and leaving two
+     words on the second. Replaces the hard <br> that was here, which broke in
+     the wrong place at every width except the one it was written for. */
+  text-wrap: balance;
 }
 .hl {
   /* A hairline underline rather than a highlighter swipe -- the app has no
@@ -205,11 +209,19 @@ h1 {
   background: linear-gradient(to top, var(--ink) 0.1em, transparent 0.1em);
 }
 
+/* Each sentence is its own <p> so a line break lands at a sentence boundary
+   instead of wherever the measure happens to run out. No gap between them --
+   it should read as one block, just with controlled breaks. text-wrap: pretty
+   handles the inside of a sentence that is still too long for one line
+   (it avoids leaving a single word stranded on the last line). */
+.lede, .band-text, .sec-sub, .note { text-wrap: pretty; }
+.lede p, .band-text p, .sec-sub p, .note p { margin: 0; }
+
 .lede {
   margin-top: 1.5rem;
   font-size: clamp(1rem, 1.9vw, 1.14rem);
   color: var(--ink-2);
-  max-width: 56ch;
+  max-width: 60ch;
 }
 .lede strong { color: var(--ink); font-weight: 600; }
 
@@ -220,32 +232,8 @@ h1 {
   font-size: 0.8rem; color: var(--ink-3);
 }
 
-.difficulty {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  list-style: none;
-  margin-top: clamp(2.5rem, 6vw, 4rem);
-  border: 1px solid var(--line);
-  border-right: 0;
-  background: var(--surface);
-}
-.difficulty li {
-  display: flex; flex-direction: column; gap: 0.1rem;
-  padding: 1.1rem 1.25rem;
-  border-right: 1px solid var(--line);
-}
-.d-n {
-  font-family: var(--font-mono);
-  font-size: clamp(1.4rem, 3.6vw, 1.95rem);
-  font-weight: 700; line-height: 1;
-  letter-spacing: -0.03em;
-}
-.d-l { font-size: 0.76rem; color: var(--ink-3); letter-spacing: 0.02em; }
-
-@media (max-width: 560px) {
-  .difficulty { grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 0; }
-  .difficulty li { border-bottom: 1px solid var(--line); }
-}
+/* .difficulty (문제 수 집계 스트립) 와 .t / .t-scroll (언어별 구성 표),
+   .feat (학교 컴퓨터실 섹션) 는 해당 섹션이 삭제되어 함께 제거했습니다. */
 
 /* ── honesty band ───────────────────────────────────────────── */
 
@@ -270,6 +258,7 @@ h1 {
   letter-spacing: -0.03em;
   text-transform: none;
   max-width: 24ch;
+  text-wrap: balance;
 }
 .sec-sub {
   margin-top: 0.85rem;
@@ -310,7 +299,7 @@ h1 {
   letter-spacing: -0.02em; text-transform: none;
   margin: 0.3rem 0 0.7rem;
 }
-.card p { font-size: 0.875rem; color: var(--ink-2); }
+.card p { font-size: 0.875rem; color: var(--ink-2); text-wrap: pretty; }
 
 /* ── demos ──────────────────────────────────────────────────── */
 
@@ -320,7 +309,17 @@ h1 {
   gap: 1.5rem;
   margin-top: 2.25rem;
 }
-.demo { border: 1px solid var(--line-strong); background: var(--surface); }
+/* The two cards are the same height (grid stretch) but not the same length
+   of content, so the shorter one left bare surface below its output pane.
+   Letting the output pane take the slack keeps both cards ending on the same
+   dark block. */
+.demo {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+}
+.demo .pane-out { flex: 1; }
 .demo-h { padding: 1.3rem 1.4rem 0; }
 .tag {
   display: inline-block;
@@ -368,26 +367,6 @@ h1 {
 .pane-out { background: var(--code-bg); color: var(--code-ink); }
 .pane-out .pane-k { color: var(--code-ink-2); }
 
-/* ── table ──────────────────────────────────────────────────── */
-
-.t-scroll { overflow-x: auto; margin-top: 2.25rem; border: 1px solid var(--line); }
-.t { width: 100%; border-collapse: collapse; background: var(--surface); font-size: 0.875rem; }
-.t th, .t td { text-align: left; padding: 0.8rem 1.1rem; border-bottom: 1px solid var(--line); }
-.t thead th {
-  font-family: var(--font-mono);
-  font-size: 0.68rem; font-weight: 500;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  color: var(--ink-3);
-  background: var(--bg-alt);
-  white-space: nowrap;
-}
-.t tbody th { font-weight: 700; white-space: nowrap; }
-.t tbody tr:last-child th, .t tbody tr:last-child td { border-bottom: 0; }
-.t .num { font-family: var(--font-mono); font-weight: 700; text-align: right; width: 1%; }
-.t thead .num { text-align: right; }
-.t .runtime { font-family: var(--font-mono); font-size: 0.78rem; color: var(--ink-2); }
-.muted { color: var(--ink-3); }
-
 /* ── guide ──────────────────────────────────────────────────── */
 
 .guide {
@@ -407,23 +386,6 @@ h1 {
 }
 .g-l { font-weight: 600; font-size: 0.9rem; }
 .g-n { font-family: var(--font-mono); font-weight: 700; color: var(--ink-3); }
-
-/* ── features ───────────────────────────────────────────────── */
-
-.feat {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-  gap: 1.75rem 2.5rem;
-  margin-top: 2.25rem;
-}
-.feat dt {
-  font-family: var(--font-display);
-  font-weight: 700; font-size: 1rem;
-  letter-spacing: -0.015em;
-  padding-top: 0.85rem;
-  border-top: 1px solid var(--line-strong);
-}
-.feat dd { margin-top: 0.4rem; font-size: 0.875rem; color: var(--ink-2); }
 
 /* ── update ─────────────────────────────────────────────────── */
 
@@ -467,7 +429,15 @@ summary::after {
   color: var(--ink-3);
 }
 details[open] summary::after { content: '−'; }
-details p { padding-bottom: 1.15rem; font-size: 0.88rem; color: var(--ink-2); max-width: 64ch; }
+details > div {
+  padding-bottom: 1.15rem;
+  font-size: 0.88rem; color: var(--ink-2);
+  max-width: 64ch;
+  text-wrap: pretty;
+}
+/* A small gap here, unlike the hero: these are full answers, and run-on
+   lines with no separation are harder to scan than the three-line lede. */
+details > div p + p { margin-top: 0.3rem; }
 
 /* ── end ────────────────────────────────────────────────────── */
 
@@ -478,6 +448,7 @@ details p { padding-bottom: 1.15rem; font-size: 0.88rem; color: var(--ink-2); ma
   font-size: clamp(1.5rem, 4.4vw, 2.5rem);
   letter-spacing: -0.03em; text-transform: none;
   max-width: 26ch; margin-inline: auto;
+  text-wrap: balance;
 }
 .end .btn { margin-top: 2rem; }
 .end .fineprint { margin-top: 0.9rem; }
