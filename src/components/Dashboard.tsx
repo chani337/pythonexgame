@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone, Users, Activity } from 'lucide-react';
+import { Award, Zap, CheckCircle2, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone, Users, Activity, ExternalLink, Copy, Check } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { useAuth } from '../contexts/AuthContext';
 import type { LeaderboardUser } from '../contexts/AuthContext';
@@ -107,6 +107,122 @@ interface DashboardProps {
   sandboxRunCount: number;
   onUnlockAll?: () => void;
   onNavigateToChangelog?: () => void;
+}
+
+// The public intro page. A separate Vercel project, so this is a plain
+// cross-origin link rather than a route -- see docs/landing-site.md. When a
+// custom domain arrives this is the one place in the app that needs changing.
+const LANDING_SITE_URL = 'https://pyquests-site.vercel.app';
+
+// Somewhere to point people at when explaining what this site is. The copy
+// button exists because that is the actual use -- pasting the address into a
+// chat or a class handout -- and selecting it out of the address bar of a new
+// tab is more work than it sounds.
+function LandingSiteCard() {
+  const [copied, setCopied] = useState(false);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(LANDING_SITE_URL);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1800);
+    } catch {
+      // Clipboard access can be refused (permission, or a non-secure
+      // context). The address is visible next to the button either way, so
+      // there is nothing to recover -- just don't claim it was copied.
+    }
+  };
+
+  return (
+    <div
+      className="glass-card"
+      style={{
+        padding: '1.5rem 1.75rem',
+        borderRadius: '0px',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1.5rem',
+        flexWrap: 'wrap',
+      }}
+    >
+      <div style={{ flex: '1 1 300px', minWidth: 0 }}>
+        <h3
+          style={{
+            fontSize: '0.95rem',
+            fontWeight: '700',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.5rem',
+            letterSpacing: '0.05em',
+            marginBottom: '0.4rem',
+          }}
+        >
+          <ExternalLink size={16} /> 소개 페이지
+        </h3>
+        <p style={{ fontSize: '0.82rem', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
+          PyQuests가 어떤 사이트인지 한 장으로 정리해 둔 페이지예요.
+          친구나 선생님에게 소개할 때 이 주소를 보내시면 됩니다.
+        </p>
+        <code
+          style={{
+            display: 'inline-block',
+            marginTop: '0.6rem',
+            fontSize: '0.76rem',
+            fontFamily: 'var(--font-mono)',
+            color: '#1a1a1a',
+            background: '#f4f4f6',
+            border: '1px solid var(--border-subtle)',
+            padding: '0.2rem 0.5rem',
+            wordBreak: 'break-all',
+          }}
+        >
+          {LANDING_SITE_URL.replace('https://', '')}
+        </code>
+      </div>
+
+      <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+        <button
+          onClick={copy}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            background: 'transparent',
+            border: '1px solid #1a1a1a',
+            color: '#1a1a1a',
+            fontSize: '0.8rem',
+            fontWeight: '700',
+            padding: '0.6rem 0.9rem',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {copied ? <Check size={14} /> : <Copy size={14} />}
+          {copied ? '복사했어요' : '주소 복사'}
+        </button>
+        <a
+          href={LANDING_SITE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.4rem',
+            background: '#1a1a1a',
+            border: '1px solid #1a1a1a',
+            color: '#ffffff',
+            fontSize: '0.8rem',
+            fontWeight: '700',
+            padding: '0.6rem 0.9rem',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          열어 보기 <ChevronRight size={14} />
+        </a>
+      </div>
+    </div>
+  );
 }
 
 export default function Dashboard({
@@ -757,6 +873,8 @@ export default function Dashboard({
           </div>
         </div>
       </div>
+
+      <LandingSiteCard />
 
       {/* Dashboard Middle Section: Recommended & Level Progress */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '1rem' }}>
