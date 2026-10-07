@@ -35,3 +35,6 @@ build_out*.log
 # Pyodide core runtime, fetched at build time (npm run fetch:pyodide).
 # 13MB of binaries -- a build artifact, not source. See scripts/fetch-pyodide-core.mjs.
 public/pyodide/
+
+# sql.js, fetched at build time (npm run fetch:sqljs). Same reasoning, 0.7MB.
+public/sql-js/

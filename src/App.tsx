@@ -19,6 +19,7 @@ import { problems, filterProblems } from './data/problems';
 import type { Problem } from './data/problems';
 import { usePyodide } from './hooks/usePyodide';
 import { useJsRunner } from './hooks/useJsRunner';
+import { useSqlRunner } from './hooks/useSqlRunner';
 
 function LoginRequiredGate({ description, onLogin }: { description: string; onLogin: () => void }) {
   return (
@@ -177,6 +178,7 @@ print("변환 리스트:", result)
   }, [currentView, selectedProblem, user]);
   const { loading: isPyodideLoading, status: pyodideStatus, runCode } = usePyodide(pyodideNeeded);
   const { runCode: runJsCode } = useJsRunner();
+  const { runCode: runSqlCode } = useSqlRunner();
 
   // Save changes to localStorage scoped to user
   useEffect(() => {
@@ -394,6 +396,7 @@ print("변환 리스트:", result)
             onPrevProblem={handlePrevProblem}
             runPythonCode={runCode}
             runJsCode={runJsCode}
+            runSqlCode={runSqlCode}
             isPyodideLoading={isPyodideLoading}
             onMarkSolved={handleMarkSolved}
             isBookmarked={reviewIds.includes(selectedProblem.id)}

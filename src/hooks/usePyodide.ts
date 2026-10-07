@@ -142,47 +142,6 @@ export interface RunResponse {
   testResults?: TestResult[];
 }
 
-// sqlite3 has no equivalent of Oracle's `(+)` outer-join operator, so a
-// `FROM a, b WHERE a.col = b.col(+) [AND ...]` query is rewritten into the
-// ANSI `a LEFT JOIN b ON a.col = b.col [WHERE ...]` form sqlite3 understands.
-// Only the single comma-joined two-table shape the SQL problems use is
-// supported -- this is a targeted rewrite, not a general SQL parser.
-function translateOracleOuterJoinToAnsi(sql: string): string {
-  if (!sql.includes('(+)')) return sql;
-  const m = sql.match(/FROM\s+(\S+)\s+(\S+)\s*,\s*(\S+)\s+(\S+)\s+WHERE\s+([\s\S]*?)(;?\s*)$/i);
-  if (!m) return sql;
-  const [, table1, alias1, table2, alias2, whereBody] = m;
-  const conditions = whereBody.split(/\s+AND\s+/i);
-  const joinIdx = conditions.findIndex((c) => c.includes('(+)'));
-  if (joinIdx === -1) return sql;
-  const joinCond = conditions[joinIdx].replace(/\(\+\)/, '').trim();
-  const plusToken = conditions[joinIdx].match(/(\S+)\(\+\)/)?.[1] ?? '';
-  const optionalIsAlias2 = plusToken.startsWith(`${alias2}.`);
-  const drivingTable = optionalIsAlias2 ? table1 : table2;
-  const drivingAlias = optionalIsAlias2 ? alias1 : alias2;
-  const optionalTable = optionalIsAlias2 ? table2 : table1;
-  const optionalAlias = optionalIsAlias2 ? alias2 : alias1;
-  const remaining = conditions.filter((_, i) => i !== joinIdx).join(' AND ');
-  const prefix = sql.slice(0, m.index);
-  return (
-    prefix +
-    `FROM ${drivingTable} ${drivingAlias} LEFT JOIN ${optionalTable} ${optionalAlias} ON ${joinCond}` +
-    (remaining ? ` WHERE ${remaining}` : '') +
-    ';'
-  );
-}
-
-// The in-browser SQL engine is sqlite3, which doesn't understand Oracle-only
-// syntax -- so Oracle syntax that problems teach ((+), FETCH FIRST, NVL) is
-// translated to its sqlite3 equivalent right before execution. The user
-// always sees and writes Oracle syntax; only the engine input differs.
-function translateOracleSqlToSqlite(sql: string): string {
-  return translateOracleOuterJoinToAnsi(sql)
-    .replace(/\bNVL\s*\(/gi, 'IFNULL(')
-    .replace(/\bOFFSET\s+(\d+)\s+ROWS\s+FETCH\s+(?:FIRST|NEXT)\s+(\d+)\s+ROWS?\s+ONLY\b/gi, 'LIMIT $2 OFFSET $1')
-    .replace(/\bFETCH\s+(?:FIRST|NEXT)\s+(\d+)\s+ROWS?\s+ONLY\b/gi, 'LIMIT $1');
-}
-
 // `enabled` defers the actual WASM download/init (Pyodide + numpy/pandas is
 // several MB and blocks the main thread for multiple seconds) until a view
 // that needs Python actually mounts, instead of eagerly loading it for every
@@ -279,62 +238,14 @@ export function usePyodide(enabled: boolean = true) {
         .replace(/[\u2018\u2019\u00B4\u02B9]/g, "'")
         .replace(/\u00A0/g, ' ');
 
-      // Raw SQL (SELECT/CREATE/INSERT/UPDATE/DELETE/WITH) is transparently routed through
-      // an in-memory sqlite3 database seeded with the same fixed users/orders tables used
-      // throughout the SQL docs and problems, so any caller can accept plain SQL as "code".
-      const trimmedForSqlCheck = normalizedCode.trim().toUpperCase();
-      const isRawSql =
-        trimmedForSqlCheck.startsWith('SELECT') ||
-        trimmedForSqlCheck.startsWith('CREATE') ||
-        trimmedForSqlCheck.startsWith('INSERT') ||
-        trimmedForSqlCheck.startsWith('UPDATE') ||
-        trimmedForSqlCheck.startsWith('DELETE') ||
-        trimmedForSqlCheck.startsWith('WITH');
-
-      if (isRawSql) {
-        const cleanSql = translateOracleSqlToSqlite(normalizedCode).replace(/\\/g, '\\\\').replace(/"""/g, '\\"\\"\\"');
-        normalizedCode = `import sqlite3
-conn = sqlite3.connect(':memory:')
-cursor = conn.cursor()
-cursor.executescript("""
-CREATE TABLE IF NOT EXISTS users (id INT, name TEXT, age INT, score INT, dept TEXT);
-DELETE FROM users;
-INSERT INTO users VALUES
-  (1, '\uAE40\uCCA0\uC218', 20, 90, '\uAC1C\uBC1C\uD300'),
-  (2, '\uC774\uC601\uD76C', 25, 85, '\uAE30\uD68D\uD300'),
-  (3, '\uBC15\uBBFC\uC218', 22, 100, '\uAC1C\uBC1C\uD300'),
-  (4, '\uCD5C\uC218\uBBFC', 28, 70, '\uB514\uC790\uC778\uD300'),
-  (5, '\uC815\uCC2C\uD76C', 24, 95, '\uAC1C\uBC1C\uD300');
-
-CREATE TABLE IF NOT EXISTS orders (order_id INT, user_id INT, product TEXT, price INT);
-DELETE FROM orders;
-INSERT INTO orders VALUES
-  (101, 1, '\uB178\uD2B8\uBD81', 1500000),
-  (102, 1, '\uB9C8\uC6B0\uC2A4', 30000),
-  (103, 3, '\uD0A4\uBCF4\uB4DC', 120000),
-  (104, 5, '\uBAA8\uB2C8\uD130', 450000);
-""")
-
-query = """${cleanSql}"""
-try:
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    if cursor.description:
-        cols = [d[0] for d in cursor.description]
-        print(" | ".join(cols))
-        print("-" * 40)
-        for r in rows:
-            print(" | ".join(str(x) if x is not None else 'NULL' for x in r))
-    else:
-        conn.commit()
-        print("SQL \uCFFC\uB9AC\uAC00 \uC131\uACF5\uC801\uC73C\uB85C \uC2E4\uD589\uB418\uC5C8\uC2B5\uB2C8\uB2E4.")
-except Exception as e:
-    print(f"SQL \uC2E4\uD589 \uC624\uB958: {e}")
-`;
-        // sqlite3 is unvendored from Pyodide's standard library and must be
-        // loaded explicitly. Stays lazy -- only SQL problems pay for it.
-        await ensurePackage(pyodide, 'sqlite3', 'SQL 실행 엔진');
-      }
+      // SQL no longer passes through here. It used to be detected by
+      // `trim().toUpperCase().startsWith(...)` and wrapped into a Python
+      // sqlite3 script with the user's query interpolated into a triple-quoted
+      // string -- which sent any query starting with a comment into Python as
+      // source code, and made a single SQL problem download the 13MB Pyodide
+      // core plus the 1.45MB sqlite3 wheel. useSqlRunner (sql.js, 0.7MB) owns
+      // it now, and ProblemWorkspace routes by problem language instead of by
+      // sniffing the code.
 
       // Loaded on demand rather than preloaded at init. The patterns below
       // were checked against every reference solution and every runnable doc

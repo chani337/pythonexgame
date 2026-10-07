@@ -35,7 +35,11 @@ export default defineConfig({
         // because those extensions aren't listed -- a partial precache that
         // costs every first-time visitor 1.2MB and saves nobody anything,
         // including the majority who never open a Python screen.
-        globIgnores: ['pyodide/**'],
+        // Same reasoning for sql-js/: the glob above matches sql-wasm.js
+        // (46KB) but not sql-wasm.wasm (658KB), so precaching it would charge
+        // every first-time visitor for the loader while leaving the part that
+        // matters to a runtime fetch anyway.
+        globIgnores: ['pyodide/**', 'sql-js/**'],
 
         // 9.62MB wasm is over Workbox's 2MB default. This only affects
         // precaching, which pyodide is excluded from, but leaving the default
@@ -66,6 +70,29 @@ export default defineConfig({
             options: {
               cacheName: 'pyodide-self-hosted-v0.26.2',
               expiration: { maxEntries: 20, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // sql.js from the CDN. A separate route from the Pyodide one
+            // because the paths don't share a prefix (/npm/sql.js@... vs
+            // /pyodide/...), and keeping the cache names versioned means a
+            // version bump doesn't serve stale wasm.
+            urlPattern: /^https:\/\/cdn\.jsdelivr\.net\/npm\/sql\.js@/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'sqljs-cdn-v1.14.2',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
+              cacheableResponse: { statuses: [0, 200] },
+            },
+          },
+          {
+            // The self-hosted sql.js fallback.
+            urlPattern: ({ url }: { url: URL }) => url.pathname.startsWith('/sql-js/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'sqljs-self-hosted-v1.14.2',
+              expiration: { maxEntries: 10, maxAgeSeconds: 60 * 60 * 24 * 365 },
               cacheableResponse: { statuses: [0, 200] },
             },
           },

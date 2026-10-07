@@ -8,6 +8,7 @@ import { checkKeywords } from '../utils/checkKeywords';
 import { decodeAnswer } from '../utils/answerObfuscation';
 import { explainError } from '../utils/explainError';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
+import type { SqlResultTable } from '../hooks/useSqlRunner';
 import confetti from 'canvas-confetti';
 import CodeEditor from './CodeEditor';
 import type { EditorLanguage } from './CodeEditor';
@@ -19,6 +20,7 @@ interface ProblemWorkspaceProps {
   onPrevProblem?: () => void;
   runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
   runJsCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
+  runSqlCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onMarkSolved: (problemId: string) => void;
   isBookmarked?: boolean;
@@ -34,6 +36,7 @@ export default function ProblemWorkspace({
   onPrevProblem,
   runPythonCode,
   runJsCode,
+  runSqlCode,
   isPyodideLoading,
   onMarkSolved,
   isBookmarked,
@@ -53,8 +56,22 @@ export default function ProblemWorkspace({
     problemLanguage === 'js' ? '여기에 자바스크립트 코드를 직접 타이핑하여 작성하세요...' :
     '여기에 파이썬 코드를 직접 타이핑하여 작성하세요...';
   // JS runs natively in the browser (Web Worker), so unlike Pyodide it has no loading phase
-  const isRuntimeLoading = problemLanguage === 'js' ? false : isPyodideLoading;
-  const executeCode = problemLanguage === 'js' && runJsCode ? runJsCode : runPythonCode;
+  // Three runners, picked by the problem's language rather than by sniffing
+  // the submitted code. SQL used to be detected with a startsWith() check on
+  // the code itself, which mis-routed anything beginning with a comment.
+  //
+  // java/c problems are quiz/fill only and never reach a runner, so they fall
+  // through to the Python one harmlessly.
+  const executeCode =
+    problemLanguage === 'js' && runJsCode ? runJsCode :
+    problemLanguage === 'sql' && runSqlCode ? runSqlCode :
+    runPythonCode;
+
+  // Only the Python runner has a multi-second wasm init to wait on. sql.js
+  // loads in well under a second and does it on first run, so blocking the
+  // button on it would be worse than letting the run show its own progress.
+  const isRuntimeLoading =
+    problemLanguage === 'js' || problemLanguage === 'sql' ? false : isPyodideLoading;
 
   const [code, setCode] = useState<string>(problem.initialCode || '');
   const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
@@ -62,6 +79,10 @@ export default function ProblemWorkspace({
   
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [consoleOutput, setConsoleOutput] = useState<string>('');
+  // Structured SQL results, rendered as a real table instead of the
+  // " | "-joined text. Grading still compares the text form (useSqlRunner's
+  // toStdout), so the 36 stored expected outputs are untouched.
+  const [sqlTables, setSqlTables] = useState<SqlResultTable[] | null>(null);
   const [consoleError, setConsoleError] = useState<string | null>(null);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [hasTested, setHasTested] = useState<boolean>(false);
@@ -162,7 +183,11 @@ export default function ProblemWorkspace({
   const handleRun = async () => {
     if (isRuntimeLoading) return;
     setIsRunning(true);
-    setConsoleOutput(problemLanguage === 'js' ? '자바스크립트 코드를 실행 중...' : '파이썬 코드를 컴파일하고 실행 중...');
+    setConsoleOutput(
+      problemLanguage === 'js' ? '자바스크립트 코드를 실행 중...' :
+      problemLanguage === 'sql' ? 'SQL 쿼리를 실행 중...' :
+      '파이썬 코드를 컴파일하고 실행 중...'
+    );
     setConsoleError(null);
     setWorkspaceSuccess(false);
     setKeywordWarning(null);
@@ -175,6 +200,8 @@ export default function ProblemWorkspace({
         expected: decodeAnswer(tc.expected),
       }));
       const res = await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
+      // Only present when the SQL runner handled this problem.
+      setSqlTables((res as { tables?: SqlResultTable[] }).tables ?? null);
 
       setConsoleOutput(res.stdout || (res.success ? '실행 완료 (출력값 없음)' : ''));
       if (res.error) {
@@ -802,7 +829,50 @@ export default function ProblemWorkspace({
                   <span className="console-prompt">&gt;</span> 코드를 실행하면 여기에 출력 및 채점 로그가 나타납니다.
                 </div>
               )}
-              {consoleOutput && (
+              {sqlTables && sqlTables.length > 0 && (
+                <div style={{ marginBottom: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  {sqlTables.map((table, ti) => (
+                    <div key={ti} style={{ overflowX: 'auto' }}>
+                      <table style={{ borderCollapse: 'collapse', fontSize: '0.78rem', fontFamily: 'var(--font-mono)', minWidth: '100%' }}>
+                        <thead>
+                          <tr style={{ background: '#f4f4f6', borderBottom: '2px solid #1a1a1a' }}>
+                            {table.columns.map((col, ci) => (
+                              <th key={ci} style={{ padding: '0.4rem 0.75rem', textAlign: 'left', fontWeight: 700, color: '#1a1a1a', whiteSpace: 'nowrap' }}>
+                                {col}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {table.rows.map((row, ri) => (
+                            <tr key={ri} style={{ borderBottom: '1px solid var(--border-subtle)', background: ri % 2 === 1 ? '#fafafa' : '#ffffff' }}>
+                              {row.map((cell, ci) => (
+                                <td
+                                  key={ci}
+                                  style={{
+                                    padding: '0.35rem 0.75rem',
+                                    whiteSpace: 'nowrap',
+                                    // NULL is a marker, not a value -- dimmed so it
+                                    // doesn't read as the literal text "NULL".
+                                    color: cell === 'NULL' ? 'var(--text-muted)' : '#1a1a1a',
+                                    fontStyle: cell === 'NULL' ? 'italic' : 'normal',
+                                  }}
+                                >
+                                  {cell}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+                        {table.rows.length}행
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {consoleOutput && !sqlTables?.length && (
                 <div className="console-stdout" style={{ fontSize: '0.8rem', color: '#1a1a1a' }}>
                   {consoleOutput.split('\n').map((line, idx) => (
                     <div key={idx}><span className="console-prompt">&gt;</span> {line}</div>
