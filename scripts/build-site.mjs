@@ -10,6 +10,7 @@
 //   npm run build:site
 //
 import { build } from 'esbuild';
+import { createHash } from 'node:crypto';
 import { mkdtemp, rm, readFile, writeFile } from 'node:fs/promises';
 import { join, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
@@ -147,13 +148,39 @@ if (unresolved.length) {
   throw new Error(`치환되지 않은 자리표시자: ${[...new Set(unresolved)].join(', ')}`);
 }
 
-// --- self-checks ----------------------------------------------------------
-// The page ships zero JavaScript and site/vercel.json sets script-src 'none',
-// so a <script> tag added later would be blocked at runtime with no local
-// symptom. Catch it here instead.
-if (/<script[\s>]/i.test(html)) {
-  throw new Error("템플릿에 <script> 가 있습니다. site/vercel.json 의 CSP 가 script-src 'none' 이라 브라우저에서 차단됩니다.");
+// --- the one inline script, and its CSP hash ------------------------------
+// This page has exactly one script: the pre-paint check that stops the mobile
+// splash replaying on every refresh. It is allowed by sha256 rather than
+// 'unsafe-inline', so an injected <script> still cannot run -- but that only
+// holds while the hash in site/vercel.json matches the script's bytes. If it
+// drifts, the real script stops running and the splash comes back on every
+// load, which is the kind of thing nobody notices for months.
+//
+// So the hash is derived here, from the generated page, and written into (or
+// checked against) the CSP.
+const scripts = [...html.matchAll(/<script(?![^>]*\bsrc=)[^>]*>([\s\S]*?)<\/script>/g)];
+const external = [...html.matchAll(/<script[^>]*\bsrc=/g)];
+
+if (external.length) {
+  throw new Error("외부 <script src=...> 는 쓸 수 없습니다. CSP 가 해시로만 허용합니다.");
 }
+if (scripts.length !== 1) {
+  throw new Error(
+    `인라인 <script> 는 정확히 1개여야 합니다 (현재 ${scripts.length}개).\n` +
+    '추가하려면 site/vercel.json 의 CSP 에 해시를 함께 넣도록 이 스크립트를 먼저 고치세요.'
+  );
+}
+
+const scriptHash = 'sha256-' + createHash('sha256').update(scripts[0][1], 'utf8').digest('base64');
+const VERCEL = join(SITE, 'vercel.json');
+const vercelRaw = await readFile(VERCEL, 'utf8');
+const cspLine = vercelRaw.match(/"value": "(default-src 'none';[^"]*)"/);
+if (!cspLine) {
+  throw new Error('site/vercel.json 에서 CSP 를 찾지 못했습니다.');
+}
+const currentCsp = cspLine[1];
+const wantedCsp = currentCsp.replace(/script-src [^;]*/, `script-src '${scriptHash}'`);
+const cspNeedsUpdate = currentCsp !== wantedCsp;
 
 // The brief for this project called out that the old copy claimed every
 // language runs in the browser. Java and C never reach a runtime, so that
@@ -167,6 +194,12 @@ for (const banned of ['5개 언어를 브라우저에서 바로 실행', '6개 �
 // --check regenerates and compares instead of writing, so CI fails when
 // index.html was hand-edited or problem counts changed without a rebuild.
 if (process.argv.includes('--check')) {
+  if (cspNeedsUpdate) {
+    console.error('site/vercel.json 의 CSP 해시가 인라인 스크립트와 다릅니다.');
+    console.error(`  필요한 값: script-src '${scriptHash}'`);
+    console.error('  npm run build:site 로 갱신하세요.');
+    process.exit(1);
+  }
   let current = '';
   try {
     current = await readFile(join(SITE, 'index.html'), 'utf8');
@@ -185,6 +218,11 @@ if (process.argv.includes('--check')) {
 }
 
 await writeFile(join(SITE, 'index.html'), html);
+
+if (cspNeedsUpdate) {
+  await writeFile(VERCEL, vercelRaw.replace(currentCsp, wantedCsp));
+  console.log(`site/vercel.json 의 CSP 해시 갱신됨 → '${scriptHash}'`);
+}
 
 console.log('site/index.html 생성됨');
 console.log(`  문제 ${totalProblems}개 (실제 코드 실행 ${executable}개)`);

@@ -133,6 +133,13 @@ code {
  */
 .splash { display: none; }
 
+/* Already shown once in this tab. Higher specificity than the rule inside the
+   media query below, so it wins without !important. The class is set by the
+   one inline script in <head>, before the stylesheet is applied -- so on a
+   repeat view the panel is never painted at all, rather than flashing and
+   disappearing. */
+html.splash-seen .splash { display: none; }
+
 @media (max-width: 768px) and (prefers-reduced-motion: no-preference) {
   .splash {
     display: grid;

@@ -10,6 +10,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <!-- The only script on this page. It marks the splash as already seen for
+       this tab so a refresh doesn't replay it, and runs before the stylesheet
+       so the panel is never painted on a repeat visit. CSP allows exactly
+       this content by sha256 -- not 'unsafe-inline' -- so an injected script
+       still cannot run. Edit it and the hash in site/vercel.json must be
+       regenerated; build:site fails if they disagree. -->
+  <script>try{var k='pq_splash_seen';if(sessionStorage.getItem(k)){document.documentElement.className='splash-seen'}else{sessionStorage.setItem(k,'1')}}catch(e){}</script>
   <link rel="stylesheet" href="/style.css" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
 </head>
