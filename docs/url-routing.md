@@ -125,13 +125,10 @@ routeForState('docs', 'sql_q1', 'sql')  // → { view: 'problems', problemId: 's
 `vercel.json` 의 SPA rewrite 는 **처음부터 거기 있었고, 처음부터 동작하지 않았습니다.**
 
 ```json
-{
-  "cleanUrls": true,
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
-}
+"rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
 ```
 
-`cleanUrls: true` 는 정적 사이트에서 `.html` 확장자를 떼는 옵션입니다. 그 결과 **`/index.html` 이 `/` 로 308 리다이렉트**됩니다.
+**Vercel 은 `/index.html` 을 `/` 로 308 리다이렉트합니다.**
 
 ```
 $ curl -I https://pyquests.vercel.app/index.html
@@ -139,15 +136,29 @@ HTTP/2 308
 location: https://pyquests.vercel.app/
 ```
 
-즉 rewrite 의 destination 이 **파일이 아니라 리다이렉트**를 가리키고 있었고, Vercel 은 그 경로를 404 로 처리했습니다.
+즉 rewrite 의 destination 이 **파일이 아니라 리다이렉트**였고, Vercel 은 그 경로를 404 로 처리했습니다.
 
 깊은 링크가 없던 동안에는 아무도 `/` 외의 경로를 열지 않았으니 드러날 일이 없었습니다.
 
 ### 수정
 
-`cleanUrls` 를 **제거**했습니다. 우회하지 않고 원인을 없앴습니다 — 이 옵션은 여러 `.html` 페이지가 있는 사이트에서 확장자를 떼기 위한 것이고, `dist/` 에는 `index.html` **하나뿐**입니다. 여기서 관측 가능한 유일한 효과가 rewrite 를 깨뜨리는 것이었습니다.
+```json
+"rewrites": [{ "source": "/(.*)", "destination": "/" }]
+```
 
-> 소개 사이트(`site/vercel.json`)는 `cleanUrls` 를 **유지**합니다. 거기는 rewrite 가 없고, `/index.html` → `/` 리다이렉트는 정규 주소를 하나로 모아 주므로 오히려 바람직합니다.
+`/` 는 실제로 서빙되는 경로입니다.
+
+### 첫 번째 수정 시도는 틀렸습니다
+
+308 리다이렉트를 보고 `cleanUrls: true` 때문이라고 판단해서 그 옵션을 제거했습니다. **배포해 보니 `cleanUrls` 가 없는데도 `/index.html` 은 여전히 308 이었고, 깊은 경로는 그대로 404 였습니다.**
+
+그 정규화는 `cleanUrls` 가 아니라 **Vercel 의 기본 동작**입니다. 메커니즘("destination 이 리다이렉트를 가리킨다")은 맞았지만 원인 지목이 틀렸습니다.
+
+`cleanUrls` 제거는 되돌리지 않았습니다 — `dist/` 에 `.html` 이 하나뿐이라 이 앱에서는 아무 일도 하지 않는 옵션이고, 없는 편이 추론할 거리가 하나 줄어듭니다. 다만 **그게 버그의 원인은 아니었습니다.**
+
+> 소개 사이트(`site/vercel.json`)는 `cleanUrls` 를 **유지**합니다. 거기는 rewrite 가 없고, `/index.html` → `/` 정규화는 주소를 하나로 모아 주므로 바람직합니다.
+
+이 과정에서 확인된 것: **배포본 확인이 없었으면 틀린 수정을 맞다고 보고했을 것입니다.** 설정만 보고는 판정할 수 없었습니다.
 
 ### 왜 못 잡았나 — 검증의 구멍
 
@@ -164,7 +175,7 @@ PYQUESTS_URL=https://pyquests.vercel.app npm run verify:routing
 | 층 | 검사 | CI |
 |---|---|---|
 | 설정 | catch-all rewrite 존재 | ✓ |
-| 설정 | **`cleanUrls` + `.html` destination 조합 금지** ← 이번 버그 | ✓ |
+| 설정 | **destination 이 `.html` 이 아님** ← 이번 버그 | ✓ |
 | 설정 | `redirects` 가 앱 경로를 가로채지 않음 | ✓ |
 | 설정 | `staticPaths()` 전부 해석 가능 · 정규형 | ✓ |
 | 배포본 | 각 경로가 실제로 200 | 배포 후 수동 |

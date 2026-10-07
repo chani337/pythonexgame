@@ -1,10 +1,15 @@
 // Checks that deep URLs actually resolve.
 //
 // This exists because of a bug that survived unnoticed for a long time: the
-// SPA rewrite in vercel.json pointed at /index.html while cleanUrls was on,
-// and cleanUrls 308-redirects /index.html to /. The destination therefore
-// resolved to a redirect rather than a file, and every path except / returned
-// 404 in production.
+// SPA rewrite in vercel.json pointed at /index.html, and Vercel canonicalises
+// /index.html to / with a 308. The destination therefore resolved to a
+// redirect rather than a file, and every path except / returned 404 in
+// production.
+//
+// Worth recording that the first fix attempt was wrong: the 308 looked like
+// it came from cleanUrls, so cleanUrls was removed -- and /index.html still
+// 308'd, because that canonicalisation is Vercel's default. Only the
+// deployed-host probe below settled it.
 //
 // Nothing caught it locally because `vite preview` has its own SPA fallback,
 // so the routes all returned 200 on a dev machine regardless of what
@@ -46,22 +51,20 @@ check(Boolean(catchAll), 'SPA catch-all rewrite 존재',
       'rewrite 가 없으면 / 외의 모든 경로가 404 입니다');
 
 if (catchAll) {
-  // The exact bug. cleanUrls strips .html, which turns an .html destination
-  // into a 308 and leaves the rewrite pointing at a redirect.
-  const destIsHtml = /\.html$/.test(catchAll.destination);
+  // The exact bug: Vercel 308-redirects /index.html to / by default, so an
+  // .html destination is a redirect rather than a servable file and the
+  // rewrite produces a 404.
   check(
-    !(vercel.cleanUrls === true && destIsHtml),
-    'cleanUrls 와 .html destination 이 함께 쓰이지 않음',
-    `cleanUrls: ${vercel.cleanUrls}, destination: ${catchAll.destination}\n`
-    + "       cleanUrls 가 /index.html 을 / 로 308 리다이렉트하므로, rewrite 가\n"
-    + '       파일이 아니라 리다이렉트를 가리켜 모든 깊은 경로가 404 가 됩니다.'
+    !/\.html$/.test(catchAll.destination),
+    'destination 이 .html 이 아님',
+    `destination: ${catchAll.destination}\n`
+    + '       Vercel 은 /index.html 을 / 로 308 리다이렉트합니다. rewrite 가\n'
+    + '       파일이 아니라 리다이렉트를 가리켜 모든 깊은 경로가 404 가 됩니다.\n'
+    + "       destination 을 '/' 로 두세요."
   );
 
-  check(
-    catchAll.destination === '/index.html' || catchAll.destination === '/',
-    'destination 이 index 를 가리킴',
-    `destination: ${catchAll.destination}`
-  );
+  check(catchAll.destination === '/', "destination 이 '/' 임",
+        `destination: ${catchAll.destination}`);
 }
 
 // A redirect whose source swallows an app path would shadow the rewrite.
