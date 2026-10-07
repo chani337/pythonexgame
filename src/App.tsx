@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, lazy, Suspense } from 'react';
-import { RefreshCw, CloudUpload, X } from 'lucide-react';
+import { RefreshCw, CloudUpload, X, Clock } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
 
@@ -50,7 +50,7 @@ function MainApp() {
   const [currentView, setCurrentView] = useState<string>('dashboard');
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
 
-  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncSandboxRunsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen, guestMergeResult, clearGuestMergeResult } = useAuth();
+  const { user, profile, loading: isAuthLoading, syncSolvedToSupabase, syncSandboxRunsToSupabase, fetchUserSolvedIds, syncReviewProblemToSupabase, fetchUserReviewProblemIds, setAuthModalOpen, guestMergeResult, clearGuestMergeResult, idleLoggedOut, clearIdleLoggedOut, idleLimitMinutes } = useAuth();
 
   // Filter states lifted up to preserve active view & difficulty
   const [selectedLanguage, setSelectedLanguage] = useState<string>('all');
@@ -506,6 +506,12 @@ print("변환 리스트:", result)
         />
       )}
 
+      {/* An auto-logout with no explanation is indistinguishable from the
+          site breaking, so it always says why. */}
+      {idleLoggedOut && (
+        <IdleLogoutNotice minutes={idleLimitMinutes} onClose={clearIdleLoggedOut} />
+      )}
+
       {pyodideStatus && <RuntimeStatusPill message={pyodideStatus} />}
     </div>
   );
@@ -549,6 +555,51 @@ function GuestMergeToast({ result, onClose }: { result: GuestMergeResult; onClos
             {` (지금은 없는 문제 ${result.skippedSolved}개는 제외)`}
           </span>
         )}
+      </span>
+      <button
+        onClick={onClose}
+        aria-label="알림 닫기"
+        style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: '0.15rem', display: 'flex', color: 'var(--text-secondary)' }}
+      >
+        <X size={15} />
+      </button>
+    </div>
+  );
+}
+
+// Shown after the inactivity timer ends a session. Written for school
+// computer labs, where the session that gets left open is the one someone
+// else inherits.
+function IdleLogoutNotice({ minutes, onClose }: { minutes: number; onClose: () => void }) {
+  return (
+    <div
+      role="status"
+      aria-live="polite"
+      style={{
+        position: 'fixed',
+        top: '1rem',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        zIndex: 99999,
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.6rem',
+        padding: '0.75rem 1rem 0.75rem 1.1rem',
+        maxWidth: 'calc(100vw - 2rem)',
+        background: '#fff8e6',
+        border: '1px solid #a66908',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+        fontSize: '0.85rem',
+        fontWeight: 600,
+        color: '#1a1a1a',
+      }}
+    >
+      <Clock size={16} color="#a66908" style={{ flexShrink: 0 }} />
+      <span>
+        {`${minutes}분 동안 사용이 없어 자동으로 로그아웃했어요.`}
+        <span style={{ color: 'var(--text-secondary)', fontWeight: 500 }}>
+          {' 진도는 계정에 저장되어 있으니 다시 로그인하면 이어서 풀 수 있어요.'}
+        </span>
       </span>
       <button
         onClick={onClose}

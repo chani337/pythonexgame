@@ -1,6 +1,14 @@
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
-import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import {
+  supabase,
+  isSupabaseConfigured,
+  clearSharedComputerMode,
+  isSharedComputerMode,
+  purgeAuthTokens,
+  setSharedComputerMode,
+} from '../lib/supabase';
+import { useIdleLogout, clearIdleTimer, IDLE_LIMIT_MS } from '../hooks/useIdleLogout';
 import type { User, Session } from '@supabase/supabase-js';
 import { isProfaneOrForbidden } from '../utils/profanityFilter';
 import { problems } from '../data/problems';
@@ -101,6 +109,52 @@ function purgeOtherAccountsLocalStorage(keepId: string) {
   keysToRemove.forEach((k) => localStorage.removeItem(k));
 }
 
+// Logout cleanup. purgeOtherAccountsLocalStorage above only removes *other*
+// accounts' keys, because the signed-in user's own cache is what makes the
+// app work offline. On logout that reasoning inverts: the account is leaving,
+// and on a shared computer its solved-problem history, streak and display
+// name should not be sitting in the browser for whoever sits down next.
+//
+// Guest keys (`..._guest`) are deliberately left alone -- see below.
+function purgeSignedOutAccountLocalStorage(userId: string | null, sharedSession: boolean) {
+  if (userId) {
+    SCOPED_KEY_PREFIXES.forEach((prefix) => localStorage.removeItem(prefix + userId));
+  }
+
+  // The cached leaderboard holds other users' display names and scores. It is
+  // public data, but it is also the only thing that would still render a
+  // populated ranking after a logout, which reads as "still signed in".
+  localStorage.removeItem('pyquests_cached_leaderboard');
+
+  // These two exist so the leaderboard can still highlight "me" while the
+  // session is being restored. Left behind, they make the *previous* student's
+  // row light up as the current visitor's -- and the email one is a stored
+  // email address with no other purpose once its owner has logged out.
+  localStorage.removeItem('pyquests_last_user_id');
+  localStorage.removeItem('pyquests_last_user_email');
+
+  // Supabase's own token, from whichever store it ended up in. signOut()
+  // normally removes it via the storage adapter; this covers a signOut that
+  // failed because the network was down, where the local session has to end
+  // regardless of what the server thinks.
+  purgeAuthTokens();
+
+  // The sandbox editor's contents are one unscoped key shared by every
+  // account and guest on this browser, so it is also the next person's view
+  // of whatever the last person was writing. Only cleared in shared-computer
+  // mode: on a personal machine, wiping someone's draft because they logged
+  // out would be destroying their work, and there the privacy case is moot.
+  if (sharedSession) {
+    localStorage.removeItem('pyquests_sandbox_code');
+  }
+
+  // Cache Storage is intentionally untouched. Every runtimeCaching route in
+  // vite.config.ts matches a static asset (Pyodide core, sql.js, Google
+  // Fonts) -- there is no Supabase route and no personalized response in
+  // there, so clearing it would cost the next user a 13MB Pyodide download to
+  // delete nothing. verify:shared-pc asserts that this stays true.
+}
+
 // ADMIN_EMAIL / ADMIN_USER_ID and the EXCLUDED_LEADERBOARD_IDS list used to
 // live here. They named the exact account worth attacking (plus two test
 // accounts) in a public repository, and changing who the admin is meant
@@ -130,10 +184,15 @@ interface AuthContextType {
   leaderboard: LeaderboardUser[];
   refreshLeaderboard: () => Promise<void>;
   recentActivity: ActivityEvent[];
-  signUp: (email: string, password: string, displayName: string) => Promise<{ error: any }>;
-  signIn: (email: string, password: string) => Promise<{ error: any }>;
-  signInWithGoogle: () => Promise<{ error: any }>;
+  signUp: (email: string, password: string, displayName: string, sharedComputer?: boolean) => Promise<{ error: any }>;
+  signIn: (email: string, password: string, sharedComputer?: boolean) => Promise<{ error: any }>;
+  signInWithGoogle: (sharedComputer?: boolean) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  /** True after the 60-minute inactivity timer signed the user out. */
+  idleLoggedOut: boolean;
+  clearIdleLoggedOut: () => void;
+  /** Minutes of inactivity before the session ends, for the UI to quote. */
+  idleLimitMinutes: number;
   syncSolvedToSupabase: (problemId: string) => Promise<void>;
   syncSandboxRunsToSupabase: (sandboxRuns: number) => Promise<void>;
   /** Non-null right after a login that moved guest progress into the account. */
@@ -169,6 +228,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // "23개를 저장했어요" popping up on every refresh is not acceptable.
   const mergedForUserRef = useRef<string | null>(null);
 
+  // Set when the inactivity timer ended the session, so the app can explain
+  // why the user is suddenly looking at a logged-out screen. Without this the
+  // auto-logout is indistinguishable from the site breaking.
+  const [idleLoggedOut, setIdleLoggedOut] = useState<boolean>(false);
+
   // Initialize leaderboard state with persistent local cache or empty array
   const [leaderboard, setLeaderboard] = useState<LeaderboardUser[]>(() => {
     const cached = localStorage.getItem('pyquests_cached_leaderboard');
@@ -200,6 +264,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        setIdleLoggedOut(false);
         localStorage.setItem('pyquests_last_user_id', session.user.id);
         if (session.user.email) {
           localStorage.setItem('pyquests_last_user_email', session.user.email);
@@ -207,6 +272,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         purgeOtherAccountsLocalStorage(session.user.id);
         fetchProfile(session.user.id, session.user.email || '');
       } else {
+        // Landing with no session: there is nothing left to restore, so the
+        // "who was last here" hints have no job and shouldn't outlive the
+        // session. This is the path a shared-mode tab-close takes -- the
+        // session is gone but logout cleanup never ran.
+        localStorage.removeItem('pyquests_last_user_id');
+        localStorage.removeItem('pyquests_last_user_email');
         purgeOtherAccountsLocalStorage('guest');
         setLoading(false);
       }
@@ -216,6 +287,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
+        setIdleLoggedOut(false);
         localStorage.setItem('pyquests_last_user_id', session.user.id);
         if (session.user.email) {
           localStorage.setItem('pyquests_last_user_email', session.user.email);
@@ -223,6 +295,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         purgeOtherAccountsLocalStorage(session.user.id);
         fetchProfile(session.user.id, session.user.email || '');
       } else {
+        // Landing with no session: there is nothing left to restore, so the
+        // "who was last here" hints have no job and shouldn't outlive the
+        // session. This is the path a shared-mode tab-close takes -- the
+        // session is gone but logout cleanup never ran.
+        localStorage.removeItem('pyquests_last_user_id');
+        localStorage.removeItem('pyquests_last_user_email');
         purgeOtherAccountsLocalStorage('guest');
         setProfile(null);
         setLoading(false);
@@ -272,6 +350,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       supabase.removeChannel(channel);
     };
   }, []);
+
+  // Armed only while signed in. A guest has no session to end, and signing
+  // them out would discard local progress they haven't saved anywhere yet.
+  useIdleLogout(Boolean(user), () => {
+    void signOut('idle');
+  });
 
   const fetchProfile = async (userId: string, userEmail: string) => {
     try {
@@ -723,7 +807,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return {};
   };
 
-  const signUp = async (email: string, password: string, displayName: string) => {
+  const signUp = async (email: string, password: string, displayName: string, sharedComputer = false) => {
     if (!isSupabaseConfigured) {
       return { error: { message: '클라우드 데이터베이스 접속 정보가 설정되지 않았습니다.' } };
     }
@@ -751,6 +835,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.warn('Signup duplication check notice:', err);
     }
 
+    // Before the auth call, never after: the storage adapter decides where
+    // the token lands at the moment supabase-js writes it.
+    setSharedComputerMode(sharedComputer);
+
     const res = await supabase.auth.signUp({
       email,
       password,
@@ -774,10 +862,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: res.error };
   };
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, sharedComputer = false) => {
     if (!isSupabaseConfigured) {
       return { error: { message: '클라우드 데이터베이스 접속 정보가 설정되지 않았습니다.' } };
     }
+    setSharedComputerMode(sharedComputer);
     const res = await supabase.auth.signInWithPassword({ email, password });
     if (!res.error) {
       refreshLeaderboard();
@@ -785,10 +874,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: res.error };
   };
 
-  const signInWithGoogle = async () => {
+  const signInWithGoogle = async (sharedComputer = false) => {
     if (!isSupabaseConfigured) {
       return { error: { message: '클라우드 데이터베이스 접속 정보가 설정되지 않았습니다.' } };
     }
+    // Survives the round trip to Google: sessionStorage is per-tab, and the
+    // OAuth redirect comes back into the same tab, so the flag is still set
+    // when detectSessionInUrl writes the token.
+    setSharedComputerMode(sharedComputer);
     const res = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -798,15 +891,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: res.error };
   };
 
-  const signOut = async () => {
+  // `reason` only affects what the user is told. Everything else about an
+  // idle logout is identical to pressing the button.
+  const signOut = async (reason: 'user' | 'idle' = 'user') => {
+    const leavingUserId = user?.id ?? localStorage.getItem('pyquests_last_user_id');
+    // Read before clearSharedComputerMode() below wipes the flag.
+    const sharedSession = isSharedComputerMode();
+
     if (isSupabaseConfigured) {
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+      } catch (err) {
+        // A failed round trip must not leave the browser logged in --
+        // purgeSignedOutAccountLocalStorage below drops the token either way.
+        console.warn('Sign-out request failed, clearing locally anyway:', err);
+      }
     }
+
+    purgeSignedOutAccountLocalStorage(leavingUserId, sharedSession);
+    clearSharedComputerMode();
+    clearIdleTimer();
+
     mergedForUserRef.current = null;
     setGuestMergeResult(null);
     setUser(null);
     setSession(null);
     setProfile(null);
+    setIdleLoggedOut(reason === 'idle');
   };
 
   // Only creates the profile row if it's genuinely missing (needed for the
@@ -1002,9 +1113,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return { error: { message: '이미 사용 중인 닉네임입니다.' } };
     }
 
-    // Save to local storage for instant availability
+    // Save to local storage for instant availability. The unscoped
+    // `pyquests_display_name` twin that used to be written here had no
+    // reader anywhere in the app -- it only left the last person's nickname
+    // sitting in a shared browser.
     localStorage.setItem(`pyquests_display_name_${activeUserId}`, cleanName);
-    localStorage.setItem('pyquests_display_name', cleanName);
 
     // Update profile state
     setProfile((prev) => {
@@ -1064,6 +1177,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         signIn,
         signInWithGoogle,
         signOut,
+        idleLoggedOut,
+        clearIdleLoggedOut: () => setIdleLoggedOut(false),
+        idleLimitMinutes: Math.round(IDLE_LIMIT_MS / 60000),
         syncSolvedToSupabase,
         syncSandboxRunsToSupabase,
         guestMergeResult,

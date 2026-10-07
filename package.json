@@ -19,7 +19,8 @@
     "verify:pyodide": "node scripts/verify-pyodide-loader.mjs",
     "verify:pyodide-core": "node scripts/verify-pyodide-core.mjs",
     "verify:sql": "node scripts/verify-sql-runner.mjs",
-    "verify:guest-merge": "node scripts/verify-guest-merge.mjs"
+    "verify:guest-merge": "node scripts/verify-guest-merge.mjs",
+    "verify:shared-pc": "node scripts/verify-shared-pc.mjs"
   },
   "dependencies": {
     "@codemirror/lang-java": "^6.0.2",

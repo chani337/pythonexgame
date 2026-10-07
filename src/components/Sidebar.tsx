@@ -307,13 +307,17 @@ export default function Sidebar({
                     {user.email}
                   </div>
                 )}
+                {/* Collapsed, this used to be a bare 12px icon with no
+                    border -- on a shared machine the logout has to be
+                    findable at a glance, so it reads as a button either way. */}
                 <button
                   onClick={() => signOut()}
                   title="로그아웃"
+                  aria-label="로그아웃"
                   style={{
                     marginTop: '0.4rem',
                     background: 'transparent',
-                    border: 'none',
+                    border: isCollapsed ? '1px solid #cf222e' : 'none',
                     color: '#cf222e',
                     fontSize: '0.7rem',
                     fontWeight: '700',
@@ -322,11 +326,11 @@ export default function Sidebar({
                     alignItems: 'center',
                     justifyContent: isCollapsed ? 'center' : 'flex-start',
                     gap: '0.2rem',
-                    padding: 0,
+                    padding: isCollapsed ? '0.35rem 0' : 0,
                     width: '100%',
                   }}
                 >
-                  <LogOut size={12} /> {!isCollapsed && '로그아웃'}
+                  <LogOut size={isCollapsed ? 15 : 12} /> {!isCollapsed && '로그아웃'}
                 </button>
               </div>
             ) : (
@@ -521,6 +525,83 @@ export default function Sidebar({
               gap: '0.75rem',
             }}
           >
+            {/* Account + logout. The desktop sidebar's account card is
+                display:none below 768px, so without this block a student on a
+                phone or a lab tablet had no way to log out at all -- the one
+                thing a shared machine most needs. */}
+            {user ? (
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  gap: '0.5rem',
+                  border: '1px solid var(--border-subtle)',
+                  padding: '0.6rem 0.75rem',
+                  background: '#ffffff',
+                }}
+              >
+                <span
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem',
+                    minWidth: 0,
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: '#1a1a1a',
+                  }}
+                >
+                  <UserCheck size={16} color="#0969da" style={{ flexShrink: 0 }} />
+                  <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    {profile?.display_name || user.email?.split('@')[0]}
+                  </span>
+                </span>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    signOut();
+                  }}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem',
+                    background: 'transparent',
+                    border: '1px solid #cf222e',
+                    color: '#cf222e',
+                    fontSize: '0.78rem',
+                    fontWeight: '700',
+                    padding: '0.4rem 0.6rem',
+                    cursor: 'pointer',
+                    flexShrink: 0,
+                  }}
+                >
+                  <LogOut size={14} /> 로그아웃
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  setAuthModalOpen(true);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: 'transparent',
+                  border: '1px solid var(--border-subtle)',
+                  padding: '0.6rem 0.75rem',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  color: '#1a1a1a',
+                  cursor: 'pointer',
+                }}
+              >
+                <LogIn size={16} />
+                로그인 / 회원가입
+              </button>
+            )}
             <button
               onClick={() => {
                 onViewChange('board');

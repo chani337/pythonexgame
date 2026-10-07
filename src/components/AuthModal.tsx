@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, LogIn, UserPlus, Lock, Mail, User, AlertCircle, Database } from 'lucide-react';
+import { X, LogIn, UserPlus, Lock, Mail, User, AlertCircle, Database, MonitorSmartphone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function AuthModal() {
@@ -10,12 +10,16 @@ export default function AuthModal() {
   const [displayName, setDisplayName] = useState<string>('');
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  // Shared/public computer: keeps the session in sessionStorage so closing
+  // the tab ends it. Default off -- the common case is a personal device, and
+  // defaulting on would silently log everyone out whenever they close a tab.
+  const [sharedComputer, setSharedComputer] = useState<boolean>(false);
 
   if (!authModalOpen) return null;
 
   const handleGoogleSignIn = async () => {
     setErrorMsg(null);
-    const res = await signInWithGoogle();
+    const res = await signInWithGoogle(sharedComputer);
     if (res.error) {
       setErrorMsg(res.error.message);
     }
@@ -33,14 +37,14 @@ export default function AuthModal() {
           setLoading(false);
           return;
         }
-        const res = await signUp(email, password, displayName);
+        const res = await signUp(email, password, displayName, sharedComputer);
         if (res.error) {
           setErrorMsg(res.error.message);
         } else {
           setAuthModalOpen(false);
         }
       } else {
-        const res = await signIn(email, password);
+        const res = await signIn(email, password, sharedComputer);
         if (res.error) {
           setErrorMsg(res.error.message === 'Invalid login credentials' ? '이메일 또는 비밀번호가 올바르지 않습니다.' : res.error.message);
         } else {
@@ -158,6 +162,57 @@ export default function AuthModal() {
             {errorMsg}
           </div>
         )}
+
+        {/* Shared-computer option. Sits above the Google button on
+            purpose: it applies to every sign-in path, and below the form
+            it would be invisible to anyone who signs in with Google. */}
+        <label
+          style={{
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '0.5rem',
+            cursor: 'pointer',
+            background: sharedComputer ? '#fff8e6' : '#f4f4f6',
+            border: `1px solid ${sharedComputer ? '#a66908' : 'var(--border-subtle)'}`,
+            padding: '0.7rem 0.75rem',
+            marginBottom: '1rem',
+            transition: 'background 0.15s, border-color 0.15s',
+          }}
+        >
+          <input
+            type="checkbox"
+            checked={sharedComputer}
+            onChange={(e) => setSharedComputer(e.target.checked)}
+            style={{ marginTop: '0.15rem', cursor: 'pointer', flexShrink: 0 }}
+          />
+          <span>
+            <span
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                fontSize: '0.78rem',
+                fontWeight: '700',
+                color: '#1a1a1a',
+              }}
+            >
+              <MonitorSmartphone size={13} />
+              공용 컴퓨터예요 (로그인 유지 안 함)
+            </span>
+            <span
+              style={{
+                display: 'block',
+                fontSize: '0.68rem',
+                color: 'var(--text-secondary)',
+                lineHeight: '1.45',
+                marginTop: '0.15rem',
+              }}
+            >
+              학교 컴퓨터실처럼 여러 사람이 쓰는 PC 라면 체크해 주세요. 탭을 닫으면
+              로그인이 바로 풀리고, 새 탭에서는 다시 로그인해야 합니다.
+            </span>
+          </span>
+        </label>
 
         {/* Google OAuth Login Button */}
         <button
