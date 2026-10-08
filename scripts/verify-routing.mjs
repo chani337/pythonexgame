@@ -64,7 +64,16 @@ check(unknownKeys.length === 0, 'vercel.json 에 알 수 없는 최상위 키가
       + '       주석이 필요하면 docs/ 에 쓰세요.');
 
 const rewrites = vercel.rewrites ?? [];
-const catchAll = rewrites.find((r) => r.source === '/(.*)' || r.source === '/:path*');
+// The catch-all must skip /assets/: a hashed chunk that no longer exists
+// (a tab left open across a deploy) has to 404, not get index.html with a
+// 200 -- the browser rejects that as a module and, before ViewErrorBoundary,
+// the app went blank. See src/lib/lazyWithReload.ts.
+const CATCH_ALL = '/((?!assets/).*)';
+const catchAll = rewrites.find((r) => r.source === CATCH_ALL);
+const unguarded = rewrites.find((r) => r.source === '/(.*)' || r.source === '/:path*');
+check(!unguarded, '없는 /assets/ 파일이 index.html 로 응답되지 않음',
+      `rewrite source 가 ${unguarded?.source} 입니다. ${CATCH_ALL} 로 바꾸세요.\n`
+      + '       배포 전에 열어 둔 탭이 옛 청크를 요청하면 HTML 이 돌아가 화면이 하얘집니다.');
 check(Boolean(catchAll), 'SPA catch-all rewrite 존재',
       'rewrite 가 없으면 / 외의 모든 경로가 404 입니다');
 

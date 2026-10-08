@@ -1,18 +1,21 @@
-import { useState, useEffect, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { RefreshCw, CloudUpload, X, Clock } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
+import ViewErrorBoundary from './components/ViewErrorBoundary';
+import { lazyWithReload } from './lib/lazyWithReload';
 
 // Lazily loaded so each view's code (and, for DocsViewer, the large docs.ts
 // chapter text) only downloads when the user actually navigates there,
-// instead of all being bundled into the initial page load.
-const Dashboard = lazy(() => import('./components/Dashboard'));
-const ProblemList = lazy(() => import('./components/ProblemList'));
-const ProblemWorkspace = lazy(() => import('./components/ProblemWorkspace'));
-const Sandbox = lazy(() => import('./components/Sandbox'));
-const DocsViewer = lazy(() => import('./components/DocsViewer'));
-const Board = lazy(() => import('./components/Board'));
-const Changelog = lazy(() => import('./components/Changelog'));
+// instead of all being bundled into the initial page load. lazyWithReload
+// recovers a tab left open across a deploy (see that file).
+const Dashboard = lazyWithReload(() => import('./components/Dashboard'));
+const ProblemList = lazyWithReload(() => import('./components/ProblemList'));
+const ProblemWorkspace = lazyWithReload(() => import('./components/ProblemWorkspace'));
+const Sandbox = lazyWithReload(() => import('./components/Sandbox'));
+const DocsViewer = lazyWithReload(() => import('./components/DocsViewer'));
+const Board = lazyWithReload(() => import('./components/Board'));
+const Changelog = lazyWithReload(() => import('./components/Changelog'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import type { GuestMergeResult } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
@@ -450,6 +453,7 @@ print("변환 리스트:", result)
 
       {/* Main Content Router */}
       <main className="main-content">
+        <ViewErrorBoundary key={selectedProblem ? `problem:${selectedProblem.id}` : currentView}>
         <Suspense
           fallback={
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '60vh', color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
@@ -555,6 +559,7 @@ print("변환 리스트:", result)
           <div style={{ padding: '2rem', textAlign: 'center' }}>404 Not Found</div>
         )}
         </Suspense>
+        </ViewErrorBoundary>
       </main>
 
       {guestMergeResult && (
