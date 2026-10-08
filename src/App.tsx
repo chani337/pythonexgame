@@ -3,6 +3,7 @@ import { RefreshCw, CloudUpload, X, Clock } from 'lucide-react';
 import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
 import ViewErrorBoundary from './components/ViewErrorBoundary';
+import UpdatePrompt from './components/UpdatePrompt';
 import { lazyWithReload } from './lib/lazyWithReload';
 
 // Lazily loaded so each view's code (and, for DocsViewer, the large docs.ts
@@ -583,6 +584,8 @@ print("변환 리스트:", result)
       )}
 
       {pyodideStatus && <RuntimeStatusPill message={pyodideStatus} />}
+
+      <UpdatePrompt />
     </div>
   );
 }

@@ -266,6 +266,7 @@ const INTENTIONAL_KEEPS = {
   pyquests_docs_last_category: '학습가이드 UI 위치, 개인정보 아님',
   pyquests_docs_last_chapter_idx: '학습가이드 UI 위치, 개인정보 아님',
   pyquests_docs_toc_open: '학습가이드 UI 상태, 개인정보 아님',
+  pyquests_update_dismissed: '업데이트 안내 "나중에" 표시 (sessionStorage), 개인정보 아님',
   pyquests_chunk_reload_at: '배포 직후 새로고침 루프 방지용 타임스탬프 (sessionStorage), 개인정보 아님',
 };
 

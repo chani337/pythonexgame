@@ -7,9 +7,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // Auto-update so returning users pick up new deploys instead of being
-      // stuck on a stale cached build.
-      registerType: 'autoUpdate',
+      // 'prompt', not 'autoUpdate': a new deploy installs and waits until the
+      // user accepts it in UpdatePrompt.tsx. autoUpdate took over open tabs
+      // without reloading them and deleted the chunks they still needed.
+      registerType: 'prompt',
+      // UpdatePrompt imports virtual:pwa-register itself; injecting
+      // registerSW.js as well would register twice.
+      injectRegister: false,
       includeAssets: ['favicon.svg', 'pwa-icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'PyQuests | 코딩 마스터 지름길',
@@ -28,6 +32,10 @@ export default defineConfig({
         // App shell only. Supabase calls need live data and are deliberately
         // absent from runtimeCaching below, so they always hit the network.
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+        // The plugin's default, stated because the update flow depends on it:
+        // the previous build's precache is removed when the new worker
+        // activates -- which, in prompt mode, is only after the user accepts.
+        cleanupOutdatedCaches: true,
 
         // public/pyodide/ must stay OUT of the precache. The glob above would
         // otherwise pick up pyodide.js and pyodide.asm.js (1.17MB) while
