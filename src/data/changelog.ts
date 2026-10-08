@@ -8,6 +8,16 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-08',
+    title: 'HTML · CSS 문제가 생겼어요 — 쓰는 대로 화면이 바뀌어요',
+    items: [
+      'HTML 18문제, CSS 20문제를 새로 넣었어요. 첫 웹페이지 만들기부터 표, 폼, 시맨틱 태그, Flexbox, Grid, position, CSS 변수까지 학습 가이드 순서를 그대로 따라갑니다.',
+      '코드를 입력하면 편집기 아래 미리보기가 바로 바뀌어요. VS Code의 Live Server처럼 저장할 필요 없이, 타이핑을 멈추면 곧바로 다시 그려집니다.',
+      '채점은 완성된 화면을 직접 검사해요. red, #f00, rgb(255, 0, 0)처럼 다르게 써도 같은 색이면 정답이고, 틀리면 어느 조건이 지금 어떤 값인지 알려 드려요.',
+      '미리보기 안에서는 스크립트가 실행되지 않아서, 어떤 코드를 넣어도 사이트나 계정에 영향을 줄 수 없어요.',
+    ],
+  },
+  {
     date: '2026-10-07',
     title: '문제마다 주소가 생겨서 링크를 보낼 수 있어요',
     items: [

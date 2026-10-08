@@ -1,4 +1,6 @@
 // Auto-generated problems file from 문제.txt
+import type { WebCheck } from '../utils/webChecks';
+
 export interface TestCase {
   input: string;
   // base64-encoded (see src/utils/answerObfuscation.ts), decode before
@@ -7,7 +9,7 @@ export interface TestCase {
 }
 
 export type ProblemType = 'coding' | 'quiz' | 'fill';
-export type ProblemLanguage = 'python' | 'sql' | 'java' | 'js' | 'algorithm' | 'c';
+export type ProblemLanguage = 'python' | 'sql' | 'java' | 'js' | 'algorithm' | 'c' | 'html' | 'css';
 
 export interface Problem {
   id: string;
@@ -22,6 +24,9 @@ export interface Problem {
   initialCode?: string;
   testCases?: TestCase[];
   testRunnerCode?: string;
+  // html/css coding problems only: graded by inspecting the rendered preview
+  // instead of comparing stdout (see src/utils/webChecks.ts).
+  webChecks?: WebCheck[];
   quizQuestion?: string;
   quizOptions?: string[];
   // base64-encoded (see src/utils/answerObfuscation.ts) so it isn't plainly
@@ -8263,5 +8268,1598 @@ export const problems: Problem[] = [
     "fillQuestion": "가변 인자 함수에서 다음 인자를 하나씩 꺼낼 때 사용하는 매크로는 _____이다.",
     "correctAnswerText": "dmFfYXJn",
     "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "html_q1",
+    "title": "HTML 1. 첫 웹페이지 만들기",
+    "category": "기본 구조",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "html",
+    "description": "제목과 문단이 하나씩 있는 첫 웹페이지를 만드세요. 코드를 입력하면 아래 미리보기에 바로 나타납니다.",
+    "constraints": [
+      "`<h1>` 태그로 `안녕하세요`라는 제목을 만드세요.",
+      "`<p>` 태그로 `첫 번째 웹 페이지입니다.`라는 문단을 만드세요.",
+      "`<body>` 안에 작성하세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "안녕하세요 (큰 제목)\n첫 번째 웹 페이지입니다."
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>첫 웹페이지</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "exists",
+        "selector": "body h1",
+        "label": "`<h1>` 제목이 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "h1",
+        "equals": "안녕하세요",
+        "label": "제목 내용이 `안녕하세요`이다"
+      },
+      {
+        "kind": "exists",
+        "selector": "body p",
+        "label": "`<p>` 문단이 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "p",
+        "equals": "첫 번째 웹 페이지입니다.",
+        "label": "문단 내용이 `첫 번째 웹 페이지입니다.`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q3",
+    "title": "HTML 2. 제목 단계 나누기",
+    "category": "텍스트",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "html",
+    "description": "큰 제목, 중간 제목, 작은 제목을 차례로 만드세요. 제목 태그는 숫자가 작을수록 더 중요한 제목입니다.",
+    "constraints": [
+      "`<h1>`에 `여행 일기`",
+      "`<h2>`에 `첫째 날`",
+      "`<h3>`에 `아침`"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "여행 일기 (가장 큼)\n첫째 날\n아침 (가장 작음)"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>여행 일기</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "text",
+        "selector": "h1",
+        "equals": "여행 일기",
+        "label": "`<h1>`이 `여행 일기`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "h2",
+        "equals": "첫째 날",
+        "label": "`<h2>`가 `첫째 날`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "h3",
+        "equals": "아침",
+        "label": "`<h3>`이 `아침`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q4",
+    "title": "HTML 3. 글자 강조하기",
+    "category": "텍스트",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "html",
+    "description": "문단 안의 일부 단어를 강조하세요.",
+    "constraints": [
+      "`<p>` 문단에 `이 내용은 중요하니 천천히 읽어 주세요.`라고 쓰세요.",
+      "`중요`는 `<strong>`으로 감싸세요.",
+      "`천천히`는 `<em>`으로 감싸세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "이 내용은 **중요**하니 *천천히* 읽어 주세요."
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>강조하기</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "text",
+        "selector": "p",
+        "equals": "이 내용은 중요하니 천천히 읽어 주세요.",
+        "label": "문단 전체 내용이 맞다"
+      },
+      {
+        "kind": "text",
+        "selector": "p strong",
+        "equals": "중요",
+        "label": "`중요`가 `<strong>` 안에 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "p em",
+        "equals": "천천히",
+        "label": "`천천히`가 `<em>` 안에 있다"
+      }
+    ]
+  },
+  {
+    "id": "html_q2",
+    "title": "HTML 4. 장보기 목록 만들기",
+    "category": "목록",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "html",
+    "description": "순서가 없는 목록으로 장보기 목록을 만드세요.",
+    "constraints": [
+      "`<ul>` 태그로 목록을 만드세요.",
+      "`<li>` 항목 세 개에 차례대로 `사과`, `바나나`, `포도`를 넣으세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "• 사과\n• 바나나\n• 포도"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>장보기 목록</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "exists",
+        "selector": "ul",
+        "label": "`<ul>` 목록이 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "ul > li",
+        "min": 3,
+        "max": 3,
+        "label": "`<ul>` 안에 `<li>` 항목이 세 개 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "ul > li:nth-child(1)",
+        "equals": "사과",
+        "label": "첫 번째 항목이 `사과`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "ul > li:nth-child(2)",
+        "equals": "바나나",
+        "label": "두 번째 항목이 `바나나`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "ul > li:nth-child(3)",
+        "equals": "포도",
+        "label": "세 번째 항목이 `포도`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q5",
+    "title": "HTML 5. 순서 있는 목록",
+    "category": "목록",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "html",
+    "description": "라면 끓이는 순서를 번호가 붙는 목록으로 만드세요.",
+    "constraints": [
+      "`<ol>` 태그를 사용하세요.",
+      "항목은 차례대로 `물을 끓인다`, `면과 스프를 넣는다`, `4분 더 끓인다`입니다."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "1. 물을 끓인다\n2. 면과 스프를 넣는다\n3. 4분 더 끓인다"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>라면 끓이기</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "exists",
+        "selector": "ol > li",
+        "min": 3,
+        "max": 3,
+        "label": "`<ol>` 안에 항목이 세 개 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "ul",
+        "negate": true,
+        "label": "`<ul>`이 아니라 `<ol>`을 썼다"
+      },
+      {
+        "kind": "text",
+        "selector": "ol > li:nth-child(1)",
+        "equals": "물을 끓인다",
+        "label": "1번이 `물을 끓인다`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "ol > li:nth-child(2)",
+        "equals": "면과 스프를 넣는다",
+        "label": "2번이 `면과 스프를 넣는다`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "ol > li:nth-child(3)",
+        "equals": "4분 더 끓인다",
+        "label": "3번이 `4분 더 끓인다`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q6",
+    "title": "HTML 6. 링크 만들기",
+    "category": "링크와 이미지",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "html",
+    "description": "클릭하면 새 탭에서 PyQuests가 열리는 링크를 만드세요. (미리보기 안에서는 링크가 열리지 않습니다.)",
+    "constraints": [
+      "`<a>` 태그의 글자는 `PyQuests 바로가기`입니다.",
+      "`href`는 `https://pyquests.vercel.app`입니다.",
+      "새 탭에서 열리도록 `target` 속성을 쓰세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "PyQuests 바로가기 (밑줄 있는 링크)"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>링크</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "text",
+        "selector": "a",
+        "equals": "PyQuests 바로가기",
+        "label": "링크 글자가 `PyQuests 바로가기`이다"
+      },
+      {
+        "kind": "attr",
+        "selector": "a",
+        "attr": "href",
+        "equals": "https://pyquests.vercel.app",
+        "label": "`href`가 `https://pyquests.vercel.app`이다"
+      },
+      {
+        "kind": "attr",
+        "selector": "a",
+        "attr": "target",
+        "equals": "_blank",
+        "label": "`target`이 `_blank`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q7",
+    "title": "HTML 7. 이미지 넣기",
+    "category": "링크와 이미지",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "html",
+    "description": "고양이 사진을 넣으세요. 실제 사진 파일은 없어서 미리보기에는 대체 텍스트가 보입니다.",
+    "constraints": [
+      "`src`는 `cat.png`입니다.",
+      "대체 텍스트(`alt`)는 `잠자는 고양이`입니다.",
+      "너비(`width`)는 `200`입니다."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "(이미지 자리) 잠자는 고양이"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>이미지</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "attr",
+        "selector": "img",
+        "attr": "src",
+        "equals": "cat.png",
+        "label": "`src`가 `cat.png`이다"
+      },
+      {
+        "kind": "attr",
+        "selector": "img",
+        "attr": "alt",
+        "equals": "잠자는 고양이",
+        "label": "`alt`가 `잠자는 고양이`이다"
+      },
+      {
+        "kind": "attr",
+        "selector": "img",
+        "attr": "width",
+        "equals": "200",
+        "label": "`width`가 `200`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q8",
+    "title": "HTML 8. 표 만들기",
+    "category": "표",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "html",
+    "description": "이름과 점수가 있는 성적표를 표로 만드세요.",
+    "constraints": [
+      "`<thead>`에 제목 칸(`<th>`) `이름`, `점수`를 넣으세요.",
+      "`<tbody>`에 두 줄을 넣으세요: `김철수` `90`, `이영희` `85`."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "이름 | 점수\n김철수 | 90\n이영희 | 85"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>성적표</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "exists",
+        "selector": "table thead th",
+        "min": 2,
+        "max": 2,
+        "label": "`<thead>`에 `<th>`가 두 개 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "thead th:nth-child(1)",
+        "equals": "이름",
+        "label": "첫 제목 칸이 `이름`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "thead th:nth-child(2)",
+        "equals": "점수",
+        "label": "둘째 제목 칸이 `점수`이다"
+      },
+      {
+        "kind": "exists",
+        "selector": "table tbody tr",
+        "min": 2,
+        "max": 2,
+        "label": "`<tbody>`에 두 줄이 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "tbody tr:nth-child(1) td:nth-child(1)",
+        "equals": "김철수",
+        "label": "첫 줄 이름이 `김철수`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "tbody tr:nth-child(2) td:nth-child(2)",
+        "equals": "85",
+        "label": "둘째 줄 점수가 `85`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q9",
+    "title": "HTML 9. 칸 합치기",
+    "category": "표",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "html",
+    "description": "제목 칸 하나가 아래 두 칸 너비를 모두 차지하는 표를 만드세요.",
+    "constraints": [
+      "첫 줄에 `<th>` 하나만 두고 내용은 `시간표`입니다.",
+      "그 칸이 두 칸을 차지하도록 `colspan`을 쓰세요.",
+      "둘째 줄에는 `<td>` 두 개: `1교시`, `국어`."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "      시간표\n1교시 | 국어"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>시간표</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "text",
+        "selector": "th",
+        "equals": "시간표",
+        "label": "제목 칸이 `시간표`이다"
+      },
+      {
+        "kind": "attr",
+        "selector": "th",
+        "attr": "colspan",
+        "equals": "2",
+        "label": "제목 칸이 `colspan=\"2\"`이다"
+      },
+      {
+        "kind": "exists",
+        "selector": "tr td",
+        "min": 2,
+        "max": 2,
+        "label": "`<td>`가 두 개 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "tr td:nth-child(2)",
+        "equals": "국어",
+        "label": "둘째 칸이 `국어`이다"
+      }
+    ]
+  },
+  {
+    "id": "html_q10",
+    "title": "HTML 10. 로그인 폼",
+    "category": "폼",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "html",
+    "description": "아이디와 비밀번호를 입력받는 로그인 폼을 만드세요.",
+    "constraints": [
+      "`<form>` 안에 작성하세요.",
+      "아이디 칸: `<input type=\"text\" id=\"user-id\">`, 그리고 `for=\"user-id\"`인 `<label>`",
+      "비밀번호 칸: `type=\"password\"`",
+      "`로그인`이라고 쓰인 `<button type=\"submit\">`"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "아이디 [      ]\n비밀번호 [••••••]\n[로그인]"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>로그인</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "attr",
+        "selector": "form input#user-id",
+        "attr": "type",
+        "equals": "text",
+        "label": "아이디 칸이 `type=\"text\"`이다"
+      },
+      {
+        "kind": "exists",
+        "selector": "form label[for=\"user-id\"]",
+        "label": "`for=\"user-id\"`인 `<label>`이 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "form input[type=\"password\"]",
+        "label": "비밀번호 칸이 `type=\"password\"`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "form button[type=\"submit\"]",
+        "equals": "로그인",
+        "label": "`로그인` 제출 버튼이 있다"
+      }
+    ]
+  },
+  {
+    "id": "html_q11",
+    "title": "HTML 11. 선택해서 입력받기",
+    "category": "폼",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "html",
+    "description": "학년을 고르는 목록과, 약관 동의 체크박스를 만드세요.",
+    "constraints": [
+      "`name=\"grade\"`인 `<select>`에 `<option>` 세 개: `1학년`, `2학년`, `3학년`",
+      "`name=\"agree\"`인 체크박스(`type=\"checkbox\"`)"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "[1학년 ▾]\n☐ 약관에 동의합니다"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>선택 입력</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "exists",
+        "selector": "select[name=\"grade\"] > option",
+        "min": 3,
+        "max": 3,
+        "label": "`grade` 목록에 선택지가 세 개 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "select[name=\"grade\"] > option:nth-child(3)",
+        "equals": "3학년",
+        "label": "셋째 선택지가 `3학년`이다"
+      },
+      {
+        "kind": "attr",
+        "selector": "input[name=\"agree\"]",
+        "attr": "type",
+        "equals": "checkbox",
+        "label": "`agree`가 체크박스다"
+      }
+    ]
+  },
+  {
+    "id": "html_q12",
+    "title": "HTML 12. 시맨틱 태그로 바꾸기",
+    "category": "시맨틱",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "html",
+    "description": "`<div>`로만 만든 블로그 구조를 의미가 있는 시맨틱 태그로 바꾸세요. 화면은 거의 그대로지만 문서의 구조가 분명해집니다.",
+    "constraints": [
+      "`div.header` → `<header>`, `div.nav` → `<nav>`",
+      "`div.main` → `<main>`, `div.article` → `<article>`",
+      "`div.footer` → `<footer>`",
+      "안의 내용은 그대로 두세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "(화면은 그대로, 구조만 바뀜)"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>블로그</title>\n</head>\n<body>\n  <div class=\"header\">\n    <h1>나의 블로그</h1>\n    <div class=\"nav\">\n      <a href=\"#\">홈</a>\n      <a href=\"#\">글 목록</a>\n    </div>\n  </div>\n  <div class=\"main\">\n    <div class=\"article\">\n      <h2>첫 번째 글</h2>\n      <p>오늘 HTML을 배웠다.</p>\n    </div>\n  </div>\n  <div class=\"footer\">\n    <p>© 2026 나의 블로그</p>\n  </div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "exists",
+        "selector": "body > header",
+        "label": "`<header>`가 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "header nav a",
+        "min": 2,
+        "label": "`<header>` 안에 `<nav>` 메뉴가 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "body > main",
+        "label": "`<main>`이 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "main > article",
+        "label": "`<main>` 안에 `<article>`이 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "body > footer",
+        "label": "`<footer>`가 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "div",
+        "negate": true,
+        "label": "`<div>`가 남아 있지 않다"
+      },
+      {
+        "kind": "text",
+        "selector": "article h2",
+        "equals": "첫 번째 글",
+        "label": "글 제목은 그대로다"
+      }
+    ]
+  },
+  {
+    "id": "html_q13",
+    "title": "HTML 13. 모두가 읽을 수 있는 페이지",
+    "category": "접근성",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "html",
+    "description": "화면을 보지 못하는 사용자도 이해할 수 있게 고치세요. 화면 낭독기는 이미지와 아이콘 버튼을 글자로 읽어 줍니다.",
+    "constraints": [
+      "`<html>`에 이 문서가 한국어라는 `lang=\"ko\"`를 추가하세요.",
+      "로고 이미지에 `alt=\"회사 로고\"`를 추가하세요.",
+      "☰ 버튼에 `aria-label=\"메뉴 열기\"`를 추가하세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "(화면은 그대로, 읽어 주는 내용이 바뀜)"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html>\n<head>\n  <meta charset=\"UTF-8\">\n  <title>접근성</title>\n</head>\n<body>\n  <img src=\"logo.png\">\n  <button>☰</button>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "attr",
+        "selector": "html",
+        "attr": "lang",
+        "equals": "ko",
+        "label": "`<html lang=\"ko\">`이다"
+      },
+      {
+        "kind": "attr",
+        "selector": "img",
+        "attr": "alt",
+        "equals": "회사 로고",
+        "label": "로고에 `alt=\"회사 로고\"`가 있다"
+      },
+      {
+        "kind": "attr",
+        "selector": "button",
+        "attr": "aria-label",
+        "equals": "메뉴 열기",
+        "label": "버튼에 `aria-label=\"메뉴 열기\"`가 있다"
+      }
+    ]
+  },
+  {
+    "id": "html_q14",
+    "title": "HTML 14. 자기소개 카드",
+    "category": "종합",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "html",
+    "description": "지금까지 배운 태그로 자기소개 카드를 만드세요.",
+    "constraints": [
+      "`class=\"profile\"`인 `<section>` 안에 작성하세요.",
+      "`alt`가 있는 프로필 `<img>`",
+      "`<h2>`에 이름 `김철수`, `<p>`에 한 줄 소개",
+      "`<ul>` 목록에 링크(`<a href>`) 세 개"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "(사진)\n김철수\n한 줄 소개\n• GitHub • PyQuests • 이메일"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>프로필 카드</title>\n</head>\n<body>\n  <!-- 여기에 코드를 작성하세요 -->\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "exists",
+        "selector": "section.profile",
+        "label": "`<section class=\"profile\">`이 있다"
+      },
+      {
+        "kind": "attr",
+        "selector": "section.profile img",
+        "attr": "alt",
+        "label": "사진에 `alt`가 있다"
+      },
+      {
+        "kind": "text",
+        "selector": "section.profile h2",
+        "equals": "김철수",
+        "label": "이름이 `김철수`이다"
+      },
+      {
+        "kind": "exists",
+        "selector": "section.profile p",
+        "label": "소개 문단이 있다"
+      },
+      {
+        "kind": "exists",
+        "selector": "section.profile ul > li > a[href]",
+        "min": 3,
+        "label": "목록에 링크가 세 개 있다"
+      }
+    ]
+  },
+  {
+    "id": "html_quiz_1",
+    "title": "HTML 15. head와 body",
+    "category": "기본 구조",
+    "difficulty": "basic",
+    "type": "quiz",
+    "language": "html",
+    "description": "다음 중 `<head>` 안에 들어가는 것은?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "다음 중 `<head>` 안에 들어가는 것은?",
+    "quizOptions": [
+      "<title>내 홈페이지</title>",
+      "<h1>환영합니다</h1>",
+      "<p>첫 문단</p>",
+      "<img src=\"a.png\" alt=\"그림\">"
+    ],
+    "correctAnswerIndex": "MA=="
+  },
+  {
+    "id": "html_fill_1",
+    "title": "HTML 16. 새 탭으로 열기",
+    "category": "링크와 이미지",
+    "difficulty": "basic",
+    "type": "fill",
+    "language": "html",
+    "description": "빈칸에 들어갈 정확한 코드를 입력하세요.",
+    "constraints": [
+      "철자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": "링크를 새 탭에서 열려면 <a href=\"...\" target=\"_____\">처럼 씁니다.",
+    "correctAnswerText": "X2JsYW5r",
+    "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "html_fill_2",
+    "title": "HTML 17. label 연결하기",
+    "category": "폼",
+    "difficulty": "intermediate",
+    "type": "fill",
+    "language": "html",
+    "description": "빈칸에 들어갈 정확한 코드를 입력하세요.",
+    "constraints": [
+      "철자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": "<label _____=\"email\">이메일</label>\n<input type=\"email\" id=\"email\">\n\nlabel과 input을 연결하는 속성은?",
+    "correctAnswerText": "Zm9y",
+    "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "html_quiz_2",
+    "title": "HTML 18. 본문 영역",
+    "category": "시맨틱",
+    "difficulty": "intermediate",
+    "type": "quiz",
+    "language": "html",
+    "description": "페이지에서 핵심 내용을 감싸며, 한 페이지에 하나만 쓰는 시맨틱 태그는?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "페이지에서 핵심 내용을 감싸며, 한 페이지에 하나만 쓰는 시맨틱 태그는?",
+    "quizOptions": [
+      "<section>",
+      "<main>",
+      "<article>",
+      "<div>"
+    ],
+    "correctAnswerIndex": "MQ=="
+  },
+  {
+    "id": "css_q1",
+    "title": "CSS 1. 제목 꾸미기",
+    "category": "선택자와 색상",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "css",
+    "description": "HTML은 이미 작성돼 있습니다. `<style>` 안에 CSS를 작성해서 제목과 문단을 꾸미세요.",
+    "constraints": [
+      "`h1`의 글자 색을 빨간색(`red`)으로 바꾸세요.",
+      "`h1`을 가운데 정렬하세요.",
+      "`.intro` 문단의 글자 크기를 `20px`로 바꾸세요.",
+      "HTML 부분은 고치지 마세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "빨간색으로 가운데 정렬된 제목\n20px 크기의 문단"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>제목 꾸미기</title>\n  <style>\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <h1>나의 블로그</h1>\n  <p class=\"intro\">오늘 배운 내용을 정리합니다.</p>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": "h1",
+        "property": "color",
+        "equals": "red",
+        "label": "`h1` 글자 색이 빨간색이다"
+      },
+      {
+        "kind": "style",
+        "selector": "h1",
+        "property": "text-align",
+        "equals": "center",
+        "label": "`h1`이 가운데 정렬돼 있다"
+      },
+      {
+        "kind": "style",
+        "selector": ".intro",
+        "property": "font-size",
+        "equals": "20px",
+        "label": "`.intro` 글자 크기가 `20px`이다"
+      },
+      {
+        "kind": "text",
+        "selector": "h1",
+        "equals": "나의 블로그",
+        "label": "HTML 내용은 그대로다"
+      }
+    ]
+  },
+  {
+    "id": "css_q17",
+    "title": "CSS 2. class와 id 선택자",
+    "category": "선택자와 색상",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "css",
+    "description": "id와 class로 특정 요소만 골라서 꾸미세요.",
+    "constraints": [
+      "`id=\"title\"`인 제목의 글자 굵기(`font-weight`)를 `800`으로 바꾸세요.",
+      "`class=\"highlight\"`인 글자에 노란색(`yellow`) 배경을 주세요.",
+      "HTML 부분은 고치지 마세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "공지사항 (아주 굵게)\n이번 주 [금요일](노란 배경)은 쉽니다."
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>class와 id</title>\n  <style>\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <h1 id=\"title\">공지사항</h1>\n  <p>이번 주 <span class=\"highlight\">금요일</span>은 쉽니다.</p>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": "#title",
+        "property": "font-weight",
+        "equals": "800",
+        "label": "`#title` 굵기가 `800`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".highlight",
+        "property": "background-color",
+        "equals": "yellow",
+        "label": "`.highlight` 배경이 노란색이다"
+      },
+      {
+        "kind": "style",
+        "selector": "p",
+        "property": "background-color",
+        "equals": "yellow",
+        "negate": true,
+        "label": "문단 전체에는 배경이 없다"
+      }
+    ]
+  },
+  {
+    "id": "css_q3",
+    "title": "CSS 3. 자손 선택자",
+    "category": "선택자와 색상",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "css",
+    "description": "메뉴 안의 링크만 초록색으로 바꾸세요. 메뉴 바깥의 링크는 그대로 두어야 합니다.",
+    "constraints": [
+      "`.menu` 안에 있는 `a`만 글자 색을 `green`으로 바꾸세요.",
+      "`.outside` 링크는 색이 바뀌면 안 됩니다.",
+      "`class`를 새로 추가하지 말고 선택자로 해결하세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "홈 소개 (초록)\n바깥 링크 (원래 색)"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>자손 선택자</title>\n  <style>\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <nav class=\"menu\">\n    <a href=\"#\">홈</a>\n    <a href=\"#\">소개</a>\n  </nav>\n  <p><a href=\"#\" class=\"outside\">바깥 링크</a></p>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".menu a:nth-child(1)",
+        "property": "color",
+        "equals": "green",
+        "label": "메뉴 첫 링크가 초록색이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".menu a:nth-child(2)",
+        "property": "color",
+        "equals": "green",
+        "label": "메뉴 둘째 링크가 초록색이다"
+      },
+      {
+        "kind": "exists",
+        "selector": ".outside",
+        "label": "`.outside` 링크가 그대로 있다"
+      },
+      {
+        "kind": "style",
+        "selector": ".outside",
+        "property": "color",
+        "equals": "green",
+        "negate": true,
+        "label": "`.outside` 링크는 초록색이 아니다"
+      }
+    ]
+  },
+  {
+    "id": "css_q4",
+    "title": "CSS 4. 안쪽 여백과 테두리",
+    "category": "박스 모델",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "css",
+    "description": "모든 요소는 상자(박스)입니다. 카드에 안쪽 여백, 테두리, 바깥 여백을 주세요.",
+    "constraints": [
+      "`.card`의 안쪽 여백(`padding`)을 `20px`로",
+      "`2px` 두께의 검은 실선(`solid`) 테두리(`border`)",
+      "바깥 여백(`margin`)을 `16px`로"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "┌────────────┐\n│  카드 내용  │\n└────────────┘"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>박스 모델</title>\n  <style>\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <div class=\"card\">카드 내용</div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".card",
+        "property": "padding-top",
+        "equals": "20px",
+        "label": "안쪽 여백이 `20px`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".card",
+        "property": "border-top-width",
+        "equals": "2px",
+        "label": "테두리 두께가 `2px`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".card",
+        "property": "border-top-style",
+        "equals": "solid",
+        "label": "테두리가 실선이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".card",
+        "property": "margin-top",
+        "equals": "16px",
+        "label": "바깥 여백이 `16px`이다"
+      }
+    ]
+  },
+  {
+    "id": "css_q5",
+    "title": "CSS 5. 정확히 200px 상자",
+    "category": "박스 모델",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "css",
+    "description": "`width: 200px`를 줬는데 화면에서는 상자가 250px입니다. padding과 border가 바깥에 더해지기 때문입니다. 실제 너비가 정확히 200px이 되게 고치세요.",
+    "constraints": [
+      "이미 작성된 `.box` 규칙은 고치지 마세요.",
+      "`box-sizing` 속성을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "테두리까지 포함해 정확히 200px인 상자"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>box-sizing</title>\n  <style>\n    .box {\n      width: 200px;\n      padding: 20px;\n      border: 5px solid #8b5cf6;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <div class=\"box\">200px 상자</div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "size",
+        "selector": ".box",
+        "width": 200,
+        "label": "상자의 실제 너비가 `200px`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".box",
+        "property": "box-sizing",
+        "equals": "border-box",
+        "label": "`box-sizing: border-box`를 썼다"
+      }
+    ]
+  },
+  {
+    "id": "css_q6",
+    "title": "CSS 6. 글자 꾸미기",
+    "category": "텍스트와 배경",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "css",
+    "description": "제목과 명언 문장을 꾸미세요.",
+    "constraints": [
+      "`h2`의 글자 사이 간격(`letter-spacing`)을 `2px`로",
+      "`h2`에 밑줄(`text-decoration: underline`)",
+      "`.quote`를 기울임꼴(`font-style: italic`)로"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "오 늘 의 명 언 (밑줄)\n천 리 길도 한 걸음부터 (기울임)"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>글자 꾸미기</title>\n  <style>\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <h2>오늘의 명언</h2>\n  <p class=\"quote\">천 리 길도 한 걸음부터</p>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": "h2",
+        "property": "letter-spacing",
+        "equals": "2px",
+        "label": "`h2` 글자 간격이 `2px`이다"
+      },
+      {
+        "kind": "style",
+        "selector": "h2",
+        "property": "text-decoration-line",
+        "equals": "underline",
+        "label": "`h2`에 밑줄이 있다"
+      },
+      {
+        "kind": "style",
+        "selector": ".quote",
+        "property": "font-style",
+        "equals": "italic",
+        "label": "`.quote`가 기울임꼴이다"
+      }
+    ]
+  },
+  {
+    "id": "css_q7",
+    "title": "CSS 7. 둥근 배지",
+    "category": "텍스트와 배경",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "css",
+    "description": "보라색 배경에 흰 글자, 모서리가 둥근 배지를 만드세요.",
+    "constraints": [
+      "배경색은 `#8b5cf6`",
+      "글자 색은 `white`",
+      "모서리 둥글기(`border-radius`)는 `12px`"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "(NEW) ← 보라색 둥근 배지"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>배지</title>\n  <style>\n    .badge {\n      padding: 4px 12px;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <span class=\"badge\">NEW</span>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".badge",
+        "property": "background-color",
+        "equals": "#8b5cf6",
+        "label": "배경색이 `#8b5cf6`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".badge",
+        "property": "color",
+        "equals": "white",
+        "label": "글자 색이 흰색이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".badge",
+        "property": "border-top-left-radius",
+        "equals": "12px",
+        "label": "모서리 둥글기가 `12px`이다"
+      }
+    ]
+  },
+  {
+    "id": "css_q8",
+    "title": "CSS 8. 카드에 그림자 주기",
+    "category": "텍스트와 배경",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "css",
+    "description": "카드가 살짝 떠 보이도록 그림자를 주세요.",
+    "constraints": [
+      "`box-shadow`를 사용하세요.",
+      "가로 `0`, 세로 `4px`, 흐림 `12px`, 색 `rgba(0, 0, 0, 0.2)`"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "아래쪽으로 은은한 그림자가 있는 카드"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>그림자</title>\n  <style>\n    .card {\n      padding: 24px;\n      margin: 24px;\n      background: white;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <div class=\"card\">그림자 카드</div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".card",
+        "property": "box-shadow",
+        "equals": "0 4px 12px rgba(0, 0, 0, 0.2)",
+        "label": "그림자가 `0 4px 12px rgba(0, 0, 0, 0.2)`이다"
+      }
+    ]
+  },
+  {
+    "id": "css_q2",
+    "title": "CSS 9. 상자 가로로 늘어놓기",
+    "category": "Flexbox",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "css",
+    "description": "세로로 쌓여 있는 상자 세 개를 Flexbox로 가로로 늘어놓으세요.",
+    "constraints": [
+      "`.container`에 `display: flex`를 적용하세요.",
+      "상자 사이 간격(`gap`)을 `16px`로 만드세요.",
+      "HTML 부분은 고치지 마세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "[1] [2] [3] 이 한 줄에 16px 간격으로"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>상자 늘어놓기</title>\n  <style>\n    .box {\n      width: 80px;\n      height: 80px;\n      background: #8b5cf6;\n      color: white;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"box\">1</div>\n    <div class=\"box\">2</div>\n    <div class=\"box\">3</div>\n  </div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".container",
+        "property": "display",
+        "equals": "flex",
+        "label": "`.container`가 `display: flex`이다"
+      },
+      {
+        "kind": "layout",
+        "selector": ".container > .box",
+        "direction": "row",
+        "label": "상자 세 개가 한 줄로 늘어섰다"
+      },
+      {
+        "kind": "style",
+        "selector": ".container",
+        "property": "column-gap",
+        "equals": "16px",
+        "label": "상자 사이 간격이 `16px`이다"
+      }
+    ]
+  },
+  {
+    "id": "css_q10",
+    "title": "CSS 10. 정가운데 놓기",
+    "category": "Flexbox",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "css",
+    "description": "상자를 회색 영역의 가로·세로 정가운데에 놓으세요. 웹에서 가장 자주 쓰는 배치입니다.",
+    "constraints": [
+      "`.stage`에 Flexbox를 적용하세요.",
+      "가로 가운데: `justify-content`",
+      "세로 가운데: `align-items`"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "회색 영역 정가운데에 보라색 상자"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>가운데 정렬</title>\n  <style>\n    .stage {\n      height: 200px;\n      background: #f4f4f6;\n    }\n    .box {\n      padding: 16px;\n      background: #8b5cf6;\n      color: white;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <div class=\"stage\">\n    <div class=\"box\">가운데</div>\n  </div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".stage",
+        "property": "display",
+        "equals": "flex",
+        "label": "`.stage`가 `display: flex`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".stage",
+        "property": "justify-content",
+        "equals": "center",
+        "label": "가로 가운데 정렬 (`justify-content: center`)"
+      },
+      {
+        "kind": "style",
+        "selector": ".stage",
+        "property": "align-items",
+        "equals": "center",
+        "label": "세로 가운데 정렬 (`align-items: center`)"
+      }
+    ]
+  },
+  {
+    "id": "css_q11",
+    "title": "CSS 11. 양 끝으로 벌리기",
+    "category": "Flexbox",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "css",
+    "description": "로고는 왼쪽 끝, 로그인은 오른쪽 끝에 오도록 상단 메뉴를 만드세요.",
+    "constraints": [
+      "`.nav`에 Flexbox를 적용하세요.",
+      "`justify-content`로 두 링크를 양 끝으로 벌리세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "로고                         로그인"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>내비게이션</title>\n  <style>\n    .nav {\n      padding: 12px;\n      background: #1a1a1a;\n    }\n    .nav a {\n      color: white;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <nav class=\"nav\">\n    <a href=\"#\">로고</a>\n    <a href=\"#\">로그인</a>\n  </nav>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "layout",
+        "selector": ".nav > a",
+        "direction": "row",
+        "label": "두 링크가 한 줄에 있다"
+      },
+      {
+        "kind": "style",
+        "selector": ".nav",
+        "property": "justify-content",
+        "equals": "space-between",
+        "label": "양 끝 정렬 (`justify-content: space-between`)"
+      }
+    ]
+  },
+  {
+    "id": "css_q12",
+    "title": "CSS 12. 3열 그리드",
+    "category": "Grid",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "css",
+    "description": "상자 여섯 개를 3열짜리 바둑판으로 배치하세요.",
+    "constraints": [
+      "`.grid`에 `display: grid`를 적용하세요.",
+      "`grid-template-columns`로 같은 너비의 열 3개를 만드세요. (`repeat(3, 1fr)`)",
+      "칸 사이 간격은 `10px`"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "[1] [2] [3]\n[4] [5] [6]"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>그리드</title>\n  <style>\n    .item {\n      padding: 20px;\n      background: #8b5cf6;\n      color: white;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <div class=\"grid\">\n    <div class=\"item\">1</div>\n    <div class=\"item\">2</div>\n    <div class=\"item\">3</div>\n    <div class=\"item\">4</div>\n    <div class=\"item\">5</div>\n    <div class=\"item\">6</div>\n  </div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".grid",
+        "property": "display",
+        "equals": "grid",
+        "label": "`.grid`가 `display: grid`이다"
+      },
+      {
+        "kind": "layout",
+        "selector": ".grid > .item:nth-child(-n+3)",
+        "direction": "row",
+        "label": "1~3번이 첫 줄에 있다"
+      },
+      {
+        "kind": "layout",
+        "selector": ".grid > .item:nth-child(n+4)",
+        "direction": "row",
+        "label": "4~6번이 둘째 줄에 있다"
+      },
+      {
+        "kind": "layout",
+        "selector": ".grid > .item:nth-child(3n+1)",
+        "direction": "column",
+        "label": "1번과 4번이 같은 열에 있다"
+      },
+      {
+        "kind": "style",
+        "selector": ".grid",
+        "property": "row-gap",
+        "equals": "10px",
+        "label": "칸 사이 간격이 `10px`이다"
+      }
+    ]
+  },
+  {
+    "id": "css_q13",
+    "title": "CSS 13. 구석에 배지 붙이기",
+    "category": "position",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "css",
+    "description": "`SALE` 배지를 카드의 오른쪽 위 구석에 딱 붙이세요.",
+    "constraints": [
+      "카드(`.card`)를 기준점으로 만드세요. (`position: relative`)",
+      "배지(`.badge`)는 `position: absolute`로 띄우세요.",
+      "배지를 위쪽 `0`, 오른쪽 `0`에 놓으세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "┌──────────[SALE]┐\n│ 상품 카드       │\n└────────────────┘"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>위치 지정</title>\n  <style>\n    .card {\n      width: 200px;\n      height: 120px;\n      background: #f4f4f6;\n    }\n    .badge {\n      background: #cf222e;\n      color: white;\n      padding: 2px 8px;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <div class=\"card\">\n    상품 카드\n    <span class=\"badge\">SALE</span>\n  </div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".card",
+        "property": "position",
+        "equals": "relative",
+        "label": "카드가 `position: relative`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".badge",
+        "property": "position",
+        "equals": "absolute",
+        "label": "배지가 `position: absolute`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".badge",
+        "property": "top",
+        "equals": "0px",
+        "label": "배지가 위쪽 `0`에 있다"
+      },
+      {
+        "kind": "style",
+        "selector": ".badge",
+        "property": "right",
+        "equals": "0px",
+        "label": "배지가 오른쪽 `0`에 있다"
+      }
+    ]
+  },
+  {
+    "id": "css_q14",
+    "title": "CSS 14. 부드럽게 바뀌기",
+    "category": "전환과 변형",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "css",
+    "description": "버튼 색이 부드럽게 바뀌도록 전환 효과를 주고, 화살표를 90도 돌리세요.",
+    "constraints": [
+      "`.btn`의 `transition`을 `background-color 0.3s`로",
+      "`.btn:hover`일 때 배경색을 `#8b5cf6`로",
+      "`.arrow`를 `transform: rotate(90deg)`로 회전"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "버튼에 마우스를 올리면 색이 0.3초 동안 바뀜\n➜ 가 아래를 향함"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>변형과 전환</title>\n  <style>\n    .arrow {\n      width: 40px;\n      font-size: 32px;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <button class=\"btn\">마우스를 올려 보세요</button>\n  <div class=\"arrow\">➜</div>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".btn",
+        "property": "transition-duration",
+        "equals": "0.3s",
+        "label": "전환 시간이 `0.3s`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".btn",
+        "property": "transition-property",
+        "equals": "background-color",
+        "label": "전환 대상이 `background-color`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".arrow",
+        "property": "transform",
+        "equals": "rotate(90deg)",
+        "label": "화살표가 90도 회전했다"
+      }
+    ]
+  },
+  {
+    "id": "css_q15",
+    "title": "CSS 15. CSS 변수로 색 관리하기",
+    "category": "모던 CSS",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "css",
+    "description": "테마 색을 변수 하나로 관리하세요. 변수 값만 바꾸면 사이트 전체 색이 한꺼번에 바뀝니다.",
+    "constraints": [
+      "`:root`에 `--main-color: #8b5cf6;`를 선언하세요.",
+      "`.title`의 글자 색과 `.btn`의 배경색에 `var(--main-color)`를 쓰세요.",
+      "색 값을 직접 두 번 쓰지 말고 변수를 쓰세요."
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "보라색 제목\n보라색 버튼"
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>CSS 변수</title>\n  <style>\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <h1 class=\"title\">테마 색</h1>\n  <button class=\"btn\">확인</button>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "style",
+        "selector": ".title",
+        "property": "color",
+        "equals": "#8b5cf6",
+        "label": "제목 글자 색이 `#8b5cf6`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".btn",
+        "property": "background-color",
+        "equals": "#8b5cf6",
+        "label": "버튼 배경색이 `#8b5cf6`이다"
+      }
+    ]
+  },
+  {
+    "id": "css_q16",
+    "title": "CSS 16. 프로필 카드 완성하기",
+    "category": "종합",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "css",
+    "description": "HTML 단원에서 만든 자기소개 카드를 CSS로 완성하세요.",
+    "constraints": [
+      "`.profile`: Flexbox로 사진과 글을 가로 배치, 세로 가운데 정렬, 간격 `16px`",
+      "`.profile`: 안쪽 여백 `24px`, 모서리 `16px`, 그림자는 자유롭게",
+      "`.avatar`: `border-radius: 50%`로 동그랗게"
+    ],
+    "examples": [
+      {
+        "input": "미리보기",
+        "output": "(●) 김철수\n    파이썬과 웹을 공부하는 학생입니다."
+      }
+    ],
+    "initialCode": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n  <meta charset=\"UTF-8\">\n  <title>프로필 카드</title>\n  <style>\n    .avatar {\n      width: 64px;\n      height: 64px;\n      background: #ddd6fe;\n    }\n\n    /* 여기에 CSS를 작성하세요 */\n\n  </style>\n</head>\n<body>\n  <section class=\"profile\">\n    <img src=\"me.png\" alt=\"프로필 사진\" class=\"avatar\">\n    <div>\n      <h2>김철수</h2>\n      <p>파이썬과 웹을 공부하는 학생입니다.</p>\n    </div>\n  </section>\n\n</body>\n</html>\n",
+    "webChecks": [
+      {
+        "kind": "layout",
+        "selector": ".profile > *",
+        "direction": "row",
+        "label": "사진과 글이 가로로 놓였다"
+      },
+      {
+        "kind": "style",
+        "selector": ".profile",
+        "property": "align-items",
+        "equals": "center",
+        "label": "세로 가운데 정렬이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".profile",
+        "property": "column-gap",
+        "equals": "16px",
+        "label": "사진과 글 사이 간격이 `16px`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".profile",
+        "property": "padding-left",
+        "equals": "24px",
+        "label": "안쪽 여백이 `24px`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".profile",
+        "property": "border-top-left-radius",
+        "equals": "16px",
+        "label": "모서리 둥글기가 `16px`이다"
+      },
+      {
+        "kind": "style",
+        "selector": ".profile",
+        "property": "box-shadow",
+        "equals": "none",
+        "negate": true,
+        "label": "그림자가 있다"
+      },
+      {
+        "kind": "style",
+        "selector": ".avatar",
+        "property": "border-top-left-radius",
+        "equals": "50%",
+        "label": "사진이 동그랗다"
+      }
+    ]
+  },
+  {
+    "id": "css_quiz_1",
+    "title": "CSS 17. 누가 이길까",
+    "category": "선택자와 색상",
+    "difficulty": "basic",
+    "type": "quiz",
+    "language": "css",
+    "description": "<p id=\"a\" class=\"b\">글자</p>에 아래 세 규칙이 모두 적용될 때 글자 색은?\n\np { color: red; }\n.b { color: green; }\n#a { color: blue; }",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "<p id=\"a\" class=\"b\">글자</p>에 아래 세 규칙이 모두 적용될 때 글자 색은?\n\np { color: red; }\n.b { color: green; }\n#a { color: blue; }",
+    "quizOptions": [
+      "red",
+      "green",
+      "blue",
+      "세 색이 섞인다"
+    ],
+    "correctAnswerIndex": "Mg=="
+  },
+  {
+    "id": "css_fill_1",
+    "title": "CSS 18. 세로로 쌓기",
+    "category": "Flexbox",
+    "difficulty": "intermediate",
+    "type": "fill",
+    "language": "css",
+    "description": "빈칸에 들어갈 정확한 코드를 입력하세요.",
+    "constraints": [
+      "철자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": ".container {\n  display: flex;\n  _____: column;\n}\n\nflex 자식들을 세로로 쌓으려면?",
+    "correctAnswerText": "ZmxleC1kaXJlY3Rpb24=",
+    "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "css_fill_2",
+    "title": "CSS 19. 그리드 열 나누기",
+    "category": "Grid",
+    "difficulty": "intermediate",
+    "type": "fill",
+    "language": "css",
+    "description": "빈칸에 들어갈 정확한 코드를 입력하세요.",
+    "constraints": [
+      "철자를 정확히 입력하세요."
+    ],
+    "examples": [
+      {
+        "input": "빈칸 입력",
+        "output": "입력 즉시 정답/오답 확인"
+      }
+    ],
+    "fillQuestion": ".grid {\n  display: grid;\n  grid-template-columns: repeat(4, _____);\n}\n\n같은 너비의 열 4개를 만들려면? (남은 공간의 한 몫을 뜻하는 단위)",
+    "correctAnswerText": "MWZy",
+    "placeholderText": "정답 입력..."
+  },
+  {
+    "id": "css_quiz_2",
+    "title": "CSS 20. 반응형",
+    "category": "반응형",
+    "difficulty": "intermediate",
+    "type": "quiz",
+    "language": "css",
+    "description": "화면 너비가 600px 이하일 때만 적용되는 CSS를 쓰려면?",
+    "constraints": [
+      "보기 중 정답 하나를 선택하세요."
+    ],
+    "examples": [
+      {
+        "input": "보기 중 선택",
+        "output": "선택 즉시 정답/오답 확인"
+      }
+    ],
+    "quizQuestion": "화면 너비가 600px 이하일 때만 적용되는 CSS를 쓰려면?",
+    "quizOptions": [
+      "@media (max-width: 600px) { ... }",
+      "@media (min-width: 600px) { ... }",
+      "@screen 600px { ... }",
+      "@width (600px) { ... }"
+    ],
+    "correctAnswerIndex": "MA=="
   }
 ];

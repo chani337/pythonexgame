@@ -4,13 +4,14 @@ import { python } from '@codemirror/lang-python';
 import { sql } from '@codemirror/lang-sql';
 import { java } from '@codemirror/lang-java';
 import { javascript } from '@codemirror/lang-javascript';
+import { html } from '@codemirror/lang-html';
 import { oneDark } from '@codemirror/theme-one-dark';
 import { EditorView } from '@codemirror/view';
 import { indentUnit } from '@codemirror/language';
 import { keymap } from '@codemirror/view';
 import { Prec } from '@codemirror/state';
 
-export type EditorLanguage = 'python' | 'sql' | 'java' | 'js';
+export type EditorLanguage = 'python' | 'sql' | 'java' | 'js' | 'html';
 
 interface CodeEditorProps {
   value: string;
@@ -30,6 +31,8 @@ function getLanguageExtension(language: EditorLanguage) {
       return java();
     case 'js':
       return javascript();
+    case 'html':
+      return html();
     default:
       return python();
   }
@@ -48,6 +51,10 @@ export default function CodeEditor({
     () => [
       getLanguageExtension(language),
       indentUnit.of('    '),
+      // Markup reads fine wrapped, and one long line otherwise scrolls the
+      // whole editor sideways and hides every tag's start. Code languages
+      // keep no-wrap so indentation stays visibly meaningful.
+      ...(language === 'html' ? [EditorView.lineWrapping] : []),
       // Block paste/drop entirely (typing-practice / anti-copy-paste policy),
       // matching the previous plain-textarea editor's behavior. Blocking the
       // native paste/drop DOM events covers keyboard paste, right-click paste,

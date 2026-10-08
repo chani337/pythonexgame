@@ -12,11 +12,16 @@ import type { Problem, ProblemLanguage } from '../src/data/problems';
 import { decodeAnswer } from '../src/utils/answerObfuscation';
 import { solutionCode } from '../src/data/solutionCode';
 
-const LANGUAGES: ProblemLanguage[] = ['python', 'sql', 'java', 'js', 'algorithm', 'c'];
+const LANGUAGES: ProblemLanguage[] = ['python', 'sql', 'java', 'js', 'algorithm', 'c', 'html', 'css'];
 const DIFFICULTIES = ['basic', 'intermediate', 'advanced', 'expert'] as const;
 const TYPES = ['coding', 'quiz', 'fill'] as const;
 
 const byType = (t: Problem['type']) => problems.filter((p) => p.type === t);
+// HTML/CSS coding problems are graded by inspecting the rendered page
+// (webChecks), not by stdout, so the stdout invariants exclude them.
+const isWeb = (p: Problem) => p.language === 'html' || p.language === 'css';
+const stdoutCoding = () => byType('coding').filter((p) => !isWeb(p));
+const webCoding = () => byType('coding').filter(isWeb);
 
 describe('문제 데이터 — 전체', () => {
   it('문제가 존재한다', () => {
@@ -71,8 +76,8 @@ describe('문제 데이터 — 전체', () => {
 
 describe('문제 데이터 — type 별 필수 필드', () => {
   it('coding: testCases 와 testRunnerCode 가 있다', () => {
-    const noCases = byType('coding').filter((p) => !p.testCases?.length).map((p) => p.id);
-    const noRunner = byType('coding').filter((p) => !p.testRunnerCode).map((p) => p.id);
+    const noCases = stdoutCoding().filter((p) => !p.testCases?.length).map((p) => p.id);
+    const noRunner = stdoutCoding().filter((p) => !p.testRunnerCode).map((p) => p.id);
     expect({ noCases, noRunner }).toEqual({ noCases: [], noRunner: [] });
   });
 
@@ -80,12 +85,33 @@ describe('문제 데이터 — type 별 필수 필드', () => {
     // An unknown value falls through to no grading at all.
     const KNOWN = new Set(['stdout_match']);
     const unknown = [...new Set(
-      byType('coding')
+      stdoutCoding()
         .map((p) => p.testRunnerCode!)
         .filter((r) => !KNOWN.has(r) && !r.includes('\n'))
     )];
     // Multi-line values are inline Python harnesses (algorithm problems).
     expect(unknown).toEqual([]);
+  });
+
+  it('coding (html/css): webChecks 가 있고 stdout 채점 필드는 없다', () => {
+    // A web problem with testCases would look gradable but the workspace
+    // never reads them; one with no checks would pass on an empty page.
+    const bad = webCoding()
+      .filter((p) => !p.webChecks?.length || p.testCases || p.testRunnerCode)
+      .map((p) => p.id);
+    expect(bad).toEqual([]);
+  });
+
+  it('coding (html/css): 모든 검사에 label 이 있다', () => {
+    const bad = webCoding().flatMap((p) =>
+      (p.webChecks ?? []).filter((c) => !c.label?.trim() || !c.selector?.trim()).map(() => p.id)
+    );
+    expect(bad).toEqual([]);
+  });
+
+  it('webChecks 는 html/css 문제에만 있다', () => {
+    const bad = problems.filter((p) => p.webChecks && !isWeb(p)).map((p) => p.id);
+    expect(bad).toEqual([]);
   });
 
   it('quiz: quizQuestion · quizOptions(2개 이상) · correctAnswerIndex 가 있다', () => {

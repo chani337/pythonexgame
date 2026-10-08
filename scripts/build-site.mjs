@@ -51,6 +51,8 @@ const LANG_META = [
   { key: 'algorithm', label: '알고리즘',    runtime: 'Pyodide (WASM Python)' },
   { key: 'sql',       label: 'SQL',        runtime: 'sql.js (SQLite WASM)' },
   { key: 'js',        label: 'JavaScript', runtime: 'Web Worker' },
+  { key: 'html',      label: 'HTML',       runtime: 'iframe 미리보기' },
+  { key: 'css',       label: 'CSS',        runtime: 'iframe 미리보기' },
   { key: 'java',      label: 'Java',       runtime: null },
   { key: 'c',         label: 'C',          runtime: null },
 ];

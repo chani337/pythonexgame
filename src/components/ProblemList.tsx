@@ -107,6 +107,10 @@ export default function ProblemList({
         return { text: '알고리즘', color: '#cf222e', bg: '#ffebe9' };
       case 'c':
         return { text: 'C', color: '#5c6bc0', bg: '#e8eaf6' };
+      case 'html':
+        return { text: 'HTML', color: '#c2410c', bg: '#ffedd5' };
+      case 'css':
+        return { text: 'CSS', color: '#1d4ed8', bg: '#dbeafe' };
       default:
         return { text: 'Python', color: '#1a7f37', bg: '#dafbe1' };
     }
@@ -120,7 +124,7 @@ export default function ProblemList({
           코딩 문제 학습
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-          Python · SQL · Java · JS, 기초부터 고급까지 다양한 문제를 해결하고 실전 역량을 강화하세요.
+          Python · SQL · Java · JS · HTML · CSS, 기초부터 고급까지 다양한 문제를 해결하고 실전 역량을 강화하세요.
         </p>
       </div>
 
@@ -148,6 +152,8 @@ export default function ProblemList({
               { id: 'java', name: 'Java' },
               { id: 'js', name: 'JS' },
               { id: 'c', name: 'C' },
+              { id: 'html', name: 'HTML' },
+              { id: 'css', name: 'CSS' },
               { id: 'algorithm', name: '알고리즘' },
             ].map((lang) => (
               <button

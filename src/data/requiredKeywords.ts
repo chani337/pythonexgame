@@ -67,6 +67,9 @@ export const requiredKeywords: Record<string, string[]> = {
   "sql_q28": ["(+)", "NVL("],
   "sql_q29": ["CASE"],
   "sql_q30": ["ROUND("],
+  // HTML/CSS: only where the rendered result can't tell the technique apart
+  // -- the same purple could be typed twice instead of read from a variable.
+  "css_q15": ["--main-color", "var(--main-color)"],
 };
 
 export const forbiddenKeywords: Record<string, string[]> = {

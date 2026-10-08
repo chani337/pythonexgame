@@ -53,6 +53,12 @@ jobs:
       - name: SQL runner
         run: npm run verify:sql
 
+      # HTML/CSS grading needs a real cascade, so this runs in the runner's
+      # preinstalled Chrome under the production CSP: reference solutions
+      # pass, starter code fails, and nothing in the preview can run script.
+      - name: HTML/CSS grader
+        run: npm run verify:web
+
       - name: Guest progress merge
         run: npm run verify:guest-merge
 

@@ -380,14 +380,18 @@ h1 {
    a fixed minimum cannot shrink below it, so on a 320px phone the track stayed
    at its minimum and pushed the card past the viewport. Capping the minimum at
    100% lets the last column collapse to whatever is actually available. */
-.grid3 {
+.runtimes {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(255px, 100%), 1fr));
+  /* Four runtimes: 4 → 2 → 1 columns. auto-fit would leave a 3 + 1 row at
+     tablet widths with two empty cells showing the gap colour. */
+  grid-template-columns: repeat(4, 1fr);
   gap: 1px;
   margin-top: 2.25rem;
   background: var(--line);
   border: 1px solid var(--line);
 }
+@media (max-width: 1080px) { .runtimes { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 560px) { .runtimes { grid-template-columns: 1fr; } }
 .card { background: var(--surface); padding: 1.6rem 1.5rem; }
 .card-k {
   font-family: var(--font-mono);

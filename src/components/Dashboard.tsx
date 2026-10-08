@@ -9,7 +9,7 @@ import LearningRoadmap from './LearningRoadmap';
 import { triviaItems } from '../data/trivia';
 import { changelogEntries } from '../data/changelog';
 
-type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js' | 'c' | 'algorithm';
+type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css' | 'algorithm';
 
 const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'all', label: '전체' },
@@ -19,6 +19,8 @@ const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'java', label: 'Java' },
   { id: 'js', label: 'JS' },
   { id: 'c', label: 'C' },
+  { id: 'html', label: 'HTML' },
+  { id: 'css', label: 'CSS' },
   { id: 'algorithm', label: '알고리즘' },
 ];
 

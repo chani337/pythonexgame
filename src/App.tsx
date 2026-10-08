@@ -192,7 +192,7 @@ print("변환 리스트:", result)
   }, [sandboxCode]);
 
   // Pyodide in-browser runtime: deferred until a view that actually needs
-  // Python (sandbox/docs/a non-JS coding problem) mounts, since the WASM
+  // Python (sandbox/docs/a coding problem that isn't JS/HTML/CSS) mounts, since the WASM
   // download + numpy/pandas preload blocks the main thread for several
   // seconds and shouldn't happen just for browsing the dashboard. Once
   // triggered it latches on so navigating away and back doesn't reload it.
@@ -201,7 +201,7 @@ print("변환 리스트:", result)
     const problemLanguage = selectedProblem?.language || (selectedProblem ? 'python' : undefined);
     const needsPyodide =
       ((currentView === 'sandbox' || currentView === 'docs') && !!user) ||
-      (!!selectedProblem && problemLanguage !== 'js');
+      (!!selectedProblem && !['js', 'html', 'css'].includes(problemLanguage!));
     if (needsPyodide) setPyodideNeeded(true);
   }, [currentView, selectedProblem, user]);
   const { loading: isPyodideLoading, status: pyodideStatus, runCode } = usePyodide(pyodideNeeded);

@@ -65,38 +65,45 @@ function buildSeedSql(problems) {
 -- but only when nothing references them (a solved row pinning a retired
 -- problem keeps that row, so re-running can never cascade-delete progress).
 
-BEGIN;
+-- One statement on purpose. This used to be BEGIN; a TEMP TABLE ... ON
+-- COMMIT DROP; three statements; COMMIT -- and the Supabase SQL Editor
+-- failed it with 'relation "_problems_incoming" does not exist', because it
+-- doesn't run a pasted script as one session-bound transaction. A single
+-- statement is atomic by itself and has no session state to lose.
+--
+-- All parts of one statement see the same snapshot, which is fine here: the
+-- upsert only touches ids in \`incoming\`, the delete only ids outside it.
 
-CREATE TEMP TABLE _problems_incoming (
-  id TEXT PRIMARY KEY,
-  language TEXT NOT NULL,
-  difficulty TEXT NOT NULL,
-  type TEXT NOT NULL
-) ON COMMIT DROP;
-
-INSERT INTO _problems_incoming (id, language, difficulty, type) VALUES
-${rows};
-
-INSERT INTO public.problems (id, language, difficulty, type)
-SELECT id, language, difficulty, type FROM _problems_incoming
-ON CONFLICT (id) DO UPDATE
-  SET language   = EXCLUDED.language,
-      difficulty = EXCLUDED.difficulty,
-      type       = EXCLUDED.type;
-
+WITH incoming (id, language, difficulty, type) AS (
+  VALUES
+${rows}
+),
+upserted AS (
+  INSERT INTO public.problems (id, language, difficulty, type)
+  SELECT id, language, difficulty, type FROM incoming
+  ON CONFLICT (id) DO UPDATE
+    SET language   = EXCLUDED.language,
+        difficulty = EXCLUDED.difficulty,
+        type       = EXCLUDED.type
+  RETURNING id
+),
 -- Retire problems that no longer exist in the source, unless a user's solved
 -- or review row still points at them.
-DELETE FROM public.problems p
-WHERE NOT EXISTS (SELECT 1 FROM _problems_incoming i WHERE i.id = p.id)
-  AND NOT EXISTS (SELECT 1 FROM public.user_solved_problems s WHERE s.problem_id = p.id)
-  AND NOT EXISTS (SELECT 1 FROM public.user_review_problems r WHERE r.problem_id = p.id);
-
--- Report what is still pinned by user data after the delete above.
-SELECT p.id AS orphaned_problem_still_referenced
-FROM public.problems p
-WHERE NOT EXISTS (SELECT 1 FROM _problems_incoming i WHERE i.id = p.id);
-
-COMMIT;
+retired AS (
+  DELETE FROM public.problems p
+  WHERE NOT EXISTS (SELECT 1 FROM incoming i WHERE i.id = p.id)
+    AND NOT EXISTS (SELECT 1 FROM public.user_solved_problems s WHERE s.problem_id = p.id)
+    AND NOT EXISTS (SELECT 1 FROM public.user_review_problems r WHERE r.problem_id = p.id)
+  RETURNING p.id
+)
+SELECT
+  (SELECT count(*) FROM upserted) AS upserted,
+  (SELECT count(*) FROM retired)  AS retired,
+  -- Gone from the source but kept because user data still points at them.
+  (SELECT coalesce(array_agg(p.id ORDER BY p.id), '{}')
+     FROM public.problems p
+    WHERE NOT EXISTS (SELECT 1 FROM incoming i WHERE i.id = p.id)
+      AND p.id NOT IN (SELECT id FROM retired)) AS still_referenced;
 `;
 }
 

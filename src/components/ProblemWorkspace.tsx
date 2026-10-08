@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, Fragment } from 'react';
-import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Play, Send, RefreshCw, FileCode, Eye, CheckSquare, HelpCircle, AlertCircle, CheckCircle, XCircle, Star } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { solutionExplanations } from '../data/solutionExplanations';
 import { solutionCode } from '../data/solutionCode';
@@ -7,11 +7,14 @@ import { requiredKeywords, forbiddenKeywords } from '../data/requiredKeywords';
 import { checkKeywords } from '../utils/checkKeywords';
 import { decodeAnswer } from '../utils/answerObfuscation';
 import { explainError } from '../utils/explainError';
+import { runWebChecks } from '../utils/webChecks';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
 import confetti from 'canvas-confetti';
 import CodeEditor from './CodeEditor';
 import type { EditorLanguage } from './CodeEditor';
+import WebPreview from './WebPreview';
+import type { WebPreviewHandle } from './WebPreview';
 
 interface ProblemWorkspaceProps {
   problem: Problem;
@@ -45,12 +48,17 @@ export default function ProblemWorkspace({
   backLabel = '목록으로 돌아가기',
 }: ProblemWorkspaceProps) {
   const problemLanguage = problem.language || 'python';
+  // HTML and CSS problems share one editor: a single index.html with the CSS
+  // in its <style>, like a one-file Live Server page.
+  const isWeb = problemLanguage === 'html' || problemLanguage === 'css';
   const editorFileLabel =
+    isWeb ? 'index.html (HTML · CSS 편집기)' :
     problemLanguage === 'sql' ? 'query.sql (SQL 편집기)' :
     problemLanguage === 'java' ? 'Main.java (자바 편집기)' :
     problemLanguage === 'js' ? 'main.js (자바스크립트 편집기)' :
     'main.py (파이썬 편집기)';
   const editorPlaceholder =
+    isWeb ? '여기에 HTML · CSS 코드를 직접 타이핑하여 작성하세요...' :
     problemLanguage === 'sql' ? '여기에 SQL 쿼리를 직접 타이핑하여 작성하세요...' :
     problemLanguage === 'java' ? '여기에 자바 코드를 직접 타이핑하여 작성하세요...' :
     problemLanguage === 'js' ? '여기에 자바스크립트 코드를 직접 타이핑하여 작성하세요...' :
@@ -71,7 +79,8 @@ export default function ProblemWorkspace({
   // loads in well under a second and does it on first run, so blocking the
   // button on it would be worse than letting the run show its own progress.
   const isRuntimeLoading =
-    problemLanguage === 'js' || problemLanguage === 'sql' ? false : isPyodideLoading;
+    problemLanguage === 'js' || problemLanguage === 'sql' || isWeb ? false : isPyodideLoading;
+  const previewRef = useRef<WebPreviewHandle>(null);
 
   const [code, setCode] = useState<string>(problem.initialCode || '');
   const [selectedQuizIndex, setSelectedQuizIndex] = useState<number | null>(null);
@@ -184,6 +193,7 @@ export default function ProblemWorkspace({
     if (isRuntimeLoading) return;
     setIsRunning(true);
     setConsoleOutput(
+      isWeb ? '화면을 검사하는 중...' :
       problemLanguage === 'js' ? '자바스크립트 코드를 실행 중...' :
       problemLanguage === 'sql' ? 'SQL 쿼리를 실행 중...' :
       '파이썬 코드를 컴파일하고 실행 중...'
@@ -195,11 +205,25 @@ export default function ProblemWorkspace({
     try {
       let codeToExecute = code;
 
-      const decodedTestCases = problem.testCases?.map((tc) => ({
-        ...tc,
-        expected: decodeAnswer(tc.expected),
-      }));
-      const res = await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
+      let res: RunResponse;
+      if (isWeb) {
+        // Render the exact code being submitted (not whatever the debounced
+        // preview last showed), then inspect the page the browser built.
+        const doc = await previewRef.current!.render(codeToExecute);
+        const results = runWebChecks(doc, problem.webChecks ?? []);
+        const passedCount = results.filter((r) => r.passed).length;
+        res = {
+          success: results.length > 0 && passedCount === results.length,
+          stdout: `검사 ${results.length}개 중 ${passedCount}개 통과`,
+          testResults: results,
+        };
+      } else {
+        const decodedTestCases = problem.testCases?.map((tc) => ({
+          ...tc,
+          expected: decodeAnswer(tc.expected),
+        }));
+        res = await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
+      }
       // Only present when the SQL runner handled this problem.
       setSqlTables((res as { tables?: SqlResultTable[] }).tables ?? null);
 
@@ -638,12 +662,27 @@ export default function ProblemWorkspace({
                 <CodeEditor
                   value={code}
                   onChange={setCode}
-                  language={problemLanguage as EditorLanguage}
+                  language={isWeb ? 'html' : (problemLanguage as EditorLanguage)}
                   placeholder={editorPlaceholder}
                   disabled={isRuntimeLoading}
                   onSubmitShortcut={handleEditorShortcut}
                 />
               </div>
+
+              {isWeb && (
+                <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: '180px', borderTop: '1px solid #1e1b2e' }}>
+                  <div className="editor-tabs">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
+                      <Eye size={14} style={{ color: '#8b5cf6' }} />
+                      <span style={{ fontWeight: '600', color: '#ffffff' }}>미리보기</span>
+                      <span style={{ color: '#94a3b8', fontSize: '0.72rem' }}>입력하면 바로 바뀌어요</span>
+                    </div>
+                  </div>
+                  <div style={{ flex: 1, minHeight: 0 }}>
+                    <WebPreview ref={previewRef} code={code} />
+                  </div>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div
@@ -918,8 +957,30 @@ export default function ProblemWorkspace({
               )}
             </div>
 
+            {/* Web checks: each one is a requirement in words, so list them
+                rather than the numbered PASS/FAIL tiles below. */}
+            {isWeb && problem.type === 'coding' && testResults.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', fontSize: '0.76rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
+                {testResults.map((tr, i) => (
+                  <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', color: '#1a1a1a' }}>
+                    {tr.passed ? (
+                      <CheckCircle size={13} style={{ color: '#1a7f37', flexShrink: 0, marginTop: '0.15rem' }} />
+                    ) : (
+                      <XCircle size={13} style={{ color: '#cf222e', flexShrink: 0, marginTop: '0.15rem' }} />
+                    )}
+                    <span>
+                      {renderFormattedText(tr.input)}
+                      {!tr.passed && (
+                        <span style={{ color: 'var(--text-muted)', marginLeft: '0.4rem' }}>지금: {tr.actual}</span>
+                      )}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+
             {/* Test Cases Table (only for coding challenges) */}
-            {problem.type === 'coding' && testResults.length > 0 && (
+            {!isWeb && problem.type === 'coding' && testResults.length > 0 && (
               <div
                 style={{
                   display: 'grid',
