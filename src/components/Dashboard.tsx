@@ -17,10 +17,10 @@ const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'python', label: 'Python' },
   { id: 'sql', label: 'SQL' },
   { id: 'java', label: 'Java' },
-  { id: 'js', label: 'JS' },
   { id: 'c', label: 'C' },
   { id: 'html', label: 'HTML' },
   { id: 'css', label: 'CSS' },
+  { id: 'js', label: 'JS' },
   { id: 'algorithm', label: '알고리즘' },
 ];
 

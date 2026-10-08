@@ -43,10 +43,10 @@ const DOC_CATEGORIES: {
   { key: 'python', label: '파이썬 (Python)', shortLabel: '파이썬', accent: '#1a1a1a', border: '#1a1a1a', activeText: '#ffffff', shadow: 'rgba(0,0,0,0.15)' },
   { key: 'sql', label: 'SQL 데이터베이스 (Database)', shortLabel: 'SQL', accent: '#0969da', border: '#0969da', activeText: '#ffffff', shadow: 'rgba(9,105,218,0.2)' },
   { key: 'java', label: '자바 (Java)', shortLabel: 'Java', accent: '#b07219', border: '#b07219', activeText: '#ffffff', shadow: 'rgba(176,114,25,0.2)' },
-  { key: 'js', label: '자바스크립트 (JS)', shortLabel: 'JS', accent: '#f0db4f', border: '#d4b83a', activeText: '#1a1a1a', shadow: 'rgba(212,184,58,0.3)' },
   { key: 'c', label: 'C 언어', shortLabel: 'C', accent: '#5c6bc0', border: '#5c6bc0', activeText: '#ffffff', shadow: 'rgba(92,107,192,0.25)' },
   { key: 'html', label: 'HTML', shortLabel: 'HTML', accent: '#e34f26', border: '#e34f26', activeText: '#ffffff', shadow: 'rgba(227,79,38,0.25)' },
   { key: 'css', label: 'CSS & Tailwind', shortLabel: 'CSS', accent: '#1572b6', border: '#1572b6', activeText: '#ffffff', shadow: 'rgba(21,114,182,0.25)' },
+  { key: 'js', label: '자바스크립트 (JS)', shortLabel: 'JS', accent: '#f0db4f', border: '#d4b83a', activeText: '#1a1a1a', shadow: 'rgba(212,184,58,0.3)' },
 ];
 
 const DOC_CATEGORY_TITLES: Record<DocCategory, string> = {

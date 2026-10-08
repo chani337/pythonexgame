@@ -124,7 +124,7 @@ export default function ProblemList({
           코딩 문제 학습
         </h2>
         <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>
-          Python · SQL · Java · JS · HTML · CSS, 기초부터 고급까지 다양한 문제를 해결하고 실전 역량을 강화하세요.
+          Python · SQL · Java · C · HTML · CSS · JS, 기초부터 고급까지 다양한 문제를 해결하고 실전 역량을 강화하세요.
         </p>
       </div>
 
@@ -150,10 +150,10 @@ export default function ProblemList({
               { id: 'python', name: 'Python' },
               { id: 'sql', name: 'SQL' },
               { id: 'java', name: 'Java' },
-              { id: 'js', name: 'JS' },
               { id: 'c', name: 'C' },
               { id: 'html', name: 'HTML' },
               { id: 'css', name: 'CSS' },
+              { id: 'js', name: 'JS' },
               { id: 'algorithm', name: '알고리즘' },
             ].map((lang) => (
               <button

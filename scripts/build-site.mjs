@@ -74,7 +74,7 @@ const executable = rows.filter((r) => r.runtime).reduce((a, r) => a + r.coding, 
 
 const DOC_META = [
   ['python', 'Python'], ['sql', 'SQL'], ['java', 'Java'],
-  ['js', 'JavaScript'], ['c', 'C'], ['html', 'HTML'], ['css', 'CSS'],
+  ['c', 'C'], ['html', 'HTML'], ['css', 'CSS'], ['js', 'JavaScript'],
 ];
 const docCounts = DOC_META.map(([key, label]) => ({
   label,
