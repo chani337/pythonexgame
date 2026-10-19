@@ -8,6 +8,8 @@ import { checkKeywords } from '../utils/checkKeywords';
 import { decodeAnswer } from '../utils/answerObfuscation';
 import { explainError } from '../utils/explainError';
 import { runWebChecks } from '../utils/webChecks';
+import { testLabel } from '../lib/pythonRuntime';
+import { pyDatasetById } from '../data/pyDatasets';
 import type { RunResponse, TestResult } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
 import confetti from 'canvas-confetti';
@@ -51,6 +53,10 @@ export default function ProblemWorkspace({
   // HTML and CSS problems share one editor: a single index.html with the CSS
   // in its <style>, like a one-file Live Server page.
   const isWeb = problemLanguage === 'html' || problemLanguage === 'css';
+  // Checks that describe themselves in words -- web checks, and plot checks
+  // written as "<label>|<expression>" -- are listed with their labels
+  // instead of as numbered PASS/FAIL tiles.
+  const hasLabelledChecks = isWeb || problem.testRunnerCode === 'figure_check';
   const editorFileLabel =
     isWeb ? 'index.html (HTML · CSS 편집기)' :
     problemLanguage === 'sql' ? 'query.sql (SQL 편집기)' :
@@ -92,6 +98,8 @@ export default function ProblemWorkspace({
   // " | "-joined text. Grading still compares the text form (useSqlRunner's
   // toStdout), so the 36 stored expected outputs are untouched.
   const [sqlTables, setSqlTables] = useState<SqlResultTable[] | null>(null);
+  // Matplotlib figures from the last Python run, as base64 PNGs.
+  const [plotImages, setPlotImages] = useState<string[]>([]);
   const [consoleError, setConsoleError] = useState<string | null>(null);
   const [testResults, setTestResults] = useState<TestResult[]>([]);
   const [hasTested, setHasTested] = useState<boolean>(false);
@@ -157,6 +165,7 @@ export default function ProblemWorkspace({
     setConsoleOutput('');
     setConsoleError(null);
     setTestResults([]);
+    setPlotImages([]);
     setHasTested(false);
     setWorkspaceSuccess(false);
     setShowExplanation(false);
@@ -226,6 +235,7 @@ export default function ProblemWorkspace({
       }
       // Only present when the SQL runner handled this problem.
       setSqlTables((res as { tables?: SqlResultTable[] }).tables ?? null);
+      setPlotImages(res.images ?? []);
 
       setConsoleOutput(res.stdout || (res.success ? '실행 완료 (출력값 없음)' : ''));
       if (res.error) {
@@ -571,6 +581,57 @@ export default function ProblemWorkspace({
             </div>
           )}
 
+          {/* CSV files this problem reads (src/data/pyDatasets.ts). Same
+              look as the SQL table reference above: first rows, then how
+              many more, plus the exact path to pass to read_csv. */}
+          {problem.datasets && problem.datasets.length > 0 && (
+            <div>
+              <h3 style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '0.05em' }}>
+                제공 데이터
+              </h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                {problem.datasets.map((id) => {
+                  const ds = pyDatasetById(id);
+                  if (!ds) return null;
+                  const [header, ...rows] = ds.csv.trim().split('\n').map((line) => line.split(','));
+                  const shown = rows.slice(0, 5);
+                  return (
+                    <div key={id} style={{ border: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
+                      <div style={{ padding: '0.4rem 0.75rem', background: '#f4f4f6', fontSize: '0.75rem', fontWeight: '700', color: '#1a1a1a', fontFamily: 'var(--font-mono)' }}>
+                        {ds.path} <span style={{ fontWeight: 500, color: 'var(--text-muted)', fontFamily: 'var(--font-sans)' }}>· {ds.title} — {ds.description}</span>
+                      </div>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
+                        <thead>
+                          <tr>
+                            {header.map((col) => (
+                              <th key={col} style={{ textAlign: 'left', padding: '0.35rem 0.75rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-subtle)', fontWeight: '600', whiteSpace: 'nowrap' }}>
+                                {col}
+                              </th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {shown.map((row, i) => (
+                            <tr key={i}>
+                              {row.map((cell, j) => (
+                                <td key={j} style={{ padding: '0.3rem 0.75rem', color: cell === '' ? 'var(--text-muted)' : '#1a1a1a', fontStyle: cell === '' ? 'italic' : 'normal', borderBottom: '1px solid var(--border-subtle)', whiteSpace: 'nowrap' }}>
+                                  {cell === '' ? '(빈칸)' : cell}
+                                </td>
+                              ))}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                      <div style={{ padding: '0.35rem 0.75rem', fontSize: '0.72rem', color: 'var(--text-muted)' }}>
+                        … 외 {rows.length - shown.length}행 (전체 {rows.length}행) · <code style={{ fontFamily: 'var(--font-mono)' }}>pd.read_csv('{ds.path}')</code>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
           {/* Constraints/Conditions */}
           <div>
             <h3 style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '0.05em' }}>
@@ -852,7 +913,7 @@ export default function ProblemWorkspace({
           )}
 
           {/* Test Case Outputs & Web Console */}
-          <div className="terminal-frame" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', minHeight: '120px', maxHeight: '240px', flexShrink: 0, overflowY: 'auto' }}>
+          <div className="terminal-frame" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', minHeight: '120px', maxHeight: plotImages.length > 0 ? '640px' : '240px', flexShrink: 0, overflowY: 'auto' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>실행 콘솔 & 테스트 검증 결과</span>
             
             {/* Terminal Panel */}
@@ -918,6 +979,18 @@ export default function ProblemWorkspace({
                   ))}
                 </div>
               )}
+              {plotImages.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', margin: '0.5rem 0' }}>
+                  {plotImages.map((b64, i) => (
+                    <img
+                      key={i}
+                      src={`data:image/png;base64,${b64}`}
+                      alt={`그래프 ${i + 1}`}
+                      style={{ maxWidth: '100%', border: '1px solid var(--border-subtle)', background: '#ffffff' }}
+                    />
+                  ))}
+                </div>
+              )}
               {consoleError && (
                 <div className="console-error" style={{ whiteSpace: 'pre-wrap', marginTop: '0.35rem', fontSize: '0.8rem' }}>
                   <AlertCircle size={13} style={{ display: 'inline', marginRight: '4px', verticalAlign: 'text-bottom' }} />
@@ -959,7 +1032,7 @@ export default function ProblemWorkspace({
 
             {/* Web checks: each one is a requirement in words, so list them
                 rather than the numbered PASS/FAIL tiles below. */}
-            {isWeb && problem.type === 'coding' && testResults.length > 0 && (
+            {hasLabelledChecks && problem.type === 'coding' && testResults.length > 0 && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.3rem', fontSize: '0.76rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
                 {testResults.map((tr, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '0.4rem', color: '#1a1a1a' }}>
@@ -969,7 +1042,7 @@ export default function ProblemWorkspace({
                       <XCircle size={13} style={{ color: '#cf222e', flexShrink: 0, marginTop: '0.15rem' }} />
                     )}
                     <span>
-                      {renderFormattedText(tr.input)}
+                      {renderFormattedText(testLabel(tr.input))}
                       {!tr.passed && (
                         <span style={{ color: 'var(--text-muted)', marginLeft: '0.4rem' }}>지금: {tr.actual}</span>
                       )}
@@ -980,7 +1053,7 @@ export default function ProblemWorkspace({
             )}
 
             {/* Test Cases Table (only for coding challenges) */}
-            {!isWeb && problem.type === 'coding' && testResults.length > 0 && (
+            {!hasLabelledChecks && problem.type === 'coding' && testResults.length > 0 && (
               <div
                 style={{
                   display: 'grid',

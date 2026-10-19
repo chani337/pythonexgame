@@ -74,8 +74,15 @@ const DOC_CATEGORY_DESCRIPTIONS: Record<DocCategory, string> = {
 // same language. Best-effort: chapters with no matching problems (e.g. the
 // NumPy/Pandas/ML chapters) simply show no related-problems section.
 function getRelatedProblems(chapter: DocChapter, allProblems: Problem[]): Problem[] {
-  // HTML/CSS are read-only guides -- there are no practice problems to link to yet.
-  if (chapter.category === 'html' || chapter.category === 'css') return [];
+  // HTML/CSS problem categories are written to appear verbatim in their
+  // chapter's title ('폼' in "HTML 5. 폼(Form) 태그 총정리"), because the
+  // keyword split below drops one-syllable words and every title shares the
+  // "HTML"/"CSS" prefix, which would match all of them.
+  if (chapter.category === 'html' || chapter.category === 'css') {
+    return allProblems
+      .filter((p) => p.language === chapter.category && chapter.title.includes(p.category))
+      .slice(0, 4);
+  }
 
   const lang = chapter.category === 'sql' ? 'sql' : chapter.category === 'java' ? 'java' : chapter.category === 'js' ? 'js' : chapter.category === 'c' ? 'c' : 'python';
 
@@ -118,7 +125,7 @@ export default function DocsViewer({
     const saved = localStorage.getItem('pyquests_docs_last_chapter_idx');
     return saved !== null ? JSON.parse(saved) : 0;
   });
-  const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean }>>({});
+  const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean; images?: string[] }>>({});
   const [isTocOpen, setIsTocOpen] = useState<boolean>(() => {
     const saved = localStorage.getItem('pyquests_docs_toc_open');
     return saved !== null ? JSON.parse(saved) : true;
@@ -427,6 +434,13 @@ export default function DocsViewer({
                     </button>
                   </div>
                 </div>
+                {outputState.images && outputState.images.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    {outputState.images.map((b64, i) => (
+                      <img key={i} src={`data:image/png;base64,${b64}`} alt={`그래프 ${i + 1}`} style={{ maxWidth: '100%', border: '1px solid var(--border-subtle)', background: '#ffffff' }} />
+                    ))}
+                  </div>
+                )}
                 {(outputState.stdout || outputState.error) && (
                   variant === 'focus' ? (
                     <div style={{ padding: '1rem', background: '#0a080f', border: '1px solid #1e1b2e', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: outputState.error ? '#ef4444' : '#10b981' }}>
@@ -583,9 +597,10 @@ export default function DocsViewer({
       setCodeOutputs(prev => ({
         ...prev,
         [cellId]: {
-          stdout: res.stdout || '실행 성공 (출력 결과 없음)',
+          stdout: res.stdout || (res.images?.length ? '' : '실행 성공 (출력 결과 없음)'),
           error: res.error || null,
-          isRunning: false
+          isRunning: false,
+          images: res.images,
         }
       }));
     } catch (err: any) {

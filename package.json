@@ -28,7 +28,8 @@
     "check:site": "node scripts/build-site.mjs --check",
     "verify:routing": "node scripts/verify-routing.mjs",
     "verify:web": "node scripts/verify-web-checks.mjs",
-    "verify:pwa-update": "node scripts/verify-pwa-update.mjs"
+    "verify:pwa-update": "node scripts/verify-pwa-update.mjs",
+    "verify:pylibs": "node scripts/verify-python-libs.mjs"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.12",

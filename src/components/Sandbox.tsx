@@ -267,6 +267,8 @@ export default function Sandbox({
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [stdout, setStdout] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  // Matplotlib figures from the last run, as base64 PNGs.
+  const [images, setImages] = useState<string[]>([]);
   const [activeSnippetIdx, setActiveSnippetIdx] = useState<number | null>(0);
 
   // Auto-scroll the console to the bottom whenever a run finishes, so the
@@ -294,10 +296,12 @@ export default function Sandbox({
     setIsRunning(true);
     setStdout('실행 중...');
     setError(null);
+    setImages([]);
 
     try {
       const res = await runPythonCode(code);
-      setStdout(res.stdout || '실행 성공 (출력 결과 없음)');
+      setStdout(res.stdout || (res.images?.length ? '' : '실행 성공 (출력 결과 없음)'));
+      setImages(res.images ?? []);
       if (res.error) {
         setError(res.error);
       }
@@ -466,7 +470,7 @@ export default function Sandbox({
                   파이썬 WebAssembly 런타임을 로딩 중입니다...
                 </div>
               )}
-              {!isPyodideLoading && stdout === '' && !error && (
+              {!isPyodideLoading && stdout === '' && !error && images.length === 0 && (
                 <div style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
                   <span className="console-prompt">&gt;</span> 코드를 실행하면 여기에 결과가 출력됩니다.
                 </div>
@@ -475,6 +479,13 @@ export default function Sandbox({
                 <div className="console-stdout" style={{ fontSize: '0.8rem', color: '#1a1a1a' }}>
                   {stdout.split('\n').map((line, idx) => (
                     <div key={idx}><span className="console-prompt">&gt;</span> {line}</div>
+                  ))}
+                </div>
+              )}
+              {images.length > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', margin: '0.5rem 0' }}>
+                  {images.map((b64, i) => (
+                    <img key={i} src={`data:image/png;base64,${b64}`} alt={`그래프 ${i + 1}`} style={{ maxWidth: '100%', border: '1px solid var(--border-subtle)', background: '#ffffff' }} />
                   ))}
                 </div>
               )}

@@ -11,6 +11,7 @@ import { problems, filterProblems } from '../src/data/problems';
 import type { Problem, ProblemLanguage } from '../src/data/problems';
 import { decodeAnswer } from '../src/utils/answerObfuscation';
 import { solutionCode } from '../src/data/solutionCode';
+import { PY_DATASETS } from '../src/data/pyDatasets';
 
 const LANGUAGES: ProblemLanguage[] = ['python', 'sql', 'java', 'js', 'algorithm', 'c', 'html', 'css'];
 const DIFFICULTIES = ['basic', 'intermediate', 'advanced', 'expert'] as const;
@@ -83,7 +84,7 @@ describe('문제 데이터 — type 별 필수 필드', () => {
 
   it('coding: testRunnerCode 가 알려진 채점기다', () => {
     // An unknown value falls through to no grading at all.
-    const KNOWN = new Set(['stdout_match']);
+    const KNOWN = new Set(['stdout_match', 'figure_check']);
     const unknown = [...new Set(
       stdoutCoding()
         .map((p) => p.testRunnerCode!)
@@ -106,6 +107,21 @@ describe('문제 데이터 — type 별 필수 필드', () => {
     const bad = webCoding().flatMap((p) =>
       (p.webChecks ?? []).filter((c) => !c.label?.trim() || !c.selector?.trim()).map(() => p.id)
     );
+    expect(bad).toEqual([]);
+  });
+
+  it('datasets 가 실제 데이터셋을 가리킨다', () => {
+    const ids = new Set(PY_DATASETS.map((d) => d.id));
+    const bad = problems.flatMap((p) => (p.datasets ?? []).filter((d) => !ids.has(d)).map((d) => `${p.id}:${d}`));
+    expect(bad).toEqual([]);
+  });
+
+  it('figure_check: 모든 테스트 입력이 "설명|식" 형태다', () => {
+    // The label is shown to students; without the separator the harness
+    // would eval the label itself.
+    const bad = problems
+      .filter((p) => p.testRunnerCode === 'figure_check')
+      .flatMap((p) => (p.testCases ?? []).filter((t) => !/^[^|]+\|.+/.test(t.input)).map(() => p.id));
     expect(bad).toEqual([]);
   });
 

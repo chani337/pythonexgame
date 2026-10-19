@@ -1,4 +1,8 @@
 import { useState, useEffect } from 'react';
+import {
+  PY_RUNTIME_SETUP, PY_BEFORE_RUN, PY_COLLECT_FIGURES, PY_FONT_SETUP, FIGURE_CHECK_HARNESS,
+  KOREAN_FONT_URL, KOREAN_FONT_PATH, needsMatplotlib, writeDatasets,
+} from '../lib/pythonRuntime';
 
 declare global {
   interface Window {
@@ -127,6 +131,9 @@ export const __bootPyodideForTests = bootPyodide;
 // logs on every call. Tracking what is loaded keeps repeat runs instant and
 // lets the UI show the "preparing numpy" message only on the first one.
 const loadedPackages = new Set<string>();
+// Per Pyodide instance (there is only ever one per page).
+let runtimeReady = false;
+let koreanFontState: 'none' | 'loaded' | 'failed' = 'none';
 
 export interface TestResult {
   input: string;
@@ -140,6 +147,8 @@ export interface RunResponse {
   stdout: string;
   error?: string;
   testResults?: TestResult[];
+  /** Matplotlib figures left open by the run, as base64 PNGs. */
+  images?: string[];
 }
 
 // `enabled` defers the actual WASM download/init (Pyodide + numpy/pandas is
@@ -208,6 +217,39 @@ export function usePyodide(enabled: boolean = true) {
     }
   };
 
+  // Hangul for matplotlib. Best effort: if the font can't be fetched the
+  // plot still renders and grades, Korean text just shows as boxes.
+  const ensureKoreanFont = async (py: any) => {
+    if (koreanFontState !== 'none') return;
+    setStatus('그래프용 한글 글꼴을 준비하는 중입니다... (최초 1회만 내려받습니다)');
+    try {
+      const res = await fetch(KOREAN_FONT_URL);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const bytes = new Uint8Array(await res.arrayBuffer());
+      py.FS.mkdirTree(KOREAN_FONT_PATH.slice(0, KOREAN_FONT_PATH.lastIndexOf('/')));
+      py.FS.writeFile(KOREAN_FONT_PATH, bytes);
+      await py.runPythonAsync(PY_FONT_SETUP);
+      koreanFontState = 'loaded';
+    } catch (err) {
+      console.warn('[PyQuests] 그래프용 한글 글꼴을 불러오지 못했습니다:', err);
+      koreanFontState = 'failed';
+    } finally {
+      setStatus(null);
+    }
+  };
+
+  // Every open figure as a PNG, so plots show up in the console.
+  const collectFigures = (py: any): string[] => {
+    try {
+      const proxy = py.runPython(PY_COLLECT_FIGURES);
+      const list = proxy?.toJs ? proxy.toJs() : proxy;
+      proxy?.destroy?.();
+      return Array.isArray(list) ? list : [];
+    } catch {
+      return [];
+    }
+  };
+
   const runCode = async (
     code: string,
     testCases?: { input: string; expected: string }[],
@@ -260,6 +302,18 @@ export function usePyodide(enabled: boolean = true) {
         await ensurePackage(pyodide, 'pandas', 'pandas');
       }
 
+      if (!runtimeReady) {
+        await pyodide.runPythonAsync(PY_RUNTIME_SETUP);
+        runtimeReady = true;
+      }
+      // Rewritten every run, so a deleted or overwritten CSV comes back.
+      writeDatasets(pyodide);
+      if (needsMatplotlib(normalizedCode)) {
+        await ensurePackage(pyodide, 'matplotlib', 'matplotlib');
+        await ensureKoreanFont(pyodide);
+      }
+      await pyodide.runPythonAsync(PY_BEFORE_RUN);
+
       // Clear python globals cache (except builtins) to avoid state pollution between runs
       await pyodide.runPythonAsync(`
 import sys
@@ -268,6 +322,7 @@ import sys
 
       // 1. Run the user's custom function definition in Pyodide
       await pyodide.runPythonAsync(normalizedCode);
+      const images = collectFigures(pyodide);
 
       // 1.5. If the test runner is output-based matching (stdout_match)
       if (testRunnerCode === 'stdout_match') {
@@ -284,6 +339,7 @@ import sys
         return {
           success: passed,
           stdout: userStdout,
+          images,
           testResults: [
             {
               input: '전체 코드 출력',
@@ -300,6 +356,7 @@ import sys
         return {
           success: true,
           stdout: stdoutLines.join('\n'),
+          images,
         };
       }
 
@@ -307,8 +364,9 @@ import sys
       const inputs = testCases.map((tc) => tc.input);
       pyodide.globals.set('test_cases', pyodide.toPy(inputs));
 
-      // 4. Run the validation harness
-      await pyodide.runPythonAsync(testRunnerCode);
+      // 4. Run the validation harness. 'figure_check' names the shared plot
+      // inspector rather than repeating it in every matplotlib problem.
+      await pyodide.runPythonAsync(testRunnerCode === 'figure_check' ? FIGURE_CHECK_HARNESS : testRunnerCode);
 
       // 5. Clean up injected globals
       pyodide.globals.delete('test_cases');
@@ -321,6 +379,7 @@ import sys
         return {
           success: false,
           stdout: stdoutResult,
+          images,
           error: '테스트 프레임워크와 연결되지 않았습니다. 함수명과 매개변수를 확인해 주세요.',
         };
       }
@@ -352,6 +411,7 @@ import sys
       return {
         success: allPassed,
         stdout: userStdout,
+        images,
         testResults,
       };
     } catch (err: any) {

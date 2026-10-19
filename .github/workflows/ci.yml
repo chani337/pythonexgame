@@ -93,3 +93,13 @@ jobs:
       # Python. Exits 0 if the download above didn't land.
       - name: Pyodide self-hosted copy
         run: npm run verify:pyodide-core
+
+      # NumPy / Pandas / Matplotlib problems in a real Pyodide: every reference
+      # solution passes, every starter fails, and common mistakes are caught.
+      # The ~60MB of wheels are cached between runs.
+      - uses: actions/cache@v4
+        with:
+          path: node_modules/.cache/pyodide-packages
+          key: pyodide-packages-v0.26.2
+      - name: Python library problems
+        run: npm run verify:pylibs

@@ -8,6 +8,17 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-10',
+    title: 'NumPy · Pandas · Matplotlib 문제가 생겼어요 — 실제 데이터 파일로 연습해요',
+    items: [
+      'NumPy 11문제, Pandas 13문제, Matplotlib 9문제를 기초부터 챌린지까지 난이도별로 넣었어요. 학습 가이드의 각 라이브러리 장에서 바로 이어서 풀 수 있어요.',
+      '학생 성적, 카페 매출, 날씨 데이터 파일 3개를 준비했어요. 실제 분석처럼 pd.read_csv(\'data/students.csv\')로 파일을 읽어서 풀고, 문제 화면에서 데이터 앞부분을 미리 볼 수 있어요.',
+      '그래프를 그리면 실행 결과 아래에 바로 그림이 나와요. 한글 제목·축 이름도 깨지지 않고, 샌드박스와 학습 가이드 예제에서도 그래프가 보여요.',
+      '그래프 문제는 그려진 그래프 자체를 검사해서 채점해요. 막대 개수, 값, 제목, 범례처럼 어떤 조건을 통과했고 무엇이 다른지 하나씩 알려 드려요.',
+      'Pandas 문제를 처음 실행할 때 정답을 써도 틀렸다고 나오던 문제를 고쳤어요. pandas가 처음 한 번 내보내는 안내 문구가 출력에 섞여 들어가던 것이 원인이었어요.',
+    ],
+  },
+  {
     date: '2026-10-08',
     title: 'HTML · CSS 문제가 생겼어요 — 쓰는 대로 화면이 바뀌어요',
     items: [

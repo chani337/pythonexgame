@@ -1,6 +1,6 @@
 -- GENERATED FILE -- do not edit by hand.
 -- Regenerate with: npm run sync:problems
--- Source: src/data/problems.ts (415 problems)
+-- Source: src/data/problems.ts (448 problems)
 --
 -- Seeds/refreshes public.problems, the reference table that
 -- user_solved_problems.problem_id is validated against. Safe to re-run: it
@@ -113,6 +113,39 @@ WITH incoming (id, language, difficulty, type) AS (
   ('numpy_q2', 'python', 'intermediate', 'coding'),
   ('pandas_q1', 'python', 'intermediate', 'coding'),
   ('pandas_q2', 'python', 'intermediate', 'coding'),
+  ('np_b1', 'python', 'basic', 'coding'),
+  ('np_b2', 'python', 'basic', 'coding'),
+  ('np_b3', 'python', 'basic', 'coding'),
+  ('np_b4', 'python', 'basic', 'coding'),
+  ('np_i1', 'python', 'intermediate', 'coding'),
+  ('np_i2', 'python', 'intermediate', 'coding'),
+  ('np_i3', 'python', 'intermediate', 'coding'),
+  ('np_a1', 'python', 'advanced', 'coding'),
+  ('np_a2', 'python', 'advanced', 'coding'),
+  ('np_e1', 'python', 'expert', 'coding'),
+  ('np_e2', 'python', 'expert', 'coding'),
+  ('pd_b1', 'python', 'basic', 'coding'),
+  ('pd_b2', 'python', 'basic', 'coding'),
+  ('pd_b3', 'python', 'basic', 'coding'),
+  ('pd_b4', 'python', 'basic', 'coding'),
+  ('pd_i1', 'python', 'intermediate', 'coding'),
+  ('pd_i2', 'python', 'intermediate', 'coding'),
+  ('pd_i3', 'python', 'intermediate', 'coding'),
+  ('pd_i4', 'python', 'intermediate', 'coding'),
+  ('pd_a1', 'python', 'advanced', 'coding'),
+  ('pd_a2', 'python', 'advanced', 'coding'),
+  ('pd_a3', 'python', 'advanced', 'coding'),
+  ('pd_e1', 'python', 'expert', 'coding'),
+  ('pd_e2', 'python', 'expert', 'coding'),
+  ('plt_b1', 'python', 'basic', 'coding'),
+  ('plt_b2', 'python', 'basic', 'coding'),
+  ('plt_b3', 'python', 'basic', 'coding'),
+  ('plt_i1', 'python', 'intermediate', 'coding'),
+  ('plt_i2', 'python', 'intermediate', 'coding'),
+  ('plt_i3', 'python', 'intermediate', 'coding'),
+  ('plt_a1', 'python', 'advanced', 'coding'),
+  ('plt_a2', 'python', 'advanced', 'coding'),
+  ('plt_e1', 'python', 'expert', 'coding'),
   ('lambda_q1', 'python', 'intermediate', 'coding'),
   ('algorithm_q1', 'python', 'intermediate', 'coding'),
   ('algorithm_q2', 'python', 'intermediate', 'coding'),

@@ -27,6 +27,10 @@ export interface Problem {
   // html/css coding problems only: graded by inspecting the rendered preview
   // instead of comparing stdout (see src/utils/webChecks.ts).
   webChecks?: WebCheck[];
+  // python problems: CSV files from src/data/pyDatasets.ts this problem
+  // reads. Every file is available to every run; this only decides which
+  // ones the workspace previews.
+  datasets?: string[];
   quizQuestion?: string;
   quizOptions?: string[];
   // base64-encoded (see src/utils/answerObfuscation.ts) so it isn't plainly
@@ -2525,6 +2529,1005 @@ export const problems: Problem[] = [
       }
     ],
     "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_b1",
+    "title": "NumPy 연습 1. 배열 합계 구하기",
+    "category": "NumPy",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "하루 동안 마신 물의 양(잔)을 기록한 배열이 있습니다. 전체 합계를 출력하세요.",
+    "constraints": [
+      "`cups` 배열은 이미 만들어져 있습니다.",
+      "`.sum()`을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "25"
+      }
+    ],
+    "initialCode": "import numpy as np\n\ncups = np.array([3, 7, 2, 9, 4])\n# 합계를 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "MjU="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_b2",
+    "title": "NumPy 연습 2. 모든 값 두 배로",
+    "category": "NumPy",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "가격 배열의 모든 값을 두 배로 만든 배열을 출력하세요. 반복문 없이 해결합니다.",
+    "constraints": [
+      "`for` 문을 쓰지 마세요.",
+      "배열에 바로 `* 2`를 하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "[2400 7000 1600 8200]"
+      }
+    ],
+    "initialCode": "import numpy as np\n\nprices = np.array([1200, 3500, 800, 4100])\n# 모든 가격을 두 배로 만든 배열을 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "WzI0MDAgNzAwMCAxNjAwIDgyMDBd"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_b3",
+    "title": "NumPy 연습 3. 배열의 모양 확인",
+    "category": "NumPy",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "2행 3열 배열의 모양(shape)과 전체 원소 개수(size)를 차례로 출력하세요.",
+    "constraints": [
+      "`.shape`와 `.size`를 사용하세요.",
+      "한 줄에 하나씩 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "(2, 3)\n6"
+      }
+    ],
+    "initialCode": "import numpy as np\n\ntable = np.array([[1, 2, 3], [4, 5, 6]])\n# shape 과 size 를 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "KDIsIDMpCjY="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_b4",
+    "title": "NumPy 연습 4. 짝수 배열 만들기",
+    "category": "NumPy",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "`np.arange`로 2부터 10까지의 짝수 배열을 만들어 출력하세요.",
+    "constraints": [
+      "`np.arange(시작, 끝, 간격)`을 사용하세요.",
+      "끝 값은 포함되지 않는다는 점에 주의하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "[ 2  4  6  8 10]"
+      }
+    ],
+    "initialCode": "import numpy as np\n\n# 2, 4, 6, 8, 10 을 담은 배열을 만들어 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "WyAyICA0ICA2ICA4IDEwXQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_i1",
+    "title": "NumPy 연습 5. 가장 더운 날 찾기",
+    "category": "NumPy",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "일주일 최고기온 배열에서 가장 높은 기온과, 그날이 몇 번째 날인지(0부터 시작하는 위치)를 차례로 출력하세요.",
+    "constraints": [
+      "`.max()`와 `.argmax()`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "33\n6"
+      }
+    ],
+    "initialCode": "import numpy as np\n\ntemps = np.array([29, 31, 27, 25, 28, 32, 33])\n# 최고 기온과 그 위치를 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "MzMKNg=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_i2",
+    "title": "NumPy 연습 6. 행별 합계",
+    "category": "NumPy",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "0부터 11까지를 3행 4열로 바꾼 뒤, 각 행의 합계를 출력하세요.",
+    "constraints": [
+      "`np.arange`와 `.reshape`을 사용하세요.",
+      "행별 합계는 `axis=1`입니다."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "[ 6 22 38]"
+      }
+    ],
+    "initialCode": "import numpy as np\n\n# 0~11 을 3행 4열로 만들고, 행별 합계를 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "WyA2IDIyIDM4XQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_i3",
+    "title": "NumPy 연습 7. 80점 이상 인원 세기",
+    "category": "NumPy",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "점수 배열에서 80점 이상인 학생이 몇 명인지 출력하세요.",
+    "constraints": [
+      "조건식(`scores >= 80`)으로 만든 True/False 배열을 활용하세요.",
+      "`for` 문을 쓰지 마세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "6"
+      }
+    ],
+    "initialCode": "import numpy as np\n\nscores = np.array([92, 79, 88, 95, 58, 87, 81, 90, 73, 66])\n# 80점 이상 인원을 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Ng=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_a1",
+    "title": "NumPy 연습 8. 과목별 평균",
+    "category": "NumPy",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "학생 4명의 국어·영어·수학 점수가 2차원 배열로 있습니다. 과목별(열별) 평균을 소수 첫째 자리까지 반올림해 출력하세요.",
+    "constraints": [
+      "행은 학생, 열은 과목(국어, 영어, 수학)입니다.",
+      "`axis`와 `np.round`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "[85.2 85.8 88.5]"
+      }
+    ],
+    "initialCode": "import numpy as np\n\nscores = np.array([\n    [85, 78, 92],\n    [92, 88, 79],\n    [76, 95, 88],\n    [88, 82, 95],\n])\n# 과목별 평균을 소수 첫째 자리까지 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Wzg1LjIgODUuOCA4OC41XQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_a2",
+    "title": "NumPy 연습 9. 점수 표준화",
+    "category": "NumPy",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "점수를 표준화(z-score)하세요. 각 점수에서 평균을 빼고 표준편차로 나눈 값을 소수 둘째 자리까지 반올림해 출력합니다.",
+    "constraints": [
+      "`.mean()`과 `.std()`를 사용하세요.",
+      "`np.round(값, 2)`로 반올림하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "[-1.34 -0.45  0.45  1.34]"
+      }
+    ],
+    "initialCode": "import numpy as np\n\nscores = np.array([70, 80, 90, 100])\n# 표준화한 점수를 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Wy0xLjM0IC0wLjQ1ICAwLjQ1ICAxLjM0XQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_e1",
+    "title": "NumPy 연습 10. 할인가 표 만들기",
+    "category": "NumPy",
+    "difficulty": "expert",
+    "type": "coding",
+    "description": "상품 3개의 가격과 할인율 3가지가 있습니다. 브로드캐스팅으로 '상품 × 할인율' 할인가 표(3행 3열)를 만들어 정수로 출력하세요.",
+    "constraints": [
+      "행은 상품, 열은 할인율입니다.",
+      "가격 배열을 세로(3행 1열)로 바꾸면 브로드캐스팅됩니다.",
+      "`for` 문을 쓰지 마세요.",
+      "결과는 `.astype(int)`로 정수로 바꾸세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "[[ 9000  8000  7000]\n [22500 20000 17500]\n [36000 32000 28000]]"
+      }
+    ],
+    "initialCode": "import numpy as np\n\nprices = np.array([10000, 25000, 40000])\nrates = np.array([0.1, 0.2, 0.3])\n# 할인가 = 가격 * (1 - 할인율)\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "W1sgOTAwMCAgODAwMCAgNzAwMF0KIFsyMjUwMCAyMDAwMCAxNzUwMF0KIFszNjAwMCAzMjAwMCAyODAwMF1d"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "np_e2",
+    "title": "NumPy 연습 11. 합격/불합격 표시",
+    "category": "NumPy",
+    "difficulty": "expert",
+    "type": "coding",
+    "description": "점수 배열을 보고 60점 이상이면 `'P'`, 미만이면 `'F'`인 배열을 만들어 출력하세요.",
+    "constraints": [
+      "`np.where(조건, 참일 때, 거짓일 때)`를 사용하세요.",
+      "`for` 문을 쓰지 마세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "['P' 'F' 'P' 'F' 'P' 'P']"
+      }
+    ],
+    "initialCode": "import numpy as np\n\nscores = np.array([85, 58, 72, 45, 90, 60])\n# P/F 배열을 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "WydQJyAnRicgJ1AnICdGJyAnUCcgJ1AnXQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_b1",
+    "title": "Pandas 연습 1. CSV 파일 읽기",
+    "category": "Pandas",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "`data/students.csv` 파일을 읽어 데이터프레임의 크기(행, 열)를 출력하세요.",
+    "constraints": [
+      "`pd.read_csv`로 파일을 읽으세요.",
+      "`.shape`을 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "(20, 6)"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\n# data/students.csv 를 읽고 shape 을 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "KDIwLCA2KQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_b2",
+    "title": "Pandas 연습 2. 열 이름 확인",
+    "category": "Pandas",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "학생 성적 데이터의 열 이름을 리스트로 출력하세요.",
+    "constraints": [
+      "`df.columns`를 `.tolist()`로 바꿔 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "['이름', '반', '성별', '국어', '영어', '수학']"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 열 이름을 리스트로 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "WyfsnbTrpoQnLCAn67CYJywgJ+yEseuzhCcsICfqta3slrQnLCAn7JiB7Ja0JywgJ+yImO2VmSdd"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_b3",
+    "title": "Pandas 연습 3. 수학 평균",
+    "category": "Pandas",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "전체 학생의 수학 평균을 출력하세요.",
+    "constraints": [
+      "`df['수학']`으로 열을 꺼낸 뒤 `.mean()`을 쓰세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "83.0"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 수학 평균을 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ODMuMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_b4",
+    "title": "Pandas 연습 4. 앞부분 미리보기",
+    "category": "Pandas",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "데이터의 앞 3행에서 이름과 국어 열만 출력하세요.",
+    "constraints": [
+      "열 여러 개는 `df[['이름', '국어']]`처럼 리스트로 고르세요.",
+      "`.head(3)`을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "이름  국어\n0  김철수  85\n1  이영희  92\n2  박민수  76"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 이름, 국어 열의 앞 3행을 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7J2066aEICDqta3slrQKMCAg6rmA7LKg7IiYICA4NQoxICDsnbTsmIHtnawgIDkyCjIgIOuwleuvvOyImCAgNzY="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_i1",
+    "title": "Pandas 연습 5. 수학 90점 이상",
+    "category": "Pandas",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "수학 점수가 90점 이상인 학생의 이름을 리스트로 출력하세요.",
+    "constraints": [
+      "조건으로 행을 고르는 불리언 인덱싱을 사용하세요.",
+      "`.tolist()`로 리스트로 바꾸세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "['김철수', '최수민', '윤서연', '한지호', '권민재', '류건우', '문채원']"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 수학 90점 이상인 학생 이름을 리스트로 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "WyfquYDssqDsiJgnLCAn7LWc7IiY66+8JywgJ+ycpOyEnOyXsCcsICftlZzsp4DtmLgnLCAn6raM66+87J6sJywgJ+ulmOqxtOyasCcsICfrrLjssYTsm5AnXQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_i2",
+    "title": "Pandas 연습 6. 국어 상위 3명",
+    "category": "Pandas",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "국어 점수가 높은 순서로 정렬해 상위 3명의 이름을 리스트로 출력하세요.",
+    "constraints": [
+      "`sort_values`의 `ascending=False`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "['문채원', '강지은', '신예린']"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 국어 상위 3명의 이름을 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "WyfrrLjssYTsm5AnLCAn6rCV7KeA7J2AJywgJ+yLoOyYiOumsCdd"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_i3",
+    "title": "Pandas 연습 7. 총점 1등 찾기",
+    "category": "Pandas",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "국어·영어·수학을 더한 `총점` 열을 새로 만들고, 총점이 가장 높은 학생의 이름과 총점을 차례로 출력하세요.",
+    "constraints": [
+      "`df['총점'] = ...`으로 새 열을 만드세요.",
+      "`idxmax()`나 정렬을 활용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "문채원\n280"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 총점 열을 만들고, 1등의 이름과 총점을 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "66y47LGE7JuQCjI4MA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_i4",
+    "title": "Pandas 연습 8. 반별 인원",
+    "category": "Pandas",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "반별 학생 수를 반 이름 순서로 출력하세요.",
+    "constraints": [
+      "`value_counts()`를 쓰고 `sort_index()`로 반 이름 순으로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "반\n1반    5\n2반    5\n3반    5\n4반    5\nName: count, dtype: int64"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 반별 인원을 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "67CYCjHrsJggICAgNQoy67CYICAgIDUKM+uwmCAgICA1CjTrsJggICAgNQpOYW1lOiBjb3VudCwgZHR5cGU6IGludDY0"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_a1",
+    "title": "Pandas 연습 9. 반별 수학 평균",
+    "category": "Pandas",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "반별 수학 평균을 소수 첫째 자리까지 반올림해 출력하세요.",
+    "constraints": [
+      "`groupby('반')`을 사용하세요.",
+      "`.round(1)`로 반올림하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "반\n1반    82.4\n2반    79.4\n3반    88.2\n4반    82.0\nName: 수학, dtype: float64"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/students.csv')\n# 반별 수학 평균을 출력하세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "67CYCjHrsJggICAgODIuNAoy67CYICAgIDc5LjQKM+uwmCAgICA4OC4yCjTrsJggICAgODIuMApOYW1lOiDsiJjtlZksIGR0eXBlOiBmbG9hdDY0"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_a2",
+    "title": "Pandas 연습 10. 지점별 매출 순위",
+    "category": "Pandas",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "카페 매출 데이터에서 매출(`수량 × 단가`)을 계산해 지점별 매출 합계를 큰 순서대로 출력하세요.",
+    "constraints": [
+      "`df['매출'] = df['수량'] * df['단가']`로 열을 만드세요.",
+      "`groupby`와 `sort_values(ascending=False)`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "지점\n강남    1713000\n홍대    1664000\n잠실    1365500\nName: 매출, dtype: int64"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/sales.csv')\n# 지점별 매출 합계를 큰 순서대로 출력하세요\n",
+    "datasets": [
+      "sales"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7KeA7KCQCuqwleuCqCAgICAxNzEzMDAwCu2ZjeuMgCAgICAxNjY0MDAwCuyeoOyLpCAgICAxMzY1NTAwCk5hbWU6IOunpOy2nCwgZHR5cGU6IGludDY0"
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_a3",
+    "title": "Pandas 연습 11. 빈 강수량 채우기",
+    "category": "Pandas",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "날씨 데이터의 강수량에 빈칸이 있습니다. 빈칸 개수를 먼저 출력하고, 빈칸을 0으로 채운 뒤 도시별 평균 강수량을 소수 둘째 자리까지 반올림해 출력하세요.",
+    "constraints": [
+      "`isna().sum()`으로 빈칸을 세세요.",
+      "`fillna(0)`으로 채우세요.",
+      "도시별 평균은 `groupby`와 `.round(2)`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "2\n도시\n부산    10.50\n서울     6.79\n제주     6.79\nName: 강수량, dtype: float64"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/weather.csv')\n# 1) 강수량 빈칸 개수  2) 0으로 채운 뒤 도시별 평균 강수량\n",
+    "datasets": [
+      "weather"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Mgrrj4Tsi5wK67aA7IKwICAgIDEwLjUwCuyEnOyauCAgICAgNi43OQrsoJzso7wgICAgIDYuNzkKTmFtZTog6rCV7IiY65+JLCBkdHlwZTogZmxvYXQ2NA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_e1",
+    "title": "Pandas 연습 12. 월별·지점별 매출표",
+    "category": "Pandas",
+    "difficulty": "expert",
+    "type": "coding",
+    "description": "카페 매출 데이터로 행은 월(1~3), 열은 지점인 매출 합계표를 만들어 출력하세요.",
+    "constraints": [
+      "`pd.to_datetime`으로 날짜를 바꾸고 `.dt.month`로 월을 꺼내세요.",
+      "`pivot_table(index='월', columns='지점', values='매출', aggfunc='sum')`을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "지점      강남      잠실      홍대\n월                         \n1   426500  346500  463000\n2   496500  382500  459500\n3   790000  636500  741500"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/sales.csv')\n# 월별·지점별 매출 합계표를 출력하세요\n",
+    "datasets": [
+      "sales"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7KeA7KCQICAgICAg6rCV64KoICAgICAg7J6g7IukICAgICAg7ZmN64yACuyblCAgICAgICAgICAgICAgICAgICAgICAgICAKMSAgIDQyNjUwMCAgMzQ2NTAwICA0NjMwMDAKMiAgIDQ5NjUwMCAgMzgyNTAwICA0NTk1MDAKMyAgIDc5MDAwMCAgNjM2NTAwICA3NDE1MDA="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "pd_e2",
+    "title": "Pandas 연습 13. 일교차가 큰 도시",
+    "category": "Pandas",
+    "difficulty": "expert",
+    "type": "coding",
+    "description": "날씨 데이터에서 일교차(`최고기온 - 최저기온`)의 도시별 평균을 구해, 평균 일교차가 가장 큰 도시 이름과 그 값(소수 둘째 자리 반올림)을 차례로 출력하세요.",
+    "constraints": [
+      "일교차 열을 만든 뒤 `groupby`로 평균을 구하세요.",
+      "`idxmax()`와 `max()`를 활용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 실행",
+        "output": "서울\n6.71"
+      }
+    ],
+    "initialCode": "import pandas as pd\n\ndf = pd.read_csv('data/weather.csv')\n# 평균 일교차가 가장 큰 도시와 그 값을 출력하세요\n",
+    "datasets": [
+      "weather"
+    ],
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7ISc7Jq4CjYuNzE="
+      }
+    ],
+    "testRunnerCode": "stdout_match"
+  },
+  {
+    "id": "plt_b1",
+    "title": "Matplotlib 연습 1. 첫 선 그래프",
+    "category": "Matplotlib",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "1~5일 동안의 방문자 수를 선 그래프로 그리세요. 실행하면 아래 콘솔에 그래프가 나타납니다.",
+    "constraints": [
+      "`plt.plot(x, y)`를 사용하세요.",
+      "x는 `days`, y는 `visitors`입니다."
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "선이 하나 있다: 1\nx 값이 1~5일이다: [1, 2, 3, 4, 5]\ny 값이 방문자 수다: [120, 150, 90, 180, 210]"
+      }
+    ],
+    "initialCode": "import matplotlib.pyplot as plt\n\ndays = [1, 2, 3, 4, 5]\nvisitors = [120, 150, 90, 180, 210]\n# 선 그래프를 그리세요\n",
+    "testCases": [
+      {
+        "input": "선이 하나 있다|len(_ax.get_lines())",
+        "expected": "MQ=="
+      },
+      {
+        "input": "x 값이 1~5일이다|list(_ax.get_lines()[0].get_xdata())",
+        "expected": "WzEsIDIsIDMsIDQsIDVd"
+      },
+      {
+        "input": "y 값이 방문자 수다|list(_ax.get_lines()[0].get_ydata())",
+        "expected": "WzEyMCwgMTUwLCA5MCwgMTgwLCAyMTBd"
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_b2",
+    "title": "Matplotlib 연습 2. 제목과 축 이름",
+    "category": "Matplotlib",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "그래프에 제목과 축 이름을 붙이세요.",
+    "constraints": [
+      "제목: `월별 방문자`",
+      "x축 이름: `월`, y축 이름: `방문자 수`"
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "제목이 월별 방문자다: 월별 방문자\nx축 이름이 월이다: 월\ny축 이름이 방문자 수다: 방문자 수"
+      }
+    ],
+    "initialCode": "import matplotlib.pyplot as plt\n\nmonths = [1, 2, 3, 4]\nvisitors = [320, 410, 380, 520]\nplt.plot(months, visitors)\n# 제목과 축 이름을 붙이세요\n",
+    "testCases": [
+      {
+        "input": "제목이 `월별 방문자`다|_ax.get_title()",
+        "expected": "7JuU67OEIOuwqeusuOyekA=="
+      },
+      {
+        "input": "x축 이름이 `월`이다|_ax.get_xlabel()",
+        "expected": "7JuU"
+      },
+      {
+        "input": "y축 이름이 `방문자 수`다|_ax.get_ylabel()",
+        "expected": "67Cp66y47J6QIOyImA=="
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_b3",
+    "title": "Matplotlib 연습 3. 막대그래프",
+    "category": "Matplotlib",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "과일별 판매량을 막대그래프로 그리세요.",
+    "constraints": [
+      "`plt.bar(이름, 값)`을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "막대가 4개다: 4\n막대 높이가 판매량이다: [30, 45, 22, 38]\nx축 이름표가 과일 이름이다: [사과, 바나나, 포도, 딸기]"
+      }
+    ],
+    "initialCode": "import matplotlib.pyplot as plt\n\nfruits = ['사과', '바나나', '포도', '딸기']\nsold = [30, 45, 22, 38]\n# 막대그래프를 그리세요\n",
+    "testCases": [
+      {
+        "input": "막대가 4개다|len(_ax.patches)",
+        "expected": "NA=="
+      },
+      {
+        "input": "막대 높이가 판매량이다|[p.get_height() for p in _ax.patches]",
+        "expected": "WzMwLCA0NSwgMjIsIDM4XQ=="
+      },
+      {
+        "input": "x축 이름표가 과일 이름이다|[t.get_text() for t in _ax.get_xticklabels()]",
+        "expected": "W+yCrOqzvCwg67CU64KY64KYLCDtj6zrj4QsIOuUuOq4sF0="
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_i1",
+    "title": "Matplotlib 연습 4. 반별 평균 막대그래프",
+    "category": "Matplotlib",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "학생 성적 데이터로 반별 수학 평균을 막대그래프로 그리고, 제목을 `반별 수학 평균`으로 붙이세요.",
+    "constraints": [
+      "`groupby('반')['수학'].mean()`으로 평균을 구하세요.",
+      "결과의 `index`와 `values`로 `plt.bar`를 그리세요."
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "막대가 반 개수(4개)만큼 있다: 4\n막대 높이가 반별 수학 평균이다: [82.4, 79.4, 88.2, 82.0]\n제목이 반별 수학 평균이다: 반별 수학 평균"
+      }
+    ],
+    "initialCode": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndf = pd.read_csv('data/students.csv')\n# 반별 수학 평균 막대그래프를 그리세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "막대가 반 개수(4개)만큼 있다|len(_ax.patches)",
+        "expected": "NA=="
+      },
+      {
+        "input": "막대 높이가 반별 수학 평균이다|[p.get_height() for p in _ax.patches]",
+        "expected": "WzgyLjQsIDc5LjQsIDg4LjIsIDgyLjBd"
+      },
+      {
+        "input": "제목이 `반별 수학 평균`이다|_ax.get_title()",
+        "expected": "67CY67OEIOyImO2VmSDtj4nqt6A="
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_i2",
+    "title": "Matplotlib 연습 5. 두 도시 기온 비교",
+    "category": "Matplotlib",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "날씨 데이터로 서울과 부산의 최고기온을 한 그래프에 선 두 개로 그리고, 범례를 표시하세요.",
+    "constraints": [
+      "도시별로 행을 골라 `plt.plot`을 두 번 호출하세요.",
+      "`label='서울'`, `label='부산'`을 주고 `plt.legend()`를 호출하세요.",
+      "x축은 `날짜` 열을 그대로 쓰세요."
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "선이 두 개다: 2\n범례가 있다: True\n범례가 서울, 부산이다: [서울, 부산]\n서울 선의 값이 서울 최고기온이다: [29, 31, 27, 25, 28, 32, 33]"
+      }
+    ],
+    "initialCode": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndf = pd.read_csv('data/weather.csv')\n# 서울과 부산의 최고기온 선 그래프를 그리세요\n",
+    "datasets": [
+      "weather"
+    ],
+    "testCases": [
+      {
+        "input": "선이 두 개다|len(_ax.get_lines())",
+        "expected": "Mg=="
+      },
+      {
+        "input": "범례가 있다|_ax.get_legend() is not None",
+        "expected": "VHJ1ZQ=="
+      },
+      {
+        "input": "범례가 `서울`, `부산`이다|[t.get_text() for t in _ax.get_legend().get_texts()]",
+        "expected": "W+yEnOyauCwg67aA7IKwXQ=="
+      },
+      {
+        "input": "서울 선의 값이 서울 최고기온이다|list(_ax.get_lines()[0].get_ydata())",
+        "expected": "WzI5LCAzMSwgMjcsIDI1LCAyOCwgMzIsIDMzXQ=="
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_i3",
+    "title": "Matplotlib 연습 6. 국어와 수학 산점도",
+    "category": "Matplotlib",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "description": "학생 성적 데이터로 x축은 국어, y축은 수학인 산점도를 그리세요.",
+    "constraints": [
+      "`plt.scatter(x, y)`를 사용하세요.",
+      "x축 이름 `국어`, y축 이름 `수학`을 붙이세요."
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "점이 학생 수(20개)만큼 있다: 20\nx 값이 국어 점수다: [85.0, 92.0, 76.0, 88.0, 64.0]\nx축·y축 이름이 국어, 수학이다: [국어, 수학]"
+      }
+    ],
+    "initialCode": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndf = pd.read_csv('data/students.csv')\n# 국어-수학 산점도를 그리세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "점이 학생 수(20개)만큼 있다|len(_ax.collections[0].get_offsets())",
+        "expected": "MjA="
+      },
+      {
+        "input": "x 값이 국어 점수다|[float(p[0]) for p in _ax.collections[0].get_offsets()][:5]",
+        "expected": "Wzg1LjAsIDkyLjAsIDc2LjAsIDg4LjAsIDY0LjBd"
+      },
+      {
+        "input": "x축·y축 이름이 `국어`, `수학`이다|[_ax.get_xlabel(), _ax.get_ylabel()]",
+        "expected": "W+q1reyWtCwg7IiY7ZWZXQ=="
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_a1",
+    "title": "Matplotlib 연습 7. 수학 점수 분포",
+    "category": "Matplotlib",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "학생 성적 데이터의 수학 점수 분포를 히스토그램으로 그리세요. 구간은 5개로 나눕니다.",
+    "constraints": [
+      "`plt.hist(값, bins=5)`를 사용하세요.",
+      "제목을 `수학 점수 분포`로 붙이세요."
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "구간(막대)이 5개다: 5\n구간별 인원이 맞다: [3.0, 2.0, 3.0, 7.0, 5.0]\n제목이 수학 점수 분포다: 수학 점수 분포"
+      }
+    ],
+    "initialCode": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndf = pd.read_csv('data/students.csv')\n# 수학 점수 히스토그램을 그리세요\n",
+    "datasets": [
+      "students"
+    ],
+    "testCases": [
+      {
+        "input": "구간(막대)이 5개다|len(_ax.patches)",
+        "expected": "NQ=="
+      },
+      {
+        "input": "구간별 인원이 맞다|[p.get_height() for p in _ax.patches]",
+        "expected": "WzMuMCwgMi4wLCAzLjAsIDcuMCwgNS4wXQ=="
+      },
+      {
+        "input": "제목이 `수학 점수 분포`다|_ax.get_title()",
+        "expected": "7IiY7ZWZIOygkOyImCDrtoTtj6w="
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_a2",
+    "title": "Matplotlib 연습 8. 그래프 두 개 나란히",
+    "category": "Matplotlib",
+    "difficulty": "advanced",
+    "type": "coding",
+    "description": "카페 매출 데이터로 그래프 두 개를 나란히 그리세요. 왼쪽은 지점별 매출 합계 막대그래프, 오른쪽은 메뉴별 판매 수량 합계 막대그래프입니다.",
+    "constraints": [
+      "`fig, (ax1, ax2) = plt.subplots(1, 2)`를 사용하세요.",
+      "매출은 `수량 × 단가`입니다.",
+      "왼쪽 제목 `지점별 매출`, 오른쪽 제목 `메뉴별 판매량`"
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "그래프가 두 개다: 2\n제목이 지점별 매출, 메뉴별 판매량이다: [지점별 매출, 메뉴별 판매량]\n왼쪽 막대 높이가 지점별 매출이다: [1713000, 1365500, 1664000]\n오른쪽 막대 높이가 메뉴별 판매량이다: [444, 337, 163]"
+      }
+    ],
+    "initialCode": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndf = pd.read_csv('data/sales.csv')\n# 1행 2열 그래프를 그리세요\n",
+    "datasets": [
+      "sales"
+    ],
+    "testCases": [
+      {
+        "input": "그래프가 두 개다|len(_axes)",
+        "expected": "Mg=="
+      },
+      {
+        "input": "제목이 `지점별 매출`, `메뉴별 판매량`이다|[a.get_title() for a in _axes]",
+        "expected": "W+yngOygkOuzhCDrp6TstpwsIOuplOuJtOuzhCDtjJDrp6Trn4ld"
+      },
+      {
+        "input": "왼쪽 막대 높이가 지점별 매출이다|[p.get_height() for p in _axes[0].patches]",
+        "expected": "WzE3MTMwMDAsIDEzNjU1MDAsIDE2NjQwMDBd"
+      },
+      {
+        "input": "오른쪽 막대 높이가 메뉴별 판매량이다|[p.get_height() for p in _axes[1].patches]",
+        "expected": "WzQ0NCwgMzM3LCAxNjNd"
+      }
+    ],
+    "testRunnerCode": "figure_check"
+  },
+  {
+    "id": "plt_e1",
+    "title": "Matplotlib 연습 9. 최고 지점만 강조하기",
+    "category": "Matplotlib",
+    "difficulty": "expert",
+    "type": "coding",
+    "description": "지점별 매출 막대그래프에서 매출이 가장 큰 지점만 빨간색(`red`), 나머지는 회색(`gray`)으로 칠하고, 평균 매출 위치에 가로 점선을 그리세요.",
+    "constraints": [
+      "`color`에 막대마다 색 리스트를 넘기세요.",
+      "평균선은 `plt.axhline(평균, linestyle='--')`입니다.",
+      "매출은 `수량 × 단가`입니다."
+    ],
+    "examples": [
+      {
+        "input": "그래프 확인",
+        "output": "막대가 3개다: 3\n최고 매출 막대만 빨간색이다: [True, False, False]\n가로 평균선이 점선이다: [--]\n평균선 위치가 평균 매출이다: 1580833.33"
+      }
+    ],
+    "initialCode": "import pandas as pd\nimport matplotlib.pyplot as plt\n\ndf = pd.read_csv('data/sales.csv')\ndf['매출'] = df['수량'] * df['단가']\nby_store = df.groupby('지점')['매출'].sum()\n# 최고 지점만 빨간색, 평균 점선을 그리세요\n",
+    "datasets": [
+      "sales"
+    ],
+    "testCases": [
+      {
+        "input": "막대가 3개다|len(_ax.patches)",
+        "expected": "Mw=="
+      },
+      {
+        "input": "최고 매출 막대만 빨간색이다|[tuple(round(c, 2) for c in p.get_facecolor()[:3]) == (1.0, 0.0, 0.0) for p in _ax.patches]",
+        "expected": "W1RydWUsIEZhbHNlLCBGYWxzZV0="
+      },
+      {
+        "input": "가로 평균선이 점선이다|[l.get_linestyle() for l in _ax.get_lines()]",
+        "expected": "Wy0tXQ=="
+      },
+      {
+        "input": "평균선 위치가 평균 매출이다|float(_ax.get_lines()[0].get_ydata()[0])",
+        "expected": "MTU4MDgzMy4zMw=="
+      }
+    ],
+    "testRunnerCode": "figure_check"
   },
   {
     "id": "lambda_q1",
@@ -8504,7 +9507,7 @@ export const problems: Problem[] = [
   {
     "id": "html_q6",
     "title": "HTML 6. 링크 만들기",
-    "category": "링크와 이미지",
+    "category": "링크",
     "difficulty": "basic",
     "type": "coding",
     "language": "html",
@@ -8547,7 +9550,7 @@ export const problems: Problem[] = [
   {
     "id": "html_q7",
     "title": "HTML 7. 이미지 넣기",
-    "category": "링크와 이미지",
+    "category": "이미지",
     "difficulty": "intermediate",
     "type": "coding",
     "language": "html",
@@ -8973,7 +9976,7 @@ export const problems: Problem[] = [
   {
     "id": "html_fill_1",
     "title": "HTML 16. 새 탭으로 열기",
-    "category": "링크와 이미지",
+    "category": "링크",
     "difficulty": "basic",
     "type": "fill",
     "language": "html",
@@ -9041,7 +10044,7 @@ export const problems: Problem[] = [
   {
     "id": "css_q1",
     "title": "CSS 1. 제목 꾸미기",
-    "category": "선택자와 색상",
+    "category": "선택자",
     "difficulty": "basic",
     "type": "coding",
     "language": "css",
@@ -9092,7 +10095,7 @@ export const problems: Problem[] = [
   {
     "id": "css_q17",
     "title": "CSS 2. class와 id 선택자",
-    "category": "선택자와 색상",
+    "category": "선택자",
     "difficulty": "basic",
     "type": "coding",
     "language": "css",
@@ -9137,7 +10140,7 @@ export const problems: Problem[] = [
   {
     "id": "css_q3",
     "title": "CSS 3. 자손 선택자",
-    "category": "선택자와 색상",
+    "category": "선택자",
     "difficulty": "intermediate",
     "type": "coding",
     "language": "css",
@@ -9273,7 +10276,7 @@ export const problems: Problem[] = [
   {
     "id": "css_q6",
     "title": "CSS 6. 글자 꾸미기",
-    "category": "텍스트와 배경",
+    "category": "텍스트",
     "difficulty": "basic",
     "type": "coding",
     "language": "css",
@@ -9317,7 +10320,7 @@ export const problems: Problem[] = [
   {
     "id": "css_q7",
     "title": "CSS 7. 둥근 배지",
-    "category": "텍스트와 배경",
+    "category": "배경",
     "difficulty": "basic",
     "type": "coding",
     "language": "css",
@@ -9361,7 +10364,7 @@ export const problems: Problem[] = [
   {
     "id": "css_q8",
     "title": "CSS 8. 카드에 그림자 주기",
-    "category": "텍스트와 배경",
+    "category": "그림자",
     "difficulty": "intermediate",
     "type": "coding",
     "language": "css",
@@ -9618,7 +10621,7 @@ export const problems: Problem[] = [
   {
     "id": "css_q14",
     "title": "CSS 14. 부드럽게 바뀌기",
-    "category": "전환과 변형",
+    "category": "전환",
     "difficulty": "advanced",
     "type": "coding",
     "language": "css",
@@ -9771,7 +10774,7 @@ export const problems: Problem[] = [
   {
     "id": "css_quiz_1",
     "title": "CSS 17. 누가 이길까",
-    "category": "선택자와 색상",
+    "category": "선택자",
     "difficulty": "basic",
     "type": "quiz",
     "language": "css",
