@@ -1042,9 +1042,18 @@ export default function Dashboard({
 }
 
 function LeaderboardWidget() {
-  const { leaderboard, isConfigured, setAuthModalOpen, user } = useAuth();
+  const { leaderboard, isConfigured, setAuthModalOpen, user, profile } = useAuth();
   const [profileEditOpen, setProfileEditOpen] = useState(false);
   const [mode, setMode] = useState<RankingMode>('all');
+  // The weekly tab is shown to admins only. This hides the tab, it doesn't
+  // protect the data: weekly_leaderboard_public stays readable, the same way
+  // the admin stats view is (see isMasterAdmin above).
+  const isAdmin = profile?.is_admin === true;
+  const rankingTabs = RANKING_TABS.filter((tab) => tab.id !== 'week' || isAdmin);
+  // Signing out of the admin account while on that tab falls back to 전체.
+  useEffect(() => {
+    if (mode === 'week' && !isAdmin) setMode('all');
+  }, [mode, isAdmin]);
   const [filteredList, setFilteredList] = useState<LeaderboardUser[]>([]);
   const [isLoadingFiltered, setIsLoadingFiltered] = useState(false);
 
@@ -1121,7 +1130,7 @@ function LeaderboardWidget() {
 
       {isConfigured && (
         <div className="docs-category-tabs" style={{ display: 'flex', gap: '0.4rem', marginBottom: '1rem', overflowX: 'auto' }}>
-          {RANKING_TABS.map((tab) => (
+          {rankingTabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setMode(tab.id)}
@@ -1137,6 +1146,7 @@ function LeaderboardWidget() {
               }}
             >
               {tab.label}
+              {tab.id === 'week' && <span style={{ marginLeft: '0.3rem', fontSize: '0.65rem', opacity: 0.7 }}>관리자</span>}
             </button>
           ))}
         </div>
