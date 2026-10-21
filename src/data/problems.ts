@@ -31,6 +31,10 @@ export interface Problem {
   // reads. Every file is available to every run; this only decides which
   // ones the workspace previews.
   datasets?: string[];
+  // python/algorithm problems: call expressions with large inputs, run after
+  // every testCase passes. Graded against the reference solution in
+  // solutionCode.ts, timed on the student's own device (PERF_HARNESS).
+  perfTests?: string[];
   quizQuestion?: string;
   quizOptions?: string[];
   // base64-encoded (see src/utils/answerObfuscation.ts) so it isn't plainly
@@ -10864,5 +10868,376 @@ export const problems: Problem[] = [
       "@width (600px) { ... }"
     ],
     "correctAnswerIndex": "MA=="
+  },
+  {
+    "id": "prac_1",
+    "title": "실전 1. 출석부 정리",
+    "category": "실전",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "동아리 회장 민지는 한 달 동안 모임에 온 사람의 이름을 온 순서대로 적어 두었습니다. 같은 사람이 여러 번 적혀 있습니다. 회원 명단을 만들려고 합니다.\n\n기록 `names`가 주어질 때, 처음 온 순서를 유지하면서 각 사람이 **한 번씩만** 들어 있는 리스트를 반환하세요.\n\n(난이도: 프로그래머스 Lv.1 수준)",
+    "constraints": [
+      "`names`의 길이는 1 이상 100,000 이하입니다.",
+      "이름은 1~6글자 문자열입니다.",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution(['민지', '수호', '민지', '하린', '수호'])",
+        "output": "['민지', '수호', '하린']"
+      }
+    ],
+    "initialCode": "def solution(names):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution(['민지', '수호', '민지', '하린', '수호'])",
+        "expected": "Wyfrr7zsp4AnLCAn7IiY7Zi4JywgJ+2VmOumsCdd"
+      },
+      {
+        "input": "solution(['도윤'])",
+        "expected": "Wyfrj4TsnKQnXQ=="
+      },
+      {
+        "input": "solution(['아영', '아영', '아영'])",
+        "expected": "WyfslYTsmIEnXQ=="
+      },
+      {
+        "input": "solution(['c', 'b', 'a', 'b', 'c'])",
+        "expected": "WydjJywgJ2InLCAnYSdd"
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution([f'회원{i % 50000}' for i in range(100000)])"
+    ]
+  },
+  {
+    "id": "prac_2",
+    "title": "실전 2. 가장 많이 팔린 메뉴",
+    "category": "실전",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "분식집 사장님은 하루 동안 들어온 주문을 메뉴 이름으로 기록합니다. 내일 재료를 넉넉히 준비할 메뉴를 고르려 합니다.\n\n주문 기록 `orders`가 주어질 때, 가장 많이 주문된 메뉴를 반환하세요. 주문 수가 같은 메뉴가 여럿이면 **사전 순으로 가장 앞서는** 메뉴를 반환합니다.\n\n(난이도: 프로그래머스 Lv.1 수준)",
+    "constraints": [
+      "`orders`의 길이는 1 이상 100,000 이하입니다.",
+      "메뉴의 종류는 최대 5,000가지입니다.",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution(['떡볶이', '순대', '떡볶이', '튀김', '순대', '떡볶이'])",
+        "output": "떡볶이"
+      }
+    ],
+    "initialCode": "def solution(orders):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution(['떡볶이', '순대', '떡볶이', '튀김', '순대', '떡볶이'])",
+        "expected": "65ah67O27J20"
+      },
+      {
+        "input": "solution(['김밥', '라면', '라면', '김밥'])",
+        "expected": "6rmA67Cl"
+      },
+      {
+        "input": "solution(['어묵'])",
+        "expected": "7Ja066y1"
+      },
+      {
+        "input": "solution(['b', 'a', 'c'])",
+        "expected": "YQ=="
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution([f'메뉴{(i * 7) % 5000}' for i in range(100000)])"
+    ]
+  },
+  {
+    "id": "prac_3",
+    "title": "실전 3. 연속 휴가 최고 방문객",
+    "category": "실전",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "놀이공원은 하루 방문객 수를 매일 기록합니다. 직원들에게 k일 연속 휴가를 주는데, 방문객이 가장 많은 k일 동안에는 휴가를 주지 않으려 합니다.\n\n하루 방문객 수 `visitors`와 휴가 일수 `k`가 주어질 때, **연속한 k일** 방문객 합의 최댓값을 반환하세요.\n\n(난이도: 프로그래머스 Lv.2 수준)",
+    "constraints": [
+      "`visitors`의 길이는 1 이상 100,000 이하입니다.",
+      "`k`는 1 이상 `visitors`의 길이 이하입니다.",
+      "하루 방문객 수는 0 이상 10,000 이하입니다.",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution([3, 8, 1, 9, 4, 6], 2)",
+        "output": "13"
+      }
+    ],
+    "initialCode": "def solution(visitors, k):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution([3, 8, 1, 9, 4, 6], 2)",
+        "expected": "MTM="
+      },
+      {
+        "input": "solution([5, 5, 5], 3)",
+        "expected": "MTU="
+      },
+      {
+        "input": "solution([7], 1)",
+        "expected": "Nw=="
+      },
+      {
+        "input": "solution([1, 2, 3, 100, 1, 2], 3)",
+        "expected": "MTA1"
+      },
+      {
+        "input": "solution([0, 0, 0, 0], 2)",
+        "expected": "MA=="
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution([(i * 37) % 10001 for i in range(100000)], 50000)"
+    ]
+  },
+  {
+    "id": "prac_4",
+    "title": "실전 4. 괄호 검사기",
+    "category": "실전",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "코드 편집기에 괄호가 제대로 짝지어졌는지 검사하는 기능을 넣으려 합니다. 괄호는 `()`, `[]`, `{}` 세 종류이며, 여는 괄호는 같은 종류의 닫는 괄호로, 올바른 순서로 닫혀야 합니다.\n\n괄호로만 이루어진 문자열 `s`가 주어질 때, 올바르게 짝지어졌으면 `True`, 아니면 `False`를 반환하세요.\n\n(난이도: 프로그래머스 Lv.2 수준)",
+    "constraints": [
+      "`s`의 길이는 1 이상 200,000 이하입니다.",
+      "`s`는 `()[]{}` 문자로만 이루어져 있습니다.",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution('([]{})')",
+        "output": "True"
+      }
+    ],
+    "initialCode": "def solution(s):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution('([]{})')",
+        "expected": "VHJ1ZQ=="
+      },
+      {
+        "input": "solution('([)]')",
+        "expected": "RmFsc2U="
+      },
+      {
+        "input": "solution('((')",
+        "expected": "RmFsc2U="
+      },
+      {
+        "input": "solution('}{')",
+        "expected": "RmFsc2U="
+      },
+      {
+        "input": "solution('{[()()]}')",
+        "expected": "VHJ1ZQ=="
+      },
+      {
+        "input": "solution(')')",
+        "expected": "RmFsc2U="
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution('([{' * 33333 + '}])' * 33333)",
+      "solution('()' * 100000)"
+    ]
+  },
+  {
+    "id": "prac_5",
+    "title": "실전 5. 회의실 하나로 최대한",
+    "category": "실전",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "학교에는 빈 회의실이 하나뿐입니다. 여러 동아리가 사용 시간을 신청했고, 시간이 겹치는 신청은 함께 받을 수 없습니다. 한 회의가 끝나는 시각에 다음 회의가 바로 시작하는 것은 괜찮습니다.\n\n신청 목록 `meetings`가 `[시작, 끝]` 형태로 주어질 때, 받아들일 수 있는 회의의 **최대 개수**를 반환하세요.\n\n(난이도: 프로그래머스 Lv.2 수준)",
+    "constraints": [
+      "`meetings`의 길이는 1 이상 100,000 이하입니다.",
+      "0 ≤ 시작 < 끝 ≤ 1,000,000",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution([[1, 4], [3, 5], [0, 6], [5, 7], [8, 9], [5, 9]])",
+        "output": "3"
+      }
+    ],
+    "initialCode": "def solution(meetings):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution([[1, 4], [3, 5], [0, 6], [5, 7], [8, 9], [5, 9]])",
+        "expected": "Mw=="
+      },
+      {
+        "input": "solution([[1, 2], [2, 3], [3, 4]])",
+        "expected": "Mw=="
+      },
+      {
+        "input": "solution([[0, 10]])",
+        "expected": "MQ=="
+      },
+      {
+        "input": "solution([[1, 10], [2, 3], [4, 5]])",
+        "expected": "Mg=="
+      },
+      {
+        "input": "solution([[5, 6], [1, 2], [3, 4]])",
+        "expected": "Mw=="
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution([[(i * 37) % 900000, (i * 37) % 900000 + (i % 50) + 1] for i in range(100000)])"
+    ]
+  },
+  {
+    "id": "prac_6",
+    "title": "실전 6. 미로 탈출",
+    "category": "실전",
+    "difficulty": "advanced",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "방탈출 카페의 미로는 칸으로 나뉘어 있습니다. `.`은 지나갈 수 있는 칸, `#`은 벽입니다. 왼쪽 위 칸에서 출발해 오른쪽 아래 칸으로 나가야 하며, 한 번에 상하좌우로 한 칸씩 움직입니다.\n\n미로 `maze`(문자열 리스트)가 주어질 때, 출구까지 가는 **가장 적은 이동 횟수**를 반환하세요. 갈 수 없으면 `-1`을 반환합니다.\n\n(난이도: 프로그래머스 Lv.2 수준)",
+    "constraints": [
+      "`maze`의 크기는 1×1 이상 200×200 이하입니다.",
+      "출발 칸과 출구 칸은 항상 `.`입니다.",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution(['..#', '#..', '#..'])",
+        "output": "4"
+      }
+    ],
+    "initialCode": "def solution(maze):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution(['..#', '#..', '#..'])",
+        "expected": "NA=="
+      },
+      {
+        "input": "solution(['.#', '#.'])",
+        "expected": "LTE="
+      },
+      {
+        "input": "solution(['.'])",
+        "expected": "MA=="
+      },
+      {
+        "input": "solution(['....', '###.', '....', '.###', '....'])",
+        "expected": "MTM="
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution(['.' * 200] * 200)",
+      "solution(['.' * 200 if r % 2 == 0 else ('#' * 199 + '.' if r % 4 == 1 else '.' + '#' * 199) for r in range(199)] + ['.' * 200])"
+    ]
+  },
+  {
+    "id": "prac_7",
+    "title": "실전 7. 따뜻해지는 날까지",
+    "category": "실전",
+    "difficulty": "expert",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "일기 예보 앱에 '며칠 뒤에 오늘보다 따뜻해지나요?' 기능을 넣으려 합니다.\n\n날짜순 기온 리스트 `temps`가 주어질 때, 각 날짜마다 **처음으로 더 따뜻해지는 날까지 며칠을 기다려야 하는지**를 담은 리스트를 반환하세요. 그런 날이 없으면 0입니다.\n\n(난이도: 프로그래머스 Lv.2 수준)",
+    "constraints": [
+      "`temps`의 길이는 1 이상 100,000 이하입니다.",
+      "기온은 -50 이상 50 이하의 정수입니다.",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution([23, 24, 25, 21, 19, 22, 26, 23])",
+        "output": "[1, 1, 4, 2, 1, 1, 0, 0]"
+      }
+    ],
+    "initialCode": "def solution(temps):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution([23, 24, 25, 21, 19, 22, 26, 23])",
+        "expected": "WzEsIDEsIDQsIDIsIDEsIDEsIDAsIDBd"
+      },
+      {
+        "input": "solution([30, 30, 30])",
+        "expected": "WzAsIDAsIDBd"
+      },
+      {
+        "input": "solution([10])",
+        "expected": "WzBd"
+      },
+      {
+        "input": "solution([1, 2, 3, 4])",
+        "expected": "WzEsIDEsIDEsIDBd"
+      },
+      {
+        "input": "solution([4, 3, 2, 1])",
+        "expected": "WzAsIDAsIDAsIDBd"
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution([50 - (i * 100 // 100000) for i in range(100000)])",
+      "solution([(i % 101) - 50 for i in range(100000)])"
+    ]
+  },
+  {
+    "id": "prac_8",
+    "title": "실전 8. 계단 오르는 방법",
+    "category": "실전",
+    "difficulty": "expert",
+    "type": "coding",
+    "language": "algorithm",
+    "description": "한 번에 계단을 1칸 또는 2칸씩 오를 수 있습니다. n칸짜리 계단을 오르는 방법이 몇 가지인지 구하려 합니다. 예를 들어 3칸은 (1,1,1), (1,2), (2,1)의 3가지입니다.\n\n계단 수 `n`이 주어질 때, 오르는 방법의 수를 **1,000,000,007로 나눈 나머지**로 반환하세요.\n\n(난이도: 프로그래머스 Lv.2 수준)",
+    "constraints": [
+      "`n`은 1 이상 100,000 이하입니다.",
+      "정확성 테스트를 통과하면, 제한사항의 최대 크기 입력으로 **효율성 테스트**를 합니다."
+    ],
+    "examples": [
+      {
+        "input": "solution(3)",
+        "output": "3"
+      }
+    ],
+    "initialCode": "def solution(n):\n    answer = None\n    return answer\n",
+    "testCases": [
+      {
+        "input": "solution(3)",
+        "expected": "Mw=="
+      },
+      {
+        "input": "solution(1)",
+        "expected": "MQ=="
+      },
+      {
+        "input": "solution(2)",
+        "expected": "Mg=="
+      },
+      {
+        "input": "solution(10)",
+        "expected": "ODk="
+      },
+      {
+        "input": "solution(25)",
+        "expected": "MTIxMzkz"
+      }
+    ],
+    "testRunnerCode": "import json\nresults = []\nfor _call in test_cases:\n    try:\n        _result = eval(_call)\n        results.append(str(_result))\n    except Exception as e:\n        results.append(\"ERROR: \" + str(e))\nprint(\"###TEST_OUT###\")\nprint(json.dumps(results))\n",
+    "perfTests": [
+      "solution(100000)"
+    ]
   }
 ];

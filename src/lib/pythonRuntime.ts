@@ -19,7 +19,36 @@ os.environ['MPLBACKEND'] = 'Agg'
 warnings.filterwarnings('ignore', message=r'(?s).*Pyarrow will become a required dependency')
 warnings.filterwarnings('ignore', message=r'.*non-GUI backend')
 warnings.filterwarnings('ignore', message=r'.*Glyph .* missing from')
+
+# Run guard (see RUN_GUARD_SECONDS). Same tracing trick as PERF_HARNESS: a
+# BaseException, so student code catching Exception can't swallow it.
+class _PqTimeout(BaseException):
+    pass
+
+def _pq_guard_start(limit):
+    import sys, time
+    count = [0]
+    deadline = time.perf_counter() + limit
+    def tracer(frame, event, arg):
+        count[0] += 1
+        if (count[0] & 1023) == 0 and time.perf_counter() > deadline:
+            raise _PqTimeout()
+        return tracer
+    sys.settrace(tracer)
+
+def _pq_guard_stop():
+    import sys
+    sys.settrace(None)
 `;
+
+// Pyodide shares the page's thread, so `while i < 10:` without `i += 1`
+// used to freeze the tab for good. Runs are traced and stopped after this
+// long. Not applied when NumPy/Pandas/Matplotlib are involved: importing
+// them executes a lot of Python, and tracing makes that noticeably slower.
+export const RUN_GUARD_SECONDS = 10;
+export const TIMEOUT_MARKER = '_PqTimeout';
+export const TIMEOUT_MESSAGE =
+  `실행 시간이 ${RUN_GUARD_SECONDS}초를 넘어서 멈췄어요. 끝나지 않는 반복(조건이 계속 참인 while, 값이 바뀌지 않는 반복 변수)이나 너무 깊은 재귀가 없는지 확인해 보세요.`;
 
 // Pyodide's working directory. Datasets are written by absolute path because
 // FS.mkdirTree treats a relative path as rooted at / (it made /data while
@@ -116,3 +145,71 @@ print(_json.dumps(_pq_out, ensure_ascii=False))
 
 /** The part of a "<label>|<expression>" test input that is shown to students. */
 export const testLabel = (input: string) => (input.includes('|') ? input.split('|', 1)[0] : input);
+
+// Efficiency tests (problem.perfTests): large inputs with a time limit, like
+// a coding-test site's 효율성 테스트.
+//
+// Pyodide runs on the page's main thread, so a slow or endless solution
+// can't be killed from JavaScript. Instead the run is traced: every 1024
+// Python events the tracer checks the clock and raises _PqTimeout, a
+// BaseException so `except Exception` in student code can't swallow it.
+// Tracing costs ~8x on line-heavy code, which is why both sides are traced.
+//
+// The limit is relative to the reference solution timed on the same device,
+// in the same run: 30x its time, at least 1 s, at most 5 s. A fixed limit
+// would fail correct O(n) answers on slow school PCs; 30x still separates
+// O(n) / O(n log n) from O(n^2) by orders of magnitude at these sizes.
+//
+// Globals in: _pq_perf_calls (list of call expressions), _pq_reference
+// (reference solution source). Out: a ###PERF_OUT### JSON line.
+export const PERF_HARNESS = `
+import sys as _sys, time as _time, json as _json
+
+class _PqTimeout(BaseException):
+    pass
+
+def _pq_timed(call, ns, limit):
+    count = [0]
+    deadline = _time.perf_counter() + limit
+    def tracer(frame, event, arg):
+        count[0] += 1
+        if (count[0] & 1023) == 0 and _time.perf_counter() > deadline:
+            raise _PqTimeout()
+        return tracer
+    t0 = _time.perf_counter()
+    _sys.settrace(tracer)
+    try:
+        result = eval(call, ns)
+        status = 'ok'
+    except _PqTimeout:
+        result, status = None, 'timeout'
+    except Exception as e:
+        result, status = type(e).__name__ + ': ' + str(e), 'error'
+    finally:
+        _sys.settrace(None)
+    ms = (_time.perf_counter() - t0) * 1000
+    # A single long C-level call (e.g. a key= builtin) can't be interrupted
+    # mid-way; it still fails on the clock once it returns.
+    if status == 'ok' and ms > limit * 1000:
+        status = 'timeout'
+    return status, ms, result
+
+_pq_ref_ns = {}
+exec(_pq_reference, _pq_ref_ns)
+_pq_perf = []
+for _call in _pq_perf_calls:
+    _st, _ref_ms, _ref = _pq_timed(_call, _pq_ref_ns, 30.0)
+    _limit = min(max(_ref_ms * 30 / 1000, 1.0), 5.0)
+    _st, _ms, _res = _pq_timed(_call, globals(), _limit)
+    _exp = str(_ref)
+    _act = str(_res) if _st != 'timeout' else ''
+    _pq_perf.append({
+        'status': 'ok' if _st == 'ok' and _act == _exp else ('wrong' if _st == 'ok' else _st),
+        'ms': round(_ms),
+        'limitMs': round(_limit * 1000),
+        'expected': _exp[:300],
+        'actual': _act[:300],
+    })
+print('###PERF_OUT###')
+print(_json.dumps(_pq_perf, ensure_ascii=False))
+`;

@@ -23,7 +23,7 @@ import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 
 const ROOT = resolve(import.meta.dirname, '..');
-const LIB_CATEGORIES = new Set(['NumPy', 'Pandas', 'Matplotlib']);
+const LIB_CATEGORIES = new Set(['NumPy', 'Pandas', 'Matplotlib', '실전']);
 const WRITE = process.argv.includes('--write');
 
 const pyDir = join(ROOT, 'public', 'pyodide');
@@ -76,6 +76,10 @@ async function run(code, problem) {
   // Fresh namespace per run, stricter than the app's shared globals: a
   // solution can't pass on a variable left over from the previous problem.
   const ns = py.globals.get('dict')();
+  // Same 10 s guard as the app, so a hanging solution fails instead of
+  // hanging this script.
+  const guarded = !/numpy|np\.|pandas|pd\.|matplotlib|plt\./.test(code);
+  if (guarded) py.globals.get('_pq_guard_start')(rt.RUN_GUARD_SECONDS);
   try {
     await py.runPythonAsync(code, { globals: ns });
     if (problem.testRunnerCode === 'stdout_match') {
@@ -88,8 +92,10 @@ async function run(code, problem) {
     if (i === -1) return { error: '테스트 출력 표식 없음', stdout: all };
     return { outputs: JSON.parse(all.slice(i + '###TEST_OUT###'.length).trim()) };
   } catch (e) {
-    return { error: String(e.message || e).split('\n').slice(-2).join(' ') };
+    const msg = String(e.message || e);
+    return { error: msg.includes(rt.TIMEOUT_MARKER) ? '시간 초과(10초)' : msg.split('\n').slice(-2).join(' ') };
   } finally {
+    if (guarded) py.globals.get('_pq_guard_stop')();
     ns.destroy();
   }
 }
@@ -132,6 +138,42 @@ for (const p of lib) {
   console.log(`✓ ${p.id}`);
 }
 
+// Efficiency tests (perfTests): the reference must pass them, and a
+// correct-but-slow solution -- one per problem, below -- must pass every
+// correctness test yet fail on time. Otherwise the efficiency test isn't
+// measuring anything.
+const SLOW = JSON.parse(await readFile(join(ROOT, 'scripts', 'perf-slow-solutions.json'), 'utf8'));
+async function runPerf(code, problem) {
+  lines = [];
+  const ns = py.globals.get('dict')();
+  try {
+    await py.runPythonAsync(code, { globals: ns });
+    ns.set('_pq_perf_calls', py.toPy(problem.perfTests));
+    ns.set('_pq_reference', solutionCode[problem.id]);
+    await py.runPythonAsync(rt.PERF_HARNESS, { globals: ns });
+    const all = lines.join('\n');
+    const i = all.indexOf('###PERF_OUT###');
+    return i === -1 ? null : JSON.parse(all.slice(i + '###PERF_OUT###'.length).trim());
+  } finally {
+    ns.destroy();
+  }
+}
+if (!WRITE) {
+  for (const p of lib.filter((q) => q.perfTests?.length)) {
+    const ref = await runPerf(solutionCode[p.id], p);
+    const refOk = ref && ref.every((r) => r.status === 'ok');
+    const slowSrc = SLOW[p.id];
+    if (!slowSrc) { failed++; console.log(`✗ ${p.id}: 느린 풀이(perf-slow-solutions.json)가 없음`); continue; }
+    const slowCorrect = await run(slowSrc, p);
+    const slowPassesCorrectness = !slowCorrect.error && p.testCases.every((t, i) => norm(slowCorrect.outputs[i] ?? '', p.testRunnerCode) === norm(decodeAnswer(t.expected), p.testRunnerCode));
+    const slow = await runPerf(slowSrc, p);
+    const slowFails = slow && slow.some((r) => r.status !== 'ok');
+    const ok = refOk && slowPassesCorrectness && slowFails;
+    if (!ok) failed++;
+    console.log(`${ok ? '✓' : '✗'} ${p.id}: 효율성 — 정답 ${ref?.map((r) => `${r.status} ${r.ms}ms/${r.limitMs}ms`).join(', ')} · 느린 풀이 정확성 ${slowPassesCorrectness ? '통과' : '실패'}, 효율성 ${slow?.map((r) => `${r.status} ${r.ms}ms`).join(', ')}`);
+  }
+}
+
 // Realistic mistakes, each one edit away from the reference solution. A
 // check loose enough to accept one of these is a check that isn't checking.
 const WRONG = [
@@ -166,12 +208,17 @@ if (WRITE && fills.size) {
     let block = src.slice(start, end);
     // Example shown to students: the stdout itself, or the check values.
     const p = lib.find((q) => q.id === id);
-    const example = p.testRunnerCode === 'stdout_match'
+    const example = p.testRunnerCode !== 'figure_check'
       ? outputs[0]
       : p.testCases.map((t, i) => `${t.input.split('|')[0].replace(/`/g, '')}: ${outputs[i]}`).join('\n');
     block = block.replace('"output": "__FILL__"', `"output": ${JSON.stringify(example)}`);
+    // By test-case position: only some cases may be "__FILL__" (a case
+    // added to an existing problem), so the n-th expected gets outputs[n].
     let i = 0;
-    block = block.replace(/"expected": "__FILL__"/g, () => `"expected": "${b64(outputs[i++])}"`);
+    block = block.replace(/"expected": "([^"]*)"/g, (m, v) => {
+      const k = i++;
+      return v === '__FILL__' ? `"expected": "${b64(outputs[k])}"` : m;
+    });
     src = src.slice(0, start) + block + src.slice(end);
   }
   await writeFile(path, src);

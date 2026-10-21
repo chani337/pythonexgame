@@ -125,6 +125,16 @@ describe('문제 데이터 — type 별 필수 필드', () => {
     expect(bad).toEqual([]);
   });
 
+  it('perfTests: 정답 코드가 있고, solution(...) 호출이다', () => {
+    // The efficiency harness times the reference solution as the baseline;
+    // without one there is nothing to grade against.
+    const bad = problems
+      .filter((p) => p.perfTests?.length)
+      .filter((p) => !solutionCode[p.id] || p.perfTests!.some((c) => !c.startsWith('solution(')))
+      .map((p) => p.id);
+    expect(bad).toEqual([]);
+  });
+
   it('webChecks 는 html/css 문제에만 있다', () => {
     const bad = problems.filter((p) => p.webChecks && !isWeb(p)).map((p) => p.id);
     expect(bad).toEqual([]);

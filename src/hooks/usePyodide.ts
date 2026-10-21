@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import {
   PY_RUNTIME_SETUP, PY_BEFORE_RUN, PY_COLLECT_FIGURES, PY_FONT_SETUP, FIGURE_CHECK_HARNESS,
-  KOREAN_FONT_URL, KOREAN_FONT_PATH, needsMatplotlib, writeDatasets,
+  KOREAN_FONT_URL, KOREAN_FONT_PATH, needsMatplotlib, writeDatasets, PERF_HARNESS,
+  RUN_GUARD_SECONDS, TIMEOUT_MARKER, TIMEOUT_MESSAGE,
 } from '../lib/pythonRuntime';
 
 declare global {
@@ -133,6 +134,7 @@ export const __bootPyodideForTests = bootPyodide;
 const loadedPackages = new Set<string>();
 // Per Pyodide instance (there is only ever one per page).
 let runtimeReady = false;
+const MAX_OUTPUT_LINES = 2000;
 let koreanFontState: 'none' | 'loaded' | 'failed' = 'none';
 
 export interface TestResult {
@@ -140,6 +142,14 @@ export interface TestResult {
   expected: string;
   actual: string;
   passed: boolean;
+  /** Set on efficiency-test results (see PERF_HARNESS). */
+  perf?: { status: 'ok' | 'wrong' | 'timeout' | 'error'; ms: number; limitMs: number };
+}
+
+/** Large-input timed calls, graded against the reference solution. */
+export interface PerfSpec {
+  calls: string[];
+  reference: string;
 }
 
 export interface RunResponse {
@@ -250,28 +260,67 @@ export function usePyodide(enabled: boolean = true) {
     }
   };
 
+  const runPerf = async (py: any, spec: PerfSpec, lines: string[]): Promise<TestResult[]> => {
+    setStatus('효율성 테스트를 실행하는 중입니다... (큰 입력으로 시간을 잽니다)');
+    const from = lines.length;
+    try {
+      py.globals.set('_pq_perf_calls', py.toPy(spec.calls));
+      py.globals.set('_pq_reference', spec.reference);
+      await py.runPythonAsync(PERF_HARNESS);
+      const out = lines.slice(from).join('\n');
+      const i = out.indexOf('###PERF_OUT###');
+      const rows: { status: 'ok' | 'wrong' | 'timeout' | 'error'; ms: number; limitMs: number; expected: string; actual: string }[] =
+        i === -1 ? [] : JSON.parse(out.slice(i + '###PERF_OUT###'.length).trim());
+      return rows.map((r, n) => ({
+        input: `효율성 테스트 ${n + 1}`,
+        expected: r.expected,
+        actual: r.actual,
+        passed: r.status === 'ok',
+        perf: { status: r.status, ms: r.ms, limitMs: r.limitMs },
+      }));
+    } finally {
+      lines.length = from;
+      try {
+        py.globals.delete('_pq_perf_calls');
+        py.globals.delete('_pq_reference');
+      } catch {
+        // already gone
+      }
+      setStatus(null);
+    }
+  };
+
   const runCode = async (
     code: string,
     testCases?: { input: string; expected: string }[],
-    testRunnerCode?: string
+    testRunnerCode?: string,
+    perfSpec?: PerfSpec
   ): Promise<RunResponse> => {
     if (!pyodide) {
       return { success: false, stdout: '', error: '파이썬 엔진이 아직 준비되지 않았습니다.' };
     }
 
     const stdoutLines: string[] = [];
+    let usesLibraries = true;
 
     // Redirect stdout/stderr in pyodide
-    pyodide.setStdout({
-      batched: (msg: string) => {
+    // Capped: `while True: print(i)` runs until the 10 s guard and can emit
+    // hundreds of thousands of lines, and rendering them froze the page
+    // after the guard had already stopped Python. The harness markers and
+    // the JSON line after each are always kept, so grading still works.
+    let dropped = 0;
+    let keepNext = false;
+    const collect = (msg: string) => {
+      if (stdoutLines.length < MAX_OUTPUT_LINES || keepNext || msg.startsWith('###')) {
+        keepNext = msg.startsWith('###');
         stdoutLines.push(msg);
-      },
-    });
-    pyodide.setStderr({
-      batched: (msg: string) => {
-        stdoutLines.push(msg);
-      },
-    });
+      } else {
+        if (dropped === 0) stdoutLines.push(`… 출력이 너무 많아 ${MAX_OUTPUT_LINES.toLocaleString()}줄 이후는 생략했어요.`);
+        dropped++;
+      }
+    };
+    pyodide.setStdout({ batched: collect });
+    pyodide.setStderr({ batched: collect });
 
     try {
       // Normalize mobile smart quotes, apostrophes, and non-breaking spaces
@@ -313,6 +362,11 @@ export function usePyodide(enabled: boolean = true) {
         await ensureKoreanFont(pyodide);
       }
       await pyodide.runPythonAsync(PY_BEFORE_RUN);
+      usesLibraries =
+        normalizedCode.includes('numpy') || normalizedCode.includes('np.') ||
+        normalizedCode.includes('pandas') || normalizedCode.includes('pd.') ||
+        needsMatplotlib(normalizedCode);
+      if (!usesLibraries) pyodide.runPython(`_pq_guard_start(${RUN_GUARD_SECONDS})`);
 
       // Clear python globals cache (except builtins) to avoid state pollution between runs
       await pyodide.runPythonAsync(`
@@ -408,6 +462,20 @@ import sys
 
       const allPassed = testResults.every((tr) => tr.passed);
 
+      // Efficiency tests only once every correctness test passes -- a wrong
+      // answer that is also fast tells the student nothing new, and the
+      // large inputs make the run noticeably longer.
+      if (allPassed && perfSpec && perfSpec.calls.length > 0) {
+        if (!usesLibraries) pyodide.runPython('_pq_guard_stop()');
+        const perfResults = await runPerf(pyodide, perfSpec, stdoutLines);
+        return {
+          success: perfResults.every((r) => r.passed),
+          stdout: userStdout,
+          images,
+          testResults: [...testResults, ...perfResults],
+        };
+      }
+
       return {
         success: allPassed,
         stdout: userStdout,
@@ -415,11 +483,20 @@ import sys
         testResults,
       };
     } catch (err: any) {
+      const message = String(err?.message || err);
       return {
         success: false,
         stdout: stdoutLines.join('\n'),
-        error: err.message || String(err),
+        error: message.includes(TIMEOUT_MARKER) ? TIMEOUT_MESSAGE : message,
       };
+    } finally {
+      if (!usesLibraries) {
+        try {
+          pyodide.runPython('_pq_guard_stop()');
+        } catch {
+          // runtime not set up (failed before PY_RUNTIME_SETUP)
+        }
+      }
     }
   };
 

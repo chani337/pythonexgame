@@ -10,7 +10,7 @@ import { explainError } from '../utils/explainError';
 import { runWebChecks } from '../utils/webChecks';
 import { testLabel } from '../lib/pythonRuntime';
 import { pyDatasetById } from '../data/pyDatasets';
-import type { RunResponse, TestResult } from '../hooks/usePyodide';
+import type { RunResponse, TestResult, PerfSpec } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
 import confetti from 'canvas-confetti';
 import CodeEditor from './CodeEditor';
@@ -24,7 +24,7 @@ interface ProblemWorkspaceProps {
   onBack: () => void;
   onNextProblem?: () => void;
   onPrevProblem?: () => void;
-  runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
+  runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string, perf?: PerfSpec) => Promise<RunResponse>;
   runJsCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
   runSqlCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
   isPyodideLoading: boolean;
@@ -232,7 +232,12 @@ export default function ProblemWorkspace({
           ...tc,
           expected: decodeAnswer(tc.expected),
         }));
-        res = await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
+        const perfSpec = problem.perfTests?.length && solutionCode[problem.id]
+          ? { calls: problem.perfTests, reference: solutionCode[problem.id] }
+          : undefined;
+        res = perfSpec
+          ? await runPythonCode(codeToExecute, decodedTestCases, problem.testRunnerCode, perfSpec)
+          : await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
       }
       // Only present when the SQL runner handled this problem.
       setSqlTables((res as { tables?: SqlResultTable[] }).tables ?? null);
@@ -285,7 +290,9 @@ export default function ProblemWorkspace({
   // code. Once the problem is already solved, re-running is redundant, so
   // the same shortcut instead advances to the next problem.
   // The expected-vs-actual table needs more room than the 240px console.
-  const showsComparison = !hasLabelledChecks && problem.type === 'coding' && testResults.some((r) => !r.passed);
+  const correctnessResults = testResults.filter((r) => !r.perf);
+  const perfResults = testResults.filter((r) => r.perf);
+  const showsComparison = !hasLabelledChecks && problem.type === 'coding' && (correctnessResults.some((r) => !r.passed) || perfResults.length > 0);
 
   const handleEditorShortcut = () => {
     if (workspaceSuccess && onNextProblem) {
@@ -1068,7 +1075,7 @@ export default function ProblemWorkspace({
                   paddingTop: '0.5rem',
                 }}
               >
-                {testResults.map((tr, i) => (
+                {correctnessResults.map((tr, i) => (
                   <div
                     key={i}
                     style={{
@@ -1095,10 +1102,55 @@ export default function ProblemWorkspace({
               </div>
             )}
 
+            {/* 효율성 테스트: shown once correctness passed (they only run
+                then), with the time against the device-relative limit. */}
+            {perfResults.length > 0 && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem' }}>
+                <span style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-secondary)' }}>효율성 테스트</span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '0.4rem', fontSize: '0.72rem' }}>
+                  {perfResults.map((tr, i) => {
+                    const p = tr.perf!;
+                    const label =
+                      p.status === 'ok' ? `통과 (${p.ms.toLocaleString()}ms)` :
+                      p.status === 'timeout' ? `시간 초과 (${(p.limitMs / 1000).toFixed(1)}초 넘음)` :
+                      p.status === 'wrong' ? '결과가 틀림' : '실행 오류';
+                    return (
+                      <div key={i} style={{ background: tr.passed ? '#f4fbf7' : '#fff5f5', border: tr.passed ? '1px solid #1a1a1a' : '1px solid #cf222e', padding: '0.35rem 0.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                        <div>
+                          <span style={{ color: 'var(--text-muted)', display: 'block', fontSize: '0.65rem' }}>효율성 {i + 1}</span>
+                          <span style={{ fontWeight: '700', color: '#1a1a1a' }}>{label}</span>
+                        </div>
+                        {tr.passed ? <CheckCircle size={13} style={{ color: '#1a1a1a' }} /> : <XCircle size={13} style={{ color: '#cf222e' }} />}
+                      </div>
+                    );
+                  })}
+                </div>
+                {perfResults.some((r) => r.perf?.status === 'timeout') && (
+                  <div style={{ fontSize: '0.76rem', color: '#1a1a1a', lineHeight: 1.55, padding: '0.6rem 0.8rem', background: '#fffbeb', border: '1px solid #fde68a' }}>
+                    정답은 맞지만 입력이 커지면 너무 느려요. 반복문 안에서 리스트를 처음부터 다시 훑거나(<code>in</code>, <code>count</code>, 슬라이싱), 이중 반복문을 쓰고 있지 않은지 확인해 보세요. 딕셔너리·집합으로 바꾸거나 한 번 훑으면서 계산하는 방법을 생각해 보세요.
+                  </div>
+                )}
+                {perfResults.some((r) => r.perf?.status === 'error') && (
+                  <div style={{ fontSize: '0.76rem', color: '#1a1a1a', lineHeight: 1.55 }}>
+                    큰 입력에서 오류가 났어요: <code>{perfResults.find((r) => r.perf?.status === 'error')?.actual}</code>
+                    {perfResults.some((r) => r.perf?.status === 'error' && /RecursionError/.test(r.actual)) && ' — 재귀가 너무 깊어요. 반복문으로 바꿔 보세요.'}
+                  </div>
+                )}
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-muted)' }}>
+                  시간 제한은 이 기기에서 잰 기준 풀이 시간의 30배예요 (최소 1초, 최대 5초).
+                </span>
+              </div>
+            )}
+            {!!problem.perfTests?.length && correctnessResults.length > 0 && perfResults.length === 0 && (
+              <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                정확성 테스트를 모두 통과하면 효율성 테스트(큰 입력, 시간 제한)를 실행해요.
+              </span>
+            )}
+
             {/* Where a failed output-graded run went wrong. Labelled checks
                 (web, plots) already say which condition failed. */}
-            {!hasLabelledChecks && problem.type === 'coding' && testResults.length > 0 && (
-              <OutputComparison results={testResults} />
+            {!hasLabelledChecks && problem.type === 'coding' && correctnessResults.length > 0 && (
+              <OutputComparison results={correctnessResults} />
             )}
 
             {(solutionExplanations[problem.id] || solutionCode[problem.id]) && (

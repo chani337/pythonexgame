@@ -1,0 +1,10 @@
+{
+ "prac_1": "def solution(names):\n    answer = []\n    for name in names:\n        if name not in answer:\n            answer.append(name)\n    return answer\n",
+ "prac_2": "def solution(orders):\n    best = None\n    best_count = 0\n    for menu in set(orders):\n        c = 0\n        for o in orders:\n            if o == menu:\n                c += 1\n        if c > best_count or (c == best_count and menu < best):\n            best, best_count = menu, c\n    return best\n",
+ "prac_3": "def solution(visitors, k):\n    best = 0\n    for i in range(len(visitors) - k + 1):\n        best = max(best, sum(visitors[i:i + k]))\n    return best\n",
+ "prac_4": "def solution(s):\n    while '()' in s or '[]' in s or '{}' in s:\n        s = s.replace('()', '').replace('[]', '').replace('{}', '')\n    return s == ''\n",
+ "prac_5": "def solution(meetings):\n    chosen = []\n    for start, end in sorted(meetings, key=lambda m: m[1]):\n        if all(start >= e or end <= s for s, e in chosen):\n            chosen.append((start, end))\n    return len(chosen)\n",
+ "prac_6": "def solution(maze):\n    rows, cols = len(maze), len(maze[0])\n    best = [-1]\n    seen = set()\n    def go(r, c, steps):\n        if (r, c) == (rows - 1, cols - 1):\n            if best[0] == -1 or steps < best[0]:\n                best[0] = steps\n            return\n        for dr, dc in ((1, 0), (0, 1), (-1, 0), (0, -1)):\n            nr, nc = r + dr, c + dc\n            if 0 <= nr < rows and 0 <= nc < cols and maze[nr][nc] == '.' and (nr, nc) not in seen:\n                seen.add((nr, nc))\n                go(nr, nc, steps + 1)\n                seen.remove((nr, nc))\n    seen.add((0, 0))\n    go(0, 0, 0)\n    return best[0]\n",
+ "prac_7": "def solution(temps):\n    answer = []\n    for i in range(len(temps)):\n        wait = 0\n        for j in range(i + 1, len(temps)):\n            if temps[j] > temps[i]:\n                wait = j - i\n                break\n        answer.append(wait)\n    return answer\n",
+ "prac_8": "def solution(n):\n    if n <= 2:\n        return n\n    return (solution(n - 1) + solution(n - 2)) % 1_000_000_007\n"
+}

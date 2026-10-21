@@ -1,6 +1,6 @@
 -- GENERATED FILE -- do not edit by hand.
 -- Regenerate with: npm run sync:problems
--- Source: src/data/problems.ts (448 problems)
+-- Source: src/data/problems.ts (456 problems)
 --
 -- Seeds/refreshes public.problems, the reference table that
 -- user_solved_problems.problem_id is validated against. Safe to re-run: it
@@ -466,7 +466,15 @@ WITH incoming (id, language, difficulty, type) AS (
   ('css_quiz_1', 'css', 'basic', 'quiz'),
   ('css_fill_1', 'css', 'intermediate', 'fill'),
   ('css_fill_2', 'css', 'intermediate', 'fill'),
-  ('css_quiz_2', 'css', 'intermediate', 'quiz')
+  ('css_quiz_2', 'css', 'intermediate', 'quiz'),
+  ('prac_1', 'algorithm', 'intermediate', 'coding'),
+  ('prac_2', 'algorithm', 'intermediate', 'coding'),
+  ('prac_3', 'algorithm', 'intermediate', 'coding'),
+  ('prac_4', 'algorithm', 'advanced', 'coding'),
+  ('prac_5', 'algorithm', 'advanced', 'coding'),
+  ('prac_6', 'algorithm', 'advanced', 'coding'),
+  ('prac_7', 'algorithm', 'expert', 'coding'),
+  ('prac_8', 'algorithm', 'expert', 'coding')
 ),
 upserted AS (
   INSERT INTO public.problems (id, language, difficulty, type)
