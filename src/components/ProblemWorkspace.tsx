@@ -16,6 +16,7 @@ import confetti from 'canvas-confetti';
 import CodeEditor from './CodeEditor';
 import type { EditorLanguage } from './CodeEditor';
 import WebPreview from './WebPreview';
+import OutputComparison from './OutputComparison';
 import type { WebPreviewHandle } from './WebPreview';
 
 interface ProblemWorkspaceProps {
@@ -283,6 +284,9 @@ export default function ProblemWorkspace({
   // Ctrl/Cmd+Enter and Shift+Enter inside the editor normally (re-)run the
   // code. Once the problem is already solved, re-running is redundant, so
   // the same shortcut instead advances to the next problem.
+  // The expected-vs-actual table needs more room than the 240px console.
+  const showsComparison = !hasLabelledChecks && problem.type === 'coding' && testResults.some((r) => !r.passed);
+
   const handleEditorShortcut = () => {
     if (workspaceSuccess && onNextProblem) {
       onNextProblem();
@@ -913,7 +917,7 @@ export default function ProblemWorkspace({
           )}
 
           {/* Test Case Outputs & Web Console */}
-          <div className="terminal-frame" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', minHeight: '120px', maxHeight: plotImages.length > 0 ? '640px' : '240px', flexShrink: 0, overflowY: 'auto' }}>
+          <div className="terminal-frame" style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', minHeight: '120px', maxHeight: plotImages.length > 0 ? '640px' : showsComparison ? '480px' : '240px', flexShrink: 0, overflowY: 'auto' }}>
             <span style={{ fontSize: '0.8rem', fontWeight: '700', color: 'var(--text-secondary)', letterSpacing: '0.05em' }}>실행 콘솔 & 테스트 검증 결과</span>
             
             {/* Terminal Panel */}
@@ -1089,6 +1093,12 @@ export default function ProblemWorkspace({
                   </div>
                 ))}
               </div>
+            )}
+
+            {/* Where a failed output-graded run went wrong. Labelled checks
+                (web, plots) already say which condition failed. */}
+            {!hasLabelledChecks && problem.type === 'coding' && testResults.length > 0 && (
+              <OutputComparison results={testResults} />
             )}
 
             {(solutionExplanations[problem.id] || solutionCode[problem.id]) && (

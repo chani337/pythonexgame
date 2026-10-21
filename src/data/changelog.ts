@@ -8,6 +8,16 @@ export interface ChangelogEntry {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-21',
+    title: '틀렸을 때 어디가 다른지 알려 드려요',
+    items: [
+      '지금까지는 답이 틀리면 "TEST 1 FAIL"만 나와서 왜 틀렸는지 직접 찾아야 했어요. 이제 기대 출력과 내 출력을 나란히 보여 주고, 처음 달라지는 줄을 표시해요.',
+      '흔한 실수는 원인까지 짚어 드려요. 88과 88.0처럼 정수·실수 표시가 다를 때, 따옴표까지 출력됐을 때, 띄어쓰기·대소문자가 다를 때, 줄이 모자라거나 남을 때가 그래요.',
+      'SQL은 조회한 열이 다르면 "기대: name, dept / 내 결과: name, age"처럼, 행 개수가 다르면 몇 행 차이인지 알려 드려요.',
+      '함수를 만드는 알고리즘 문제는 틀린 입력마다 기대 결과와 내 결과를 보여 드려요.',
+    ],
+  },
+  {
     date: '2026-10-10',
     title: 'NumPy · Pandas · Matplotlib 문제가 생겼어요 — 실제 데이터 파일로 연습해요',
     items: [
