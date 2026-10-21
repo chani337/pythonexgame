@@ -433,9 +433,10 @@ export default function Sandbox({
                 value={code}
                 onChange={setCode}
                 language="python"
-                placeholder="여기에 파이썬 코드를 직접 타이핑하여 작성해 보세요..."
+                placeholder="여기에 파이썬 코드를 작성해 보세요..."
                 disabled={isPyodideLoading}
                 onSubmitShortcut={handleRun}
+                pastePolicy="allow"
               />
             </div>
 
