@@ -555,7 +555,7 @@ print("변환 리스트:", result)
             />
           )
         ) : currentView === 'changelog' ? (
-          <Changelog />
+          <Changelog onSelectProblem={handleSelectProblem} />
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center' }}>404 Not Found</div>
         )}

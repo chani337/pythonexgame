@@ -12,6 +12,7 @@ import type { Problem, ProblemLanguage } from '../src/data/problems';
 import { decodeAnswer } from '../src/utils/answerObfuscation';
 import { solutionCode } from '../src/data/solutionCode';
 import { PY_DATASETS } from '../src/data/pyDatasets';
+import { changelogEntries, recentProblemIds } from '../src/data/changelog';
 
 const LANGUAGES: ProblemLanguage[] = ['python', 'sql', 'java', 'js', 'algorithm', 'c', 'html', 'css'];
 const DIFFICULTIES = ['basic', 'intermediate', 'advanced', 'expert'] as const;
@@ -133,6 +134,19 @@ describe('문제 데이터 — type 별 필수 필드', () => {
       .filter((p) => !solutionCode[p.id] || p.perfTests!.some((c) => !c.startsWith('solution(')))
       .map((p) => p.id);
     expect(bad).toEqual([]);
+  });
+
+  it('업데이트 항목의 problemIds 가 실제 문제다', () => {
+    const ids = new Set(problems.map((p) => p.id));
+    const bad = changelogEntries.flatMap((e) => (e.problemIds ?? []).filter((id) => !ids.has(id)));
+    expect(bad).toEqual([]);
+  });
+
+  it('NEW 표시는 업데이트 날짜로부터 정해진 기간만', () => {
+    // Pinned dates, not "today": the 10-21 release's 8 problems are new on
+    // 10-22 and gone a month later.
+    expect(recentProblemIds(new Date('2026-10-22T12:00:00')).has('prac_1')).toBe(true);
+    expect(recentProblemIds(new Date('2026-11-30T12:00:00')).size).toBe(0);
   });
 
   it('webChecks 는 html/css 문제에만 있다', () => {

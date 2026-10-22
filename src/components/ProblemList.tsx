@@ -1,7 +1,8 @@
-import { useLayoutEffect, useEffect, useState } from 'react';
-import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle, ArrowUp, Star } from 'lucide-react';
+import { useLayoutEffect, useEffect, useMemo, useState } from 'react';
+import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle, ArrowUp, Star, Sparkles } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { filterProblems } from '../data/problems';
+import { recentProblemIds, NEW_BADGE_DAYS } from '../data/changelog';
 
 interface ProblemListProps {
   problems: Problem[];
@@ -63,6 +64,9 @@ export default function ProblemList({
 
   // 오답노트: 별표 표시했거나 틀렸던 문제만 보기 (다른 필터와 함께 적용됨)
   const [reviewOnly, setReviewOnly] = useState(false);
+  // 새 문제: added in a release within NEW_BADGE_DAYS (src/data/changelog.ts).
+  const recentIds = useMemo(() => recentProblemIds(), []);
+  const [newOnly, setNewOnly] = useState(false);
 
   // Filter logic (shared with App.tsx's next/prev navigation via filterProblems)
   const filteredProblems = filterProblems(problems, {
@@ -70,7 +74,9 @@ export default function ProblemList({
     difficulty: selectedDifficulty,
     type: selectedType,
     search: searchQuery,
-  }).filter((p) => !reviewOnly || reviewIds.includes(p.id));
+  })
+    .filter((p) => !reviewOnly || reviewIds.includes(p.id))
+    .filter((p) => !newOnly || recentIds.has(p.id));
 
   // Rendering all ~230 problem cards at once is what actually makes switching
   // to this tab slow (measured ~650ms of main-thread blocking on a throttled
@@ -255,6 +261,30 @@ export default function ProblemList({
             <Star size={14} fill={reviewOnly ? '#e8a90c' : 'none'} />
             오답노트 {reviewIds.length > 0 && `(${reviewIds.length})`}
           </button>
+          {recentIds.size > 0 && (
+            <button
+              onClick={() => setNewOnly((prev) => !prev)}
+              title={`최근 ${NEW_BADGE_DAYS}일 안에 추가된 문제만 보기`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.35rem',
+                padding: '0.4rem 0.85rem',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                borderRadius: '0px',
+                border: '1px solid',
+                borderColor: newOnly ? '#1a1a1a' : 'var(--border-subtle)',
+                cursor: 'pointer',
+                background: newOnly ? '#1a1a1a' : '#f4f4f6',
+                color: newOnly ? '#ffffff' : 'var(--text-secondary)',
+                transition: 'all 0.2s ease',
+              }}
+            >
+              <Sparkles size={14} />
+              새 문제 ({recentIds.size})
+            </button>
+          )}
         </div>
 
         {/* Right Side: Search Input */}
@@ -396,8 +426,13 @@ export default function ProblemList({
                     >
                       {langInfo.text}
                     </span>
+                    {recentIds.has(problem.id) && (
+                      <span style={{ fontSize: '0.62rem', fontWeight: 800, color: '#ffffff', background: '#cf222e', padding: '0.15rem 0.4rem', letterSpacing: '0.06em' }}>
+                        NEW
+                      </span>
+                    )}
                     <span className={`badge badge-${problem.difficulty}`}>
-                      {problem.difficulty === 'basic' ? '기초' : problem.difficulty === 'intermediate' ? '중급' : '고급'}
+                      {problem.difficulty === 'basic' ? '기초' : problem.difficulty === 'intermediate' ? '중급' : problem.difficulty === 'advanced' ? '고급' : '챌린지'}
                     </span>
                     <span style={{ fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: '600' }}>
                       {problem.category}
@@ -505,7 +540,9 @@ export default function ProblemList({
             borderRadius: '0px',
           }}
         >
-          {reviewOnly
+          {newOnly && !reviewOnly
+            ? '조건에 맞는 새 문제가 없습니다. 언어·난이도 필터를 확인해 보세요.'
+            : reviewOnly
             ? '오답노트가 비어있습니다. 문제를 풀다가 틀리면 자동으로 추가되거나, ⭐ 버튼으로 직접 표시할 수 있어요.'
             : '검색 및 필터 조건에 부합하는 문제가 없습니다.'}
         </div>

@@ -2,6 +2,23 @@ export interface ChangelogEntry {
   date: string; // YYYY-MM-DD
   title: string;
   items: string[];
+  // Problems this release added. The 업데이트 page lists them as links, and
+  // the problem list marks them NEW for a while (see recentProblemIds).
+  problemIds?: string[];
+}
+
+// How long a problem added in a release keeps its NEW badge.
+export const NEW_BADGE_DAYS = 14;
+
+/** Problem ids added within the last NEW_BADGE_DAYS, from changelog entries. */
+export function recentProblemIds(now: Date = new Date()): Set<string> {
+  const cutoff = now.getTime() - NEW_BADGE_DAYS * 24 * 60 * 60 * 1000;
+  const ids = new Set<string>();
+  for (const entry of changelogEntries) {
+    if (!entry.problemIds || new Date(entry.date).getTime() < cutoff) continue;
+    entry.problemIds.forEach((id) => ids.add(id));
+  }
+  return ids;
 }
 
 // Newest first. Ship this alongside the release that made the change --
@@ -16,6 +33,7 @@ export const changelogEntries: ChangelogEntry[] = [
       '시간 제한은 지금 쓰는 컴퓨터에서 기준 풀이를 먼저 돌려 보고 정해요. 학교의 느린 컴퓨터라고 해서 불리하지 않아요.',
       '끝나지 않는 반복문을 실행하면 화면이 멈춰 버리던 문제를 고쳤어요. 이제 10초가 지나면 자동으로 멈추고 이유를 알려 드려요.',
     ],
+    problemIds: ["prac_1", "prac_2", "prac_3", "prac_4", "prac_5", "prac_6", "prac_7", "prac_8"],
   },
   {
     date: '2026-10-21',
@@ -38,6 +56,7 @@ export const changelogEntries: ChangelogEntry[] = [
       '그래프 문제는 그려진 그래프 자체를 검사해서 채점해요. 막대 개수, 값, 제목, 범례처럼 어떤 조건을 통과했고 무엇이 다른지 하나씩 알려 드려요.',
       'Pandas 문제를 처음 실행할 때 정답을 써도 틀렸다고 나오던 문제를 고쳤어요. pandas가 처음 한 번 내보내는 안내 문구가 출력에 섞여 들어가던 것이 원인이었어요.',
     ],
+    problemIds: ["np_b1", "np_b2", "np_b3", "np_b4", "np_i1", "np_i2", "np_i3", "np_a1", "np_a2", "np_e1", "np_e2", "pd_b1", "pd_b2", "pd_b3", "pd_b4", "pd_i1", "pd_i2", "pd_i3", "pd_i4", "pd_a1", "pd_a2", "pd_a3", "pd_e1", "pd_e2", "plt_b1", "plt_b2", "plt_b3", "plt_i1", "plt_i2", "plt_i3", "plt_a1", "plt_a2", "plt_e1"],
   },
   {
     date: '2026-10-08',
@@ -48,6 +67,7 @@ export const changelogEntries: ChangelogEntry[] = [
       '채점은 완성된 화면을 직접 검사해요. red, #f00, rgb(255, 0, 0)처럼 다르게 써도 같은 색이면 정답이고, 틀리면 어느 조건이 지금 어떤 값인지 알려 드려요.',
       '미리보기 안에서는 스크립트가 실행되지 않아서, 어떤 코드를 넣어도 사이트나 계정에 영향을 줄 수 없어요.',
     ],
+    problemIds: ["html_q1", "html_q3", "html_q4", "html_q2", "html_q5", "html_q6", "html_q7", "html_q8", "html_q9", "html_q10", "html_q11", "html_q12", "html_q13", "html_q14", "html_quiz_1", "html_fill_1", "html_fill_2", "html_quiz_2", "css_q1", "css_q17", "css_q3", "css_q4", "css_q5", "css_q6", "css_q7", "css_q8", "css_q2", "css_q10", "css_q11", "css_q12", "css_q13", "css_q14", "css_q15", "css_q16", "css_quiz_1", "css_fill_1", "css_fill_2", "css_quiz_2"],
   },
   {
     date: '2026-10-08',
