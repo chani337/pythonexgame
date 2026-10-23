@@ -53,6 +53,10 @@ jobs:
       - name: SQL runner
         run: npm run verify:sql
 
+      # Every runnable example in the SQL guide, on the same engine and seed.
+      - name: SQL guide examples
+        run: npm run verify:sql-guide
+
       # HTML/CSS grading needs a real cascade, so this runs in the runner's
       # preinstalled Chrome under the production CSP: reference solutions
       # pass, starter code fails, and nothing in the preview can run script.

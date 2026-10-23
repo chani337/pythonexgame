@@ -231,186 +231,890 @@ export const docChapters: DocChapter[] = [
       }
     ]
   },
-  // SQL Chapters (14 Comprehensive Professional & SQLD Certification Chapters)
+  // SQL Chapters: written for beginners -- each opens with the situation
+  // the feature is for, and every example cell runs on the SQL runner
+  // (DocsViewer routes category 'sql' to useSqlRunner) against the same
+  // users/orders seed as the SQL problems. Oracle-only syntax is shown in
+  // markdown with a note, not in runnable cells.
   {
-    id: "SQL_1_SELECT",
-    filename: "SQL 1. SELECT & FROM 기초 구문",
-    title: "SQL 1. SELECT & FROM 기초 구문",
-    category: "sql",
-    cells: [
+    "id": "SQL_1_SELECT",
+    "filename": "SQL 1. 보고 싶은 열만 꺼내기 — SELECT",
+    "title": "SQL 1. 보고 싶은 열만 꺼내기 — SELECT",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_1_SELECT_cell_0",
-        type: "markdown",
-        content: "# SQL 1. SELECT & FROM 기초 구문\n\n## 1. 데이터베이스와 SQL 개요\n\n데이터베이스(Database)는 데이터를 규칙적으로 저장하고 관리하는 데이터 집합체입니다.\n관계형 데이터베이스(RDBMS)에서는 데이터를 2차원 표 형태인 테이블(Table)로 관리합니다.\n\n- **행 (Row / Record)**: 데이터 한 개(엔티티)를 나타내는 가로 줄입니다.\n- **열 (Column / Field)**: 데이터의 속성 및 항목을 구분하는 세로 줄입니다.\n\n| id | name | age | score | dept |\n|---|---|---|---|---|\n| 1 | 김철수 | 20 | 90 | 개발팀 |\n| 2 | 이영희 | 25 | 85 | 기획팀 |\n\nSQL(Structured Query Language)은 데이터베이스에 접근하여 데이터를 조회, 생성, 수정, 삭제하기 위한 표준 언어입니다.\n\n---\n\n## 2. SELECT & FROM 기본 구문\n\n데이터베이스에서 데이터를 조회할 때 `SELECT`와 `FROM` 키워드를 사용합니다.\n\n```sql\nSELECT 컬럼명1, 컬럼명2\nFROM   테이블명;\n```\n\n- `SELECT`: 조회하고자 하는 열(Column) 이름을 지정합니다.\n- `FROM`: 조회의 대상이 되는 테이블(Table) 이름을 지정합니다.\n\n### 모든 열 조회 (`SELECT *`)\n\n테이블 내의 전체 열을 조회하려면 `*` (애스터리스크) 기호를 사용합니다.\n\n```sql\nSELECT * FROM users;\n```\n\n---\n\n## 3. 특정 열 선택 조회 및 산술 연산자\n\n필요한 열만 조회하는 경우 쉼표(`,`)로 구분하여 명시합니다. 또한 열 이름에 산술 연산자(`+`, `-`, `*`, `/`)를 사용하여 가공된 값을 조회할 수 있습니다.\n\n```sql\nSELECT name, score, score + 5 AS 보정점수 FROM users;\n```\n\n---\n\n## 4. 열 별칭 지정 (`AS` 키워드)\n\n조회 결과의 열 이름을 변경하여 출력하려면 `AS` 키워드를 사용합니다. 별칭에 공백이 포함된 경우 따옴표로 감싸야 합니다.\n\n```sql\nSELECT name AS 사용자이름, score AS 파이썬점수 FROM users;\n```\n\n---\n\n## 5. 중복 제거 (`DISTINCT` 키워드)\n\n특정 열에서 중복된 값을 제외하고 유일한 데이터 목록만 추출할 때 `DISTINCT`를 사용합니다.\n\n```sql\nSELECT DISTINCT dept FROM users;\n```\n\n---\n\n## 6. SQL 실행 순서 (Logical Query Processing Order)\n\nSQL은 우리가 작성하는 순서(`SELECT` → `FROM` → `WHERE`)가 아니라, 다음과 같은 **논리적 처리 순서**로 실행됩니다.\n\n```text\nFROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY\n```\n\n이 순서를 알아야 하는 이유는 다음과 같습니다.\n\n- `WHERE` 절이 실행되는 시점에는 아직 `SELECT`가 처리되지 않았기 때문에, `SELECT`에서 `AS`로 지정한 별칭(Alias)을 `WHERE`에서는 사용할 수 없습니다.\n- 반면 `ORDER BY`는 `SELECT` 이후 가장 마지막에 처리되므로, `SELECT`에서 지정한 별칭을 사용할 수 있습니다.\n\n```sql\n-- 오류: WHERE 절에서는 SELECT의 별칭을 사용할 수 없음\nSELECT score + 5 AS 보정점수 FROM users WHERE 보정점수 >= 90;\n\n-- 정상: ORDER BY 절에서는 별칭 사용 가능\nSELECT score + 5 AS 보정점수 FROM users ORDER BY 보정점수 DESC;\n```\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nSELECT id, name AS 사용자이름, dept AS 부서명, score AS 점수 FROM users;\n```"
+        "id": "SQL_1_SELECT_cell_0",
+        "type": "markdown",
+        "content": "# SQL 1. 보고 싶은 열만 꺼내기 — SELECT\n\n## 이럴 때 써요\n\n- \"회원 명단에서 **이름하고 점수만** 보고 싶어요.\"\n- \"우리 회사에 **어떤 부서들이** 있지?\"\n\n데이터베이스는 엑셀 파일, **테이블**은 그 안의 시트 하나라고 생각하면 돼요. 가로 한 줄(**행**)이 회원 한 명, 세로 한 칸(**열**)이 이름·나이 같은 항목이에요.\n\n이 가이드에서는 표 두 개로 연습해요.\n\n**users** (회원)\n\n| id | name | age | score | dept |\n|---|---|---|---|---|\n| 1 | 김철수 | 20 | 90 | 개발팀 |\n| 2 | 이영희 | 25 | 85 | 기획팀 |\n| 3 | 박민수 | 22 | 100 | 개발팀 |\n| 4 | 최수민 | 28 | 70 | 디자인팀 |\n| 5 | 정찬희 | 24 | 95 | 개발팀 |\n\n**orders** (주문) — `user_id`가 users의 `id`를 가리켜요\n\n| order_id | user_id | product | price |\n|---|---|---|---|\n| 101 | 1 | 노트북 | 1500000 |\n| 102 | 1 | 마우스 | 30000 |\n| 103 | 3 | 키보드 | 120000 |\n| 104 | 5 | 모니터 | 450000 |\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 전부 보기 — `SELECT *`\n\n`SELECT` 뒤에는 **보고 싶은 열**, `FROM` 뒤에는 **어느 표에서**를 써요. `*`는 \"모든 열\"이라는 뜻이에요."
+      },
+      {
+        "id": "SQL_1_SELECT_cell_1",
+        "type": "code",
+        "content": "SELECT * FROM users;"
+      },
+      {
+        "id": "SQL_1_SELECT_cell_2",
+        "type": "markdown",
+        "content": "## 2. 필요한 열만 보기\n\n열 이름을 쉼표로 나열하면 그 열만, 그 순서대로 나와요."
+      },
+      {
+        "id": "SQL_1_SELECT_cell_3",
+        "type": "code",
+        "content": "SELECT name, score FROM users;"
+      },
+      {
+        "id": "SQL_1_SELECT_cell_4",
+        "type": "markdown",
+        "content": "**왜 `*` 대신 열을 골라 쓰나요?**\n연습할 때는 `*`가 편하지만, 실제 서비스의 표는 열이 수십 개이고 행이 수백만 개예요. 필요 없는 열까지 가져오면 느려지고, 나중에 표에 열이 추가되면 결과 모양이 바뀌어서 프로그램이 깨질 수 있어요. 그래서 실무에서는 **필요한 열만 적는 습관**을 들여요.\n\n## 3. 계산해서 보여 주기 — `AS`로 이름 붙이기\n\n\"모두에게 5점씩 보너스를 주면 몇 점일까?\" 원본 점수를 바꾸지 않고, **보여 줄 때만** 계산할 수 있어요. 계산한 열에는 `AS`로 알아보기 쉬운 이름을 붙여요."
+      },
+      {
+        "id": "SQL_1_SELECT_cell_5",
+        "type": "code",
+        "content": "SELECT name, score, score + 5 AS 보정점수 FROM users;"
+      },
+      {
+        "id": "SQL_1_SELECT_cell_6",
+        "type": "markdown",
+        "content": "`AS`를 안 붙이면 열 이름이 `score + 5` 그대로 나와서 읽기 불편해요.\n\n## 4. 중복 없이 종류만 — `DISTINCT`\n\n\"어떤 부서들이 있지?\"라고 할 때 `SELECT dept`만 하면 개발팀이 세 번 나와요. `DISTINCT`를 붙이면 **종류만 한 번씩** 보여 줘요."
+      },
+      {
+        "id": "SQL_1_SELECT_cell_7",
+        "type": "code",
+        "content": "SELECT DISTINCT dept FROM users;"
+      },
+      {
+        "id": "SQL_1_SELECT_cell_8",
+        "type": "markdown",
+        "content": "## 자주 하는 실수\n\n**쉼표를 빠뜨리면 오류 대신 이상한 결과가 나와요.**"
+      },
+      {
+        "id": "SQL_1_SELECT_cell_9",
+        "type": "code",
+        "content": "SELECT name score FROM users;"
+      },
+      {
+        "id": "SQL_1_SELECT_cell_10",
+        "type": "markdown",
+        "content": "`name, score`라고 써야 하는데 쉼표를 빠뜨리면, SQL은 `score`를 `name` 열의 **별명(AS 생략)**으로 받아들여요. 그래서 오류 없이 \"score라는 이름의 열에 사람 이름\"이 나와요. 결과 열 이름이 이상하면 쉼표부터 확인하세요.\n\n## 정리\n\n| 하고 싶은 것 | 쓰는 것 |\n|---|---|\n| 모든 열 보기 | `SELECT *` |\n| 몇 개 열만 | `SELECT 열1, 열2` |\n| 계산한 값에 이름 붙이기 | `score + 5 AS 보정점수` |\n| 종류만 한 번씩 | `SELECT DISTINCT dept` |"
       }
     ]
   },
   {
-    id: "SQL_2_WHERE",
-    filename: "SQL 2. WHERE 조건절 & 데이터 필터링",
-    title: "SQL 2. WHERE 조건절 & 데이터 필터링",
-    category: "sql",
-    cells: [
+    "id": "SQL_2_WHERE",
+    "filename": "SQL 2. 조건에 맞는 행만 — WHERE",
+    "title": "SQL 2. 조건에 맞는 행만 — WHERE",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_2_WHERE_cell_0",
-        type: "markdown",
-        content: "# SQL 2. WHERE 조건절 & 데이터 필터링\n\n## 1. WHERE 절 개요\n\n`users` 테이블에서 특정 조건에 부합하는 데이터 행만 추출할 때 `WHERE` 절을 사용합니다.\n\n```sql\nSELECT 컬럼명\nFROM   테이블명\nWHERE  조건식;\n```\n\n---\n\n## 2. 비교 연산자 및 데이터 타입 규칙\n\n### 비교 연산자\n| 연산자 | 의미 | 사용 예시 |\n|---|---|---|\n| `=` | 같다 | `score = 90` |\n| `!=` 또는 `<>` | 같지 않다 | `dept != '기획팀'` |\n| `>` / `<` | 크다 / 작다 | `score > 80` |\n| `>=` / `<=` | 크거나 같다 / 작거나 같다 | `score >= 90` |\n\n### 데이터 타입 표기 규칙\n- **숫자형**: 따옴표 없이 수치만 작성합니다 (`score >= 90`).\n- **문자형**: 따옴표(`' '`)로 값을 감싸서 작성합니다 (`dept = '개발팀'`).\n\n---\n\n## 3. 다중 조건 조합 (`AND`, `OR`, `NOT`)\n\n- `AND`: 제시된 조건을 모두 만족하는 데이터만 조회합니다.\n- `OR`: 제시된 조건 중 하나 이상을 만족하는 데이터를 조회합니다.\n- `NOT`: 조건의 결과를 부정합니다.\n\n```sql\nSELECT name, dept, score\nFROM   users\nWHERE  dept = '개발팀' AND score >= 90;\n```\n\n---\n\n## 4. 범위 및 목록 필터링 (`BETWEEN`, `IN`)\n\n### BETWEEN A AND B\n특정 범위 내의 데이터를 조회합니다 (이상/이하 포함).\n\n```sql\nSELECT name, score FROM users WHERE score BETWEEN 80 AND 95;\n```\n\n### IN (값1, 값2, ...)\n지정한 목록 중 일치하는 데이터가 존재하는지 확인합니다.\n\n```sql\nSELECT name, dept FROM users WHERE dept IN ('개발팀', '디자인팀');\n```\n\n---\n\n## 5. 와일드카드 패턴 검색 (`LIKE`)\n\n문자열의 특정 패턴을 검색할 때 `LIKE`와 와일드카드 기호(`%`, `_`)를 사용합니다.\n\n- `%`: 0개 이상의 임의의 문자열\n- `_`: 임의의 단일 문자\n\n```sql\nSELECT * FROM users WHERE name LIKE '김%';\n```\n\n---\n\n## 6. NULL 값 확인 (`IS NULL` / `IS NOT NULL`)\n\n`NULL`은 값이 존재하지 않는 상태를 의미하며, `=`나 `!=` 같은 일반 비교 연산자로는 비교할 수 없습니다. `NULL`을 판별할 때는 반드시 `IS NULL` / `IS NOT NULL`을 사용해야 합니다.\n\n```sql\n-- 잘못된 예: 결과가 항상 없음 (UNKNOWN 처리됨)\nSELECT * FROM users WHERE dept = NULL;\n\n-- 올바른 예\nSELECT * FROM users WHERE dept IS NULL;\nSELECT * FROM users WHERE dept IS NOT NULL;\n```\n\n### NOT과 함께 사용하는 조건 (`NOT IN`, `NOT BETWEEN`, `NOT LIKE`)\n\n```sql\nSELECT name, dept FROM users WHERE dept NOT IN ('개발팀', '디자인팀');\nSELECT name, score FROM users WHERE score NOT BETWEEN 80 AND 95;\nSELECT * FROM users WHERE name NOT LIKE '김%';\n```\n\n> 주의: `NOT IN` 목록 안에 `NULL`이 하나라도 포함되어 있으면, 비교 결과가 `UNKNOWN`이 되어 **조회 결과가 아예 없어질 수 있습니다.**\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nSELECT name, dept, score FROM users WHERE score >= 85 AND dept = '개발팀';\n```"
+        "id": "SQL_2_WHERE_cell_0",
+        "type": "markdown",
+        "content": "# SQL 2. 조건에 맞는 행만 — WHERE\n\n## 이럴 때 써요\n\n- \"**개발팀** 사람만 보여 주세요.\"\n- \"점수가 **90점 이상**인 사람은?\"\n- \"**김씨**는 누구누구야?\"\n\n`SELECT`가 **열**을 고른다면, `WHERE`는 **행**을 골라요. 조건이 참인 줄만 남겨요.\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 같은 값 찾기\n\n문자는 **작은따옴표**로 감싸요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_1",
+        "type": "code",
+        "content": "SELECT name, dept FROM users WHERE dept = '개발팀';"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_2",
+        "type": "markdown",
+        "content": "**왜 따옴표가 필요할까요?** 따옴표가 없으면 SQL은 `개발팀`을 **열 이름**으로 생각해요. 그런 열이 없으니 오류가 나요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_3",
+        "type": "code",
+        "content": "SELECT name FROM users WHERE dept = 개발팀;"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_4",
+        "type": "markdown",
+        "content": "숫자는 따옴표 없이 써요. 비교 기호는 `=`, `!=`(또는 `<>`), `>`, `<`, `>=`, `<=`예요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_5",
+        "type": "code",
+        "content": "SELECT name, score FROM users WHERE score >= 90;"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_6",
+        "type": "markdown",
+        "content": "## 2. 조건 여러 개 — `AND`, `OR`\n\n- `AND`: 둘 다 맞아야 (개발팀**이면서** 95점 이상)\n- `OR`: 하나만 맞아도 (개발팀**이거나** 기획팀)"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_7",
+        "type": "code",
+        "content": "SELECT name, dept, score FROM users WHERE dept = '개발팀' AND score >= 95;"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_8",
+        "type": "markdown",
+        "content": "**`AND`와 `OR`를 섞을 때는 괄호를 꼭 치세요.** `AND`가 먼저 계산되기 때문에, 괄호가 없으면 뜻이 바뀌어요.\n\n\"개발팀이나 기획팀 중에서 95점 이상\"을 원했는데 괄호 없이 쓰면 이렇게 돼요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_9",
+        "type": "code",
+        "content": "-- 괄호 없음: 개발팀 전원 + (기획팀이면서 95점 이상)\nSELECT name, dept, score FROM users\nWHERE dept = '개발팀' OR dept = '기획팀' AND score >= 95;\n\n-- 괄호 있음: (개발팀 또는 기획팀) 중에서 95점 이상\nSELECT name, dept, score FROM users\nWHERE (dept = '개발팀' OR dept = '기획팀') AND score >= 95;"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_10",
+        "type": "markdown",
+        "content": "위는 3명, 아래는 2명이 나와요. 첫 번째는 90점인 김철수도 들어가 버렸어요.\n\n## 3. 여러 값 중 하나 — `IN`\n\n`OR`를 여러 번 쓰는 대신 목록으로 써요. 읽기 훨씬 쉬워요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_11",
+        "type": "code",
+        "content": "SELECT name, dept FROM users WHERE dept IN ('개발팀', '디자인팀');"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_12",
+        "type": "markdown",
+        "content": "## 4. 범위 — `BETWEEN`\n\n\"80점부터 95점까지\". 양쪽 끝(80, 95)도 **포함**해요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_13",
+        "type": "code",
+        "content": "SELECT name, score FROM users WHERE score BETWEEN 80 AND 95;"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_14",
+        "type": "markdown",
+        "content": "## 5. 글자 일부로 찾기 — `LIKE`\n\n- `%`: 아무 글자 몇 개든 (0개도 됨)\n- `_`: 아무 글자 딱 하나\n\n`'김%'`는 \"김으로 시작\", `'%수'`는 \"수로 끝남\", `'%민%'`은 \"민이 들어감\"이에요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_15",
+        "type": "code",
+        "content": "SELECT name FROM users WHERE name LIKE '김%';\nSELECT name FROM users WHERE name LIKE '%수';"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_16",
+        "type": "markdown",
+        "content": "## 6. 조건에 따라 다른 값 보여 주기 — `CASE WHEN`\n\n`WHERE`는 줄을 **걸러 내지만**, 줄은 다 두고 **조건에 따라 표시만 바꾸고** 싶을 때가 있어요. \"90점 이상이면 우수, 아니면 보통\"처럼요."
+      },
+      {
+        "id": "SQL_2_WHERE_cell_17",
+        "type": "code",
+        "content": "SELECT name, score,\n       CASE\n         WHEN score >= 90 THEN '우수'\n         WHEN score >= 80 THEN '보통'\n         ELSE '노력'\n       END AS 등급\nFROM users;"
+      },
+      {
+        "id": "SQL_2_WHERE_cell_18",
+        "type": "markdown",
+        "content": "위에서부터 차례로 검사해서 **처음 맞는 것**을 써요. 그래서 100점은 `>= 90`에서 바로 '우수'가 되고, 아래 조건은 보지 않아요.\n\n## 자주 하는 실수\n\n| 실수 | 결과 | 고치기 |\n|---|---|---|\n| `dept = 개발팀` | 오류 (열 이름으로 착각) | `dept = '개발팀'` |\n| `AND`·`OR` 섞고 괄호 없음 | 생각과 다른 사람이 나옴 | `OR` 쪽을 괄호로 묶기 |\n| 빈 값 찾기에 `= NULL` | 아무것도 안 나옴 | 4장에서 배우는 `IS NULL` |"
       }
     ]
   },
   {
-    id: "SQL_3_SELECT_NULL",
-    filename: "SQL 3. NULL의 특성 및 치환 함수",
-    title: "SQL 3. NULL의 특성 및 치환 함수",
-    category: "sql",
-    cells: [
+    "id": "SQL_4_ORDER_BY",
+    "filename": "SQL 3. 순서 정하고 몇 개만 — ORDER BY, LIMIT",
+    "title": "SQL 3. 순서 정하고 몇 개만 — ORDER BY, LIMIT",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_3_SELECT_NULL_cell_0",
-        type: "markdown",
-        content: "# SQL 3. NULL의 특성 및 치환 함수\n\n## 1. SELECT 구문 기초\n\n```sql\nSELECT [DISTINCT] 컬럼명 [AS 별칭]\nFROM   테이블명\nWHERE  조건식\nORDER BY 정렬컬럼 [ASC|DESC];\n```\n\n---\n\n## 2. NULL의 연산 특성\n\n데이터베이스에서 `NULL` 관련 연산은 매우 중요한 특성을 가지고 있습니다.\n\n1. **산술 연산**: `NULL`이 포함된 모든 산술 연산 결과는 `NULL`입니다 (`NULL + 10 = NULL`).\n2. **비교 연산**: `NULL`과의 비교 연산은 `UNKNOWN` 상태가 되므로 `=` 연산자가 아닌 `IS NULL` 또는 `IS NOT NULL`을 사용해야 합니다.\n3. **정렬 순서**: Oracle에서는 `NULL`을 가장 큰 값으로 처리(오름차순 시 맨 뒤), MySQL/SQLite에서는 가장 작은 값으로 처리(오름차순 시 맨 앞)합니다.\n\n---\n\n## 3. NULL 치환 함수\n\n- **COALESCE(val1, val2, ...)**: 나열된 인자 중 첫 번째로 `NULL`이 아닌 값을 반환합니다 (표준 SQL).\n- **NVL(val1, val2)**: `val1`이 `NULL`이면 `val2`를 반환합니다 (Oracle).\n- **IFNULL(val1, val2)**: `val1`이 `NULL`이면 `val2`를 반환합니다 (MySQL / SQLite).\n\n---\n\n## 4. NULLIF 함수\n\n`NULLIF(val1, val2)`는 두 값이 같으면 `NULL`을, 다르면 `val1`을 반환합니다. 0으로 나누기 오류를 방지하는 등 특정 값을 의도적으로 `NULL` 처리할 때 사용합니다.\n\n```sql\n-- score가 0이면 NULL로 처리한 뒤 나눗셈 (0으로 나누기 오류 방지)\nSELECT name, 100 / NULLIF(score, 0) AS 환산값 FROM users;\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT name, score, COALESCE(score, 0) AS 치환점수 FROM users;\n```"
+        "id": "SQL_4_ORDER_BY_cell_0",
+        "type": "markdown",
+        "content": "# SQL 3. 순서 정하고 몇 개만 — ORDER BY, LIMIT\n\n## 이럴 때 써요\n\n- \"점수 **높은 순으로** 보여 주세요.\"\n- \"**상위 3명**만 보고 싶어요.\"\n- \"게시판 **2페이지**(11~20번째 글)를 보여 주세요.\"\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 정렬 — `ORDER BY`\n\n`ASC`는 작은 것부터(기본값이라 생략 가능), `DESC`는 큰 것부터예요."
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_1",
+        "type": "code",
+        "content": "SELECT name, score FROM users ORDER BY score DESC;"
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_2",
+        "type": "markdown",
+        "content": "**정렬 안 하면 어떤 순서로 나와요?** \"아무 순서\"예요. 지금은 넣은 순서로 나오는 것처럼 보여도, 데이터가 많아지거나 DB가 바뀌면 달라질 수 있어요. **순서가 중요하면 항상 `ORDER BY`를 쓰세요.**\n\n## 2. 기준을 두 개 이상\n\n\"부서별로 모아서, 같은 부서 안에서는 점수 높은 순\". 첫 번째 기준이 같을 때만 두 번째 기준을 봐요."
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_3",
+        "type": "code",
+        "content": "SELECT name, dept, score FROM users ORDER BY dept, score DESC;"
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_4",
+        "type": "markdown",
+        "content": "## 3. 몇 개만 — `LIMIT`\n\n\"상위 3명\" = **점수 높은 순으로 정렬한 뒤** 3개만 자르기예요."
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_5",
+        "type": "code",
+        "content": "SELECT name, score FROM users ORDER BY score DESC LIMIT 3;"
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_6",
+        "type": "markdown",
+        "content": "**`ORDER BY` 없이 `LIMIT`만 쓰면** 그냥 \"아무거나 3개\"예요. 상위가 아니에요.\n\n## 4. 건너뛰고 가져오기 — `OFFSET` (페이지 나누기)\n\n`OFFSET 2`는 \"앞의 2개는 건너뛰고\". 한 페이지에 2명씩 보여 준다면 2페이지는 이렇게 가져와요."
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_7",
+        "type": "code",
+        "content": "SELECT name, score FROM users ORDER BY score DESC LIMIT 2 OFFSET 2;"
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_8",
+        "type": "markdown",
+        "content": "게시판이 이런 식이에요. N페이지는 `LIMIT 10 OFFSET (N-1)*10`.\n\n## 5. 거르고 → 정렬하고 → 자르기\n\nSQL은 쓰는 순서와 **실행되는 순서**가 달라요. `WHERE`로 먼저 거르고, 그다음 정렬하고, 마지막에 잘라요.\n\n```text\nFROM → WHERE → SELECT → ORDER BY → LIMIT\n```\n\n그래서 \"개발팀 중 상위 2명\"은 이렇게 한 번에 쓸 수 있어요."
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_9",
+        "type": "code",
+        "content": "SELECT name, score FROM users WHERE dept = '개발팀' ORDER BY score DESC LIMIT 2;"
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_10",
+        "type": "markdown",
+        "content": "## Oracle에서는\n\nOracle은 `LIMIT` 대신 `FETCH FIRST`를 써요. (이 사이트는 Oracle 표기를 바꿔서 실행해 줘서, 아래도 실행돼요.)"
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_11",
+        "type": "code",
+        "content": "SELECT name, score FROM users ORDER BY score DESC FETCH FIRST 3 ROWS ONLY;"
+      },
+      {
+        "id": "SQL_4_ORDER_BY_cell_12",
+        "type": "markdown",
+        "content": "## 정리\n\n| 하고 싶은 것 | 쓰는 것 |\n|---|---|\n| 큰 것부터 | `ORDER BY 열 DESC` |\n| 기준 두 개 | `ORDER BY 열1, 열2 DESC` |\n| 상위 N개 | `ORDER BY ... LIMIT N` (정렬 먼저!) |\n| N페이지 | `LIMIT 개수 OFFSET 건너뛸개수` |"
       }
     ]
   },
   {
-    id: "SQL_4_ORDER_BY",
-    filename: "SQL 4. ORDER BY 정렬 & LIMIT",
-    title: "SQL 4. ORDER BY 정렬 & LIMIT",
-    category: "sql",
-    cells: [
+    "id": "SQL_3_SELECT_NULL",
+    "filename": "SQL 4. 값이 비어 있을 때 — NULL 처리",
+    "title": "SQL 4. 값이 비어 있을 때 — NULL 처리",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_4_ORDER_BY_cell_0",
-        type: "markdown",
-        content: "# SQL 4. ORDER BY 정렬 & LIMIT\n\n## 1. ORDER BY 절 개요\n\n조회된 데이터의 출력 순서를 특정 열 기준으로 정렬할 때 `ORDER BY` 절을 사용합니다.\n\n```sql\nSELECT   컬럼명\nFROM     테이블명\nORDER BY 정렬기준_열 [ASC | DESC];\n```\n\n---\n\n## 2. 오름차순(ASC) 및 내림차순(DESC)\n\n- `ASC` (Ascending): 오름차순 정렬 (작은 값 → 큰 값, A → Z). 기본값입니다.\n- `DESC` (Descending): 내림차순 정렬 (큰 값 → 작은 값, Z → A).\n\n```sql\nSELECT name, score\nFROM   users\nORDER BY score DESC;\n```\n\n---\n\n## 3. 다중 열 기준 정렬\n\n1차 정렬 기준의 값이 동일할 경우, 2차 정렬 기준을 적용하여 데이터를 정렬합니다.\n\n```sql\nSELECT name, dept, score\nFROM   users\nORDER BY dept ASC, score DESC;\n```\n\n---\n\n## 4. 조회 결과 개수 제한 (`LIMIT`, `OFFSET`)\n\n출력되는 행의 최대 개수를 제한할 때 `LIMIT` 키워드를 사용하며, 건너뛸 행의 개수는 `OFFSET`으로 지정합니다.\n\n```sql\nSELECT name, score\nFROM   users\nORDER BY score DESC\nLIMIT 3 OFFSET 0;\n```\n\n---\n\n## 5. 열 위치 번호로 정렬하기\n\n`ORDER BY`에는 열 이름 대신 `SELECT`에 나열한 순서의 **위치 번호**를 사용할 수도 있습니다.\n\n```sql\n-- dept(1번째), score(3번째) 기준 정렬 (위 3번 예시와 동일)\nSELECT name, dept, score FROM users ORDER BY 2 ASC, 3 DESC;\n```\n\n---\n\n## 6. NULL 값의 정렬 위치 (`NULLS FIRST` / `NULLS LAST`)\n\nDBMS마다 `NULL`의 기본 정렬 위치가 다릅니다 (Oracle은 가장 큰 값 취급, MySQL/SQLite는 가장 작은 값 취급). 정렬 위치를 직접 지정하고 싶다면 `NULLS FIRST` / `NULLS LAST`를 사용합니다. (MySQL은 미지원 — `CASE WHEN 컬럼 IS NULL THEN 1 ELSE 0 END`으로 대체합니다.)\n\n```sql\nSELECT name, dept, score FROM users ORDER BY dept NULLS LAST;\n```\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nSELECT name, dept, score FROM users ORDER BY score DESC LIMIT 3;\n```"
+        "id": "SQL_3_SELECT_NULL_cell_0",
+        "type": "markdown",
+        "content": "# SQL 4. 값이 비어 있을 때 — NULL 처리\n\n## 이럴 때 알아야 해요\n\n신입 회원 한지민 씨는 아직 시험을 안 봐서 점수가 없고, 부서도 안 정해졌어요. 이걸 **0점**이라고 적으면 안 되겠죠. 0점을 받은 것과 **아직 모르는 것**은 다르니까요. 이렇게 \"값이 없음 / 모름\"을 나타내는 게 `NULL`이에요.\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n아래 예제들은 맨 앞에서 한지민 씨를 잠깐 추가하고 시작해요."
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_1",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, NULL, NULL);\nSELECT * FROM users;"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_2",
+        "type": "markdown",
+        "content": "## 1. NULL은 `=`로 찾을 수 없어요\n\n점수가 비어 있는 사람을 찾으려고 `score = NULL`이라고 쓰면 **아무도 안 나와요.**"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_3",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, NULL, NULL);\nSELECT name FROM users WHERE score = NULL;   -- 결과: 0명"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_4",
+        "type": "markdown",
+        "content": "같은 걸 `IS NULL`로 찾으면 나와요."
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_5",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, NULL, NULL);\nSELECT name FROM users WHERE score IS NULL;  -- 결과: 한지민"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_6",
+        "type": "markdown",
+        "content": "**왜 그럴까요?** NULL은 \"모름\"이에요. \"모르는 값이 모르는 값과 같은가?\"의 답도 \"모름\"이라서, 참이 아니니 걸러져요. 그래서 NULL은 **전용 문법 `IS NULL` / `IS NOT NULL`**로만 찾아요.\n\n## 2. 계산에 섞이면 결과도 NULL\n\n모르는 점수에 5점을 더하면? 역시 모르죠."
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_7",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, NULL, NULL);\nSELECT name, score, score + 5 AS 보정점수 FROM users;"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_8",
+        "type": "markdown",
+        "content": "## 3. 비어 있으면 다른 값으로 — `COALESCE`\n\n\"점수가 없으면 0으로 보여 주세요\". `COALESCE(값, 대신할 값)`은 앞의 값이 NULL이면 뒤의 값을 써요."
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_9",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, NULL, NULL);\nSELECT name, COALESCE(score, 0) AS 점수, COALESCE(dept, '미배정') AS 부서 FROM users;"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_10",
+        "type": "markdown",
+        "content": "같은 일을 하는 함수가 DB마다 이름이 달라요.\n\n| DB | 함수 |\n|---|---|\n| 어디서나 (표준) | `COALESCE(score, 0)` |\n| Oracle | `NVL(score, 0)` |\n| MySQL · SQLite | `IFNULL(score, 0)` |\n\n(이 사이트는 Oracle의 `NVL`도 바꿔서 실행해 줘요.)\n\n## 4. 평균과 개수에서 생기는 차이 — 중요해요\n\n`AVG`, `COUNT(열)` 같은 집계 함수는 **NULL을 빼고** 계산해요."
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_11",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, NULL, NULL);\nSELECT COUNT(*)           AS 전체인원,\n       COUNT(score)       AS 점수있는인원,\n       AVG(score)         AS 평균_NULL빼고,\n       AVG(COALESCE(score, 0)) AS 평균_0점으로\nFROM users;"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_12",
+        "type": "markdown",
+        "content": "- `COUNT(*)`는 **줄 수**(6명), `COUNT(score)`는 **점수가 있는 줄 수**(5명)\n- 평균은 88점과 73.3점으로 달라져요\n\n어느 쪽이 맞는지는 상황마다 달라요. \"시험 본 사람들의 평균\"이면 NULL을 빼는 게 맞고, \"안 본 사람은 0점 처리\"라는 규칙이 있으면 `COALESCE`로 채워야 해요. **NULL이 섞인 열을 집계할 때는 항상 한 번 생각해 보세요.**\n\n## 5. 정렬할 때 NULL의 자리\n\nDB마다 NULL을 맨 앞에 둘지 맨 뒤에 둘지가 달라요(Oracle은 뒤, MySQL·SQLite는 앞). 확실히 하고 싶으면 직접 정해요."
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_13",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, NULL, NULL);\nSELECT name, score FROM users ORDER BY score DESC NULLS LAST;"
+      },
+      {
+        "id": "SQL_3_SELECT_NULL_cell_14",
+        "type": "markdown",
+        "content": "## 정리\n\n| 하고 싶은 것 | 쓰는 것 |\n|---|---|\n| 빈 값 찾기 | `WHERE 열 IS NULL` (`= NULL` ❌) |\n| 빈 값 아닌 것 | `WHERE 열 IS NOT NULL` |\n| 비면 다른 값 | `COALESCE(열, 대신할값)` |\n| 정렬 위치 정하기 | `ORDER BY 열 NULLS LAST` |"
       }
     ]
   },
   {
-    id: "SQL_5_GROUP_BY",
-    filename: "SQL 5. 집계 함수 & GROUP BY / HAVING",
-    title: "SQL 5. 집계 함수 & GROUP BY / HAVING",
-    category: "sql",
-    cells: [
+    "id": "SQL_5_GROUP_BY",
+    "filename": "SQL 5. 묶어서 세기 — GROUP BY, HAVING",
+    "title": "SQL 5. 묶어서 세기 — GROUP BY, HAVING",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_5_GROUP_BY_cell_0",
-        type: "markdown",
-        content: "# SQL 5. 집계 함수 & GROUP BY / HAVING\n\n## 1. 집계 함수 (Aggregate Functions)\n\n여러 행의 데이터를 수집하여 단일 결과를 반환하는 집계 함수 목록입니다.\n\n| 함수 | 기능 | 예시 |\n|---|---|---|\n| `COUNT(*)` | 행의 총 개수 산출 | `SELECT COUNT(*) FROM users;` |\n| `SUM(score)` | 합계 계산 | `SELECT SUM(score) FROM users;` |\n| `AVG(score)` | 평균값 계산 | `SELECT AVG(score) FROM users;` |\n| `MAX(score)` | 최댓값 산출 | `SELECT MAX(score) FROM users;` |\n| `MIN(score)` | 최솟값 산출 | `SELECT MIN(score) FROM users;` |\n\n---\n\n## 2. 그룹화 (`GROUP BY` 절)\n\n특정 열의 동일한 값을 가진 데이터를 그룹으로 묶어 그룹별 집계를 수행합니다.\n\n```sql\nSELECT   dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수\nFROM     users\nGROUP BY dept;\n```\n\n---\n\n## 3. 그룹 집계 결과 필터링 (`HAVING` 절)\n\n- `WHERE`: 그룹화 전의 개별 행을 필터링합니다.\n- `HAVING`: `GROUP BY`를 통한 그룹 집계 결과를 필터링합니다.\n\n```sql\nSELECT   dept, AVG(score) AS 평균점수\nFROM     users\nGROUP BY dept\nHAVING   AVG(score) >= 85;\n```\n\n---\n\n## 4. GROUP BY의 중요한 규칙\n\n`SELECT` 절에는 `GROUP BY`에 명시한 열이나 **집계 함수로 감싼 열만** 사용할 수 있습니다. 그룹화 기준에 없는 일반 열을 그대로 조회하면 오류가 발생합니다.\n\n```sql\n-- 오류: age는 GROUP BY에도 없고 집계 함수로 감싸지도 않음\nSELECT dept, age, AVG(score) FROM users GROUP BY dept;\n\n-- 올바른 예: age를 집계하거나 GROUP BY에 포함시켜야 함\nSELECT dept, AVG(age), AVG(score) FROM users GROUP BY dept;\n```\n\n### 여러 열 기준으로 그룹화하기\n\n```sql\nSELECT   dept, age, COUNT(*) AS 인원수\nFROM     users\nGROUP BY dept, age;\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 FROM users GROUP BY dept;\n```"
+        "id": "SQL_5_GROUP_BY_cell_0",
+        "type": "markdown",
+        "content": "# SQL 5. 묶어서 세기 — GROUP BY, HAVING\n\n## 이럴 때 써요\n\n- \"부서마다 **사람이 몇 명**이지?\"\n- \"어느 부서 **평균 점수**가 제일 높지?\"\n\n지금까지는 결과가 **한 줄씩** 나왔어요. 위 질문은 **여러 줄을 하나로 뭉쳐야** 답할 수 있어요.\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1단계: 전체를 하나로 뭉치기 — 집계 함수\n\n| 함수 | 뜻 |\n|---|---|\n| `COUNT(*)` | 몇 줄? |\n| `SUM(열)` | 합계 |\n| `AVG(열)` | 평균 |\n| `MAX(열)` / `MIN(열)` | 가장 큰 / 작은 값 |"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_1",
+        "type": "code",
+        "content": "SELECT COUNT(*) AS 인원, AVG(score) AS 평균, MAX(score) AS 최고점 FROM users;"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_2",
+        "type": "markdown",
+        "content": "다섯 줄이 **한 줄**로 뭉쳤어요.\n\n## 2단계: 부서별로 나눠서 뭉치기 — `GROUP BY`\n\n엑셀에서 부서별로 정렬해 놓고, 부서마다 따로 평균을 내는 것과 같아요."
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_3",
+        "type": "code",
+        "content": "SELECT dept, COUNT(*) AS 인원, AVG(score) AS 평균 FROM users GROUP BY dept;"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_4",
+        "type": "markdown",
+        "content": "## 3단계: 뭉친 결과를 걸러 내기 — `HAVING`\n\n\"평균이 80점 넘는 부서만 보고 싶어요.\" 이러면 `WHERE`가 먼저 떠오르는데, **`WHERE`로는 안 돼요.**"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_5",
+        "type": "code",
+        "content": "SELECT dept, AVG(score) AS 평균 FROM users GROUP BY dept HAVING AVG(score) > 80;"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_6",
+        "type": "markdown",
+        "content": "| | 거르는 시점 | 예 |\n|---|---|---|\n| `WHERE` | 뭉치기 **전**, 한 사람씩 | \"점수 90 넘는 **사람**만 모아서 부서별로\" |\n| `HAVING` | 뭉친 **후**, 부서 단위로 | \"부서 **평균**이 80 넘는 부서만\" |\n\n**왜 `WHERE`로는 안 될까요?** SQL은 이 순서로 실행돼요.\n\n```text\nFROM → WHERE → GROUP BY → HAVING → SELECT → ORDER BY\n```\n\n`WHERE`가 실행될 때는 아직 부서별로 묶지도 않았으니, **부서 평균이라는 값이 없어요.** 그래서 묶은 뒤의 값으로 거르는 `HAVING`이 따로 있어요.\n\n## 둘 다 쓰기\n\n\"90점 이상인 사람만 모아서, 그런 사람이 2명 이상인 부서\". 사람 단위 조건은 `WHERE`, 부서 단위 조건은 `HAVING`이에요."
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_7",
+        "type": "code",
+        "content": "SELECT dept, COUNT(*) AS 우수인원\nFROM users\nWHERE score >= 90\nGROUP BY dept\nHAVING COUNT(*) >= 2;"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_8",
+        "type": "markdown",
+        "content": "## 자주 하는 실수 — 묶었는데 개인 열을 같이 보기\n\n\"부서별 인원과 이름을 같이 보고 싶어요.\""
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_9",
+        "type": "code",
+        "content": "SELECT dept, name, COUNT(*) FROM users GROUP BY dept;"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_10",
+        "type": "markdown",
+        "content": "개발팀은 세 명이 한 줄로 뭉쳤는데, `name`에는 셋 중 **누구를** 보여 줘야 할까요? 정할 수가 없어요. 그래서 대부분의 DB(Oracle, PostgreSQL 등)는 **오류**를 내요.\n\n이 사이트의 SQLite는 오류 없이 **아무나 한 명**을 보여 줘서 위험해요. 맞는 것처럼 보이니까요. 뭉친 줄에는 **묶은 기준(dept)이나 뭉친 값(COUNT, AVG)만** 쓰세요. 이름 목록이 꼭 필요하면 `GROUP_CONCAT(name)`(Oracle은 `LISTAGG`)처럼 이름도 뭉쳐야 해요."
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_11",
+        "type": "code",
+        "content": "SELECT dept, COUNT(*) AS 인원, GROUP_CONCAT(name) AS 명단 FROM users GROUP BY dept;"
+      },
+      {
+        "id": "SQL_5_GROUP_BY_cell_12",
+        "type": "markdown",
+        "content": "## 정리\n\n| 질문 | 쓰는 것 |\n|---|---|\n| 전체 몇 명 / 평균 | `COUNT(*)`, `AVG(열)` |\n| ~별로 | `GROUP BY 기준열` |\n| 묶은 결과에 조건 | `HAVING 집계조건` |\n| 묶기 전 개인 조건 | `WHERE` |"
       }
     ]
   },
   {
-    id: "SQL_6_GROUP_FUNCTION",
-    filename: "SQL 6. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)",
-    title: "SQL 6. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)",
-    category: "sql",
-    cells: [
+    "id": "SQL_7_JOIN",
+    "filename": "SQL 6. 두 표를 이어 붙이기 — JOIN",
+    "title": "SQL 6. 두 표를 이어 붙이기 — JOIN",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_6_GROUP_FUNCTION_cell_0",
-        type: "markdown",
-        content: "# SQL 6. 그룹 함수 (ROLLUP, CUBE, GROUPING SETS)\n\n## 1. 소계/총계 그룹 함수 개요\n\n`GROUP BY` 절과 함께 사용되어 다차원 집계 소계(Subtotal) 및 총계(Grand Total) 데이터를 일괄 생성합니다.\n\n---\n\n## 2. ROLLUP vs CUBE vs GROUPING SETS\n\n- **`ROLLUP(A, B)`**: 계층 구조를 기반으로 집계를 수행합니다.\n  - 생성 집계 조합: `(A, B)`, `(A)`, `()` [총 N+1개 집계 조합 생성]\n- **`CUBE(A, B)`**: 가능한 모든 조합에 대해 집계를 수행합니다.\n  - 생성 집계 조합: `(A, B)`, `(A)`, `(B)`, `()` [총 2^N개 집계 조합 생성]\n- **`GROUPING SETS(A, B)`**: 지정된 독립적 집계 단위만 개별 생성합니다.\n  - 생성 집계 조합: `(A)`, `(B)`\n\n---\n\n## 3. 실제 SQL 문법\n\n```sql\n-- ROLLUP: (dept, name), (dept), () 순으로 소계 + 총계 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY ROLLUP(dept, name);\n\n-- CUBE: (dept, name), (dept), (name), () 모든 조합 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY CUBE(dept, name);\n\n-- GROUPING SETS: (dept), (name)만 개별적으로 생성\nSELECT dept, name, SUM(score)\nFROM   users\nGROUP BY GROUPING SETS((dept), (name));\n```\n\n---\n\n## 4. GROUPING 함수\n\n`GROUPING(컬럼)` 함수는 해당 행이 소계/총계를 위해 인위적으로 묶인 행인 경우 `1`을 반환하고, 일반 집계 행인 경우 `0`을 반환합니다. 소계/총계 행을 구분해서 표시할 때 유용합니다.\n\n```sql\nSELECT dept,\n       SUM(score) AS 합계,\n       GROUPING(dept) AS 총계여부\nFROM   users\nGROUP BY ROLLUP(dept);\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT dept, COUNT(*) AS 인원수, AVG(score) AS 평균점수 FROM users GROUP BY ROLLUP(dept);\n```"
+        "id": "SQL_7_JOIN_cell_0",
+        "type": "markdown",
+        "content": "# SQL 6. 두 표를 이어 붙이기 — JOIN\n\n## 이럴 때 써요\n\norders 표에는 `user_id`가 **숫자로만** 들어 있어요. \"노트북은 **누가** 샀지?\"를 알려면 users 표에서 1번이 누구인지 찾아 **옆에 붙여야** 해요.\n\n## 왜 처음부터 한 표에 안 넣었을까요?\n\n주문표에 이름을 직접 적어 두면, 김철수 씨가 이름을 바꿀 때 **주문 기록을 전부** 고쳐야 해요. 하나라도 빠뜨리면 같은 사람이 두 이름으로 남아요. 그래서 회원 정보는 users에 **한 번만** 두고, 주문에는 **번호만** 적어서 필요할 때 이어 붙여요. 이게 관계형 데이터베이스의 기본 생각이에요. (14장에서 더 자세히 다뤄요.)\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 짝이 있는 것만 — `INNER JOIN`\n\n`ON` 뒤에 \"어떤 열끼리 같으면 짝인지\"를 써요. `u`, `o`는 표 이름을 짧게 부르는 **별명**이에요. 두 표에 같은 이름의 열이 있을 수 있어서, `u.name`처럼 어느 표의 열인지 밝혀 줘요."
+      },
+      {
+        "id": "SQL_7_JOIN_cell_1",
+        "type": "code",
+        "content": "SELECT u.name, o.product, o.price\nFROM users u\nINNER JOIN orders o ON u.id = o.user_id;"
+      },
+      {
+        "id": "SQL_7_JOIN_cell_2",
+        "type": "markdown",
+        "content": "주문이 4건이라 4줄이 나와요. 김철수 씨는 두 번 샀으니 두 줄이에요. **주문이 없는 이영희, 최수민 씨는 안 나와요.** 짝이 없으니까요.\n\n## 2. 한쪽은 전부 — `LEFT JOIN`\n\n\"**모든 회원**을 보여 주되, 주문이 있으면 옆에 붙여 주세요.\" 왼쪽 표(users)는 전부 남기고, 짝이 없으면 오른쪽을 NULL로 채워요."
+      },
+      {
+        "id": "SQL_7_JOIN_cell_3",
+        "type": "code",
+        "content": "SELECT u.name, o.product, o.price\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id;"
+      },
+      {
+        "id": "SQL_7_JOIN_cell_4",
+        "type": "markdown",
+        "content": "이걸 응용하면 \"**한 번도 주문 안 한 회원**\"을 찾을 수 있어요. 짝이 없어서 NULL이 된 줄만 고르면 돼요."
+      },
+      {
+        "id": "SQL_7_JOIN_cell_5",
+        "type": "code",
+        "content": "SELECT u.name\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nWHERE o.order_id IS NULL;"
+      },
+      {
+        "id": "SQL_7_JOIN_cell_6",
+        "type": "markdown",
+        "content": "## 3. JOIN + GROUP BY — 회원별 총 구매액\n\n실무에서 가장 많이 쓰는 조합이에요. 주문이 없는 사람도 0원으로 나오게 `LEFT JOIN`과 `COALESCE`를 같이 써요."
+      },
+      {
+        "id": "SQL_7_JOIN_cell_7",
+        "type": "code",
+        "content": "SELECT u.name, COUNT(o.order_id) AS 주문수, COALESCE(SUM(o.price), 0) AS 총구매액\nFROM users u\nLEFT JOIN orders o ON u.id = o.user_id\nGROUP BY u.id, u.name\nORDER BY 총구매액 DESC;"
+      },
+      {
+        "id": "SQL_7_JOIN_cell_8",
+        "type": "markdown",
+        "content": "`COUNT(*)`가 아니라 `COUNT(o.order_id)`를 쓴 이유: 주문이 없는 사람도 LEFT JOIN 때문에 한 줄은 있어서 `COUNT(*)`는 1이 나와요. 주문 번호(NULL은 안 셈)를 세야 0이 나와요.\n\n## 4. 다른 JOIN들\n\n| JOIN | 남기는 것 | 언제 |\n|---|---|---|\n| `INNER JOIN` | 양쪽 다 짝이 있는 것 | 가장 흔함 |\n| `LEFT JOIN` | 왼쪽 전부 + 짝 | \"~가 없는 것도 포함\", \"~가 없는 것 찾기\" |\n| `RIGHT JOIN` | 오른쪽 전부 + 짝 | 표 순서만 바꾼 LEFT JOIN이라 잘 안 씀 |\n| `FULL OUTER JOIN` | 양쪽 전부 | 두 목록 대조할 때 |\n| `CROSS JOIN` | 모든 조합 | 사이즈×색상 같은 조합표 만들 때 |\n\n## 자주 하는 실수 — `ON`을 빠뜨리기\n\n조건 없이 두 표를 붙이면 **모든 조합**이 나와요. 회원 5명 × 주문 4건 = 20줄이에요. 행 수가 갑자기 많아지면 조인 조건부터 확인하세요."
+      },
+      {
+        "id": "SQL_7_JOIN_cell_9",
+        "type": "code",
+        "content": "SELECT u.name, o.product FROM users u CROSS JOIN orders o;"
+      },
+      {
+        "id": "SQL_7_JOIN_cell_10",
+        "type": "markdown",
+        "content": "## 옛날 방식과 Oracle 표기\n\n`JOIN`이라는 단어가 생기기 전에는 `FROM`에 표를 나열하고 `WHERE`에 조건을 썼어요. 결과는 같지만, 조건을 빠뜨리면 위처럼 20줄이 되는 실수를 하기 쉬워서 요즘은 `JOIN`을 써요."
+      },
+      {
+        "id": "SQL_7_JOIN_cell_11",
+        "type": "code",
+        "content": "SELECT u.name, o.product\nFROM users u, orders o\nWHERE u.id = o.user_id;"
+      },
+      {
+        "id": "SQL_7_JOIN_cell_12",
+        "type": "markdown",
+        "content": "Oracle은 LEFT JOIN을 `(+)`로도 써요. 데이터가 없어도 되는 쪽(여기서는 orders)에 `(+)`를 붙여요. 이 사이트는 이 표기도 바꿔서 실행해 줘요."
+      },
+      {
+        "id": "SQL_7_JOIN_cell_13",
+        "type": "code",
+        "content": "SELECT u.name, o.product\nFROM users u, orders o\nWHERE u.id = o.user_id(+);"
       }
     ]
   },
   {
-    id: "SQL_7_JOIN",
-    filename: "SQL 7. JOIN 다중 테이블 조인",
-    title: "SQL 7. JOIN 다중 테이블 조인",
-    category: "sql",
-    cells: [
+    "id": "SQL_8_SUBQUERY",
+    "filename": "SQL 7. 쿼리 안에 쿼리 — 서브쿼리",
+    "title": "SQL 7. 쿼리 안에 쿼리 — 서브쿼리",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_7_JOIN_cell_0",
-        type: "markdown",
-        content: "# SQL 7. JOIN 다중 테이블 조인\n\n## 1. 조인(JOIN) 개요\n\n관계형 데이터베이스에서 서로 연관된 복수의 테이블을 공통 키(Key) 기준으로 결합하여 단일 결과 집합으로 조회하는 구문입니다.\n\n---\n\n## 2. INNER JOIN (내부 조인)\n\n두 테이블 모두 조인 조건에 일치하는 데이터가 존재하는 행만 결합하여 출력합니다.\n\n```sql\nSELECT u.name AS 사용자이름, u.dept AS 부서, o.product AS 구매상품, o.price AS 가격\nFROM   users u\nINNER JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 3. LEFT JOIN (왼쪽 외부 조인)\n\n선행(왼쪽) 테이블의 데이터를 유지하고, 일치하는 후행(오른쪽) 테이블 데이터를 결합합니다. 일치하는 데이터가 없으면 `NULL`을 매핑합니다.\n\n```sql\nSELECT u.name, o.product, o.price\nFROM   users u\nLEFT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 4. RIGHT JOIN (오른쪽 외부 조인)\n\n후행(오른쪽) 테이블의 데이터를 모두 유지하고, 일치하는 선행(왼쪽) 테이블 데이터를 결합합니다. 일치하는 데이터가 없으면 `NULL`을 매핑합니다. `LEFT JOIN`에서 두 테이블의 순서만 바꾸면 동일한 결과를 얻을 수 있습니다.\n\n```sql\nSELECT u.name, o.product, o.price\nFROM   users u\nRIGHT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 5. FULL OUTER JOIN (완전 외부 조인)\n\n두 테이블 중 어느 한쪽에만 데이터가 존재해도 모두 결합하여 출력합니다. 일치하지 않는 쪽은 `NULL`로 채워집니다. (MySQL/SQLite는 `FULL OUTER JOIN`을 직접 지원하지 않아 `UNION`으로 `LEFT JOIN`과 `RIGHT JOIN`을 합쳐서 구현합니다.)\n\n```sql\nSELECT u.name, o.product\nFROM   users u\nLEFT JOIN orders o ON u.id = o.user_id\nUNION\nSELECT u.name, o.product\nFROM   users u\nRIGHT JOIN orders o ON u.id = o.user_id;\n```\n\n---\n\n## 6. CROSS JOIN (교차 조인)\n\n조인 조건 없이 두 테이블의 **모든 행을 조합**하여 결합합니다(카티션 곱, Cartesian Product). 두 테이블의 행 개수를 곱한 만큼의 결과가 생성됩니다.\n\n```sql\nSELECT u.name, o.product\nFROM   users u\nCROSS JOIN orders o;\n```\n\n---\n\n## 7. SELF JOIN (자체 조인)\n\n같은 테이블을 자기 자신과 조인하는 방식으로, 주로 상사-부하 직원처럼 **같은 테이블 안에서 계층 관계**를 조회할 때 사용합니다. 반드시 서로 다른 별칭(Alias)을 지정해야 합니다.\n\n```sql\nSELECT e.name AS 직원, m.name AS 상사\nFROM   employees e\nJOIN   employees m ON e.manager_id = m.id;\n```\n\n---\n\n## 8. 3개 이상의 테이블 조인\n\n`JOIN` 절을 이어서 작성하면 3개 이상의 테이블도 함께 조회할 수 있습니다.\n\n```sql\nSELECT u.name, o.product, p.category\nFROM   users u\nJOIN   orders o ON u.id = o.user_id\nJOIN   products p ON o.product_id = p.id;\n```\n\n---\n\n## 9. 옛날 방식 조인 (WHERE 절 기반 조인)\n\n`JOIN` 키워드가 표준화되기 전에는 `FROM` 절에 테이블을 나열하고 `WHERE` 절에 조인 조건을 적는 방식을 사용했습니다. 결과는 `INNER JOIN`과 동일하지만, `WHERE`에 필터 조건과 조인 조건이 섞여 가독성이 떨어지고 실수로 조인 조건을 빠뜨리면 `CROSS JOIN`처럼 동작할 위험이 있습니다.\n\n```sql\n-- 옛날 방식 (암시적 조인)\nSELECT u.name, o.product\nFROM   users u, orders o\nWHERE  u.id = o.user_id;\n\n-- 표준 방식 (명시적 조인) — 요즘은 이 방식을 사용합니다\nSELECT u.name, o.product\nFROM   users u\nJOIN   orders o ON u.id = o.user_id;\n```\n\n> Oracle에서는 `LEFT JOIN`을 `WHERE a.col = b.col(+)` 형태로도 표현하는데, `(+)`가 붙은 쪽이 데이터가 없어도 `NULL`로 채워 함께 조회하겠다는 의미입니다. 현재는 표준 `JOIN` 구문 사용이 권장됩니다.\n\n---\n\n## 10. `ON` vs `USING`\n\n조인 조건의 두 열 이름이 완전히 같을 때는 `ON` 대신 `USING`을 사용해 더 간결하게 쓸 수 있습니다.\n\n```sql\n-- ON: 열 이름이 다르거나 같아도 사용 가능, 조건을 명시적으로 작성\nSELECT u.name, o.product FROM users u JOIN orders o ON u.id = o.user_id;\n\n-- USING: 두 테이블의 열 이름이 동일할 때만 사용 가능 (예: 둘 다 user_id)\nSELECT name, product FROM users JOIN orders USING (user_id);\n```\n\n---\n\n## 11. 대화식 SQL 실습\n\n```sql\nSELECT u.name AS 사용자이름, o.product AS 구매상품, o.price AS 가격 FROM users u INNER JOIN orders o ON u.id = o.user_id;\n```"
+        "id": "SQL_8_SUBQUERY_cell_0",
+        "type": "markdown",
+        "content": "# SQL 7. 쿼리 안에 쿼리 — 서브쿼리\n\n## 이럴 때 써요\n\n\"**평균보다** 점수가 높은 사람은?\"\n\n평균이 몇 점인지 모르니 원래는 두 번 물어봐야 해요. ① 평균을 구하고(88점), ② 88점보다 높은 사람을 찾고. 서브쿼리는 ①을 ② 안에 **괄호로 넣어서** 한 번에 해요.\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 값 하나를 돌려주는 서브쿼리"
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_1",
+        "type": "code",
+        "content": "SELECT name, score\nFROM users\nWHERE score > (SELECT AVG(score) FROM users);"
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_2",
+        "type": "markdown",
+        "content": "괄호 안이 먼저 계산돼서 `88`이 되고, 바깥 쿼리는 `score > 88`과 똑같이 돌아요. 데이터가 바뀌어 평균이 달라져도 쿼리를 고칠 필요가 없어요.\n\n## 2. 목록을 돌려주는 서브쿼리 — `IN`\n\n\"**주문한 적 있는** 회원은?\" 주문표에서 user_id 목록을 뽑고, 그 안에 있는 회원을 골라요."
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_3",
+        "type": "code",
+        "content": "SELECT name\nFROM users\nWHERE id IN (SELECT user_id FROM orders);"
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_4",
+        "type": "markdown",
+        "content": "## 3. 없는 것 찾기 — `NOT IN`과 `NOT EXISTS`의 함정\n\n\"**주문한 적 없는** 회원\"은 `NOT IN`으로 될 것 같지만, 함정이 있어요. 주문표에 user_id가 **비어 있는(NULL) 주문**이 하나만 섞여도 결과가 **0명**이 돼요."
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_5",
+        "type": "code",
+        "content": "INSERT INTO orders VALUES (105, NULL, '연필', 1000);  -- 비회원 주문 하나\nSELECT name FROM users WHERE id NOT IN (SELECT user_id FROM orders);   -- 결과: 0명!"
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_6",
+        "type": "markdown",
+        "content": "같은 질문을 `NOT EXISTS`로 하면 제대로 나와요."
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_7",
+        "type": "code",
+        "content": "INSERT INTO orders VALUES (105, NULL, '연필', 1000);\nSELECT name FROM users u\nWHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);     -- 결과: 이영희, 최수민"
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_8",
+        "type": "markdown",
+        "content": "**왜 0명일까요?** `NOT IN (1, 3, 5, NULL)`은 \"1도 아니고, 3도 아니고, 5도 아니고, **모르는 값도 아니다**\"예요. 모르는 값이 아닌지는 알 수 없으니 전부 \"모름\"이 돼서 걸러져요(4장의 NULL 규칙).\n\n`NOT EXISTS`는 \"짝이 되는 주문이 **한 건이라도 있는가**\"만 봐서 NULL 영향을 안 받아요. **\"없는 것 찾기\"에는 `NOT EXISTS`를 쓰는 게 안전해요.** (6장의 LEFT JOIN + IS NULL도 같은 답을 줘요.)\n\n## 4. 줄마다 다시 계산하는 서브쿼리 — 연관 서브쿼리\n\n\"**자기 부서** 평균보다 높은 사람\". 이번엔 평균이 사람마다 달라요. 김철수 씨는 개발팀 평균과, 이영희 씨는 기획팀 평균과 비교해야 해요. 서브쿼리 안에서 **바깥의 `u.dept`**를 쓰면, 바깥 줄마다 서브쿼리가 다시 계산돼요."
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_9",
+        "type": "code",
+        "content": "SELECT u.name, u.dept, u.score\nFROM users u\nWHERE u.score > (SELECT AVG(score) FROM users WHERE dept = u.dept);"
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_10",
+        "type": "markdown",
+        "content": "개발팀 평균은 95점이라 박민수(100) 씨만 나와요. 기획팀과 디자인팀은 한 명씩이라 자기 자신이 평균이어서 \"보다 높은\" 사람이 없어요.\n\n## 5. 표처럼 쓰는 서브쿼리 — `FROM` 안에\n\n서브쿼리 결과를 **임시 표**로 놓고 다시 고를 수도 있어요. \"부서별 평균표를 만든 다음, 그중 90점 넘는 부서\"처럼요."
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_11",
+        "type": "code",
+        "content": "SELECT *\nFROM (SELECT dept, AVG(score) AS 평균 FROM users GROUP BY dept) AS 부서평균\nWHERE 평균 > 90;"
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_12",
+        "type": "markdown",
+        "content": "이렇게 길어지면 읽기 어려워요. 12장의 `WITH`를 쓰면 같은 내용을 훨씬 읽기 좋게 쓸 수 있어요.\n\n## JOIN이랑 뭐가 달라요?\n\n| 상황 | 추천 |\n|---|---|\n| 다른 표의 열을 **결과에 보여 줘야** 함 (구매 상품명) | JOIN |\n| 다른 표는 **조건으로만** 씀 (주문한 적이 있는가) | 서브쿼리 (`IN`, `EXISTS`) |\n\n## Oracle 등에서 쓰는 `ALL` / `ANY`\n\n\"기획팀 **모든** 사람보다 높은\"은 Oracle·PostgreSQL에서 `> ALL (서브쿼리)`로 써요.\n\n```sql\nSELECT name FROM users\nWHERE score > ALL (SELECT score FROM users WHERE dept = '기획팀');\n```\n\n> ⚠️ SQLite(이 사이트)에는 `ALL`/`ANY`가 없어요. \"모든 값보다 크다\"는 \"**최댓값보다** 크다\"와 같으니 `MAX`로 바꿔 쓰면 돼요."
+      },
+      {
+        "id": "SQL_8_SUBQUERY_cell_13",
+        "type": "code",
+        "content": "SELECT name, score FROM users\nWHERE score > (SELECT MAX(score) FROM users WHERE dept = '기획팀');"
       }
     ]
   },
   {
-    id: "SQL_8_SUBQUERY",
-    filename: "SQL 8. 서브쿼리 (Subquery) 마스터",
-    title: "SQL 8. 서브쿼리 (Subquery) 마스터",
-    category: "sql",
-    cells: [
+    "id": "SQL_9_SET_OPERATOR",
+    "filename": "SQL 8. 결과끼리 합치고 빼기 — 집합 연산자 (UNION, EXCEPT)",
+    "title": "SQL 8. 결과끼리 합치고 빼기 — 집합 연산자 (UNION, EXCEPT)",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_8_SUBQUERY_cell_0",
-        type: "markdown",
-        content: "# SQL 8. 서브쿼리 (Subquery) 마스터\n\n## 1. 서브쿼리 위치별 분류\n\n1. **스칼라 서브쿼리 (Scalar Subquery)**: `SELECT` 절에 위치하며 단 1행 1열의 단일 값을 반환합니다.\n2. **인라인 뷰 (Inline View)**: `FROM` 절에 위치하며 메인 쿼리 실행 시 임시 가상 테이블처럼 작동합니다.\n3. **중첩 서브쿼리 (Nested Subquery)**: `WHERE` 또는 `HAVING` 절에 위치하여 서브쿼리 조건 검증을 수행합니다.\n\n---\n\n## 2. 다중행 서브쿼리 연산자 (`IN`, `ALL`, `ANY`, `EXISTS`)\n\n- **IN**: 서브쿼리 결과 목록 중 하나라도 일치하면 참.\n- **ALL**: 서브쿼리 결과의 모든 값보다 조건이 만족해야 함 (`> ALL` 은 최댓값보다 큼).\n- **ANY / SOME**: 서브쿼리 결과 중 하나 이상 조건을 만족해야 함 (`> ANY` 는 최솟값보다 큼).\n- **EXISTS**: 서브쿼리의 결과 행이 1건이라도 존재하는지 여부만 확인 (조건 충족 시 즉시 탐색 종료로 성능 우수).\n\n```sql\nSELECT name, score\nFROM   users\nWHERE  score > (SELECT AVG(score) FROM users);\n```\n\n---\n\n## 3. 비연관 서브쿼리 vs 연관 서브쿼리\n\n- **비연관 서브쿼리 (Uncorrelated Subquery)**: 서브쿼리가 메인 쿼리와 무관하게 **독립적으로 한 번만 실행**되어 결과를 메인 쿼리에 전달합니다. 지금까지 살펴본 예시가 모두 비연관 서브쿼리입니다.\n- **연관 서브쿼리 (Correlated Subquery)**: 서브쿼리 안에서 메인 쿼리의 열을 참조하며, **메인 쿼리의 행마다 서브쿼리가 반복 실행**됩니다.\n\n```sql\n-- 연관 서브쿼리: 각 사용자(u)가 자신이 속한 부서의 평균 점수보다 높은지 확인\nSELECT u.name, u.dept, u.score\nFROM   users u\nWHERE  u.score > (\n  SELECT AVG(score) FROM users WHERE dept = u.dept\n);\n```\n\n---\n\n## 4. NOT EXISTS와 NOT IN의 NULL 함정\n\n`EXISTS`의 부정형인 `NOT EXISTS`는 연관 서브쿼리와 함께 자주 사용됩니다.\n\n```sql\nSELECT u.name\nFROM   users u\nWHERE  NOT EXISTS (\n  SELECT 1 FROM orders o WHERE o.user_id = u.id\n);\n```\n\n> **주의**: `NOT IN`의 서브쿼리 결과에 `NULL`이 하나라도 포함되면, 비교가 `UNKNOWN`이 되어 **전체 결과가 0건**이 됩니다. 서브쿼리 결과에 `NULL`이 섞일 수 있다면 `NOT IN` 대신 `NOT EXISTS`를 사용하는 것이 안전합니다.\n\n```sql\n-- 위험: orders.user_id에 NULL이 있으면 결과가 아예 없어짐\nSELECT name FROM users WHERE id NOT IN (SELECT user_id FROM orders);\n\n-- 안전: NOT EXISTS는 NULL의 영향을 받지 않음\nSELECT name FROM users u WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id);\n```\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT name, score FROM users WHERE score > (SELECT AVG(score) FROM users);\n```"
+        "id": "SQL_9_SET_OPERATOR_cell_0",
+        "type": "markdown",
+        "content": "# SQL 8. 결과끼리 합치고 빼기 — 집합 연산자\n\n## 이럴 때 써요\n\n쿼리 **결과 두 개를** 위아래로 합치거나, 겹치는 것만 남기거나, 한쪽에서 다른 쪽을 빼고 싶을 때요.\n\n| 연산자 | 뜻 | 예 |\n|---|---|---|\n| `UNION` | 합집합 (중복은 한 번만) | 개발팀 **또는** 90점 이상 |\n| `UNION ALL` | 합치기 (중복도 그대로) | 두 지점 판매 기록 이어 붙이기 |\n| `INTERSECT` | 교집합 | 개발팀**이면서** 주문한 사람 |\n| `EXCEPT` | 차집합 (Oracle은 `MINUS`) | 회원 **중에서** 주문한 사람 **빼기** |\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. `UNION`과 `UNION ALL`의 차이"
+      },
+      {
+        "id": "SQL_9_SET_OPERATOR_cell_1",
+        "type": "code",
+        "content": "-- 개발팀 3명 + 90점 이상 3명. 겹치는 사람이 있어요.\nSELECT name FROM users WHERE dept = '개발팀'\nUNION\nSELECT name FROM users WHERE score >= 90;"
+      },
+      {
+        "id": "SQL_9_SET_OPERATOR_cell_2",
+        "type": "code",
+        "content": "SELECT name FROM users WHERE dept = '개발팀'\nUNION ALL\nSELECT name FROM users WHERE score >= 90;"
+      },
+      {
+        "id": "SQL_9_SET_OPERATOR_cell_3",
+        "type": "markdown",
+        "content": "`UNION`은 겹치는 사람을 한 번만 보여 줘서 3명, `UNION ALL`은 그대로 이어 붙여서 6줄이에요.\n\n**어느 걸 써야 하나요?** 중복을 없애려면 DB가 결과를 전부 비교해야 해서 느려요. **중복이 없다고 확실하거나 중복도 필요하면 `UNION ALL`**을 쓰세요.\n\n## 2. 같은 표면 `OR`가 더 간단해요\n\n위 예제는 사실 `WHERE dept = '개발팀' OR score >= 90`으로도 돼요. 집합 연산자는 **다른 표**나 **모양이 다른 쿼리**를 합칠 때 진가가 나와요. 회원 이름과 상품 이름을 한 목록으로 만드는 것처럼요."
+      },
+      {
+        "id": "SQL_9_SET_OPERATOR_cell_4",
+        "type": "code",
+        "content": "SELECT name AS 이름, '회원' AS 종류 FROM users\nUNION ALL\nSELECT product, '상품' FROM orders;"
+      },
+      {
+        "id": "SQL_9_SET_OPERATOR_cell_5",
+        "type": "markdown",
+        "content": "## 3. 겹치는 것 / 빼기 — `INTERSECT`, `EXCEPT`"
+      },
+      {
+        "id": "SQL_9_SET_OPERATOR_cell_6",
+        "type": "code",
+        "content": "-- 개발팀이면서 주문한 적 있는 회원 id\nSELECT id FROM users WHERE dept = '개발팀'\nINTERSECT\nSELECT user_id FROM orders;\n\n-- 회원 중에서 주문한 적 없는 id (Oracle은 MINUS)\nSELECT id FROM users\nEXCEPT\nSELECT user_id FROM orders;"
+      },
+      {
+        "id": "SQL_9_SET_OPERATOR_cell_7",
+        "type": "markdown",
+        "content": "## 지켜야 할 규칙\n\n1. 위아래 쿼리의 **열 개수가 같아야** 해요.\n2. 같은 자리의 열끼리 **종류가 맞아야** 해요(숫자는 숫자끼리).\n3. 결과의 열 이름은 **첫 번째 쿼리**를 따라요(위 예제의 `이름`, `종류`).\n4. `ORDER BY`는 **맨 마지막에 한 번만** 써요. 합친 전체를 정렬해요."
       }
     ]
   },
   {
-    id: "SQL_9_SET_OPERATOR",
-    filename: "SQL 9. 집합 연산자 (Set Operators)",
-    title: "SQL 9. 집합 연산자 (Set Operators)",
-    category: "sql",
-    cells: [
+    "id": "SQL_10_WINDOW_FUNCTION",
+    "filename": "SQL 9. 줄은 그대로, 순위와 누적 — 윈도우 함수",
+    "title": "SQL 9. 줄은 그대로, 순위와 누적 — 윈도우 함수",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_9_SET_OPERATOR_cell_0",
-        type: "markdown",
-        content: "# SQL 9. 집합 연산자 (Set Operators)\n\n## 1. 집합 연산자 종류 및 특징\n\n| 집합 연산자 | 기능 | 중복 제거 여부 | 정렬 수행 여부 |\n|---|---|---|---|\n| `UNION` | 두 쿼리 결과의 합집합 | **중복 제거** | **자동 정렬 수행** |\n| `UNION ALL` | 두 쿼리 결과의 합집합 | 중복 유지 | 정렬 미수행 (빠름) |\n| `INTERSECT` | 두 쿼리 결과의 교집합 | 중복 제거 | 정렬 수행 |\n| `EXCEPT` / `MINUS` | 차집합 (선행 쿼리 - 후행 쿼리) | 중복 제거 | 정렬 수행 |\n\n---\n\n## 2. 집합 연산자 사용 조건\n\n1. 두 쿼리의 `SELECT` 절 컬럼 개수가 동일해야 합니다.\n2. 대응하는 컬럼의 데이터 타입이 상호 호환 가능해야 합니다.\n3. `ORDER BY` 절은 문장의 맨 마지막 쿼리에만 단 한 번 선언 가능합니다.\n\n---\n\n## 3. 대화식 SQL 실습\n\n```sql\nSELECT name, dept FROM users WHERE dept = '개발팀'\nUNION ALL\nSELECT name, dept FROM users WHERE dept = '기획팀';\n```"
+        "id": "SQL_10_WINDOW_FUNCTION_cell_0",
+        "type": "markdown",
+        "content": "# SQL 9. 줄은 그대로, 순위와 누적 — 윈도우 함수\n\n## 이럴 때 써요\n\n- \"각 사람 **옆에** 그 사람 부서의 평균을 같이 보여 주세요.\"\n- \"점수로 **순위**를 매겨 주세요.\"\n- \"부서별 **1등**만 뽑아 주세요.\"\n\n5장의 `GROUP BY`는 줄을 **뭉쳐서** 개인 정보가 사라져요. 윈도우 함수는 **줄은 그대로 두고**, 계산 결과를 옆 칸에 붙여 줘요.\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. GROUP BY와 비교"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_1",
+        "type": "code",
+        "content": "-- GROUP BY: 부서당 한 줄로 뭉쳐요 (3줄)\nSELECT dept, AVG(score) AS 부서평균 FROM users GROUP BY dept;\n\n-- 윈도우 함수: 5명 그대로, 옆에 부서평균 (5줄)\nSELECT name, dept, score,\n       AVG(score) OVER (PARTITION BY dept) AS 부서평균\nFROM users;"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_2",
+        "type": "markdown",
+        "content": "`OVER (...)`가 붙으면 윈도우 함수예요. `PARTITION BY dept`는 \"**부서별로 나눠서** 계산\"이라는 뜻이에요(GROUP BY와 비슷하지만 뭉치지 않아요).\n\n이렇게 하면 \"내 점수가 부서 평균보다 몇 점 높은지\"도 바로 계산할 수 있어요.\n\n## 2. 순위 매기기 — 동점일 때 차이가 나요\n\n동점자를 보려고 정찬희 씨와 같은 95점인 사람을 한 명 추가해 볼게요."
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_3",
+        "type": "code",
+        "content": "INSERT INTO users VALUES (6, '한지민', 23, 95, '기획팀');\nSELECT name, score,\n       RANK()       OVER (ORDER BY score DESC) AS 순위_RANK,\n       DENSE_RANK() OVER (ORDER BY score DESC) AS 순위_DENSE,\n       ROW_NUMBER() OVER (ORDER BY score DESC) AS 순번\nFROM users;"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_4",
+        "type": "markdown",
+        "content": "| 함수 | 95점 두 명 다음 사람 | 언제 |\n|---|---|---|\n| `RANK()` | **4등** (공동 2등이 두 명이니 3등은 건너뜀) | 올림픽 순위처럼 |\n| `DENSE_RANK()` | **3등** (건너뛰지 않음) | \"몇 번째로 높은 점수인가\" |\n| `ROW_NUMBER()` | 동점이어도 **무조건 다른 번호** | 한 명만 뽑아야 할 때 |\n\n## 3. 그룹 안에서 순위 — 부서별 1등 뽑기\n\n`PARTITION BY`와 순위를 합치면 \"부서**마다** 1등부터 매기기\"가 돼요. 그다음 1등만 고르면 돼요. (윈도우 함수 결과로는 바로 `WHERE`를 걸 수 없어서, 서브쿼리로 한 번 감싸요.)"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_5",
+        "type": "code",
+        "content": "SELECT name, dept, score\nFROM (\n  SELECT name, dept, score,\n         ROW_NUMBER() OVER (PARTITION BY dept ORDER BY score DESC) AS 부서내순위\n  FROM users\n)\nWHERE 부서내순위 = 1;"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_6",
+        "type": "markdown",
+        "content": "\"카테고리별 가장 많이 팔린 상품\", \"반별 1등\" 같은 질문은 전부 이 모양이에요.\n\n## 4. 앞사람과 비교 — `LAG`\n\n`LAG(열)`은 **바로 앞 줄**의 값을 가져와요. 점수 순으로 줄 세웠을 때 앞사람과 몇 점 차이인지 볼 수 있어요. (뒷줄은 `LEAD`)"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_7",
+        "type": "code",
+        "content": "SELECT name, score,\n       LAG(score) OVER (ORDER BY score DESC) AS 앞사람점수,\n       LAG(score) OVER (ORDER BY score DESC) - score AS 차이\nFROM users;"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_8",
+        "type": "markdown",
+        "content": "1등은 앞사람이 없어서 NULL이에요. 날짜순으로 정렬하면 \"어제보다 매출이 얼마나 늘었나\"를 구할 때 써요.\n\n## 5. 누적 합계\n\n`SUM(...) OVER (ORDER BY ...)`는 그 줄**까지의** 합계예요. 주문을 번호순으로 쌓아 가면서 매출이 어떻게 늘어나는지 볼 수 있어요."
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_9",
+        "type": "code",
+        "content": "SELECT order_id, product, price,\n       SUM(price) OVER (ORDER BY order_id) AS 누적매출\nFROM orders;"
+      },
+      {
+        "id": "SQL_10_WINDOW_FUNCTION_cell_10",
+        "type": "markdown",
+        "content": "## 정리\n\n| 질문 | 쓰는 것 |\n|---|---|\n| 각 줄 옆에 그룹 평균 | `AVG(열) OVER (PARTITION BY 그룹)` |\n| 순위 | `RANK()` / `DENSE_RANK()` / `ROW_NUMBER()` `OVER (ORDER BY ...)` |\n| 그룹별 1등 | `ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...)` + 바깥에서 `= 1` |\n| 앞 / 뒤 줄 값 | `LAG(열)` / `LEAD(열)` |\n| 누적 합 | `SUM(열) OVER (ORDER BY ...)` |\n| N등분 (상위 25% 등) | `NTILE(4) OVER (ORDER BY ...)` |"
       }
     ]
   },
   {
-    id: "SQL_10_WINDOW_FUNCTION",
-    filename: "SQL 10. 윈도우 함수 (Window Functions)",
-    title: "SQL 10. 윈도우 함수 (Window Functions)",
-    category: "sql",
-    cells: [
+    "id": "SQL_6_GROUP_FUNCTION",
+    "filename": "SQL 10. 소계와 총계 한 번에 — ROLLUP, CUBE",
+    "title": "SQL 10. 소계와 총계 한 번에 — ROLLUP, CUBE",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_10_WINDOW_FUNCTION_cell_0",
-        type: "markdown",
-        content: "# SQL 10. 윈도우 함수 (Window Functions)\n\n## 1. 윈도우 함수 개요 및 구문\n\n행과 행 간의 관계를 정의하여 집계 및 순위 계산을 수행하는 함수로, 원본 행의 개수를 변경하지 않고 유지합니다.\n\n```sql\nSELECT 함수이름() OVER ([PARTITION BY 컬럼] [ORDER BY 컬럼] [ROWS|RANGE 윈도우범위])\nFROM   테이블명;\n```\n\n---\n\n## 2. 순위 함수 (Ranking Functions) 특징\n\n자주 사용되는 윈도우 순위 함수입니다.\n\n- **`RANK()`**: 동률 순위 존재 시 동일 순위를 부여하고, 그 다음 순위는 동률 개수만큼 건너뜁니다 (예: 1, 2, 2, 4).\n- **`DENSE_RANK()`**: 동률 순위가 존재해도 다음 순위를 연속적으로 부여합니다 (예: 1, 2, 2, 3).\n- **`ROW_NUMBER()`**: 값의 동률 여부와 상관없이 무조건 1부터 유일한 연속 번호를 부여합니다 (예: 1, 2, 3, 4).\n\n---\n\n## 3. 위치 및 비율 윈도우 함수\n\n- **`LAG(컬럼, N)`**: 현재 행 기준 N번째 이전 행의 값을 조회합니다.\n- **`LEAD(컬럼, N)`**: 현재 행 기준 N번째 다음 행의 값을 조회합니다.\n- **`FIRST_VALUE()` / `LAST_VALUE()`**: 윈도우 파티션 내 첫 번째 및 마지막 값을 조회합니다.\n\n---\n\n## 4. 집계 윈도우 함수 (Aggregate Window Functions)\n\n`SUM`, `AVG`, `COUNT`, `MAX`, `MIN` 같은 일반 집계 함수도 `OVER()`와 함께 사용하면 행을 그룹으로 뭉치지 않고, **행마다 누적/그룹 집계 값을 함께 조회**할 수 있습니다.\n\n```sql\n-- 부서별 평균 점수를 각 행에 함께 표시 (행 개수가 줄지 않음)\nSELECT name, dept, score,\n       AVG(score) OVER (PARTITION BY dept) AS 부서평균\nFROM   users;\n\n-- 점수 기준 정렬 후 누적 합계\nSELECT name, score,\n       SUM(score) OVER (ORDER BY score) AS 누적합계\nFROM   users;\n```\n\n---\n\n## 5. NTILE() 함수\n\n`NTILE(N)`은 전체 데이터를 지정한 `N`개의 그룹으로 최대한 균등하게 나누어 그룹 번호를 부여합니다. 예를 들어 성적을 4분위로 나눌 때 사용합니다.\n\n```sql\nSELECT name, score, NTILE(4) OVER (ORDER BY score DESC) AS 사분위 FROM users;\n```\n\n---\n\n## 6. 대화식 SQL 실습\n\n```sql\nSELECT name, score, RANK() OVER (ORDER BY score DESC) AS 순위 FROM users;\n```"
+        "id": "SQL_6_GROUP_FUNCTION_cell_0",
+        "type": "markdown",
+        "content": "# SQL 10. 소계와 총계 한 번에 — ROLLUP, CUBE\n\n## 이럴 때 써요\n\n보고서를 만들면 \"부서별 합계\"와 \"**전체 합계**\"를 한 표에 같이 보여 줘야 할 때가 많아요.\n\n| dept | 점수합계 |\n|---|---|\n| 개발팀 | 285 |\n| 기획팀 | 85 |\n| 디자인팀 | 70 |\n| **(전체)** | **440** |\n\n5장의 `GROUP BY`로는 부서별 줄만 나와요. 마지막 \"전체\" 줄을 **같은 쿼리로** 붙여 주는 게 `ROLLUP`이에요.\n\n> ⚠️ **이 사이트(SQLite)에서는 실행되지 않는 문법이에요.** Oracle·SQL Server·PostgreSQL 같은 DB에서 쓰고, 자격증(SQLD) 시험에도 나와요. 그래서 문법만 보여 드리고, 실행해 볼 수 있는 대체 방법을 아래에 같이 적었어요.\n\n## 1. ROLLUP — 계층대로 소계 + 총계\n\n```sql\nSELECT dept, SUM(score) AS 점수합계\nFROM users\nGROUP BY ROLLUP(dept);\n-- 부서별 3줄 + 전체 1줄 (dept 자리는 NULL)\n```\n\n기준이 두 개면 **앞에서부터** 하나씩 떼어 가며 소계를 만들어요. `ROLLUP(지역, 지점)`이면\n\n1. 지역 + 지점별\n2. 지역별 소계\n3. 전체 총계\n\n## 2. CUBE — 가능한 모든 조합\n\n`CUBE(지역, 상품)`이면 지역별 소계, 상품별 소계, 지역×상품, 전체를 **전부** 만들어요. 교차표 보고서에 써요.\n\n## 3. GROUPING SETS — 원하는 것만 골라서\n\n`GROUPING SETS((dept), (age))`는 \"부서별\"과 \"나이별\"을 각각 따로 만들어 한 결과로 이어 붙여요.\n\n| | 만드는 묶음 (기준 A, B) | 개수 |\n|---|---|---|\n| `ROLLUP(A, B)` | (A, B), (A), 전체 | 기준 수 + 1 |\n| `CUBE(A, B)` | (A, B), (A), (B), 전체 | 2^기준 수 |\n| `GROUPING SETS((A), (B))` | (A), (B) | 적은 만큼 |\n\n## 4. 어느 줄이 소계인지 — `GROUPING()`\n\n소계 줄은 기준 칸이 NULL이 되는데, 원래 데이터에 NULL이 있으면 헷갈려요. `GROUPING(dept)`는 그 줄이 소계라서 생긴 NULL이면 `1`, 원래 값이면 `0`이에요. 보통 `CASE`로 '전체'라고 바꿔 보여 줘요.\n\n```sql\nSELECT CASE WHEN GROUPING(dept) = 1 THEN '(전체)' ELSE dept END AS 부서,\n       SUM(score) AS 점수합계\nFROM users\nGROUP BY ROLLUP(dept);\n```\n\n## 이 사이트에서 같은 결과 만들기\n\nROLLUP은 결국 \"**부서별 합계** + **전체 합계**\"를 이어 붙인 거예요. 8장의 `UNION ALL`로 똑같이 만들 수 있어요."
+      },
+      {
+        "id": "SQL_6_GROUP_FUNCTION_cell_1",
+        "type": "code",
+        "content": "SELECT dept AS 부서, SUM(score) AS 점수합계 FROM users GROUP BY dept\nUNION ALL\nSELECT '(전체)', SUM(score) FROM users;"
+      },
+      {
+        "id": "SQL_6_GROUP_FUNCTION_cell_2",
+        "type": "markdown",
+        "content": "ROLLUP이 있는 DB에서는 이렇게 길게 쓸 필요가 없고, 기준이 늘어날수록 차이가 커져요. 그래서 이 문법들이 있는 거예요."
       }
     ]
   },
   {
-    id: "SQL_11_MODELING",
-    filename: "SQL 11. 데이터 모델링과 ERD 핵심",
-    title: "SQL 11. 데이터 모델링과 ERD 핵심",
-    category: "sql",
-    cells: [
+    "id": "SQL_12_DDL_DML",
+    "filename": "SQL 11. 표 만들고, 넣고, 고치고, 지우기 — CREATE, INSERT, UPDATE, DELETE",
+    "title": "SQL 11. 표 만들고, 넣고, 고치고, 지우기 — CREATE, INSERT, UPDATE, DELETE",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_11_MODELING_cell_0",
-        type: "markdown",
-        content: "# SQL 11. 데이터 모델링과 ERD 핵심\n\n## 1. 데이터 모델링 개요\n\n데이터 모델링은 현실 세계의 비즈니스 프로세스와 데이터를 단순화하여 데이터베이스 구조로 표현하는 과정입니다.\n\n### 데이터 모델링 3단계\n1. **개념적 데이터 모델링**: 추상화 수준이 가장 높으며, 주요 엔티티와 핵심 관계를 정의합니다.\n2. **논리적 데이터 모델링**: 정규화를 수행하고 식별자, 속성, 관계를 상세히 정의합니다 (DBMS 독립적).\n3. **물리적 데이터 모델링**: 실제 DBMS 제품(Oracle, MySQL, PostgreSQL 등)의 성능, 인덱스, 데이터 타입을 고려하여 구현합니다.\n\n---\n\n## 2. 엔티티(Entity), 속성(Attribute), 관계(Relationship)\n\n- **엔티티 (Entity)**: 데이터베이스에서 관리하고자 하는 식별 가능한 객체 또는 개념 (예: 고객, 상품, 주문).\n- **속성 (Attribute)**: 엔티티가 가지는 세부 특성 및 데이터 항목 (예: 고객명, 전화번호, 회원등급).\n- **관계 (Relationship)**: 엔티티 간의 연관성 및 비즈니스 규칙 (예: 고객은 상품을 주문한다).\n\n---\n\n## 3. 식별자(Identifier) 분류 및 관계\n\n- **주식별자 (Primary Key / PK)**: 엔티티 내의 각 행을 유일하게 식별하는 대표 속성 (유일성, 최소성, 불가변성, 존재성/NOT NULL).\n- **외래식별자 (Foreign Key / FK)**: 타 엔티티의 주식별자를 참조하는 속성으로, 엔티티 간의 관계를 형성합니다.\n- **식별 관계**: 부모 엔티티의 PK가 자식 엔티티의 PK의 일부로 포함되는 관계.\n- **비식별 관계**: 부모 엔티티의 PK가 자식 엔티티의 일반 속성으로 참조되는 관계.\n\n---\n\n## 4. 정규화 (Normalization)\n\n데이터 중복을 최소화하고 이상 현상(Anomalies: 삽입/수정/삭제 이상)을 방지하기 위한 구조적 구조화 과정입니다.\n\n- **제1정규형 (1NF)**: 모든 속성의 값이 원자값(Atomic Value)을 가져야 함.\n- **제2정규형 (2NF)**: 주식별자가 복합키일 때, 부분 함수 종속성을 제거하고 완전 함수 종속성을 만족함.\n- **제3정규형 (3NF)**: 이행적 함수 종속성(A → B, B → C 이면 A → C)을 제거함.\n- **반정규화 (De-normalization)**: 시스템 성능 향상 및 조인 비용 감소를 위해 의도적으로 정규화 원칙을 위배하고 중복을 허용하는 작업.\n\n---\n\n## 5. 관계의 카디널리티 (Cardinality)\n\nERD에서 두 엔티티 사이의 관계는 **참여하는 인스턴스의 수**에 따라 세 가지로 분류됩니다.\n\n- **1:1 (일대일)**: 한 엔티티의 인스턴스 1개가 다른 엔티티의 인스턴스 1개와만 대응 (예: 사람 - 주민등록증).\n- **1:N (일대다)**: 한 엔티티의 인스턴스 1개가 다른 엔티티의 여러 인스턴스와 대응 (예: 부서 - 사원). 관계형 데이터베이스에서 가장 흔한 관계 형태입니다.\n- **N:M (다대다)**: 양쪽 엔티티의 인스턴스가 서로 여러 개씩 대응 (예: 학생 - 수강과목). N:M 관계는 그대로 테이블로 구현할 수 없어, 두 엔티티의 PK를 함께 갖는 **교차 엔티티(연결 테이블)**를 중간에 두어 1:N + N:1 관계로 분해합니다.\n\n```sql\n-- 학생(students)과 과목(courses)의 N:M 관계를 연결하는 교차 테이블\nCREATE TABLE enrollments (\n  student_id INT,\n  course_id  INT,\n  PRIMARY KEY (student_id, course_id),\n  FOREIGN KEY (student_id) REFERENCES students(id),\n  FOREIGN KEY (course_id) REFERENCES courses(id)\n);\n```\n\n---\n\n## 6. 대화식 SQL 실습\n\n```sql\nSELECT id, name, dept, score FROM users;\n```"
+        "id": "SQL_12_DDL_DML_cell_0",
+        "type": "markdown",
+        "content": "# SQL 11. 표 만들고, 넣고, 고치고, 지우기\n\n## 지금까지와 뭐가 달라요?\n\n지금까지는 데이터를 **보기만** 했어요(`SELECT`). 이번에는 데이터를 **바꿔요.**\n\n| 분류 | 하는 일 | 명령 |\n|---|---|---|\n| **DDL** (정의) | 표의 **모양**을 만들고 바꿈 | `CREATE`, `ALTER`, `DROP` |\n| **DML** (조작) | 표 **안의 데이터**를 바꿈 | `INSERT`, `UPDATE`, `DELETE` |\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 표 만들기 — `CREATE TABLE`\n\n열 이름과 **어떤 종류의 값**을 넣을지(숫자 `INT`, 글자 `VARCHAR(길이)` 등)를 정해요."
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_1",
+        "type": "code",
+        "content": "CREATE TABLE students (\n  id   INT PRIMARY KEY,\n  name VARCHAR(50) NOT NULL,\n  age  INT CHECK (age > 0)\n);\nINSERT INTO students (id, name, age) VALUES (1, '강감찬', 17);\nINSERT INTO students (id, name, age) VALUES (2, '유관순', 16);\nSELECT * FROM students;"
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_2",
+        "type": "markdown",
+        "content": "## 2. 규칙 걸어 두기 — 제약조건\n\n`PRIMARY KEY`, `NOT NULL`, `CHECK` 같은 **제약조건**은 \"잘못된 데이터가 아예 못 들어오게\" 막는 장치예요. 프로그램에서 실수해도 DB가 한 번 더 막아 줘요.\n\n| 제약조건 | 막는 것 |\n|---|---|\n| `PRIMARY KEY` | 번호 중복, 빈 번호 (줄마다 유일한 이름표) |\n| `NOT NULL` | 빈 값 |\n| `UNIQUE` | 중복 (이메일 같은 것) |\n| `CHECK (조건)` | 조건에 안 맞는 값 (나이 -3 등) |\n| `DEFAULT 값` | (막는 게 아니라) 안 넣으면 이 값 |\n| `FOREIGN KEY` | 다른 표에 없는 번호 (없는 회원의 주문) |\n\n같은 번호로 또 넣으면 오류가 나요."
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_3",
+        "type": "code",
+        "content": "CREATE TABLE students (id INT PRIMARY KEY, name VARCHAR(50) NOT NULL);\nINSERT INTO students VALUES (1, '강감찬');\nINSERT INTO students VALUES (1, '이순신');   -- 1번은 이미 있어요"
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_4",
+        "type": "markdown",
+        "content": "## 3. 고치기 — `UPDATE`는 `WHERE`부터\n\n정찬희 씨 점수를 98점으로 고쳐 볼게요."
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_5",
+        "type": "code",
+        "content": "UPDATE users SET score = 98 WHERE name = '정찬희';\nSELECT name, score FROM users;"
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_6",
+        "type": "markdown",
+        "content": "**`WHERE`를 빠뜨리면 모든 줄이 바뀌어요.** 실제로 일어나는 사고예요."
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_7",
+        "type": "code",
+        "content": "UPDATE users SET score = 0;   -- WHERE 없음!\nSELECT name, score FROM users;"
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_8",
+        "type": "markdown",
+        "content": "**안전한 습관:** `UPDATE`·`DELETE` 전에 같은 `WHERE`로 `SELECT`를 먼저 돌려서, **바뀔 줄이 맞는지** 눈으로 확인하세요.\n\n## 4. 지우기 — `DELETE`"
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_9",
+        "type": "code",
+        "content": "DELETE FROM users WHERE id = 4;\nSELECT * FROM users;"
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_10",
+        "type": "markdown",
+        "content": "## 5. 표 모양 바꾸기 — `ALTER TABLE`\n\n이미 만든 표에 열을 추가할 수 있어요."
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_11",
+        "type": "code",
+        "content": "ALTER TABLE users ADD COLUMN phone VARCHAR(20);\nUPDATE users SET phone = '010-1234-5678' WHERE id = 1;\nSELECT name, phone FROM users;"
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_12",
+        "type": "markdown",
+        "content": "열의 종류를 바꾸는 `MODIFY`는 DB마다 문법이 달라요. Oracle은 `ALTER TABLE users MODIFY (phone VARCHAR(30))`, MySQL은 `ALTER TABLE users MODIFY COLUMN phone VARCHAR(30)`이에요. (SQLite는 지원하지 않아요.)\n\n## 6. DELETE · TRUNCATE · DROP — 세 가지 \"지우기\"\n\n| | 지우는 것 | 표는? | 되돌리기 |\n|---|---|---|---|\n| `DELETE FROM 표 WHERE ...` | 조건에 맞는 **줄** | 남음 | 가능 (트랜잭션 안에서) |\n| `TRUNCATE TABLE 표` | **모든 줄** (빠름) | 남음 | 대부분 불가 |\n| `DROP TABLE 표` | 줄 **+ 표 자체** | 사라짐 | 불가 |\n\n`TRUNCATE`는 Oracle·MySQL 등에 있고, SQLite에서는 `DELETE FROM 표`(WHERE 없이)로 해요."
+      },
+      {
+        "id": "SQL_12_DDL_DML_cell_13",
+        "type": "code",
+        "content": "DROP TABLE orders;\nSELECT * FROM orders;   -- 표가 없어서 오류"
       }
     ]
   },
   {
-    id: "SQL_12_DDL_DML",
-    filename: "SQL 12. DDL & DML 데이터베이스 조작",
-    title: "SQL 12. DDL & DML 데이터베이스 조작",
-    category: "sql",
-    cells: [
+    "id": "SQL_13_CTE_TCL_DCL",
+    "filename": "SQL 12. 쿼리에 이름 붙이기와 안전장치 — VIEW, WITH, 트랜잭션",
+    "title": "SQL 12. 쿼리에 이름 붙이기와 안전장치 — VIEW, WITH, 트랜잭션",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_12_DDL_DML_cell_0",
-        type: "markdown",
-        content: "# SQL 12. DDL & DML 데이터베이스 조작\n\n## 1. DDL 및 DML 분류\n\n- **DDL (Data Definition Language)**: 데이터베이스 객체(테이블 등)의 구조를 정의하고 수정하는 명령어 (`CREATE TABLE`, `DROP TABLE`).\n- **DML (Data Manipulation Language)**: 테이블 내 데이터를 생성, 수정, 삭제하는 명령어 (`INSERT`, `UPDATE`, `DELETE`, `SELECT`).\n\n---\n\n## 2. 테이블 생성 (`CREATE TABLE`)\n\n```sql\nCREATE TABLE students (\n  id   INT PRIMARY KEY,\n  name VARCHAR(50) NOT NULL,\n  age  INT\n);\n```\n\n---\n\n## 3. 데이터 삽입 (`INSERT INTO ... VALUES`)\n\n```sql\nINSERT INTO users (id, name, age, score, dept)\nVALUES (6, '강감찬', 27, 92, '기획팀');\n```\n\n---\n\n## 4. 데이터 수정 (`UPDATE ... SET`)\n\n```sql\nUPDATE users\nSET    score = 98\nWHERE  name = '정찬희';\n```\n\n---\n\n## 5. 데이터 삭제 (`DELETE FROM`)\n\n```sql\nDELETE FROM users\nWHERE  id = 4;\n```\n\n---\n\n## 6. 제약조건 (Constraints)\n\n`CREATE TABLE` 시 열에 규칙을 지정하여 데이터의 무결성을 보장할 수 있습니다.\n\n| 제약조건 | 의미 |\n|---|---|\n| `PRIMARY KEY` | 행을 유일하게 식별 (NOT NULL + UNIQUE) |\n| `FOREIGN KEY` | 다른 테이블의 PRIMARY KEY를 참조 |\n| `NOT NULL` | `NULL` 값 저장 금지 |\n| `UNIQUE` | 중복되지 않는 값만 저장 |\n| `CHECK` | 지정한 조건을 만족하는 값만 저장 |\n| `DEFAULT` | 값을 입력하지 않았을 때 사용할 기본값 |\n\n```sql\nCREATE TABLE orders (\n  id      INT PRIMARY KEY,\n  user_id INT NOT NULL,\n  price   INT CHECK (price >= 0),\n  status  VARCHAR(20) DEFAULT '주문접수',\n  FOREIGN KEY (user_id) REFERENCES users(id)\n);\n```\n\n---\n\n## 7. 테이블 구조 변경 (`ALTER TABLE`)\n\n이미 만들어진 테이블에 열을 추가/수정/삭제할 때 사용합니다.\n\n```sql\nALTER TABLE users ADD COLUMN phone VARCHAR(20);\nALTER TABLE users MODIFY COLUMN phone VARCHAR(30);\nALTER TABLE users DROP COLUMN phone;\n```\n\n---\n\n## 8. DELETE vs TRUNCATE vs DROP\n\n세 명령어 모두 데이터를 지우지만 동작 방식이 크게 다릅니다.\n\n| 구분 | 종류 | 삭제 대상 | 테이블 구조 | 롤백(ROLLBACK) |\n|---|---|---|---|---|\n| `DELETE` | DML | 조건에 맞는 행 | 유지 | 가능 |\n| `TRUNCATE` | DDL | 테이블의 모든 행 | 유지 | 불가능 |\n| `DROP` | DDL | 모든 행 + 테이블 자체 | 삭제됨 | 불가능 |\n\n```sql\nDELETE FROM users WHERE id = 4;   -- 특정 행만 삭제, 되돌릴 수 있음\nTRUNCATE TABLE users;              -- 전체 행 삭제, 테이블 구조는 남음\nDROP TABLE users;                  -- 테이블 자체를 완전히 삭제\n```\n\n---\n\n## 9. 대화식 SQL 실습\n\n```sql\nSELECT * FROM users;\n```"
+        "id": "SQL_13_CTE_TCL_DCL_cell_0",
+        "type": "markdown",
+        "content": "# SQL 12. 쿼리에 이름 붙이기와 안전장치 — VIEW, WITH, 트랜잭션\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 자주 쓰는 쿼리를 저장 — `VIEW`\n\n\"90점 이상 우수 회원\" 목록을 여기저기서 계속 쓴다면, 매번 같은 `WHERE`를 쓰는 대신 **쿼리에 이름을 붙여 저장**해 둘 수 있어요. 이게 뷰예요. 표처럼 조회하지만 데이터를 따로 저장하지는 않아요. 조회할 때마다 안의 쿼리가 실행돼요."
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_1",
+        "type": "code",
+        "content": "CREATE VIEW 우수회원 AS\nSELECT name, dept, score FROM users WHERE score >= 90;\n\nSELECT * FROM 우수회원;"
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_2",
+        "type": "markdown",
+        "content": "**왜 쓰나요?**\n- **재사용:** 복잡한 쿼리를 한 번만 써 두고 이름으로 불러요.\n- **보안:** 직원에게 users 표 전체(전화번호 등) 대신 필요한 열만 있는 뷰만 보여 줄 수 있어요.\n\n## 2. 이 쿼리 안에서만 쓰는 이름 — `WITH` (CTE)\n\n7장의 \"부서별 평균표를 만든 다음 그중 고르기\"를 떠올려 보세요. 서브쿼리가 괄호 안에 들어가서 읽기 힘들었어요. `WITH`로 **먼저 이름을 붙여 두고** 아래에서 쓰면 위에서 아래로 읽혀요."
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_3",
+        "type": "code",
+        "content": "WITH 부서평균 AS (\n  SELECT dept, AVG(score) AS 평균 FROM users GROUP BY dept\n)\nSELECT * FROM 부서평균 WHERE 평균 > 80;"
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_4",
+        "type": "markdown",
+        "content": "| | VIEW | WITH |\n|---|---|---|\n| 남아 있는 기간 | 지울 때까지 | 이 쿼리 한 번 |\n| 쓰는 곳 | 여러 쿼리에서 | 이 쿼리 안에서만 |\n\n## 3. 자기 자신을 부르는 WITH — 재귀 CTE\n\n`WITH RECURSIVE`는 결과를 **자기 자신에게 다시 넣으면서** 늘려 가요. 가장 간단한 예는 1부터 5까지 숫자 만들기예요."
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_5",
+        "type": "code",
+        "content": "WITH RECURSIVE 숫자(n) AS (\n  SELECT 1            -- 시작\n  UNION ALL\n  SELECT n + 1 FROM 숫자 WHERE n < 5   -- 앞 결과에 1을 더해 계속\n)\nSELECT n FROM 숫자;"
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_6",
+        "type": "markdown",
+        "content": "실무에서는 **조직도**(사장 → 부장 → 과장 …)나 **댓글의 답글의 답글**처럼, 몇 단계인지 모르는 계층을 따라갈 때 써요.\n\n## 4. 전부 되거나 전부 안 되거나 — 트랜잭션\n\n계좌 이체를 생각해 보세요. ① 내 통장에서 10만 원 빼기 ② 친구 통장에 10만 원 넣기. ①만 되고 ②가 실패하면 돈이 사라져요. **트랜잭션**은 여러 작업을 하나로 묶어서, **전부 성공하면 확정(`COMMIT`)**, 중간에 문제가 생기면 **전부 취소(`ROLLBACK`)**해요."
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_7",
+        "type": "code",
+        "content": "BEGIN;                                   -- 여기서부터 한 묶음\nUPDATE users SET score = 0 WHERE id = 1;\nUPDATE users SET score = 0 WHERE id = 2;\nROLLBACK;                                -- 없던 일로!\n\nSELECT name, score FROM users WHERE id IN (1, 2);   -- 원래 점수 그대로"
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_8",
+        "type": "markdown",
+        "content": "`SAVEPOINT`로 중간 저장 지점을 만들면 **일부만** 되돌릴 수도 있어요."
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_9",
+        "type": "code",
+        "content": "BEGIN;\nUPDATE users SET score = 100 WHERE id = 1;\nSAVEPOINT 여기까지;\nUPDATE users SET score = 0 WHERE id = 2;\nROLLBACK TO 여기까지;   -- 2번 수정만 취소\nCOMMIT;\n\nSELECT name, score FROM users WHERE id IN (1, 2);"
+      },
+      {
+        "id": "SQL_13_CTE_TCL_DCL_cell_10",
+        "type": "markdown",
+        "content": "트랜잭션이 지켜야 하는 네 가지 성질(**ACID**)은 이렇게 기억하면 돼요.\n\n| | 쉬운 말 |\n|---|---|\n| **원자성** (Atomicity) | 전부 되거나, 전부 안 되거나 |\n| **일관성** (Consistency) | 끝난 뒤에도 규칙(제약조건)이 지켜짐 |\n| **고립성** (Isolation) | 동시에 일하는 다른 사람의 중간 작업이 안 보임 |\n| **지속성** (Durability) | 확정된 건 전원이 꺼져도 남음 |\n\n## 5. 권한 주고 뺏기 — `GRANT`, `REVOKE`\n\n여러 사람이 쓰는 DB 서버에서는 \"누가 무엇을 할 수 있는지\"를 정해요.\n\n```sql\nGRANT SELECT ON users TO 인턴;     -- 조회만 허락\nREVOKE SELECT ON users FROM 인턴;  -- 권한 회수\n```\n\n> ⚠️ SQLite(이 사이트)는 파일 하나로 쓰는 DB라 사용자 계정이 없어서, 이 명령이 없어요.\n\n명령의 종류 이름은 시험에 자주 나와요. **DDL**(모양) · **DML**(데이터) · **TCL**(트랜잭션: `COMMIT`, `ROLLBACK`) · **DCL**(권한: `GRANT`, `REVOKE`)."
       }
     ]
   },
   {
-    id: "SQL_13_CTE_TCL_DCL",
-    filename: "SQL 13. 가상 테이블, TCL, DCL 및 트랜잭션",
-    title: "SQL 13. 가상 테이블, TCL, DCL 및 트랜잭션",
-    category: "sql",
-    cells: [
+    "id": "SQL_14_INDEX",
+    "filename": "SQL 13. 빨리 찾기 — 인덱스",
+    "title": "SQL 13. 빨리 찾기 — 인덱스",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_13_CTE_TCL_DCL_cell_0",
-        type: "markdown",
-        content: "# SQL 13. 가상 테이블, TCL, DCL 및 트랜잭션\n\n## 1. 뷰 (VIEW) - 가상 테이블\n\n뷰는 실제 데이터를 저장하지 않고, `SELECT` 쿼리 결과를 테이블처럼 사용할 수 있게 해주는 **가상의 테이블**입니다. 자주 사용하는 복잡한 쿼리를 뷰로 만들어두면 이후에는 간단히 조회만 하면 됩니다.\n\n```sql\nCREATE VIEW high_scorers AS\nSELECT id, name, dept, score\nFROM   users\nWHERE  score >= 85;\n\n-- 뷰는 일반 테이블처럼 조회 가능\nSELECT * FROM high_scorers;\n\n-- 뷰 삭제\nDROP VIEW high_scorers;\n```\n\n> 뷰의 장점: ① 복잡한 쿼리를 감춰 재사용성을 높임 ② 특정 열/행만 노출시켜 보안성을 높임. 단, 뷰는 원본 데이터를 저장하지 않으므로 조회할 때마다 내부 쿼리가 다시 실행됩니다.\n\n---\n\n## 2. WITH 절 (Common Table Expression - CTE)\n\n```sql\nWITH HighScorers AS (\n  SELECT id, name, dept, score\n  FROM   users\n  WHERE  score >= 85\n)\nSELECT * FROM HighScorers;\n```\n\nCTE는 뷰와 달리 **해당 쿼리 안에서만 임시로 존재**합니다.\n\n### 재귀 CTE (Recursive CTE)\n\n조직도처럼 계층 구조 데이터를 조회할 때는 `WITH RECURSIVE`를 사용합니다.\n\n```sql\nWITH RECURSIVE org_chart AS (\n  -- 1) 시작 지점: 최상위 관리자\n  SELECT id, name, manager_id, 1 AS level\n  FROM   employees\n  WHERE  manager_id IS NULL\n\n  UNION ALL\n\n  -- 2) 재귀 부분: 하위 직원을 계속 이어붙임\n  SELECT e.id, e.name, e.manager_id, oc.level + 1\n  FROM   employees e\n  JOIN   org_chart oc ON e.manager_id = oc.id\n)\nSELECT * FROM org_chart;\n```\n\n---\n\n## 3. TCL (Transaction Control Language) 및 ACID 특성\n\n- **TCL 명령어**: `COMMIT` (변경사항 확정 저장), `ROLLBACK` (변경사항 취소 원복), `SAVEPOINT` (복구 지점 지정).\n- **트랜잭션 ACID 4대 특성**:\n  - **원자성 (Atomicity)**: All or Nothing (모두 반영되거나 모두 취소).\n  - **일관성 (Consistency)**: 무결성 제약조건 유지.\n  - **고립성 (Isolation)**: 타 트랜잭션 격리.\n  - **지속성 (Durability)**: 성공 결과의 영구 저장.\n\n### SAVEPOINT 사용 예시\n\n```sql\nUPDATE users SET score = 100 WHERE id = 1;\nSAVEPOINT sp1;\n\nUPDATE users SET score = 0 WHERE id = 2;\nROLLBACK TO sp1;  -- sp1 이후 변경(사용자 2 수정)만 취소, 사용자 1 수정은 유지\n\nCOMMIT;\n```\n\n---\n\n## 4. DCL (Data Control Language) 권한 관리\n\n- **`GRANT`**: 사용자에게 권한 부여 (`GRANT SELECT ON users TO john;`).\n- **`REVOKE`**: 사용자로부터 권한 회수 (`REVOKE SELECT ON users FROM john;`).\n\n---\n\n## 5. 대화식 SQL 실습\n\n```sql\nSELECT * FROM users;\n```"
+        "id": "SQL_14_INDEX_cell_0",
+        "type": "markdown",
+        "content": "# SQL 13. 빨리 찾기 — 인덱스\n\n## 이럴 때 써요\n\n회원이 100만 명인데 \"김철수\"를 찾으려면, 인덱스가 없을 때 DB는 **100만 줄을 처음부터 끝까지** 읽어요(풀 스캔). 인덱스는 책 뒤의 **찾아보기**와 같아요. \"김철수 → 3,812쪽\"처럼 바로 찾아가요.\n\n> 아래 예제의 **실행하기**를 누르면 결과가 바로 나와요. 예제는 매번 처음 상태의 표에서 실행되니까, 데이터를 바꾸는 예제도 마음껏 눌러 보세요.\n\n## 1. 인덱스 만들기와 효과 확인\n\n`EXPLAIN QUERY PLAN`(SQLite 표기)을 쿼리 앞에 붙이면, DB가 **어떻게 찾을 계획인지** 알려 줘요.\n\n결과의 **detail** 칸을 보세요.\n\n- `SCAN users`: 전부 훑어봄\n- `SEARCH users USING INDEX ...`: 인덱스로 바로 찾아감"
+      },
+      {
+        "id": "SQL_14_INDEX_cell_1",
+        "type": "code",
+        "content": "EXPLAIN QUERY PLAN SELECT * FROM users WHERE name = '김철수';   -- 인덱스 전\n\nCREATE INDEX idx_users_name ON users(name);\n\nEXPLAIN QUERY PLAN SELECT * FROM users WHERE name = '김철수';   -- 인덱스 후"
+      },
+      {
+        "id": "SQL_14_INDEX_cell_2",
+        "type": "markdown",
+        "content": "지금은 5줄뿐이라 속도 차이를 느낄 수 없지만, 계획이 `SCAN`에서 `SEARCH`로 바뀐 게 보여요. 줄이 많을수록 이 차이가 커져요.\n\n## 2. 그럼 모든 열에 만들면 되나요? 아니요\n\n- **공간을 차지해요.** 찾아보기도 책의 일부라 두꺼워져요.\n- **쓰기가 느려져요.** 줄을 넣고·고치고·지울 때마다 찾아보기도 고쳐야 해요.\n\n그래서 **자주 찾는데(`WHERE`, `JOIN`, `ORDER BY`에 자주 나옴) 잘 안 바뀌는 열**에만 만들어요.\n\n## 3. 인덱스가 있어도 못 쓰는 경우\n\n**열을 가공해서 비교하면** 찾아보기를 쓸 수 없어요. 찾아보기에는 `score` 값이 적혀 있지, `score + 1`은 없으니까요."
+      },
+      {
+        "id": "SQL_14_INDEX_cell_3",
+        "type": "code",
+        "content": "CREATE INDEX idx_users_score ON users(score);\n\nEXPLAIN QUERY PLAN SELECT name FROM users WHERE score = 90;       -- SEARCH (인덱스 사용)\nEXPLAIN QUERY PLAN SELECT name FROM users WHERE score + 1 = 91;   -- SCAN (못 씀)"
+      },
+      {
+        "id": "SQL_14_INDEX_cell_4",
+        "type": "markdown",
+        "content": "`score + 1 = 91` 대신 `score = 90`처럼 **열은 그대로 두고 반대쪽을 계산**하세요.\n\n비슷하게, `LIKE '%철수'`처럼 **앞에 `%`**가 오면 \"어떤 글자로 시작하는지\" 모르니 찾아보기를 쓸 수 없어요.\n\n## 4. 여러 열을 묶은 인덱스는 순서가 중요해요\n\n`CREATE INDEX idx ON users(dept, score)`는 **부서 → 그 안에서 점수** 순으로 정리된 찾아보기예요. 전화번호부가 \"성 → 이름\" 순인 것처럼요.\n\n- `WHERE dept = '개발팀'` ✅ (첫 기준으로 찾음)\n- `WHERE dept = '개발팀' AND score > 90` ✅\n- `WHERE score > 90` ⚠️ 첫 기준(dept) 없이는 잘 못 써요. 전화번호부에서 이름만으로 사람을 찾기 어려운 것과 같아요.\n\n## 정리\n\n| | |\n|---|---|\n| 만들기 | `CREATE INDEX 이름 ON 표(열)` |\n| 확인 | `EXPLAIN QUERY PLAN` (SQLite) / `EXPLAIN` (MySQL 등) |\n| 만들면 좋은 열 | 자주 찾고, 잘 안 바뀌는 열 |\n| 못 쓰게 되는 경우 | 열을 가공, `LIKE '%...'`, 복합 인덱스 첫 열 빠짐 |"
       }
     ]
   },
   {
-    id: "SQL_14_INDEX",
-    filename: "SQL 14. 인덱스(INDEX)와 성능 기초",
-    title: "SQL 14. 인덱스(INDEX)와 성능 기초",
-    category: "sql",
-    cells: [
+    "id": "SQL_11_MODELING",
+    "filename": "SQL 14. 표를 어떻게 나눌까 — 데이터 모델링과 정규화",
+    "title": "SQL 14. 표를 어떻게 나눌까 — 데이터 모델링과 정규화",
+    "category": "sql",
+    "cells": [
       {
-        id: "SQL_14_INDEX_cell_0",
-        type: "markdown",
-        content: "# SQL 14. 인덱스(INDEX)와 성능 기초\n\n## 1. 인덱스란?\n\n인덱스(Index)는 책의 '찾아보기'처럼, 테이블에서 원하는 데이터를 빠르게 찾을 수 있도록 만든 별도의 자료구조입니다. 인덱스가 없으면 조건에 맞는 행을 찾기 위해 테이블 전체를 처음부터 끝까지 읽어야 합니다 (풀 테이블 스캔, Full Table Scan).\n\n---\n\n## 2. 인덱스 생성 (`CREATE INDEX`)\n\n```sql\nCREATE INDEX idx_users_name ON users(name);\n\n-- 인덱스 삭제\nDROP INDEX idx_users_name;\n```\n\n---\n\n## 3. 인덱스의 종류\n\n- **단일 열 인덱스**: 한 개의 열에 생성하는 기본 형태입니다.\n- **복합(다중 열) 인덱스**: 여러 열을 묶어서 생성합니다. 열의 순서가 중요하며, 맨 앞 열부터 조건에 사용해야 인덱스가 효과를 냅니다.\n- **UNIQUE 인덱스**: 값의 중복을 허용하지 않는 인덱스로, `PRIMARY KEY`와 `UNIQUE` 제약조건을 지정하면 자동으로 생성됩니다.\n\n```sql\nCREATE INDEX idx_users_dept_score ON users(dept, score);\nCREATE UNIQUE INDEX idx_users_email ON users(email);\n```\n\n---\n\n## 4. 인덱스의 장단점\n\n- **장점**: `WHERE`, `JOIN`, `ORDER BY`에서 조건/정렬 대상 열을 빠르게 찾아 조회 성능을 크게 향상시킵니다.\n- **단점**: 인덱스 자체도 저장 공간을 차지하며, `INSERT`/`UPDATE`/`DELETE` 시 인덱스도 함께 갱신해야 하므로 **쓰기 성능은 오히려 느려질 수 있습니다.** 따라서 조회가 잦고 변경이 적은 열에 선별적으로 생성하는 것이 좋습니다.\n\n---\n\n## 5. 인덱스가 잘 활용되지 않는 경우\n\n다음과 같은 경우에는 인덱스를 만들어도 사용되지 않거나 효과가 떨어질 수 있습니다.\n\n```sql\n-- 인덱스가 걸린 열을 가공하면 인덱스를 타지 못함\nSELECT * FROM users WHERE score + 1 = 91;\n\n-- LIKE에서 앞에 %가 오면 인덱스를 타지 못함\nSELECT * FROM users WHERE name LIKE '%철수';\n```\n\n---\n\n## 6. 실행계획 확인 (`EXPLAIN`)\n\n작성한 쿼리가 인덱스를 사용하는지, 풀 테이블 스캔을 하는지는 `EXPLAIN`으로 확인할 수 있습니다.\n\n```sql\nEXPLAIN SELECT * FROM users WHERE name = '김철수';\n```\n\n---\n\n## 7. 대화식 SQL 실습\n\n```sql\nCREATE INDEX idx_users_dept ON users(dept);\nSELECT * FROM users WHERE dept = '개발팀';\n```"
+        "id": "SQL_11_MODELING_cell_0",
+        "type": "markdown",
+        "content": "# SQL 14. 표를 어떻게 나눌까 — 데이터 모델링과 정규화\n\n## 처음 표를 만들면 이렇게 하고 싶어져요\n\n주문 기록을 **한 표에 전부** 적는 거예요.\n\n| 주문번호 | 회원이름 | 회원전화 | 상품 | 가격 |\n|---|---|---|---|---|\n| 101 | 김철수 | 010-1111 | 노트북 | 1500000 |\n| 102 | 김철수 | 010-1111 | 마우스 | 30000 |\n| 103 | 박민수 | 010-3333 | 키보드 | 120000 |\n\n편해 보이지만 곧 문제가 생겨요.\n\n- **고칠 때:** 김철수 씨가 번호를 바꾸면 주문 **줄마다** 다 고쳐야 해요. 하나라도 빠뜨리면 한 사람에게 번호가 두 개가 돼요. (수정 이상)\n- **넣을 때:** 아직 주문을 안 한 회원은 **적을 곳이 없어요.** (삽입 이상)\n- **지울 때:** 박민수 씨의 유일한 주문을 지우면 **박민수 씨 정보까지** 사라져요. (삭제 이상)\n\n그래서 **회원**과 **주문**을 다른 표로 나누고, 주문에는 회원 **번호만** 적어요. 이 가이드의 users와 orders가 바로 그렇게 나뉜 표예요. 이렇게 \"무엇을 어떤 표로 나눌지\" 정하는 일이 **데이터 모델링**이에요.\n\n## 1. 기본 용어\n\n| 용어 | 뜻 | 우리 예 |\n|---|---|---|\n| **엔티티** | 관리할 대상 (표가 됨) | 회원, 주문 |\n| **속성** | 대상의 항목 (열이 됨) | 이름, 나이, 가격 |\n| **관계** | 대상끼리의 연결 | 회원이 주문**한다** |\n| **기본키 (PK)** | 줄마다 다른 이름표 | users.id |\n| **외래키 (FK)** | 다른 표의 PK를 가리킴 | orders.user_id → users.id |\n\n## 2. 관계의 종류\n\n| 관계 | 예 | 표로 만드는 법 |\n|---|---|---|\n| **1:1** | 사람 – 여권 | 한쪽에 다른 쪽 번호 |\n| **1:N** | 회원 – 주문 (한 명이 여러 주문) | N쪽(주문)에 1쪽(회원) 번호 ← 가장 흔함 |\n| **N:M** | 학생 – 수업 (서로 여러 개) | **연결 표**를 하나 더 만듦 |\n\nN:M은 표 두 개로는 안 돼요. 학생 표에 \"수업1, 수업2…\" 칸을 만들 수도 없고 수업 표에 \"학생1, 학생2…\" 칸을 만들 수도 없으니까요. 그래서 \"누가 무엇을 듣는다\"만 적는 **연결 표**를 가운데 둬요."
+      },
+      {
+        "id": "SQL_11_MODELING_cell_1",
+        "type": "code",
+        "content": "CREATE TABLE students (id INT PRIMARY KEY, name TEXT);\nCREATE TABLE courses  (id INT PRIMARY KEY, title TEXT);\nCREATE TABLE enrollments (             -- 연결 표: 학생 번호 + 수업 번호\n  student_id INT REFERENCES students(id),\n  course_id  INT REFERENCES courses(id),\n  PRIMARY KEY (student_id, course_id)\n);\nINSERT INTO students VALUES (1, '강감찬'), (2, '유관순');\nINSERT INTO courses  VALUES (10, '파이썬'), (20, 'SQL');\nINSERT INTO enrollments VALUES (1, 10), (1, 20), (2, 20);\n\nSELECT s.name, c.title\nFROM enrollments e\nJOIN students s ON s.id = e.student_id\nJOIN courses  c ON c.id = e.course_id;"
+      },
+      {
+        "id": "SQL_11_MODELING_cell_2",
+        "type": "markdown",
+        "content": "## 3. 정규화 — 표를 나누는 규칙\n\n위의 \"한 표에 전부\" 문제를 단계별로 없애는 규칙이에요. 시험에 자주 나와요.\n\n**제1정규형 (1NF): 한 칸에 값 하나만**\n\n| ❌ 이름 | 취미 |\n|---|---|\n| 김철수 | 축구, 독서 |\n\n\"축구, 독서\"처럼 한 칸에 여러 값을 넣으면 \"축구 하는 사람 찾기\"가 어려워요. 줄을 나눠서 한 칸에 하나씩 넣어요.\n\n**제2정규형 (2NF): 기본키의 일부에만 딸린 정보는 따로**\n\n(학생번호, 수업번호)가 기본키인 수강 표에 **학생 이름**이 있다면, 이름은 학생번호만 알면 정해져요. 수업번호와는 상관없죠. 이런 열은 학생 표로 옮겨요. 그대로 두면 수업을 들을 때마다 이름이 반복돼요.\n\n**제3정규형 (3NF): 키가 아닌 열에 딸린 정보는 따로**\n\n회원 표에 `우편번호`와 `동네이름`이 같이 있으면, 동네이름은 회원이 아니라 **우편번호에** 딸린 정보예요. 우편번호 표로 옮겨요.\n\n## 4. 일부러 안 나누기 — 반정규화\n\n나누면 나눌수록 조회할 때 JOIN이 늘어서 느려질 수 있어요. 그래서 **조회가 아주 많은** 곳에서는 일부러 중복을 허용하기도 해요. 예를 들어 주문 표에 \"주문 당시 상품 가격\"을 같이 적어 두는 것처럼요. (상품 가격이 나중에 바뀌어도 그때 산 가격이 남아야 하니, 사실 이건 꼭 필요한 중복이에요.)\n\n**처음에는 나누는 걸 기본으로 하고, 성능 문제가 실제로 생기면 그때 합치는 게** 일반적인 순서예요.\n\n## 5. 설계 3단계\n\n| 단계 | 하는 일 |\n|---|---|\n| **개념적** 모델링 | 무엇을 관리할지, 무엇끼리 연결되는지 그림으로 (ERD) |\n| **논리적** 모델링 | 열·키·관계를 정하고 정규화 |\n| **물리적** 모델링 | 실제 DB 제품에 맞게 타입·인덱스 정하기 |"
       }
     ]
   },

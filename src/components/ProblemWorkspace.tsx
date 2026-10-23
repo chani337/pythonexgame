@@ -9,6 +9,7 @@ import { decodeAnswer } from '../utils/answerObfuscation';
 import { explainError } from '../utils/explainError';
 import { runWebChecks } from '../utils/webChecks';
 import { testLabel } from '../lib/pythonRuntime';
+import { optionOrder } from '../utils/optionOrder';
 import { pyDatasetById } from '../data/pyDatasets';
 import type { RunResponse, TestResult, PerfSpec } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
@@ -805,7 +806,8 @@ export default function ProblemWorkspace({
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {problem.quizOptions?.map((option, index) => {
+                {problem.quizOptions && optionOrder(problem.quizOptions.length, problem.id).map((index, position) => {
+                  const option = problem.quizOptions![index];
                   const isSelected = selectedQuizIndex === index;
                   return (
                     <button
@@ -828,7 +830,7 @@ export default function ProblemWorkspace({
                       }}
                     >
                       <strong style={{ color: isSelected ? '#ffffff' : 'var(--text-secondary)', marginRight: '0.5rem' }}>
-                        {index + 1}.
+                        {position + 1}.
                       </strong>
                       {option}
                     </button>

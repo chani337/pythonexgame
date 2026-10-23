@@ -3,13 +3,17 @@ import { docChapters } from '../data/docs';
 import type { DocCategory } from '../data/docs';
 import type { DocChapter } from '../data/docs';
 import type { RunResponse } from '../hooks/usePyodide';
+import type { SqlResultTable } from '../hooks/useSqlRunner';
+import { optionOrder } from '../utils/optionOrder';
 import { BookOpen, Play, Share2, AlertCircle, RefreshCw, PanelLeftClose, PanelLeftOpen, Maximize2, Minimize2, Sparkles, CheckCircle2, Circle, HelpCircle, X, Search, ChevronRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { chapterQuizzes } from '../data/chapterQuizzes';
+import { chapterQuizzes, quizAnswerId } from '../data/chapterQuizzes';
 import type { Problem } from '../data/problems';
 
 interface DocsViewerProps {
   runPythonCode: (code: string) => Promise<RunResponse>;
+  /** SQL chapters' example cells run here (sql.js), not through Python. */
+  runSqlCode?: (code: string) => Promise<RunResponse & { tables?: SqlResultTable[] }>;
   isPyodideLoading: boolean;
   onExportToSandbox: (code: string) => void;
   problems: Problem[];
@@ -73,6 +77,19 @@ const DOC_CATEGORY_DESCRIPTIONS: Record<DocCategory, string> = {
 // from the chapter title against each problem's category/title, scoped to the
 // same language. Best-effort: chapters with no matching problems (e.g. the
 // NumPy/Pandas/ML chapters) simply show no related-problems section.
+const SQL_CHAPTER_PROBLEM_CATEGORIES: Record<string, string[]> = {
+  SQL_1_SELECT: ['SELECT'],
+  SQL_2_WHERE: ['WHERE', 'CASE WHEN'],
+  SQL_4_ORDER_BY: ['ORDER BY', 'ORDER BY/FETCH FIRST'],
+  SQL_3_SELECT_NULL: ['NULL 처리'],
+  SQL_5_GROUP_BY: ['GROUP BY', '집계함수'],
+  SQL_7_JOIN: ['JOIN'],
+  SQL_8_SUBQUERY: ['서브쿼리'],
+  SQL_9_SET_OPERATOR: ['집합연산자'],
+  SQL_10_WINDOW_FUNCTION: ['윈도우함수'],
+  SQL_13_CTE_TCL_DCL: ['재귀CTE'],
+};
+
 function getRelatedProblems(chapter: DocChapter, allProblems: Problem[]): Problem[] {
   // HTML/CSS problem categories are written to appear verbatim in their
   // chapter's title ('폼' in "HTML 5. 폼(Form) 태그 총정리"), because the
@@ -84,7 +101,14 @@ function getRelatedProblems(chapter: DocChapter, allProblems: Problem[]): Proble
       .slice(0, 4);
   }
 
-  const lang = chapter.category === 'sql' ? 'sql' : chapter.category === 'java' ? 'java' : chapter.category === 'js' ? 'js' : chapter.category === 'c' ? 'c' : 'python';
+  // SQL: explicit, because the title keyword match below is noisy for SQL
+  // ("BY" in "ORDER BY" also matches GROUP BY problems).
+  if (chapter.category === 'sql') {
+    const cats = SQL_CHAPTER_PROBLEM_CATEGORIES[chapter.id] ?? [];
+    return allProblems.filter((p) => p.language === 'sql' && cats.includes(p.category)).slice(0, 4);
+  }
+
+  const lang = chapter.category === 'java' ? 'java' : chapter.category === 'js' ? 'js' : chapter.category === 'c' ? 'c' : 'python';
 
   const cleanTitle = chapter.title
     .replace(/^(SQL|Java|JS|C)\s*\d+\.\s*/i, '')
@@ -104,6 +128,7 @@ function getRelatedProblems(chapter: DocChapter, allProblems: Problem[]): Proble
 
 export default function DocsViewer({
   runPythonCode,
+  runSqlCode,
   isPyodideLoading,
   onExportToSandbox,
   problems,
@@ -125,7 +150,7 @@ export default function DocsViewer({
     const saved = localStorage.getItem('pyquests_docs_last_chapter_idx');
     return saved !== null ? JSON.parse(saved) : 0;
   });
-  const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean; images?: string[] }>>({});
+  const [codeOutputs, setCodeOutputs] = useState<Record<string, { stdout: string; error: string | null; isRunning: boolean; images?: string[]; tables?: SqlResultTable[] }>>({});
   const [isTocOpen, setIsTocOpen] = useState<boolean>(() => {
     const saved = localStorage.getItem('pyquests_docs_toc_open');
     return saved !== null ? JSON.parse(saved) : true;
@@ -267,13 +292,14 @@ export default function DocsViewer({
   const readCountInCategory = filteredChapters.filter((ch) => readChapterIds.includes(ch.id)).length;
   const isActiveChapterRead = readChapterIds.includes(activeChapter.id);
   const activeQuiz = chapterQuizzes.find((q) => q.chapterId === activeChapter.id);
+  const activeQuizId = activeQuiz ? quizAnswerId(activeQuiz) : activeChapter.id;
   const relatedProblems = getRelatedProblems(activeChapter, problems);
 
   // Auto-mark the chapter as read once every quiz question is answered correctly
   useEffect(() => {
     if (!activeQuiz) return;
     const allCorrect = activeQuiz.questions.every((q, qIdx) => {
-      const key = `${activeChapter.id}_${qIdx}`;
+      const key = `${activeQuizId}_${qIdx}`;
       return quizAnswers[key] === q.correctIndex;
     });
     if (allCorrect) {
@@ -291,7 +317,7 @@ export default function DocsViewer({
           <h3 style={{ fontSize: '1.05rem', fontWeight: '700', color: '#1a1a1a' }}>이해도 체크</h3>
         </div>
         {activeQuiz.questions.map((q, qIdx) => {
-          const key = `${activeChapter.id}_${qIdx}`;
+          const key = `${activeQuizId}_${qIdx}`;
           const answered = quizAnswers[key];
           return (
             <div key={key} style={{ marginBottom: '1.5rem', padding: '1.1rem 1.25rem', background: 'var(--bg-dark)', border: '1px solid var(--border-subtle)' }}>
@@ -299,7 +325,8 @@ export default function DocsViewer({
                 Q{qIdx + 1}. {q.question}
               </p>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                {q.options.map((opt, optIdx) => {
+                {optionOrder(q.options.length, `${activeQuizId}:${qIdx}`).map((optIdx) => {
+                  const opt = q.options[optIdx];
                   const isSelected = answered === optIdx;
                   const isCorrectOption = optIdx === q.correctIndex;
                   let bg = '#ffffff';
@@ -319,7 +346,7 @@ export default function DocsViewer({
                   return (
                     <button
                       key={optIdx}
-                      onClick={() => selectQuizAnswer(activeChapter.id, qIdx, optIdx)}
+                      onClick={() => selectQuizAnswer(activeQuizId, qIdx, optIdx)}
                       disabled={answered !== undefined}
                       style={{
                         textAlign: 'left',
@@ -380,7 +407,9 @@ export default function DocsViewer({
               <div key={cell.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '2rem' }}>
                 <div className="editor-frame">
                   <div className="editor-tabs" style={{ height: '36px' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8' }}>Python 예제 코드</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#94a3b8' }}>
+                      {activeChapter.category === 'sql' ? 'SQL 예제 코드 · users · orders 테이블' : 'Python 예제 코드'}
+                    </span>
                   </div>
                   <pre
                     className="docs-code-block"
@@ -398,7 +427,7 @@ export default function DocsViewer({
                     {cell.content}
                   </pre>
                   <div style={{ padding: '0.6rem 1rem', background: '#0a080f', borderTop: '1px solid #1e1b2e', display: 'flex', justifyContent: 'flex-end', gap: '0.5rem' }}>
-                    <button
+                    {activeChapter.category !== 'sql' && <button
                       className="btn-secondary"
                       onClick={() => handleExport(cell.content)}
                       style={{
@@ -411,11 +440,11 @@ export default function DocsViewer({
                       }}
                     >
                       <Share2 size={12} /> 샌드박스 전송
-                    </button>
+                    </button>}
                     <button
                       className="btn-primary"
                       onClick={() => handleRunCellCode(cell.id, cell.content)}
-                      disabled={outputState.isRunning || isPyodideLoading}
+                      disabled={outputState.isRunning || (isPyodideLoading && activeChapter.category !== 'sql')}
                       style={{
                         padding: '0.45rem 1rem',
                         fontSize: '0.72rem',
@@ -434,6 +463,33 @@ export default function DocsViewer({
                     </button>
                   </div>
                 </div>
+                {outputState.tables && outputState.tables.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                    {outputState.tables.map((t, ti) => (
+                      <div key={ti} style={{ overflowX: 'auto', border: '1px solid var(--border-subtle)', background: '#ffffff' }}>
+                        <table style={{ borderCollapse: 'collapse', fontSize: '0.78rem', fontFamily: 'var(--font-mono)', minWidth: '100%' }}>
+                          <thead>
+                            <tr style={{ background: '#f4f4f6', borderBottom: '2px solid #1a1a1a' }}>
+                              {t.columns.map((c, ci) => (
+                                <th key={ci} style={{ padding: '0.4rem 0.75rem', textAlign: 'left', fontWeight: 700, color: '#1a1a1a', whiteSpace: 'nowrap' }}>{c}</th>
+                              ))}
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {t.rows.map((row, ri) => (
+                              <tr key={ri} style={{ borderBottom: '1px solid var(--border-subtle)' }}>
+                                {row.map((cell, ci) => (
+                                  <td key={ci} style={{ padding: '0.35rem 0.75rem', whiteSpace: 'nowrap', color: cell === 'NULL' ? 'var(--text-muted)' : '#1a1a1a', fontStyle: cell === 'NULL' ? 'italic' : 'normal' }}>{cell}</td>
+                                ))}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                        <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', padding: '0.25rem 0.75rem' }}>{t.rows.length}행</div>
+                      </div>
+                    ))}
+                  </div>
+                )}
                 {outputState.images && outputState.images.length > 0 && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     {outputState.images.map((b64, i) => (
@@ -582,8 +638,9 @@ export default function DocsViewer({
   };
 
   const handleRunCellCode = async (cellId: string, rawCode: string) => {
-    if (isPyodideLoading) return;
-    
+    const isSql = activeChapter.category === 'sql';
+    if (isPyodideLoading && !isSql) return;
+
     // Set running state
     setCodeOutputs(prev => ({
       ...prev,
@@ -591,13 +648,16 @@ export default function DocsViewer({
     }));
 
     try {
-      // Raw SQL is auto-detected and routed through an in-memory sqlite3 harness
-      // inside usePyodide's runCode, so it can just be passed through as-is here.
-      const res = await runPythonCode(rawCode);
+      // SQL chapters run on sql.js against the same users/orders seed the SQL
+      // problems use (a fresh database per run). This used to go to Python,
+      // whose SQL auto-detection was removed when useSqlRunner took over.
+      const res = isSql && runSqlCode ? await runSqlCode(rawCode) : await runPythonCode(rawCode);
+      const tables = (res as { tables?: SqlResultTable[] }).tables;
       setCodeOutputs(prev => ({
         ...prev,
         [cellId]: {
-          stdout: res.stdout || (res.images?.length ? '' : '실행 성공 (출력 결과 없음)'),
+          tables: tables?.length ? tables : undefined,
+          stdout: tables?.length ? '' : res.stdout || (res.images?.length ? '' : isSql ? '실행 완료 — 결과가 0줄이에요. (조건에 맞는 행이 없거나, INSERT·UPDATE처럼 조회하지 않는 문장이에요)' : '실행 성공 (출력 결과 없음)'),
           error: res.error || null,
           isRunning: false,
           images: res.images,

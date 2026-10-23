@@ -23,13 +23,14 @@
     "verify:shared-pc": "node scripts/verify-shared-pc.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
-    "verify:all": "npm run lint && tsc -b && npm run test && npm run check:problems && npm run verify:sandbox && npm run verify:pyodide && npm run verify:sql && npm run verify:web && npm run verify:guest-merge && npm run verify:shared-pc && npm run check:site && npm run verify:routing",
+    "verify:all": "npm run lint && tsc -b && npm run test && npm run check:problems && npm run verify:sandbox && npm run verify:pyodide && npm run verify:sql && npm run verify:sql-guide && npm run verify:web && npm run verify:guest-merge && npm run verify:shared-pc && npm run check:site && npm run verify:routing",
     "build:site": "node scripts/build-site.mjs",
     "check:site": "node scripts/build-site.mjs --check",
     "verify:routing": "node scripts/verify-routing.mjs",
     "verify:web": "node scripts/verify-web-checks.mjs",
     "verify:pwa-update": "node scripts/verify-pwa-update.mjs",
-    "verify:pylibs": "node scripts/verify-python-libs.mjs"
+    "verify:pylibs": "node scripts/verify-python-libs.mjs",
+    "verify:sql-guide": "node scripts/verify-sql-guide.mjs"
   },
   "dependencies": {
     "@codemirror/lang-html": "^6.4.12",

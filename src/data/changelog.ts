@@ -25,6 +25,16 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-23',
+    title: 'SQL 학습 가이드를 처음 배우는 사람 눈높이로 다시 썼어요',
+    items: [
+      'SQL 가이드 14장을 모두 새로 썼어요. 문법을 나열하는 대신 "이럴 때 써요"로 시작해서, 왜 필요한지와 자주 하는 실수를 같이 설명해요. WHERE와 HAVING의 차이처럼 헷갈리는 건 나란히 비교해 두었어요.',
+      '예제 72개를 가이드 안에서 바로 실행해 볼 수 있어요. 문제 풀이와 같은 회원(users)·주문(orders) 표로 실행되고 결과가 표로 나와요. 예제는 매번 처음 상태에서 실행되니 데이터를 바꾸는 예제도 마음껏 눌러 보세요.',
+      'ROLLUP, GRANT처럼 이 사이트에서 실행되지 않는 Oracle 문법에는 표시를 달고, 대신 실행해 볼 수 있는 방법을 같이 적었어요. 순서도 배우기 쉽게 바꿨어요(소계·총계는 윈도우 함수 뒤로).',
+      '학습 가이드의 이해도 체크와 객관식 문제에서 정답이 대부분 첫 번째 보기에 있던 문제를 고쳤어요. 이제 보기 순서가 문제마다 섞여서 나와요.',
+    ],
+  },
+  {
     date: '2026-10-21',
     title: '실전 문제와 효율성 테스트가 생겼어요',
     items: [

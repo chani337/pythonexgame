@@ -529,6 +529,7 @@ print("변환 리스트:", result)
           user ? (
             <DocsViewer
               runPythonCode={runCode}
+              runSqlCode={runSqlCode}
               isPyodideLoading={isPyodideLoading}
               onExportToSandbox={(codeText) => {
                 setSandboxCode(codeText);

@@ -9,7 +9,15 @@ export interface ChapterQuizQuestion {
 export interface ChapterQuiz {
   chapterId: string;
   questions: ChapterQuizQuestion[];
+  // Bumped when a chapter's questions are rewritten. Answers are stored by
+  // (chapter, question index), so without this a student's answer to the old
+  // question 1 would show as already chosen on the new question 1.
+  revision?: number;
 }
+
+/** Key answers are saved under (user_quiz_answers.chapter_id, localStorage). */
+export const quizAnswerId = (quiz: ChapterQuiz) =>
+  quiz.revision ? `${quiz.chapterId}@v${quiz.revision}` : quiz.chapterId;
 
 export const chapterQuizzes: ChapterQuiz[] = [
   {
@@ -252,239 +260,253 @@ export const chapterQuizzes: ChapterQuiz[] = [
   },
   {
     chapterId: 'SQL_1_SELECT',
+    revision: 2,
     questions: [
       {
-        question: '테이블의 모든 열을 조회할 때 사용하는 기호는?',
-        options: ['*', '%', '#', '@'],
-        correctIndex: 0,
-        explanation: 'SELECT * FROM 테이블명; 형태로 모든 열을 조회할 수 있습니다.',
+        question: "회원 표에서 '어떤 부서들이 있는지' 종류만 한 번씩 보고 싶어요. 알맞은 쿼리는?",
+        options: ["SELECT dept FROM users;", "SELECT DISTINCT dept FROM users;", "SELECT UNIQUE dept FROM users;", "SELECT * FROM users GROUP;"],
+        correctIndex: 1,
+        explanation: "DISTINCT는 중복을 없애고 종류만 한 번씩 보여 줘요. 그냥 SELECT dept면 개발팀이 세 번 나와요.",
       },
       {
-        question: '중복된 값을 제거하고 조회할 때 사용하는 키워드는?',
-        options: ['DISTINCT', 'UNIQUE', 'ONLY', 'FILTER'],
-        correctIndex: 0,
-        explanation: 'SELECT DISTINCT 컬럼명은 중복을 제거한 유일한 값만 조회합니다.',
+        question: "SELECT name score FROM users; 를 실행하면 어떻게 될까요?",
+        options: ["오류가 난다", "name과 score 두 열이 나온다", "score라는 이름의 열에 이름들이 나온다", "아무것도 안 나온다"],
+        correctIndex: 2,
+        explanation: "쉼표가 없으면 score가 name의 별명(AS)이 돼요. 오류 없이 이상한 결과가 나와서 더 찾기 어려운 실수예요.",
       },
     ],
   },
   {
     chapterId: 'SQL_2_WHERE',
+    revision: 2,
     questions: [
       {
-        question: '여러 조건을 모두 만족해야 조회되는 연산자는?',
-        options: ['AND', 'OR', 'NOT', 'IN'],
-        correctIndex: 0,
-        explanation: 'AND는 나열된 모든 조건이 참일 때만 데이터를 조회합니다.',
+        question: "'개발팀이나 기획팀 중에서 95점 이상'을 찾으려면?",
+        options: ["WHERE dept = '개발팀' OR dept = '기획팀' AND score >= 95", "WHERE (dept = '개발팀' OR dept = '기획팀') AND score >= 95", "WHERE dept = '개발팀' AND dept = '기획팀' AND score >= 95", "WHERE dept IN 개발팀, 기획팀 AND score >= 95"],
+        correctIndex: 1,
+        explanation: "AND가 OR보다 먼저 계산돼요. 괄호가 없으면 '개발팀 전원 + 기획팀 95점 이상'이 돼 버려요.",
       },
       {
-        question: '문자열 패턴 검색에 사용하는 키워드는?',
-        options: ['LIKE', 'MATCH', 'SEARCH', 'FIND'],
-        correctIndex: 0,
-        explanation: 'LIKE와 와일드카드(%, _)를 사용해 문자열 패턴을 검색합니다.',
-      },
-    ],
-  },
-  {
-    chapterId: 'SQL_3_SELECT_NULL',
-    questions: [
-      {
-        question: 'NULL 값인지 확인할 때 사용하는 연산자는?',
-        options: ['IS NULL', '= NULL', '== NULL', 'NULL()'],
-        correctIndex: 0,
-        explanation: 'NULL은 = 로 비교할 수 없으므로 반드시 IS NULL / IS NOT NULL을 사용해야 합니다.',
-      },
-      {
-        question: 'NULL이 아닌 첫 번째 값을 반환하는 표준 SQL 함수는?',
-        options: ['COALESCE', 'NVL', 'IFNULL', 'ISNULL'],
-        correctIndex: 0,
-        explanation: 'COALESCE는 표준 SQL 함수이며, NVL(Oracle)/IFNULL(MySQL)은 특정 DBMS 전용 함수입니다.',
+        question: "점수에 따라 '우수/보통'을 옆 칸에 표시만 하고, 줄은 하나도 빼지 않으려면?",
+        options: ["WHERE", "HAVING", "CASE WHEN", "LIKE"],
+        correctIndex: 2,
+        explanation: "WHERE는 줄을 걸러 내요. 줄은 그대로 두고 값만 조건에 따라 바꿔 보여 줄 때는 CASE WHEN이에요.",
       },
     ],
   },
   {
     chapterId: 'SQL_4_ORDER_BY',
+    revision: 2,
     questions: [
       {
-        question: '내림차순 정렬을 나타내는 키워드는?',
-        options: ['DESC', 'ASC', 'DOWN', 'REV'],
-        correctIndex: 0,
-        explanation: 'DESC는 내림차순(큰 값→작은 값), ASC는 오름차순(기본값)입니다.',
+        question: "'점수 상위 3명'을 바르게 구하는 쿼리는?",
+        options: ["SELECT name FROM users LIMIT 3;", "SELECT name FROM users ORDER BY score LIMIT 3;", "SELECT name FROM users ORDER BY score DESC LIMIT 3;", "SELECT TOP name FROM users;"],
+        correctIndex: 2,
+        explanation: "높은 순(DESC)으로 정렬한 뒤 잘라야 상위예요. ORDER BY 없이 LIMIT만 쓰면 '아무거나 3명'이에요.",
       },
       {
-        question: '조회 결과의 행 개수를 제한하는 키워드는?',
-        options: ['LIMIT', 'TOP', 'MAX', 'COUNT'],
-        correctIndex: 0,
-        explanation: 'LIMIT은 조회할 최대 행 개수를 제한합니다.',
+        question: "한 페이지에 10개씩 보여 주는 게시판의 3페이지를 가져오려면?",
+        options: ["LIMIT 10 OFFSET 30", "LIMIT 10 OFFSET 20", "LIMIT 30 OFFSET 10", "LIMIT 3 OFFSET 10"],
+        correctIndex: 1,
+        explanation: "앞의 1·2페이지(20개)를 건너뛰고 10개를 가져와요. N페이지는 OFFSET (N-1)×10이에요.",
+      },
+    ],
+  },
+  {
+    chapterId: 'SQL_3_SELECT_NULL',
+    revision: 2,
+    questions: [
+      {
+        question: "점수가 비어 있는 회원을 찾는 올바른 조건은?",
+        options: ["WHERE score = NULL", "WHERE score == NULL", "WHERE score = ''", "WHERE score IS NULL"],
+        correctIndex: 3,
+        explanation: "NULL은 '모름'이라 =로 비교하면 결과도 '모름'이 되어 아무도 안 나와요. 전용 문법 IS NULL을 써요.",
+      },
+      {
+        question: "6명 중 1명의 점수가 NULL일 때, COUNT(*)와 COUNT(score)의 결과는?",
+        options: ["6, 6", "6, 5", "5, 5", "5, 6"],
+        correctIndex: 1,
+        explanation: "COUNT(*)는 줄 수(6), COUNT(열)은 그 열이 비어 있지 않은 줄 수(5)예요. AVG도 NULL을 빼고 계산해요.",
       },
     ],
   },
   {
     chapterId: 'SQL_5_GROUP_BY',
+    revision: 2,
     questions: [
       {
-        question: '그룹별 집계 결과를 다시 필터링하는 절은?',
-        options: ['HAVING', 'WHERE', 'FILTER', 'GROUP'],
-        correctIndex: 0,
-        explanation: 'WHERE는 그룹화 전 행을 필터링하고, HAVING은 GROUP BY 이후의 집계 결과를 필터링합니다.',
+        question: "'부서 평균 점수가 80점 넘는 부서만' 보려면 조건을 어디에 쓰나요?",
+        options: ["WHERE AVG(score) > 80", "HAVING AVG(score) > 80", "ORDER BY AVG(score) > 80", "SELECT AVG(score) > 80"],
+        correctIndex: 1,
+        explanation: "WHERE는 묶기 전에 한 줄씩 걸러서, 그때는 아직 부서 평균이 없어요. 묶은 뒤의 값으로 거르는 건 HAVING이에요.",
       },
       {
-        question: '그룹 안 데이터의 개수를 세는 함수는?',
-        options: ['COUNT(*)', 'SUM(*)', 'TOTAL(*)', 'LEN(*)'],
-        correctIndex: 0,
-        explanation: 'COUNT(*)는 조건에 맞는 행의 개수를 셉니다.',
-      },
-    ],
-  },
-  {
-    chapterId: 'SQL_6_GROUP_FUNCTION',
-    questions: [
-      {
-        question: '계층 구조를 기반으로 소계와 총계를 생성하는 함수는?',
-        options: ['ROLLUP', 'CUBE', 'GROUPING SETS', 'UNION'],
-        correctIndex: 0,
-        explanation: 'ROLLUP(A, B)는 (A,B), (A), () 순으로 계층적인 소계/총계를 생성합니다.',
-      },
-      {
-        question: '가능한 모든 조합의 집계를 생성하는 함수는?',
-        options: ['CUBE', 'ROLLUP', 'HAVING', 'DISTINCT'],
-        correctIndex: 0,
-        explanation: 'CUBE(A, B)는 (A,B), (A), (B), () 모든 조합을 생성합니다.',
+        question: "SELECT dept, name, COUNT(*) FROM users GROUP BY dept; 가 문제인 이유는?",
+        options: ["COUNT(*)는 GROUP BY와 같이 못 써서", "dept를 두 번 써서", "한 부서로 뭉친 줄에 여러 사람 중 누구의 name을 보여 줄지 정할 수 없어서", "ORDER BY가 없어서"],
+        correctIndex: 2,
+        explanation: "뭉친 줄에는 묶은 기준이나 집계값만 올 수 있어요. 대부분의 DB는 오류를, SQLite는 아무나 한 명을 보여 줘요.",
       },
     ],
   },
   {
     chapterId: 'SQL_7_JOIN',
+    revision: 2,
     questions: [
       {
-        question: '두 테이블 모두 조건에 일치하는 데이터만 조회하는 조인은?',
-        options: ['INNER JOIN', 'LEFT JOIN', 'CROSS JOIN', 'FULL OUTER JOIN'],
-        correctIndex: 0,
-        explanation: 'INNER JOIN은 양쪽 테이블 모두에 일치하는 데이터가 있는 행만 결합합니다.',
+        question: "'한 번도 주문하지 않은 회원'을 찾는 방법으로 알맞은 것은?",
+        options: ["users INNER JOIN orders 후 전부 보기", "users LEFT JOIN orders 후 WHERE o.order_id IS NULL", "users CROSS JOIN orders", "orders만 조회하기"],
+        correctIndex: 1,
+        explanation: "LEFT JOIN은 짝이 없는 회원도 남기고 주문 쪽을 NULL로 채워요. 그 NULL인 줄이 바로 주문 안 한 회원이에요.",
       },
       {
-        question: '조인 조건 없이 두 테이블의 모든 조합을 만드는 조인은?',
-        options: ['CROSS JOIN', 'INNER JOIN', 'SELF JOIN', 'RIGHT JOIN'],
-        correctIndex: 0,
-        explanation: 'CROSS JOIN은 카티션 곱으로, 두 테이블의 모든 행 조합을 생성합니다.',
+        question: "회원 5명, 주문 4건인데 JOIN 결과가 20줄 나왔어요. 가장 의심되는 원인은?",
+        options: ["데이터가 중복 저장돼서", "ON 조인 조건을 빠뜨려서", "LEFT JOIN을 써서", "ORDER BY를 안 써서"],
+        correctIndex: 1,
+        explanation: "조건 없이 붙이면 모든 조합(5×4=20)이 나와요. 행 수가 갑자기 늘면 조인 조건부터 확인하세요.",
       },
     ],
   },
   {
     chapterId: 'SQL_8_SUBQUERY',
+    revision: 2,
     questions: [
       {
-        question: '메인 쿼리의 열을 참조하며 행마다 반복 실행되는 서브쿼리는?',
-        options: ['연관 서브쿼리', '비연관 서브쿼리', '스칼라 서브쿼리', '인라인 뷰'],
-        correctIndex: 0,
-        explanation: '연관(Correlated) 서브쿼리는 메인 쿼리의 각 행에 대해 반복 실행됩니다.',
+        question: "주문표 user_id에 NULL이 하나 섞여 있을 때, '주문한 적 없는 회원'을 안전하게 찾는 방법은?",
+        options: ["WHERE id NOT IN (SELECT user_id FROM orders)", "WHERE id != (SELECT user_id FROM orders)", "WHERE NOT EXISTS (SELECT 1 FROM orders o WHERE o.user_id = u.id)", "WHERE id IN (SELECT NULL FROM orders)"],
+        correctIndex: 2,
+        explanation: "NOT IN 목록에 NULL이 있으면 결과가 0명이 돼요. NOT EXISTS는 짝이 있는지만 봐서 NULL 영향을 안 받아요.",
       },
       {
-        question: '서브쿼리 결과가 한 건이라도 존재하는지만 확인하는 연산자는?',
-        options: ['EXISTS', 'IN', 'ANY', 'ALL'],
-        correctIndex: 0,
-        explanation: 'EXISTS는 결과의 존재 여부만 확인하며, NULL의 영향을 받지 않아 NOT IN보다 안전합니다.',
+        question: "'자기 부서 평균보다 점수가 높은 사람'처럼, 서브쿼리가 바깥 줄마다 다시 계산돼야 하는 경우를 뭐라고 하나요?",
+        options: ["스칼라 서브쿼리", "연관 서브쿼리", "인라인 뷰", "집합 연산"],
+        correctIndex: 1,
+        explanation: "서브쿼리 안에서 바깥 쿼리의 열(u.dept)을 쓰면, 바깥 줄마다 다시 실행되는 연관 서브쿼리가 돼요.",
       },
     ],
   },
   {
     chapterId: 'SQL_9_SET_OPERATOR',
+    revision: 2,
     questions: [
       {
-        question: '중복을 제거하지 않고 두 쿼리 결과를 합치는 연산자는?',
-        options: ['UNION ALL', 'UNION', 'INTERSECT', 'EXCEPT'],
-        correctIndex: 0,
-        explanation: 'UNION ALL은 중복을 제거하지 않아 UNION보다 속도가 빠릅니다.',
+        question: "두 지점의 판매 기록을 그대로 이어 붙이려고 해요(같은 기록이 있어도 둘 다 남겨야 함). 알맞은 것은?",
+        options: ["UNION", "UNION ALL", "INTERSECT", "EXCEPT"],
+        correctIndex: 1,
+        explanation: "UNION은 중복을 하나로 합쳐서 같은 판매 기록이 사라질 수 있어요. 그대로 이어 붙이는 건 UNION ALL이고, 더 빠르기도 해요.",
       },
       {
-        question: '두 쿼리 결과의 교집합을 구하는 연산자는?',
-        options: ['INTERSECT', 'UNION', 'EXCEPT', 'MINUS'],
-        correctIndex: 0,
-        explanation: 'INTERSECT는 두 쿼리 결과에 공통으로 존재하는 데이터만 반환합니다.',
+        question: "집합 연산자로 두 쿼리를 합칠 때 반드시 지켜야 하는 것은?",
+        options: ["두 쿼리가 같은 표를 조회해야 한다", "두 쿼리의 열 개수가 같아야 한다", "두 쿼리 모두 ORDER BY가 있어야 한다", "WHERE를 쓰면 안 된다"],
+        correctIndex: 1,
+        explanation: "위아래 열 개수와 종류가 맞아야 해요. 다른 표끼리도 합칠 수 있고, ORDER BY는 맨 끝에 한 번만 써요.",
       },
     ],
   },
   {
     chapterId: 'SQL_10_WINDOW_FUNCTION',
+    revision: 2,
     questions: [
       {
-        question: '동률이 있어도 무조건 고유한 순번을 부여하는 함수는?',
-        options: ['ROW_NUMBER()', 'RANK()', 'DENSE_RANK()', 'NTILE()'],
-        correctIndex: 0,
-        explanation: 'ROW_NUMBER()는 동률과 상관없이 1부터 유일한 번호를 매깁니다.',
+        question: "100, 95, 95, 90점일 때 RANK()로 매긴 90점의 순위는?",
+        options: ["2", "3", "4", "5"],
+        correctIndex: 2,
+        explanation: "95점 두 명이 공동 2등이라 3등을 건너뛰고 90점은 4등이에요. DENSE_RANK()라면 3등이에요.",
       },
       {
-        question: '현재 행 기준 이전 행의 값을 가져오는 함수는?',
-        options: ['LAG()', 'LEAD()', 'FIRST_VALUE()', 'RANK()'],
-        correctIndex: 0,
-        explanation: 'LAG()는 이전 행의 값을, LEAD()는 다음 행의 값을 가져옵니다.',
+        question: "'부서별 1등'만 뽑으려면 어떤 조합이 알맞나요?",
+        options: ["GROUP BY dept + MAX(name)", "ROW_NUMBER() OVER (PARTITION BY dept ORDER BY score DESC) 후 바깥에서 = 1", "ORDER BY score DESC LIMIT 1", "DISTINCT dept"],
+        correctIndex: 1,
+        explanation: "PARTITION BY로 부서마다 순번을 매기고, 서브쿼리 바깥에서 1번만 고르면 돼요. LIMIT 1은 전체 1등 한 명뿐이에요.",
       },
     ],
   },
   {
-    chapterId: 'SQL_11_MODELING',
+    chapterId: 'SQL_6_GROUP_FUNCTION',
+    revision: 2,
     questions: [
       {
-        question: '부서 하나에 여러 사원이 속하는 것과 같은 관계는?',
-        options: ['1:N', '1:1', 'N:M', '0:1'],
-        correctIndex: 0,
-        explanation: '한쪽의 인스턴스 하나가 다른 쪽 여러 인스턴스와 대응하는 것을 1:N 관계라고 합니다.',
+        question: "ROLLUP(dept)를 쓰면 GROUP BY dept 결과에 무엇이 더해지나요?",
+        options: ["부서별 순위", "전체 합계 한 줄", "부서마다 빈 줄", "중복 제거"],
+        correctIndex: 1,
+        explanation: "ROLLUP은 소계와 총계를 붙여 줘요. 기준이 하나면 '전체' 한 줄이 추가돼요.",
       },
       {
-        question: '테이블에서 각 행을 유일하게 식별하는 속성은?',
-        options: ['기본키(Primary Key)', '외래키', '일반 속성', '도메인'],
-        correctIndex: 0,
-        explanation: '기본키는 유일성과 최소성을 만족하며 각 행을 식별하는 대표 속성입니다.',
+        question: "ROLLUP이 없는 SQLite에서 '부서별 합계 + 전체 합계'를 한 결과로 만들려면?",
+        options: ["GROUP BY 두 번 쓰기", "부서별 합계 쿼리와 전체 합계 쿼리를 UNION ALL로 잇기", "HAVING SUM(score)", "WINDOW 함수만 쓰기"],
+        correctIndex: 1,
+        explanation: "ROLLUP의 결과는 결국 두 쿼리를 이어 붙인 것과 같아서, UNION ALL로 똑같이 만들 수 있어요.",
       },
     ],
   },
   {
     chapterId: 'SQL_12_DDL_DML',
+    revision: 2,
     questions: [
       {
-        question: '테이블 구조 자체를 완전히 삭제하는 명령어는?',
-        options: ['DROP', 'DELETE', 'TRUNCATE', 'REMOVE'],
-        correctIndex: 0,
-        explanation: 'DROP TABLE은 테이블 구조와 데이터를 모두 삭제합니다.',
+        question: "UPDATE users SET score = 0; 을 실행하면?",
+        options: ["오류가 난다", "첫 번째 회원만 0점이 된다", "모든 회원의 점수가 0점이 된다", "아무 일도 없다"],
+        correctIndex: 2,
+        explanation: "WHERE가 없으면 모든 줄이 바뀌어요. UPDATE·DELETE 전에는 같은 WHERE로 SELECT를 먼저 해서 대상을 확인하세요.",
       },
       {
-        question: '테이블 구조는 남기고 데이터만 전부 지우며 롤백이 불가능한 명령어는?',
-        options: ['TRUNCATE', 'DELETE', 'DROP', 'UPDATE'],
-        correctIndex: 0,
-        explanation: 'TRUNCATE는 DDL 명령어로, 데이터를 전부 지우지만 테이블 구조는 유지하고 롤백은 불가능합니다.',
+        question: "나이에 음수가 들어오지 않도록 DB에서 막으려면 어떤 제약조건을 쓰나요?",
+        options: ["DEFAULT", "UNIQUE", "CHECK (age > 0)", "PRIMARY KEY"],
+        correctIndex: 2,
+        explanation: "CHECK는 조건에 안 맞는 값을 아예 못 넣게 막아요. 프로그램에서 실수해도 DB가 한 번 더 지켜 줘요.",
       },
     ],
   },
   {
     chapterId: 'SQL_13_CTE_TCL_DCL',
+    revision: 2,
     questions: [
       {
-        question: '실제 데이터를 저장하지 않고 SELECT 결과를 테이블처럼 보여주는 것은?',
-        options: ['VIEW', 'TABLE', 'INDEX', 'SCHEMA'],
+        question: "계좌 이체에서 '출금은 됐는데 입금이 실패'하는 일을 막으려면?",
+        options: ["두 작업을 트랜잭션으로 묶고, 실패하면 ROLLBACK", "UPDATE를 두 번 쓴다", "VIEW를 만든다", "인덱스를 만든다"],
         correctIndex: 0,
-        explanation: 'VIEW는 실제 데이터를 저장하지 않는 가상 테이블입니다.',
+        explanation: "트랜잭션은 전부 성공하면 COMMIT, 하나라도 실패하면 ROLLBACK으로 전부 취소해요(원자성).",
       },
       {
-        question: '변경 사항을 취소하고 이전 상태로 되돌리는 명령어는?',
-        options: ['ROLLBACK', 'COMMIT', 'SAVEPOINT', 'GRANT'],
-        correctIndex: 0,
-        explanation: 'ROLLBACK은 트랜잭션의 변경 사항을 취소하고 이전 상태로 되돌립니다.',
+        question: "이 쿼리 안에서만 잠깐 쓸 중간 결과에 이름을 붙여, 읽기 쉽게 만드는 문법은?",
+        options: ["CREATE VIEW", "WITH (CTE)", "CREATE TABLE", "GRANT"],
+        correctIndex: 1,
+        explanation: "WITH는 쿼리 한 번 동안만 존재하는 이름표예요. 여러 쿼리에서 계속 쓸 거면 VIEW로 저장해요.",
       },
     ],
   },
   {
     chapterId: 'SQL_14_INDEX',
+    revision: 2,
     questions: [
       {
-        question: '인덱스를 생성할 때 사용하는 명령어는?',
-        options: ['CREATE INDEX', 'ADD INDEX', 'NEW INDEX', 'MAKE INDEX'],
-        correctIndex: 0,
-        explanation: 'CREATE INDEX 인덱스명 ON 테이블명(열) 형태로 인덱스를 생성합니다.',
+        question: "score에 인덱스가 있을 때, 인덱스를 쓰지 못하는 조건은?",
+        options: ["WHERE score = 90", "WHERE score > 80", "WHERE score + 1 = 91", "WHERE score BETWEEN 80 AND 90"],
+        correctIndex: 2,
+        explanation: "열을 가공하면(score + 1) 찾아보기에 그 값이 없어서 전부 훑어봐요. 열은 그대로 두고 반대쪽을 계산하세요(score = 90).",
       },
       {
-        question: '인덱스의 단점으로 옳은 것은?',
-        options: ['INSERT/UPDATE/DELETE 시 함께 갱신되어 쓰기 성능이 느려질 수 있다', '조회 성능이 항상 느려진다', '저장 공간을 전혀 차지하지 않는다', '항상 자동으로 사용된다'],
-        correctIndex: 0,
-        explanation: '인덱스는 조회는 빠르게 하지만, 데이터가 바뀔 때마다 인덱스도 갱신해야 해서 쓰기 성능에는 부담을 줍니다.',
+        question: "모든 열에 인덱스를 만들지 않는 가장 큰 이유는?",
+        options: ["조회가 느려져서", "데이터를 넣고·고치고·지울 때마다 인덱스도 고쳐야 해서 쓰기가 느려지고 공간도 차지해서", "SQL 문법 오류가 나서", "PRIMARY KEY가 사라져서"],
+        correctIndex: 1,
+        explanation: "인덱스는 읽기를 빠르게 하는 대신 쓰기 비용과 공간을 써요. 자주 찾고 잘 안 바뀌는 열에만 만들어요.",
+      },
+    ],
+  },
+  {
+    chapterId: 'SQL_11_MODELING',
+    revision: 2,
+    questions: [
+      {
+        question: "주문표에 회원 이름과 전화번호를 매번 같이 적었더니, 회원이 번호를 바꿀 때 문제가 생겼어요. 이걸 뭐라고 하나요?",
+        options: ["삽입 이상", "수정 이상", "삭제 이상", "정규화"],
+        correctIndex: 1,
+        explanation: "같은 정보가 여러 줄에 반복돼서, 바꿀 때 일부만 고치면 서로 달라지는 문제가 수정 이상이에요. 그래서 회원 정보를 따로 나눠요.",
+      },
+      {
+        question: "학생과 수업처럼 서로 여러 개씩 연결되는(N:M) 관계는 어떻게 표로 만드나요?",
+        options: ["학생 표에 수업1, 수업2 칸을 만든다", "수업 표에 학생 이름을 쉼표로 적는다", "학생 번호와 수업 번호만 담은 연결 표를 따로 만든다", "한 표로 합친다"],
+        correctIndex: 2,
+        explanation: "N:M은 두 표만으로는 표현할 수 없어서, '누가 무엇을 듣는다'만 적는 연결 표를 가운데 둬요.",
       },
     ],
   },
