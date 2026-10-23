@@ -1,164 +1,71 @@
 # PyQuests
 
-브라우저에서 코딩 문제를 풀고 학습 가이드를 읽는 사이트입니다. 서버에 코드를 보내지 않고 **브라우저 안에서 직접 실행**합니다.
+**설치 없이 브라우저에서 바로 코딩을 배우고 연습하는 사이트**예요.
+문제를 풀면 코드가 그 자리에서 실행되고, 막히면 학습 가이드에서 개념을 찾아볼 수 있어요.
 
-배포: https://pyquests.vercel.app
-
----
-
-## 무엇이 들어 있나
-
-### 문제 377개
-
-| 언어 | 개수 | 구성 | 실행 |
-|---|---:|---|---|
-| Python | 140 | coding 140 | Pyodide (WASM Python) |
-| 알고리즘 | 69 | coding 69 | Pyodide (Python 하네스) |
-| SQL | 36 | coding 36 | sql.js (SQLite WASM) |
-| JavaScript | 36 | coding 24 · fill 4 · quiz 8 | Web Worker (coding 24개만) |
-| Java | 48 | quiz 32 · fill 16 | — |
-| C | 48 | quiz 32 · fill 16 | — |
-
-**실제로 코드가 실행되는 문제는 269개**입니다. Java 와 C, 그리고 JavaScript 중 12개는 객관식·빈칸 문제라서 실행기에 닿지 않습니다. (Java·C 실행은 백로그 12번 과제입니다.)
-
-난이도: basic 95 · intermediate 158 · advanced 65 · expert 59
-
-### 학습 가이드 86챕터
-
-Python 16 · SQL 14 · Java 12 · JavaScript 12 · C 12 · HTML 8 · CSS 12. 챕터별 확인 퀴즈 72개가 함께 있습니다.
-
-Python 챕터는 Jupyter 노트북에서 변환한 것이고, 원본은 `docs/source/` 에 있습니다 (빌드 때 읽지 않습니다 — `src/data/docs.ts` 에 내용이 들어 있습니다).
+- 사이트: https://pyquests.vercel.app
+- 소개 페이지: https://pyquests-site.vercel.app
 
 ---
 
-## 로컬에서 실행
+## 무엇을 할 수 있나요
 
-```bash
-npm install
-cp .env.example .env     # 값을 채우세요 (아래)
-npm run dev
-```
+### 문제 456개
 
-### 환경변수
+| 언어 | 문제 수 | 풀이 방식 |
+|---|---:|---|
+| Python | 173 | 코드를 직접 실행 (NumPy · Pandas · Matplotlib 포함) |
+| 알고리즘 | 77 | 함수를 작성해 여러 입력으로 채점, 실전 문제는 효율성 테스트까지 |
+| SQL | 36 | 쿼리를 직접 실행하고 결과를 표로 확인 |
+| JavaScript | 36 | 코드 실행 24 · 객관식 · 빈칸 |
+| HTML | 18 | 쓰는 대로 바뀌는 미리보기 + 완성된 화면으로 채점 |
+| CSS | 20 | 쓰는 대로 바뀌는 미리보기 + 완성된 화면으로 채점 |
+| Java | 48 | 객관식 · 빈칸 |
+| C | 48 | 객관식 · 빈칸 |
 
-```
-VITE_SUPABASE_URL=https://<project-ref>.supabase.co
-VITE_SUPABASE_ANON_KEY=sb_publishable_...
-```
+난이도는 기초 · 중급 · 고급 · 챌린지 네 단계예요.
 
-**없어도 실행됩니다.** 로그인·랭킹·진도 동기화만 꺼지고 문제 풀이, 학습 가이드, 샌드박스, localStorage 진도는 그대로 동작합니다 (`isSupabaseConfigured === false` 경로).
+### 풀면서 도움 받기
 
-자세한 내용과 Vercel 에 등록할 항목은 [docs/environment-variables.md](docs/environment-variables.md).
+- **어디가 틀렸는지 알려 줘요.** 기대 출력과 내 출력을 나란히 보여 주고, `88`과 `88.0`, 따옴표, 띄어쓰기처럼 흔한 원인을 짚어 줘요.
+- **실전 문제와 효율성 테스트.** 풀이 방법을 알려 주지 않는 이야기형 문제에서, 답이 맞아도 너무 느리면 알려 줘요.
+- **실제 데이터로 연습.** 학생 성적 · 카페 매출 · 날씨 CSV 파일을 읽어 분석하고 그래프를 그려요.
+- **해설과 정답 코드**, 틀린 문제를 모아 보는 **오답노트**.
 
-### 빌드
+### 학습 가이드 86장
 
-```bash
-npm run build      # tsc -b && vite build
-npm run lint       # oxlint
-npm run test       # vitest
-```
+Python · SQL · Java · JavaScript · C · HTML · CSS. 장마다 예제와 이해도 체크 퀴즈가 있고, Python과 SQL 예제는 가이드 안에서 바로 실행해 볼 수 있어요.
 
-`prebuild` 가 Pyodide 코어(13MB)와 sql.js(0.7MB)를 `public/` 으로 내려받습니다. 둘 다 `.gitignore` 에 있는 빌드 산출물이고, 실패해도 빌드는 계속됩니다 (CDN 폴백 없이 배포됨).
+### 그 밖에
 
-### 검증 스크립트
+- **샌드박스**: 문제와 상관없이 자유롭게 코드를 실행해 보는 곳
+- **진도와 랭킹**: 로그인하면 푼 문제와 연속 학습 기록이 저장되고 랭킹에 올라가요. 로그인하지 않아도 문제는 모두 풀 수 있어요.
+- **앱처럼 설치**: 휴대폰·PC 홈 화면에 추가해서 앱처럼 쓸 수 있고, 새 버전이 나오면 알려 줘요.
+- **공용 컴퓨터 모드**: 학교·도서관 컴퓨터에서 로그인할 때 선택하면 브라우저를 닫을 때 로그아웃돼요. 모드와 상관없이 1시간 동안 쓰지 않으면 자동으로 로그아웃돼요.
 
-타입 체크로는 잡히지 않는 것들을 검사합니다. CI 에서 전부 돌아갑니다.
+---
 
-| 명령 | 내용 |
+## 어떻게 동작하나요
+
+**작성한 코드는 서버로 보내지 않아요.** Python, SQL, JavaScript, HTML·CSS 모두 **내 브라우저 안에서** 실행되고 채점돼요.
+
+| | 실행기 |
 |---|---|
-| `npm run test` | 문제 데이터 무결성 + 순수 함수 단위 테스트 |
-| `npm run verify:sandbox` | JS Worker 샌드박스 — 실제 공격 21개를 `node:vm` 에서 시도 |
-| `npm run verify:sql` | SQL 정답 36개를 실제 sql.js 로 실행해 기대 출력과 바이트 비교 |
-| `npm run verify:shared-pc` | 세션 저장소 어댑터를 실제로 실행 + 로그아웃 정리 완전성 |
-| `npm run verify:guest-merge` | 게스트 진도 병합이 모든 키를 다루는지 |
-| `npm run verify:pyodide` | Pyodide 로더 분기·SRI·폴백 |
-| `npm run verify:csp` | `vercel.json` 의 CSP 가 실제 사용 출처를 덮는지 |
-| `npm run check:problems` | `problems.ts` 와 `migrations/problems_seed.sql` 동기화 |
+| Python | Pyodide (WebAssembly로 만든 Python) |
+| SQL | sql.js (SQLite) — Oracle 문법 일부도 받아 줘요 |
+| JavaScript | 격리된 Web Worker |
+| HTML · CSS | 스크립트가 실행되지 않는 미리보기 화면 |
+
+한 번 불러온 뒤에는 빠르게 실행되고, 끝나지 않는 반복문을 써도 일정 시간이 지나면 멈춰서 화면이 멈추지 않아요.
+
+### 저장하는 정보
+
+로그인한 경우에만 **닉네임, 푼 문제, 오답노트, 학습 가이드 진도와 퀴즈 답, 고객센터 문의글**을 저장해요. 문제를 풀며 작성한 코드는 저장하지 않아요. (샌드박스 코드는 내 브라우저에만 남아요.)
 
 ---
 
-## 아키텍처
+## 만든 기술
 
-```
-브라우저                                        서버
-┌──────────────────────────────┐
-│ React 19 + Vite 6            │
-│                              │
-│  Python ─── Pyodide 0.26.2 ──┼──→ jsDelivr (SRI) → /pyodide/ 폴백
-│  SQL ────── sql.js 1.14.2 ───┼──→ jsDelivr (SRI) → /sql-js/ 폴백
-│  JS ─────── blob Web Worker  │     (네트워크 전역 차단, 5초 타임아웃)
-│                              │
-│  진도 ───── localStorage ────┼──→ Supabase (REST)
-│                              │
-│  PWA ────── 서비스워커 ──────┼──→ 정적 자산만 캐시 (Supabase 제외)
-└──────────────────────────────┘
-```
+React · TypeScript · Vite · Pyodide · sql.js · CodeMirror · Supabase · Vercel
 
-**코드 실행은 전부 클라이언트**입니다. 채점도 브라우저에서 합니다 (`testRunnerCode === 'stdout_match'` 가 대부분). 따라서 **채점 결과는 신뢰 경계 밖**이고, 랭킹 무결성은 서버에서 따로 지킵니다 — 아래 참고.
-
-### Supabase 쪽
-
-- `problems` — 문제 id 377개의 참조 테이블. `user_solved_problems` 에 트리거로 검증
-- `streak` / `solved_count` / `last_solved_date` — **서버가 계산**합니다. 클라이언트 UPDATE 는 트리거가 무시합니다
-- 분당 30건 INSERT 속도 제한
-- 랭킹·활동 피드는 집계 뷰(`leaderboard_public` 등)로만 읽습니다 — 원본 테이블은 본인 행만 보입니다
-- 관리자·랭킹 제외는 `profiles.is_admin` / `profiles.hidden` 플래그 (쓰기 금지)
-
-스키마는 `supabase_schema.sql` (목표 상태 전체), 변경 이력은 `migrations/`.
-
-```bash
-# 새 프로젝트에 적용
-psql "$DATABASE_URL" -f supabase_schema.sql
-```
-
-기존 DB 에 적용하는 순서는 [docs/migrations/](docs/migrations/) 와 [docs/DEPLOY-1-5.md](docs/DEPLOY-1-5.md) 를 보세요. `migrations/deploy/` 에 Supabase SQL 편집기에 그대로 붙일 수 있게 쪼갠 파일들이 있습니다.
-
----
-
-## 공개 저장소입니다 — 무엇이 공개 정보인가
-
-| 항목 | 상태 |
-|---|---|
-| Supabase URL · publishable(anon) key | **공개 전제**입니다. 클라이언트 번들에 들어가므로 숨길 수 없습니다. 접근 통제는 RLS 가 합니다 |
-| 문제 정답 | `src/utils/answerObfuscation.ts` 의 **base64 난독화**입니다. 보안이 아니라 우연히 눈에 띄는 것만 막습니다 — 마음먹으면 누구나 읽습니다 |
-| 채점 로직 | 전부 클라이언트. 조작 가능합니다 |
-| RLS 정책 · 트리거 | 공개돼 있어도 안전합니다. 실제 통제는 서버에서 실행됩니다 |
-| service_role key | **절대 커밋하지 마세요.** 이 저장소에 없고, 클라이언트 코드에 들어갈 일도 없습니다 |
-| `.env` | `.gitignore` 에 있습니다. `.env.example` 만 커밋합니다 |
-
-랭킹을 조작 불가능하게 만들려면 서버 채점이 필요하고, 그게 백로그 12번입니다. 현재 구조는 **서버가 "존재하는 문제 id 인지 / 비정상적으로 빠르지 않은지"까지만** 검증합니다.
-
----
-
-## 디렉터리
-
-```
-src/
-  data/        problems.ts (377) · docs.ts (86챕터) · chapterQuizzes.ts
-               solutionCode.ts · solutionExplanations.ts · sqlSeed.ts
-  hooks/       usePyodide · useSqlRunner · useJsRunner · useIdleLogout · useDarkMode
-  utils/       oracleToSqlite · answerObfuscation · profanityFilter · checkKeywords
-  contexts/    AuthContext (세션 · 진도 동기화 · 게스트 병합)
-  components/  ProblemWorkspace (실행기 3분기) · Dashboard · DocsViewer · Sidebar ...
-  lib/         supabase.ts (세션 저장소 어댑터)
-
-migrations/    SQL 마이그레이션 + deploy/ (편집기용 분할 파일)
-scripts/       자산 다운로드 + 검증 스크립트
-tests/         vitest
-docs/          작업 문서 + source/ (노트북·원문 등 변환 원본)
-```
-
-## 문서
-
-- [보안 헤더 · CSP](docs/security-headers.md)
-- [Pyodide 로딩](docs/pyodide-loading.md)
-- [SQL 실행기](docs/sql-runner.md)
-- [게스트 진도 이관](docs/guest-progress-merge.md)
-- [공유 PC 세션](docs/shared-computer-sessions.md)
-- [환경변수](docs/environment-variables.md)
-- [타이포그래피](docs/typography.md)
-- [URL 라우팅](docs/url-routing.md)
-- [소개 사이트](docs/landing-site.md)
-- [모바일 스플래시](docs/mobile-splash.md)
-- [테스트 · 저장소 정리](docs/testing-and-cleanup.md)
-- [마이그레이션](docs/migrations/)
+개발 환경, 검증 스크립트, 구조는 [docs/development.md](docs/development.md)에 있어요.
