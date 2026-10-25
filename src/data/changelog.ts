@@ -25,6 +25,16 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-10-25',
+    title: 'SQL 실무 문제 49개가 생겼어요',
+    items: [
+      '기초 18문제, 중급 14문제를 새로 넣었어요. 직원 명단, 연봉, 재고처럼 회사에서 실제로 하는 조회를 연습해요.',
+      '데이터를 직접 넣고 고치고 지우는 문제(INSERT · UPDATE · DELETE) 10개와 표를 만들고 바꾸는 문제(CREATE · ALTER · VIEW · INDEX) 7개도 생겼어요. 실행한 뒤 표가 어떻게 바뀌었는지로 채점하고, 채점에 쓰는 확인 쿼리와 결과도 같이 보여 드려요.',
+      '새 문제는 부서 · 직원 · 상품 표로 풀어요. 문제 화면의 테이블 구조에서 데이터를 미리 볼 수 있어요.',
+    ],
+    problemIds: ["sqlc_b1", "sqlc_b2", "sqlc_b3", "sqlc_b4", "sqlc_b5", "sqlc_b6", "sqlc_b7", "sqlc_b8", "sqlc_b9", "sqlc_b10", "sqlc_b11", "sqlc_b12", "sqlc_b13", "sqlc_b14", "sqlc_b15", "sqlc_b16", "sqlc_b17", "sqlc_b18", "sqlc_i1", "sqlc_i2", "sqlc_i3", "sqlc_i4", "sqlc_i5", "sqlc_i6", "sqlc_i7", "sqlc_i8", "sqlc_i9", "sqlc_i10", "sqlc_i11", "sqlc_i12", "sqlc_i13", "sqlc_i14", "sqlc_d1", "sqlc_d2", "sqlc_d3", "sqlc_d4", "sqlc_d5", "sqlc_d6", "sqlc_d7", "sqlc_d8", "sqlc_d9", "sqlc_d10", "sqlc_t1", "sqlc_t2", "sqlc_t3", "sqlc_t4", "sqlc_t5", "sqlc_t6", "sqlc_t7"],
+  },
+  {
     date: '2026-10-23',
     title: 'SQL 학습 가이드를 새로 정리했어요',
     items: [

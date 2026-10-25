@@ -88,7 +88,7 @@ function Comparison({ expected, actual, label }: { expected: string; actual: str
 export default function OutputComparison({ results }: { results: TestResult[] }) {
   const failed = results.filter((r) => !r.passed);
   if (failed.length === 0) return null;
-  const wholeOutput = results.length === 1 && results[0].input === '전체 코드 출력';
+  const wholeOutput = results.length === 1 && (results[0].input === '전체 코드 출력' || results[0].input === '확인 쿼리 결과');
   const shown = failed.slice(0, 3);
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem', borderTop: '1px solid var(--border-subtle)', paddingTop: '0.6rem' }}>

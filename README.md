@@ -13,7 +13,7 @@
 
 <br />
 
-![문제](https://img.shields.io/badge/%EB%AC%B8%EC%A0%9C-456%EA%B0%9C-8b5cf6?style=flat-square)
+![문제](https://img.shields.io/badge/%EB%AC%B8%EC%A0%9C-505%EA%B0%9C-8b5cf6?style=flat-square)
 ![학습 가이드](https://img.shields.io/badge/%ED%95%99%EC%8A%B5_%EA%B0%80%EC%9D%B4%EB%93%9C-86%EC%9E%A5-0969da?style=flat-square)
 ![언어](https://img.shields.io/badge/%EC%96%B8%EC%96%B4-8%EA%B0%80%EC%A7%80-1a7f37?style=flat-square)
 ![설치](https://img.shields.io/badge/%EC%84%A4%EC%B9%98-%ED%95%84%EC%9A%94_%EC%97%86%EC%9D%8C-cf222e?style=flat-square)
@@ -64,13 +64,13 @@
 
 ---
 
-## 🧩 문제 456개
+## 🧩 문제 505개
 
 | 언어 | 문제 | 풀이 방식 |
 |:---|---:|:---|
 | 🐍 **Python** | 173 | 코드를 직접 실행 · NumPy · Pandas · Matplotlib 포함 |
 | 🧠 **알고리즘** | 77 | 함수를 작성해 여러 입력으로 채점 · 실전 문제는 효율성 테스트까지 |
-| 🗄️ **SQL** | 36 | 쿼리를 직접 실행하고 결과를 표로 확인 |
+| 🗄️ **SQL** | 85 | 쿼리를 직접 실행하고 결과를 표로 확인 · INSERT · UPDATE · CREATE 같은 데이터 조작까지 |
 | 🟨 **JavaScript** | 36 | 코드 실행 · 객관식 · 빈칸 |
 | 🌐 **HTML** | 18 | 실시간 미리보기 · 완성된 화면으로 채점 |
 | 🎨 **CSS** | 20 | 실시간 미리보기 · 완성된 화면으로 채점 |

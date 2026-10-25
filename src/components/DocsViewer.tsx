@@ -87,6 +87,7 @@ const SQL_CHAPTER_PROBLEM_CATEGORIES: Record<string, string[]> = {
   SQL_8_SUBQUERY: ['서브쿼리'],
   SQL_9_SET_OPERATOR: ['집합연산자'],
   SQL_10_WINDOW_FUNCTION: ['윈도우함수'],
+  SQL_12_DDL_DML: ['DML', 'DDL'],
   SQL_13_CTE_TCL_DCL: ['재귀CTE'],
 };
 

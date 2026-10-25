@@ -12,6 +12,7 @@ import type { Problem, ProblemLanguage } from '../src/data/problems';
 import { decodeAnswer } from '../src/utils/answerObfuscation';
 import { solutionCode } from '../src/data/solutionCode';
 import { PY_DATASETS } from '../src/data/pyDatasets';
+import { SQL_DATASETS } from '../src/data/sqlSeed';
 import { changelogEntries, recentProblemIds } from '../src/data/changelog';
 
 const LANGUAGES: ProblemLanguage[] = ['python', 'sql', 'java', 'js', 'algorithm', 'c', 'html', 'css'];
@@ -147,6 +148,13 @@ describe('문제 데이터 — type 별 필수 필드', () => {
     // 10-22 and gone a month later.
     expect(recentProblemIds(new Date('2026-10-22T12:00:00')).has('prac_1')).toBe(true);
     expect(recentProblemIds(new Date('2026-11-30T12:00:00')).size).toBe(0);
+  });
+
+  it('SQL: sqlDataset 이 실제 데이터셋이고, sqlCheck 는 SQL 문제에만 있다', () => {
+    const bad = problems
+      .filter((p) => (p.sqlDataset && !SQL_DATASETS[p.sqlDataset]) || ((p.sqlCheck || p.sqlDataset) && p.language !== 'sql'))
+      .map((p) => p.id);
+    expect(bad).toEqual([]);
   });
 
   it('webChecks 는 html/css 문제에만 있다', () => {
@@ -302,7 +310,8 @@ describe('문제 데이터 — SQL 채점의 행 순서 의존', () => {
       const expected = decodeAnswer(p.testCases![0].expected);
       const rows = expected.split('\n').filter((l) => l.trim() && !/^-+$/.test(l)).length - 1;
       if (rows <= 1) return false;
-      return !/order\s+by/i.test(solutionCode[p.id] ?? '');
+      // DDL/DML problems are graded on their check query, not the answer.
+      return !/order\s+by/i.test(p.sqlCheck ?? solutionCode[p.id] ?? '');
     }).map((p) => p.id);
 
     console.log(`\n  행 순서에 의존하는 SQL 문제: ${risky.length}개 / ${sqlProblems.length}개`);

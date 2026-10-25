@@ -191,6 +191,8 @@ function toStdout(tables: SqlResultTable[]): string {
 export interface SqlRunResult extends RunResponse {
   /** Structured results for table rendering. Empty for a write-only query. */
   tables?: SqlResultTable[];
+  /** Result of the problem's check query, when it has one (what was graded). */
+  checkTables?: SqlResultTable[];
 }
 
 export function useSqlRunner() {
@@ -201,7 +203,11 @@ export function useSqlRunner() {
     code: string,
     testCases?: { input: string; expected: string }[],
     testRunnerCode?: string,
-    datasetId: string = DEFAULT_SQL_DATASET.id
+    datasetId: string = DEFAULT_SQL_DATASET.id,
+    // DDL/DML problems produce no rows of their own, so they are graded on
+    // the state they leave behind: this query runs after the student's code
+    // on the same database, and its output is what gets compared.
+    checkSql?: string
   ): Promise<SqlRunResult> => {
     let engine: SqlJsStatic;
     try {
@@ -241,22 +247,35 @@ export function useSqlRunner() {
         };
       });
 
+      let checkTables: SqlResultTable[] | undefined;
+      if (checkSql) {
+        checkTables = db.exec(checkSql).map((result) => {
+          const types = columnTypes(db, checkSql, result.columns);
+          return {
+            columns: result.columns,
+            rows: result.values.map((row) => row.map((v, i) => formatValue(v, types?.[i]))),
+          };
+        });
+      }
+
       const stdout = toStdout(tables);
+      const graded = checkTables ? toStdout(checkTables) : stdout;
 
       if (testRunnerCode === 'stdout_match') {
         const expected = testCases?.[0] ? String(testCases[0].expected) : '';
         const cleanExpected = expected.replace(/^['"]|['"]$/g, '').replace(/\r\n/g, '\n').trim();
-        const cleanActual = stdout.replace(/\r\n/g, '\n').trim();
+        const cleanActual = graded.replace(/\r\n/g, '\n').trim();
         const passed = cleanActual === cleanExpected;
         return {
           success: passed,
           stdout,
           tables,
-          testResults: [{ input: '전체 코드 출력', expected: cleanExpected, actual: cleanActual, passed }],
+          checkTables,
+          testResults: [{ input: checkSql ? '확인 쿼리 결과' : '전체 코드 출력', expected: cleanExpected, actual: cleanActual, passed }],
         };
       }
 
-      return { success: true, stdout, tables };
+      return { success: true, stdout, tables, checkTables };
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : String(err);
       return { success: false, stdout: '', error: `SQL 실행 오류: ${message}` };

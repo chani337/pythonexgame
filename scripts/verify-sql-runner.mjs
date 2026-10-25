@@ -43,12 +43,13 @@ const scMod = await load('src/data/solutionCode.ts', 'solutions');
 const solutionCode = scMod.solutionCode || scMod.default;
 const { decodeAnswer } = await load('src/utils/answerObfuscation.ts', 'obf');
 const { translateOracleSqlToSqlite, translateOracleOuterJoinToAnsi } = await load('src/utils/oracleToSqlite.ts', 'oracle');
-const { buildSeedSql, DEFAULT_SQL_DATASET } = await load('src/data/sqlSeed.ts', 'seed');
+const { buildSeedSql, DEFAULT_SQL_DATASET, SQL_DATASETS } = await load('src/data/sqlSeed.ts', 'seed');
 await rm(dir, { recursive: true, force: true });
 
 const initSqlJs = (await import('sql.js')).default;
 const SQL = await initSqlJs({ locateFile: () => WASM });
 const SEED = buildSeedSql(DEFAULT_SQL_DATASET);
+const WRITE = process.argv.includes('--write');
 
 // --- mirrors useSqlRunner's columnTypes / formatValue / toStdout ----------
 function columnTypes(db, sql, columns) {
@@ -67,16 +68,20 @@ function formatValue(v, type) {
   if (type === 'real' && typeof v === 'number' && Number.isInteger(v)) return v.toFixed(1);
   return String(v);
 }
-function run(code) {
+// Mirrors useSqlRunner: the problem's dataset, and for DDL/DML problems the
+// check query's output (run after the code) is what is graded.
+function run(code, problem = {}) {
   const db = new SQL.Database();
   try {
-    db.run(SEED);
+    db.run(buildSeedSql(SQL_DATASETS[problem.sqlDataset ?? DEFAULT_SQL_DATASET.id] ?? DEFAULT_SQL_DATASET));
     const translated = translateOracleSqlToSqlite(code);
-    const raw = db.exec(translated);
+    let raw = db.exec(translated);
+    let typeSql = translated;
+    if (problem.sqlCheck) { raw = db.exec(problem.sqlCheck); typeSql = problem.sqlCheck; }
     if (raw.length === 0) return 'SQL 쿼리가 성공적으로 실행되었습니다.';
     const lines = [];
     for (const r of raw) {
-      const types = columnTypes(db, translated, r.columns);
+      const types = columnTypes(db, typeSql, r.columns);
       lines.push(r.columns.join(' | '));
       lines.push('-'.repeat(40));
       for (const row of r.values) lines.push(row.map((v, i) => formatValue(v, types?.[i])).join(' | '));
@@ -89,15 +94,43 @@ function run(code) {
 const sqlProblems = problems.filter((p) => p.language === 'sql');
 let pass = 0; const fails = []; const noSolution = [];
 
+const fills = new Map();
+let startPasses = [];
 for (const p of sqlProblems) {
   const code = solutionCode[p.id];
   if (!code) { noSolution.push(p.id); continue; }
-  const expected = decodeAnswer(p.testCases[0].expected).replace(/\r\n/g, '\n').trim();
   let actual;
-  try { actual = run(code).replace(/\r\n/g, '\n').trim(); }
+  try { actual = run(code, p).replace(/\r\n/g, '\n').trim(); }
   catch (e) { actual = 'ERROR: ' + e.message; }
+  if (p.testCases[0].expected === '__FILL__') {
+    if (WRITE && !actual.startsWith('ERROR')) { fills.set(p.id, actual); pass++; continue; }
+    fails.push({ id: p.id, code: code.trim(), expected: '(비어 있음 — --write 로 채우세요)', actual });
+    continue;
+  }
+  const expected = decodeAnswer(p.testCases[0].expected).replace(/\r\n/g, '\n').trim();
   if (actual === expected) pass++;
   else fails.push({ id: p.id, code: code.trim(), expected, actual });
+  // A problem whose starter code already passes is solved by pressing submit.
+  let start;
+  try { start = run(p.initialCode ?? '', p).replace(/\r\n/g, '\n').trim(); } catch { start = null; }
+  if (start === expected) startPasses.push(p.id);
+}
+
+if (WRITE && fills.size) {
+  const { readFile, writeFile } = await import('node:fs/promises');
+  const path = join(ROOT, 'src/data/problems.ts');
+  let src = await readFile(path, 'utf8');
+  for (const [id, out] of fills) {
+    const start = src.indexOf(`"id": "${id}"`);
+    const end = src.indexOf('\n  }', start);
+    let block = src.slice(start, end);
+    block = block.replace('"expected": "__FILL__"', `"expected": "${Buffer.from(out, 'utf8').toString('base64')}"`);
+    block = block.replace('"output": "__FILL__"', `"output": ${JSON.stringify(out)}`);
+    src = src.slice(0, start) + block + src.slice(end);
+    console.log(`✎ ${id}\n    ${out.split('\n').join('\n    ')}`);
+  }
+  await writeFile(path, src);
+  console.log(`\n${fills.size}개 문제의 기대값을 채웠습니다. 위 값이 맞는지 직접 확인하세요.\n`);
 }
 
 console.log('=== SQL 정답 코드 재현 ===');
@@ -160,6 +193,7 @@ for (const [label, sql] of [['문법 오류', 'SELCT * FROM users;'], ['없는 �
   catch (e) { errOk++; console.log(`  OK   ${label.padEnd(12)} ${e.message.slice(0, 55)}`); }
 }
 
-const total = fails.length + (ORACLE_CASES.length - trPass) + (ROUTING_CASES.length - routePass) + (2 - errOk);
+if (startPasses.length) console.log(`\n실패: 시작 코드가 이미 통과하는 문제 ${startPasses.join(', ')}`);
+const total = fails.length + startPasses.length + (ORACLE_CASES.length - trPass) + (ROUTING_CASES.length - routePass) + (2 - errOk);
 console.log(`\n${total === 0 ? '전부 통과' : total + '건 실패'}`);
 process.exit(total === 0 ? 0 : 1);

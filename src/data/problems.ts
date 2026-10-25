@@ -35,6 +35,11 @@ export interface Problem {
   // every testCase passes. Graded against the reference solution in
   // solutionCode.ts, timed on the student's own device (PERF_HARNESS).
   perfTests?: string[];
+  // sql problems: which seed dataset to run on (src/data/sqlSeed.ts,
+  // default 'default' = users/orders), and for DDL/DML problems a query run
+  // after the student's code whose output is what gets graded.
+  sqlDataset?: string;
+  sqlCheck?: string;
   quizQuestion?: string;
   quizOptions?: string[];
   // base64-encoded (see src/utils/answerObfuscation.ts) so it isn't plainly
@@ -11239,5 +11244,1378 @@ export const problems: Problem[] = [
     "perfTests": [
       "solution(100000)"
     ]
+  },
+  {
+    "id": "sqlc_b1",
+    "title": "SQL 실무 1. 전체 직원 명단 보기",
+    "category": "SELECT",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "인사팀에서 회사 전체 직원 명단을 요청했어요. employees 테이블의 모든 열을 조회하세요.",
+    "constraints": [
+      "`SELECT *`를 사용하세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "emp_id | name | dept_id | position | salary | hire_date | email\n----------------------------------------\n1 | 김철수 | 10 | 팀장 | 6200 | 2015-03-02 | cs.kim@company.com\n2 | 이영희 | 20 | 대리 | 4300 | 2019-07-15 | yh.lee@company.com\n3 | 박민수 | 10 | 사원 | 3600 | 2022-01-10 | NULL\n4 | 최수민 | 30 | 과장 | 5100 | 2017-11-20 | sm.choi@company.com\n5 | 정찬희 | 10 | 대리 | 4500 | 2020-05-04 | ch.jung@company.com\n6 | 한지민 | 20 | 사원 | 3400 | 2023-02-13 | NULL\n7 | 오세훈 | 30 | 사원 | 3500 | 2022-09-01 | sh.oh@company.com\n8 | 윤서연 | NULL | 인턴 | 2500 | 2024-07-01 | NULL"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZW1wX2lkIHwgbmFtZSB8IGRlcHRfaWQgfCBwb3NpdGlvbiB8IHNhbGFyeSB8IGhpcmVfZGF0ZSB8IGVtYWlsCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KMSB8IOq5gOyyoOyImCB8IDEwIHwg7YyA7J6lIHwgNjIwMCB8IDIwMTUtMDMtMDIgfCBjcy5raW1AY29tcGFueS5jb20KMiB8IOydtOyYge2drCB8IDIwIHwg64yA66asIHwgNDMwMCB8IDIwMTktMDctMTUgfCB5aC5sZWVAY29tcGFueS5jb20KMyB8IOuwleuvvOyImCB8IDEwIHwg7IKs7JuQIHwgMzYwMCB8IDIwMjItMDEtMTAgfCBOVUxMCjQgfCDstZzsiJjrr7wgfCAzMCB8IOqzvOyepSB8IDUxMDAgfCAyMDE3LTExLTIwIHwgc20uY2hvaUBjb21wYW55LmNvbQo1IHwg7KCV7LCs7Z2sIHwgMTAgfCDrjIDrpqwgfCA0NTAwIHwgMjAyMC0wNS0wNCB8IGNoLmp1bmdAY29tcGFueS5jb20KNiB8IO2VnOyngOuvvCB8IDIwIHwg7IKs7JuQIHwgMzQwMCB8IDIwMjMtMDItMTMgfCBOVUxMCjcgfCDsmKTshLjtm4ggfCAzMCB8IOyCrOybkCB8IDM1MDAgfCAyMDIyLTA5LTAxIHwgc2gub2hAY29tcGFueS5jb20KOCB8IOycpOyEnOyXsCB8IE5VTEwgfCDsnbjthLQgfCAyNTAwIHwgMjAyNC0wNy0wMSB8IE5VTEw="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b2",
+    "title": "SQL 실무 2. 이름과 직급만 보기",
+    "category": "SELECT",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "사내 연락망에 넣을 명단이 필요해요. 직원의 이름(name)과 직급(position)만 조회하세요.",
+    "constraints": [
+      "열 순서는 name, position입니다.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | position\n----------------------------------------\n김철수 | 팀장\n이영희 | 대리\n박민수 | 사원\n최수민 | 과장\n정찬희 | 대리\n한지민 | 사원\n오세훈 | 사원\n윤서연 | 인턴"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHBvc2l0aW9uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rmA7LKg7IiYIHwg7YyA7J6lCuydtOyYge2drCB8IOuMgOumrArrsJXrr7zsiJggfCDsgqzsm5AK7LWc7IiY66+8IHwg6rO87J6lCuygleywrO2drCB8IOuMgOumrArtlZzsp4Drr7wgfCDsgqzsm5AK7Jik7IS47ZuIIHwg7IKs7JuQCuycpOyEnOyXsCB8IOyduO2EtA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b3",
+    "title": "SQL 실무 3. 연봉 높은 순으로 보기",
+    "category": "ORDER BY",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "연봉 협상 자료를 만들고 있어요. 직원의 이름과 연봉(salary)을 연봉이 높은 순서로 조회하세요.",
+    "constraints": [
+      "열 순서는 name, salary입니다.",
+      "`ORDER BY ... DESC`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | salary\n----------------------------------------\n김철수 | 6200\n최수민 | 5100\n정찬희 | 4500\n이영희 | 4300\n박민수 | 3600\n오세훈 | 3500\n한지민 | 3400\n윤서연 | 2500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHNhbGFyeQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IDYyMDAK7LWc7IiY66+8IHwgNTEwMArsoJXssKztnawgfCA0NTAwCuydtOyYge2drCB8IDQzMDAK67CV66+87IiYIHwgMzYwMArsmKTshLjtm4ggfCAzNTAwCu2VnOyngOuvvCB8IDM0MDAK7Jyk7ISc7JewIHwgMjUwMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b4",
+    "title": "SQL 실무 4. 개발팀 직원만 보기",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "개발팀(dept_id가 10) 회식 인원을 파악하려고 해요. 개발팀 직원의 이름과 직급을 조회하세요.",
+    "constraints": [
+      "열 순서는 name, position입니다.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | position\n----------------------------------------\n김철수 | 팀장\n박민수 | 사원\n정찬희 | 대리"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHBvc2l0aW9uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rmA7LKg7IiYIHwg7YyA7J6lCuuwleuvvOyImCB8IOyCrOybkArsoJXssKztnawgfCDrjIDrpqw="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b5",
+    "title": "SQL 실무 5. 연봉 4000 이상 직원",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "연봉이 4000(만 원) 이상인 직원의 이름과 연봉을 조회하세요.",
+    "constraints": [
+      "열 순서는 name, salary입니다.",
+      "`>=` 를 사용하세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | salary\n----------------------------------------\n김철수 | 6200\n이영희 | 4300\n최수민 | 5100\n정찬희 | 4500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHNhbGFyeQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IDYyMDAK7J207JiB7Z2sIHwgNDMwMArstZzsiJjrr7wgfCA1MTAwCuygleywrO2drCB8IDQ1MDA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b6",
+    "title": "SQL 실무 6. 사원 직급만 보기",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "신입 교육 대상자를 뽑으려고 해요. 직급(position)이 '사원'인 직원의 이름과 입사일(hire_date)을 조회하세요.",
+    "constraints": [
+      "열 순서는 name, hire_date입니다.",
+      "문자 값은 작은따옴표로 감싸세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | hire_date\n----------------------------------------\n박민수 | 2022-01-10\n한지민 | 2023-02-13\n오세훈 | 2022-09-01"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IGhpcmVfZGF0ZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuuwleuvvOyImCB8IDIwMjItMDEtMTAK7ZWc7KeA66+8IHwgMjAyMy0wMi0xMwrsmKTshLjtm4ggfCAyMDIyLTA5LTAx"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b7",
+    "title": "SQL 실무 7. 2020년 이후 입사자",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "2020년 1월 1일 이후(그날 포함)에 입사한 직원의 이름과 입사일을 입사일 순서로 조회하세요.",
+    "constraints": [
+      "열 순서는 name, hire_date입니다.",
+      "입사일이 빠른 순서로 정렬하세요.",
+      "날짜는 'YYYY-MM-DD' 형식 문자열이에요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | hire_date\n----------------------------------------\n정찬희 | 2020-05-04\n박민수 | 2022-01-10\n오세훈 | 2022-09-01\n한지민 | 2023-02-13\n윤서연 | 2024-07-01"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IGhpcmVfZGF0ZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuygleywrO2drCB8IDIwMjAtMDUtMDQK67CV66+87IiYIHwgMjAyMi0wMS0xMArsmKTshLjtm4ggfCAyMDIyLTA5LTAxCu2VnOyngOuvvCB8IDIwMjMtMDItMTMK7Jyk7ISc7JewIHwgMjAyNC0wNy0wMQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b8",
+    "title": "SQL 실무 8. 이메일이 없는 직원 찾기",
+    "category": "NULL 처리",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "사내 메일 계정이 아직 없는 직원에게 안내를 보내려고 해요. email이 비어 있는(NULL) 직원의 이름을 조회하세요.",
+    "constraints": [
+      "`= NULL`이 아니라 `IS NULL`을 사용하세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name\n----------------------------------------\n박민수\n한지민\n윤서연"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuuwleuvvOyImArtlZzsp4Drr7wK7Jyk7ISc7Jew"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b9",
+    "title": "SQL 실무 9. 김씨 직원 찾기",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "이름이 '김'으로 시작하는 직원의 이름과 직급을 조회하세요.",
+    "constraints": [
+      "`LIKE`와 `%`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | position\n----------------------------------------\n김철수 | 팀장"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHBvc2l0aW9uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rmA7LKg7IiYIHwg7YyA7J6l"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b10",
+    "title": "SQL 실무 10. 품절 상품 확인",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "재고 담당자가 품절 상품을 확인하려고 해요. products에서 재고(stock)가 0인 상품의 이름을 조회하세요.",
+    "constraints": [],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name\n----------------------------------------\n노트북 거치대"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuuFuO2KuOu2gSDqsbDsuZjrjIA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b11",
+    "title": "SQL 실무 11. 5만 원 이하 상품, 싼 순서",
+    "category": "ORDER BY",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "가격(price)이 50000원 이하인 상품의 이름과 가격을 가격이 낮은 순서로 조회하세요.",
+    "constraints": [
+      "열 순서는 name, price입니다."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | price\n----------------------------------------\n무선 마우스 | 25000\n노트북 거치대 | 35000\nUSB-C 허브 | 42000"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHByaWNlCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K66y07ISgIOuniOyasOyKpCB8IDI1MDAwCuuFuO2KuOu2gSDqsbDsuZjrjIAgfCAzNTAwMApVU0ItQyDtl4jruIwgfCA0MjAwMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b12",
+    "title": "SQL 실무 12. 상품 카테고리 종류",
+    "category": "SELECT",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "판매 중인 상품의 카테고리(category) 종류를 중복 없이 조회하세요.",
+    "constraints": [
+      "`DISTINCT`를 사용하세요.",
+      "카테고리 이름 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "category\n----------------------------------------\n모니터\n액세서리\n주변기기"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Y2F0ZWdvcnkKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrrqqjri4jthLAK7JWh7IS47ISc66asCuyjvOuzgOq4sOq4sA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b13",
+    "title": "SQL 실무 13. 연봉 상위 3명",
+    "category": "ORDER BY",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "연봉이 가장 높은 직원 3명의 이름과 연봉을 조회하세요.",
+    "constraints": [
+      "연봉이 높은 순서로 정렬한 뒤 3명만 가져오세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | salary\n----------------------------------------\n김철수 | 6200\n최수민 | 5100\n정찬희 | 4500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHNhbGFyeQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IDYyMDAK7LWc7IiY66+8IHwgNTEwMArsoJXssKztnawgfCA0NTAw"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b14",
+    "title": "SQL 실무 14. 전체 직원 수",
+    "category": "집계함수",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "회사의 전체 직원 수를 '직원수'라는 이름으로 조회하세요.",
+    "constraints": [
+      "`COUNT(*)`와 `AS`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "직원수\n----------------------------------------\n8"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7KeB7JuQ7IiYCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KOA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b15",
+    "title": "SQL 실무 15. 상품 평균 가격",
+    "category": "집계함수",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "전체 상품의 평균 가격을 원 단위로 반올림해서 '평균가격'이라는 이름으로 조회하세요.",
+    "constraints": [
+      "`AVG`로 평균을 구하고 `ROUND(값)`으로 반올림하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "평균가격\n----------------------------------------\n94833.0"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7Y+J6reg6rCA6rKpCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KOTQ4MzMuMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b16",
+    "title": "SQL 실무 16. 월급 계산해서 보기",
+    "category": "SELECT",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "연봉(salary, 만 원)을 12로 나눈 월급을 계산해, 이름과 함께 '월급'이라는 이름으로 조회하세요. 월급은 소수 첫째 자리까지 반올림하세요.",
+    "constraints": [
+      "열 순서는 name, 월급입니다.",
+      "`ROUND(값, 1)`을 사용하세요.",
+      "정수끼리 나누면 소수점이 버려지니 `12.0`으로 나누세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | 월급\n----------------------------------------\n김철수 | 516.7\n이영희 | 358.3\n박민수 | 300.0\n최수민 | 425.0\n정찬희 | 375.0\n한지민 | 283.3\n오세훈 | 291.7\n윤서연 | 208.3"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IOyblOq4iQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IDUxNi43CuydtOyYge2drCB8IDM1OC4zCuuwleuvvOyImCB8IDMwMC4wCuy1nOyImOuvvCB8IDQyNS4wCuygleywrO2drCB8IDM3NS4wCu2VnOyngOuvvCB8IDI4My4zCuyYpOyEuO2biCB8IDI5MS43CuycpOyEnOyXsCB8IDIwOC4z"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b17",
+    "title": "SQL 실무 17. 연봉 범위로 찾기",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "연봉이 3500 이상 4500 이하인 직원의 이름과 연봉을 조회하세요.",
+    "constraints": [
+      "`BETWEEN`을 사용하세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | salary\n----------------------------------------\n이영희 | 4300\n박민수 | 3600\n정찬희 | 4500\n오세훈 | 3500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHNhbGFyeQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuydtOyYge2drCB8IDQzMDAK67CV66+87IiYIHwgMzYwMArsoJXssKztnawgfCA0NTAwCuyYpOyEuO2biCB8IDM1MDA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_b18",
+    "title": "SQL 실무 18. 대리·과장만 보기",
+    "category": "WHERE",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "중간 관리자 교육 대상(직급이 '대리' 또는 '과장')의 이름과 직급을 조회하세요.",
+    "constraints": [
+      "`IN`을 사용하세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | position\n----------------------------------------\n이영희 | 대리\n최수민 | 과장\n정찬희 | 대리"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHBvc2l0aW9uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K7J207JiB7Z2sIHwg64yA66asCuy1nOyImOuvvCB8IOqzvOyepQrsoJXssKztnawgfCDrjIDrpqw="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i1",
+    "title": "SQL 실무 19. 부서별 직원 수",
+    "category": "GROUP BY",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "부서(dept_id)별 직원 수를 '인원'이라는 이름으로 조회하세요. 부서가 없는 직원(NULL)도 한 그룹으로 나와요.",
+    "constraints": [
+      "열 순서는 dept_id, 인원입니다.",
+      "dept_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "dept_id | 인원\n----------------------------------------\nNULL | 1\n10 | 3\n20 | 2\n30 | 2"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZGVwdF9pZCB8IOyduOybkAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCk5VTEwgfCAxCjEwIHwgMwoyMCB8IDIKMzAgfCAy"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i2",
+    "title": "SQL 실무 20. 직급별 평균 연봉",
+    "category": "GROUP BY",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "직급(position)별 평균 연봉을 '평균연봉'이라는 이름으로, 평균 연봉이 높은 순서로 조회하세요. 평균은 소수 첫째 자리까지 반올림하세요.",
+    "constraints": [
+      "열 순서는 position, 평균연봉입니다."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "position | 평균연봉\n----------------------------------------\n팀장 | 6200.0\n과장 | 5100.0\n대리 | 4400.0\n사원 | 3500.0\n인턴 | 2500.0"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "cG9zaXRpb24gfCDtj4nqt6Dsl7DrtIkKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrtjIDsnqUgfCA2MjAwLjAK6rO87J6lIHwgNTEwMC4wCuuMgOumrCB8IDQ0MDAuMArsgqzsm5AgfCAzNTAwLjAK7J247YS0IHwgMjUwMC4w"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i3",
+    "title": "SQL 실무 21. 카테고리별 상품 수와 재고",
+    "category": "GROUP BY",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "카테고리별로 상품 수('상품수')와 재고 합계('총재고')를 카테고리 이름 순서로 조회하세요.",
+    "constraints": [
+      "열 순서는 category, 상품수, 총재고입니다."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "category | 상품수 | 총재고\n----------------------------------------\n모니터 | 1 | 8\n액세서리 | 2 | 25\n주변기기 | 3 | 58"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Y2F0ZWdvcnkgfCDsg4HtkojsiJggfCDstJ3snqzqs6AKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrrqqjri4jthLAgfCAxIHwgOArslaHshLjshJzrpqwgfCAyIHwgMjUK7KO867OA6riw6riwIHwgMyB8IDU4"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i4",
+    "title": "SQL 실무 22. 직원이 2명 이상인 부서",
+    "category": "GROUP BY",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "직원이 2명 이상인 부서의 dept_id와 인원('인원')을 조회하세요. 부서가 없는 직원은 빼고 세세요.",
+    "constraints": [
+      "`WHERE`로 dept_id가 NULL인 행을 먼저 빼고, `HAVING`으로 묶은 결과를 거르세요.",
+      "dept_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "dept_id | 인원\n----------------------------------------\n10 | 3\n20 | 2\n30 | 2"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZGVwdF9pZCB8IOyduOybkAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCjEwIHwgMwoyMCB8IDIKMzAgfCAy"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i5",
+    "title": "SQL 실무 23. 직원 이름과 부서 이름",
+    "category": "JOIN",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "employees에는 부서 번호만 있어요. departments와 연결해서 직원 이름과 부서 이름(dept_name)을 조회하세요. 부서가 없는 직원은 나오지 않아도 돼요.",
+    "constraints": [
+      "열 순서는 name, dept_name입니다.",
+      "emp_id 순서로 정렬하세요.",
+      "`INNER JOIN ... ON`을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | dept_name\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n최수민 | 디자인팀\n정찬희 | 개발팀\n한지민 | 기획팀\n오세훈 | 디자인팀"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IGRlcHRfbmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IOqwnOuwnO2MgArsnbTsmIHtnawgfCDquLDtmo3tjIAK67CV66+87IiYIHwg6rCc67Cc7YyACuy1nOyImOuvvCB8IOuUlOyekOyduO2MgArsoJXssKztnawgfCDqsJzrsJztjIAK7ZWc7KeA66+8IHwg6riw7ZqN7YyACuyYpOyEuO2biCB8IOuUlOyekOyduO2MgA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i6",
+    "title": "SQL 실무 24. 모든 부서의 인원 (0명 포함)",
+    "category": "JOIN",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "모든 부서의 이름과 소속 인원('인원')을 조회하세요. 직원이 없는 부서도 0명으로 나와야 해요.",
+    "constraints": [
+      "열 순서는 dept_name, 인원입니다.",
+      "dept_id 순서로 정렬하세요.",
+      "`LEFT JOIN`을 쓰고, `COUNT(*)`가 아니라 직원 쪽 열을 세세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "dept_name | 인원\n----------------------------------------\n개발팀 | 3\n기획팀 | 2\n디자인팀 | 2\n인사팀 | 0"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZGVwdF9uYW1lIHwg7J247JuQCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rCc67Cc7YyAIHwgMwrquLDtmo3tjIAgfCAyCuuUlOyekOyduO2MgCB8IDIK7J247IKs7YyAIHwgMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i7",
+    "title": "SQL 실무 25. 부서 미배정 직원",
+    "category": "NULL 처리",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "아직 부서가 정해지지 않은(dept_id가 NULL) 직원의 이름과 직급을 조회하세요.",
+    "constraints": [],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | position\n----------------------------------------\n윤서연 | 인턴"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHBvc2l0aW9uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K7Jyk7ISc7JewIHwg7J247YS0"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i8",
+    "title": "SQL 실무 26. 이메일 없으면 '미등록'으로",
+    "category": "NULL 처리",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "직원의 이름과 이메일을 조회하되, 이메일이 없으면 '미등록'으로 보여 주세요. 열 이름은 '이메일'로 하세요.",
+    "constraints": [
+      "열 순서는 name, 이메일입니다.",
+      "`COALESCE`를 사용하세요.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | 이메일\n----------------------------------------\n김철수 | cs.kim@company.com\n이영희 | yh.lee@company.com\n박민수 | 미등록\n최수민 | sm.choi@company.com\n정찬희 | ch.jung@company.com\n한지민 | 미등록\n오세훈 | sh.oh@company.com\n윤서연 | 미등록"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IOydtOuplOydvAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IGNzLmtpbUBjb21wYW55LmNvbQrsnbTsmIHtnawgfCB5aC5sZWVAY29tcGFueS5jb20K67CV66+87IiYIHwg66+465Ox66GdCuy1nOyImOuvvCB8IHNtLmNob2lAY29tcGFueS5jb20K7KCV7LCs7Z2sIHwgY2guanVuZ0Bjb21wYW55LmNvbQrtlZzsp4Drr7wgfCDrr7jrk7HroZ0K7Jik7IS47ZuIIHwgc2gub2hAY29tcGFueS5jb20K7Jyk7ISc7JewIHwg66+465Ox66Gd"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i9",
+    "title": "SQL 실무 27. 재고 상태 표시",
+    "category": "CASE WHEN",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "상품 이름과 재고 상태('상태')를 조회하세요. 재고가 0이면 '품절', 10개 미만이면 '부족', 그 외는 '충분'이에요.",
+    "constraints": [
+      "열 순서는 name, 상태입니다.",
+      "`CASE WHEN`을 사용하세요.",
+      "product_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | 상태\n----------------------------------------\n무선 마우스 | 충분\n기계식 키보드 | 충분\n27인치 모니터 | 부족\n노트북 거치대 | 품절\nUSB-C 허브 | 충분\n웹캠 | 부족"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IOyDge2DnAotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuustOyEoCDrp4jsmrDsiqQgfCDstqnrtoQK6riw6rOE7IudIO2CpOuztOuTnCB8IOy2qeu2hAoyN+yduOy5mCDrqqjri4jthLAgfCDrtoDsobEK64W47Yq467aBIOqxsOy5mOuMgCB8IO2SiOygiApVU0ItQyDtl4jruIwgfCDstqnrtoQK7Ju57LqgIHwg67aA7KGx"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i10",
+    "title": "SQL 실무 28. 카테고리별 재고 금액",
+    "category": "GROUP BY",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "카테고리별로 재고 금액(가격 × 재고)의 합계를 '재고금액'이라는 이름으로, 재고금액이 큰 순서로 조회하세요.",
+    "constraints": [
+      "열 순서는 category, 재고금액입니다."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "category | 재고금액\n----------------------------------------\n모니터 | 2560000\n주변기기 | 2509000\n액세서리 | 1050000"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "Y2F0ZWdvcnkgfCDsnqzqs6DquIjslaEKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQrrqqjri4jthLAgfCAyNTYwMDAwCuyjvOuzgOq4sOq4sCB8IDI1MDkwMDAK7JWh7IS47ISc66asIHwgMTA1MDAwMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i11",
+    "title": "SQL 실무 29. 서울 근무 직원",
+    "category": "JOIN",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "근무지(location)가 '서울'인 부서에 속한 직원의 이름과 부서 이름을 조회하세요.",
+    "constraints": [
+      "열 순서는 name, dept_name입니다.",
+      "emp_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | dept_name\n----------------------------------------\n김철수 | 개발팀\n이영희 | 기획팀\n박민수 | 개발팀\n정찬희 | 개발팀\n한지민 | 기획팀"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IGRlcHRfbmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IOqwnOuwnO2MgArsnbTsmIHtnawgfCDquLDtmo3tjIAK67CV66+87IiYIHwg6rCc67Cc7YyACuygleywrO2drCB8IOqwnOuwnO2MgArtlZzsp4Drr7wgfCDquLDtmo3tjIA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i12",
+    "title": "SQL 실무 30. 평균보다 연봉이 높은 직원",
+    "category": "서브쿼리",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "전체 평균 연봉보다 연봉이 높은 직원의 이름과 연봉을 연봉이 높은 순서로 조회하세요.",
+    "constraints": [
+      "평균은 서브쿼리 `(SELECT AVG(salary) FROM employees)`로 구하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "name | salary\n----------------------------------------\n김철수 | 6200\n최수민 | 5100\n정찬희 | 4500\n이영희 | 4300"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHNhbGFyeQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IDYyMDAK7LWc7IiY66+8IHwgNTEwMArsoJXssKztnawgfCA0NTAwCuydtOyYge2drCB8IDQzMDA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i13",
+    "title": "SQL 실무 31. 입사 연도별 인원",
+    "category": "GROUP BY",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "입사 연도별 인원을 조회하세요. 연도는 hire_date의 앞 4글자이고, 열 이름은 '입사연도', '인원'으로 하세요.",
+    "constraints": [
+      "`SUBSTR(hire_date, 1, 4)`를 사용하세요.",
+      "입사연도 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "입사연도 | 인원\n----------------------------------------\n2015 | 1\n2017 | 1\n2019 | 1\n2020 | 1\n2022 | 2\n2023 | 1\n2024 | 1"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7J6F7IKs7Jew64+EIHwg7J247JuQCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KMjAxNSB8IDEKMjAxNyB8IDEKMjAxOSB8IDEKMjAyMCB8IDEKMjAyMiB8IDIKMjAyMyB8IDEKMjAyNCB8IDE="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_i14",
+    "title": "SQL 실무 32. 부서별 최고·최저 연봉",
+    "category": "GROUP BY",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "부서별 최고 연봉('최고')과 최저 연봉('최저')을 부서 이름과 함께 조회하세요. 부서가 있는 직원만 대상이에요.",
+    "constraints": [
+      "열 순서는 dept_name, 최고, 최저입니다.",
+      "dept_id 순서로 정렬하세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "dept_name | 최고 | 최저\n----------------------------------------\n개발팀 | 6200 | 3600\n기획팀 | 4300 | 3400\n디자인팀 | 5100 | 3500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZGVwdF9uYW1lIHwg7LWc6rOgIHwg7LWc7KCACi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0K6rCc67Cc7YyAIHwgNjIwMCB8IDM2MDAK6riw7ZqN7YyAIHwgNDMwMCB8IDM0MDAK65SU7J6Q7J247YyAIHwgNTEwMCB8IDM1MDA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company"
+  },
+  {
+    "id": "sqlc_d1",
+    "title": "SQL 실무 33. 신규 직원 등록하기 — INSERT",
+    "category": "DML",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "오늘 새로 입사한 직원을 등록하세요.\n\n- 사번 9, 이름 '강하늘', 개발팀(10), 직급 '사원', 연봉 3600, 입사일 '2026-10-01', 이메일 없음(NULL)",
+    "constraints": [
+      "`INSERT INTO employees VALUES (...)`를 사용하세요.",
+      "값은 표의 열 순서(emp_id, name, dept_id, position, salary, hire_date, email)대로 넣어요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "emp_id | name | dept_id | position | salary | hire_date | email\n----------------------------------------\n8 | 윤서연 | NULL | 인턴 | 2500 | 2024-07-01 | NULL\n9 | 강하늘 | 10 | 사원 | 3600 | 2026-10-01 | NULL"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZW1wX2lkIHwgbmFtZSB8IGRlcHRfaWQgfCBwb3NpdGlvbiB8IHNhbGFyeSB8IGhpcmVfZGF0ZSB8IGVtYWlsCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KOCB8IOycpOyEnOyXsCB8IE5VTEwgfCDsnbjthLQgfCAyNTAwIHwgMjAyNC0wNy0wMSB8IE5VTEwKOSB8IOqwle2VmOuKmCB8IDEwIHwg7IKs7JuQIHwgMzYwMCB8IDIwMjYtMTAtMDEgfCBOVUxM"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT * FROM employees WHERE emp_id >= 8 ORDER BY emp_id;"
+  },
+  {
+    "id": "sqlc_d2",
+    "title": "SQL 실무 34. 열을 지정해서 상품 등록 — INSERT",
+    "category": "DML",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "새 상품을 등록하세요. 실무에서는 표의 열 순서가 바뀌어도 안전하도록 **열 이름을 적어서** 넣어요.\n\n- 상품번호 107, '노이즈캔슬링 헤드셋', 카테고리 '주변기기', 가격 129000, 재고 10",
+    "constraints": [
+      "`INSERT INTO products (열1, 열2, ...) VALUES (...)` 형태로 쓰세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "product_id | name | category | price | stock\n----------------------------------------\n101 | 무선 마우스 | 주변기기 | 25000 | 40\n102 | 기계식 키보드 | 주변기기 | 89000 | 15\n103 | 27인치 모니터 | 모니터 | 320000 | 8\n104 | 노트북 거치대 | 액세서리 | 35000 | 0\n105 | USB-C 허브 | 액세서리 | 42000 | 25\n106 | 웹캠 | 주변기기 | 58000 | 3\n107 | 노이즈캔슬링 헤드셋 | 주변기기 | 129000 | 10"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "cHJvZHVjdF9pZCB8IG5hbWUgfCBjYXRlZ29yeSB8IHByaWNlIHwgc3RvY2sKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoxMDEgfCDrrLTshKAg66eI7Jqw7IqkIHwg7KO867OA6riw6riwIHwgMjUwMDAgfCA0MAoxMDIgfCDquLDqs4Tsi50g7YKk67O065OcIHwg7KO867OA6riw6riwIHwgODkwMDAgfCAxNQoxMDMgfCAyN+yduOy5mCDrqqjri4jthLAgfCDrqqjri4jthLAgfCAzMjAwMDAgfCA4CjEwNCB8IOuFuO2KuOu2gSDqsbDsuZjrjIAgfCDslaHshLjshJzrpqwgfCAzNTAwMCB8IDAKMTA1IHwgVVNCLUMg7ZeI67iMIHwg7JWh7IS47ISc66asIHwgNDIwMDAgfCAyNQoxMDYgfCDsm7nsuqAgfCDso7zrs4DquLDquLAgfCA1ODAwMCB8IDMKMTA3IHwg64W47J207KaI7LqU7Iqs66eBIO2XpOuTnOyFiyB8IOyjvOuzgOq4sOq4sCB8IDEyOTAwMCB8IDEw"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT * FROM products ORDER BY product_id;"
+  },
+  {
+    "id": "sqlc_d3",
+    "title": "SQL 실무 35. 부서 두 개 한 번에 추가 — INSERT",
+    "category": "DML",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "조직 개편으로 부서 두 개가 새로 생겼어요. 한 번의 INSERT로 둘 다 추가하세요.\n\n- 50, '마케팅팀', '서울'\n- 60, '영업팀', '대전'",
+    "constraints": [
+      "`VALUES (...), (...)` 처럼 괄호를 쉼표로 이어 쓰세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "dept_id | dept_name | location\n----------------------------------------\n10 | 개발팀 | 서울\n20 | 기획팀 | 서울\n30 | 디자인팀 | 부산\n40 | 인사팀 | 서울\n50 | 마케팅팀 | 서울\n60 | 영업팀 | 대전"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZGVwdF9pZCB8IGRlcHRfbmFtZSB8IGxvY2F0aW9uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KMTAgfCDqsJzrsJztjIAgfCDshJzsmrgKMjAgfCDquLDtmo3tjIAgfCDshJzsmrgKMzAgfCDrlJTsnpDsnbjtjIAgfCDrtoDsgrAKNDAgfCDsnbjsgqztjIAgfCDshJzsmrgKNTAgfCDrp4jsvIDtjIXtjIAgfCDshJzsmrgKNjAgfCDsmIHsl4XtjIAgfCDrjIDsoIQ="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT * FROM departments ORDER BY dept_id;"
+  },
+  {
+    "id": "sqlc_d4",
+    "title": "SQL 실무 36. 품절 상품 입고 처리 — UPDATE",
+    "category": "DML",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "품절이던 '노트북 거치대'(product_id 104)에 30개가 입고됐어요. 재고를 30으로 바꾸세요.",
+    "constraints": [
+      "`UPDATE ... SET ... WHERE`를 사용하세요.",
+      "**WHERE를 빠뜨리면 모든 상품의 재고가 바뀌어요.**"
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "product_id | name | stock\n----------------------------------------\n101 | 무선 마우스 | 40\n102 | 기계식 키보드 | 15\n103 | 27인치 모니터 | 8\n104 | 노트북 거치대 | 30\n105 | USB-C 허브 | 25\n106 | 웹캠 | 3"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "cHJvZHVjdF9pZCB8IG5hbWUgfCBzdG9jawotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCjEwMSB8IOustOyEoCDrp4jsmrDsiqQgfCA0MAoxMDIgfCDquLDqs4Tsi50g7YKk67O065OcIHwgMTUKMTAzIHwgMjfsnbjsuZgg66qo64uI7YSwIHwgOAoxMDQgfCDrhbjtirjrtoEg6rGw7LmY64yAIHwgMzAKMTA1IHwgVVNCLUMg7ZeI67iMIHwgMjUKMTA2IHwg7Ju57LqgIHwgMw=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT product_id, name, stock FROM products ORDER BY product_id;"
+  },
+  {
+    "id": "sqlc_d5",
+    "title": "SQL 실무 37. 승진 처리 — 여러 열 UPDATE",
+    "category": "DML",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "박민수 씨(emp_id 3)가 대리로 승진했어요. 직급을 '대리'로, 연봉을 4000으로 한 번에 바꾸세요.",
+    "constraints": [
+      "`SET 열1 = 값1, 열2 = 값2`처럼 쉼표로 이어 쓰세요.",
+      "이름이 아니라 사번(emp_id)으로 찾으세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "emp_id | name | position | salary\n----------------------------------------\n1 | 김철수 | 팀장 | 6200\n2 | 이영희 | 대리 | 4300\n3 | 박민수 | 대리 | 4000\n4 | 최수민 | 과장 | 5100\n5 | 정찬희 | 대리 | 4500\n6 | 한지민 | 사원 | 3400\n7 | 오세훈 | 사원 | 3500\n8 | 윤서연 | 인턴 | 2500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZW1wX2lkIHwgbmFtZSB8IHBvc2l0aW9uIHwgc2FsYXJ5Ci0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KMSB8IOq5gOyyoOyImCB8IO2MgOyepSB8IDYyMDAKMiB8IOydtOyYge2drCB8IOuMgOumrCB8IDQzMDAKMyB8IOuwleuvvOyImCB8IOuMgOumrCB8IDQwMDAKNCB8IOy1nOyImOuvvCB8IOqzvOyepSB8IDUxMDAKNSB8IOygleywrO2drCB8IOuMgOumrCB8IDQ1MDAKNiB8IO2VnOyngOuvvCB8IOyCrOybkCB8IDM0MDAKNyB8IOyYpOyEuO2biCB8IOyCrOybkCB8IDM1MDAKOCB8IOycpOyEnOyXsCB8IOyduO2EtCB8IDI1MDA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT emp_id, name, position, salary FROM employees ORDER BY emp_id;"
+  },
+  {
+    "id": "sqlc_d6",
+    "title": "SQL 실무 38. 부서 전체 연봉 인상 — UPDATE",
+    "category": "DML",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "개발팀(dept_id 10) 전원의 연봉을 200씩 올리세요.",
+    "constraints": [
+      "기존 값에 더하려면 `salary = salary + 200`처럼 써요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "emp_id | name | dept_id | salary\n----------------------------------------\n1 | 김철수 | 10 | 6400\n2 | 이영희 | 20 | 4300\n3 | 박민수 | 10 | 3800\n4 | 최수민 | 30 | 5100\n5 | 정찬희 | 10 | 4700\n6 | 한지민 | 20 | 3400\n7 | 오세훈 | 30 | 3500\n8 | 윤서연 | NULL | 2500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZW1wX2lkIHwgbmFtZSB8IGRlcHRfaWQgfCBzYWxhcnkKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoxIHwg6rmA7LKg7IiYIHwgMTAgfCA2NDAwCjIgfCDsnbTsmIHtnawgfCAyMCB8IDQzMDAKMyB8IOuwleuvvOyImCB8IDEwIHwgMzgwMAo0IHwg7LWc7IiY66+8IHwgMzAgfCA1MTAwCjUgfCDsoJXssKztnawgfCAxMCB8IDQ3MDAKNiB8IO2VnOyngOuvvCB8IDIwIHwgMzQwMAo3IHwg7Jik7IS47ZuIIHwgMzAgfCAzNTAwCjggfCDsnKTshJzsl7AgfCBOVUxMIHwgMjUwMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT emp_id, name, dept_id, salary FROM employees ORDER BY emp_id;"
+  },
+  {
+    "id": "sqlc_d7",
+    "title": "SQL 실무 39. 주변기기 가격 10% 인상 — UPDATE",
+    "category": "DML",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "원자재 가격이 올라서 '주변기기' 카테고리 상품 가격을 10% 올리기로 했어요.",
+    "constraints": [
+      "가격에 1.1을 곱하세요.",
+      "채점할 때는 원 단위 정수로 바꿔서 비교해요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "product_id | name | price\n----------------------------------------\n101 | 무선 마우스 | 27500\n102 | 기계식 키보드 | 97900\n103 | 27인치 모니터 | 320000\n104 | 노트북 거치대 | 35000\n105 | USB-C 허브 | 42000\n106 | 웹캠 | 63800"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "cHJvZHVjdF9pZCB8IG5hbWUgfCBwcmljZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCjEwMSB8IOustOyEoCDrp4jsmrDsiqQgfCAyNzUwMAoxMDIgfCDquLDqs4Tsi50g7YKk67O065OcIHwgOTc5MDAKMTAzIHwgMjfsnbjsuZgg66qo64uI7YSwIHwgMzIwMDAwCjEwNCB8IOuFuO2KuOu2gSDqsbDsuZjrjIAgfCAzNTAwMAoxMDUgfCBVU0ItQyDtl4jruIwgfCA0MjAwMAoxMDYgfCDsm7nsuqAgfCA2MzgwMA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT product_id, name, CAST(ROUND(price) AS INTEGER) AS price FROM products ORDER BY product_id;"
+  },
+  {
+    "id": "sqlc_d8",
+    "title": "SQL 실무 40. 이메일 일괄 등록 — UPDATE",
+    "category": "DML",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "이메일이 없는 직원에게 임시 주소 'temp@company.com'을 넣으세요. 이미 이메일이 있는 직원은 그대로 두어야 해요.",
+    "constraints": [
+      "`WHERE email IS NULL`로 대상을 정하세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "emp_id | name | email\n----------------------------------------\n1 | 김철수 | cs.kim@company.com\n2 | 이영희 | yh.lee@company.com\n3 | 박민수 | temp@company.com\n4 | 최수민 | sm.choi@company.com\n5 | 정찬희 | ch.jung@company.com\n6 | 한지민 | temp@company.com\n7 | 오세훈 | sh.oh@company.com\n8 | 윤서연 | temp@company.com"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZW1wX2lkIHwgbmFtZSB8IGVtYWlsCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KMSB8IOq5gOyyoOyImCB8IGNzLmtpbUBjb21wYW55LmNvbQoyIHwg7J207JiB7Z2sIHwgeWgubGVlQGNvbXBhbnkuY29tCjMgfCDrsJXrr7zsiJggfCB0ZW1wQGNvbXBhbnkuY29tCjQgfCDstZzsiJjrr7wgfCBzbS5jaG9pQGNvbXBhbnkuY29tCjUgfCDsoJXssKztnawgfCBjaC5qdW5nQGNvbXBhbnkuY29tCjYgfCDtlZzsp4Drr7wgfCB0ZW1wQGNvbXBhbnkuY29tCjcgfCDsmKTshLjtm4ggfCBzaC5vaEBjb21wYW55LmNvbQo4IHwg7Jyk7ISc7JewIHwgdGVtcEBjb21wYW55LmNvbQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT emp_id, name, email FROM employees ORDER BY emp_id;"
+  },
+  {
+    "id": "sqlc_d9",
+    "title": "SQL 실무 41. 단종 상품 삭제 — DELETE",
+    "category": "DML",
+    "difficulty": "basic",
+    "type": "coding",
+    "language": "sql",
+    "description": "'노트북 거치대'(product_id 104)가 단종됐어요. 상품 목록에서 삭제하세요.",
+    "constraints": [
+      "`DELETE FROM ... WHERE`를 사용하세요.",
+      "**WHERE를 빠뜨리면 모든 상품이 지워져요.**"
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "product_id | name\n----------------------------------------\n101 | 무선 마우스\n102 | 기계식 키보드\n103 | 27인치 모니터\n105 | USB-C 허브\n106 | 웹캠"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "cHJvZHVjdF9pZCB8IG5hbWUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQoxMDEgfCDrrLTshKAg66eI7Jqw7IqkCjEwMiB8IOq4sOqzhOyLnSDtgqTrs7Trk5wKMTAzIHwgMjfsnbjsuZgg66qo64uI7YSwCjEwNSB8IFVTQi1DIO2XiOu4jAoxMDYgfCDsm7nsuqA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT product_id, name FROM products ORDER BY product_id;"
+  },
+  {
+    "id": "sqlc_d10",
+    "title": "SQL 실무 42. 인턴 계약 종료 — DELETE",
+    "category": "DML",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "인턴 계약이 끝나서 직급이 '인턴'인 직원 기록을 삭제하세요.",
+    "constraints": [],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "emp_id | name | position\n----------------------------------------\n1 | 김철수 | 팀장\n2 | 이영희 | 대리\n3 | 박민수 | 사원\n4 | 최수민 | 과장\n5 | 정찬희 | 대리\n6 | 한지민 | 사원\n7 | 오세훈 | 사원"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZW1wX2lkIHwgbmFtZSB8IHBvc2l0aW9uCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KMSB8IOq5gOyyoOyImCB8IO2MgOyepQoyIHwg7J207JiB7Z2sIHwg64yA66asCjMgfCDrsJXrr7zsiJggfCDsgqzsm5AKNCB8IOy1nOyImOuvvCB8IOqzvOyepQo1IHwg7KCV7LCs7Z2sIHwg64yA66asCjYgfCDtlZzsp4Drr7wgfCDsgqzsm5AKNyB8IOyYpOyEuO2biCB8IOyCrOybkA=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT emp_id, name, position FROM employees ORDER BY emp_id;"
+  },
+  {
+    "id": "sqlc_t1",
+    "title": "SQL 실무 43. 공지사항 테이블 만들기 — CREATE TABLE",
+    "category": "DDL",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "사내 게시판에 공지사항 기능을 만들려고 해요. notices 테이블을 만드세요.\n\n- id: 정수, 기본키(PRIMARY KEY)\n- title: 문자, 비어 있으면 안 됨(NOT NULL)\n- content: 문자\n- created_at: 문자",
+    "constraints": [
+      "열 순서는 id, title, content, created_at입니다.",
+      "채점은 열 이름 · NOT NULL 여부 · 기본키 여부로 해요(자료형 이름은 INT/INTEGER, TEXT/VARCHAR 무엇이든 괜찮아요)."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "name | notnull | pk\n----------------------------------------\nid | 0 | 1\ntitle | 1 | 0\ncontent | 0 | 0\ncreated_at | 0 | 0"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IG5vdG51bGwgfCBwawotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCmlkIHwgMCB8IDEKdGl0bGUgfCAxIHwgMApjb250ZW50IHwgMCB8IDAKY3JlYXRlZF9hdCB8IDAgfCAw"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT name, \"notnull\", pk FROM pragma_table_info('notices') ORDER BY cid;"
+  },
+  {
+    "id": "sqlc_t2",
+    "title": "SQL 실무 44. 기본값이 있는 회원 테이블 — DEFAULT",
+    "category": "DDL",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "쇼핑몰 회원 테이블 members를 만드세요. 가입하면 등급이 자동으로 'BRONZE'가 되어야 해요.\n\n- id: 정수, 기본키\n- name: 문자, NOT NULL\n- grade: 문자, 기본값 'BRONZE'",
+    "constraints": [
+      "`DEFAULT 'BRONZE'`를 사용하세요.",
+      "채점은 열 이름과 기본값으로 해요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "name | dflt_value\n----------------------------------------\nid | NULL\nname | NULL\ngrade | 'BRONZE'"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IGRmbHRfdmFsdWUKLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQppZCB8IE5VTEwKbmFtZSB8IE5VTEwKZ3JhZGUgfCAnQlJPTlpFJw=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT name, dflt_value FROM pragma_table_info('members') ORDER BY cid;"
+  },
+  {
+    "id": "sqlc_t3",
+    "title": "SQL 실무 45. 전화번호 열 추가 — ALTER TABLE",
+    "category": "DDL",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "직원 비상 연락망을 만들기 위해 employees 테이블에 phone 열(문자)을 추가하세요.",
+    "constraints": [
+      "`ALTER TABLE ... ADD COLUMN`을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "name\n----------------------------------------\nemp_id\nname\ndept_id\nposition\nsalary\nhire_date\nemail\nphone"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCmVtcF9pZApuYW1lCmRlcHRfaWQKcG9zaXRpb24Kc2FsYXJ5CmhpcmVfZGF0ZQplbWFpbApwaG9uZQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT name FROM pragma_table_info('employees') ORDER BY cid;"
+  },
+  {
+    "id": "sqlc_t4",
+    "title": "SQL 실무 46. 개발팀 백업 테이블 — CREATE TABLE AS",
+    "category": "DDL",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "개발팀(dept_id 10) 직원 데이터를 작업 전에 백업해 두려고 해요. 개발팀 직원 전체를 담은 dev_backup 테이블을 만드세요.",
+    "constraints": [
+      "`CREATE TABLE 새테이블 AS SELECT ...`를 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "emp_id | name | salary\n----------------------------------------\n1 | 김철수 | 6200\n3 | 박민수 | 3600\n5 | 정찬희 | 4500"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZW1wX2lkIHwgbmFtZSB8IHNhbGFyeQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCjEgfCDquYDssqDsiJggfCA2MjAwCjMgfCDrsJXrr7zsiJggfCAzNjAwCjUgfCDsoJXssKztnawgfCA0NTAw"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT emp_id, name, salary FROM dev_backup ORDER BY emp_id;"
+  },
+  {
+    "id": "sqlc_t5",
+    "title": "SQL 실무 47. 서울 근무자 뷰 만들기 — CREATE VIEW",
+    "category": "DDL",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "서울 근무 직원 목록을 여러 화면에서 계속 써야 해요. 매번 JOIN을 쓰지 않도록 뷰 seoul_staff를 만드세요. 뷰에는 직원 이름(name)과 부서 이름(dept_name)이 있어야 해요.",
+    "constraints": [
+      "`CREATE VIEW 이름 AS SELECT ...`를 사용하세요.",
+      "근무지(location)가 '서울'인 부서의 직원만 담으세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "name | dept_name\n----------------------------------------\n김철수 | 개발팀\n박민수 | 개발팀\n이영희 | 기획팀\n정찬희 | 개발팀\n한지민 | 기획팀"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IGRlcHRfbmFtZQotLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tCuq5gOyyoOyImCB8IOqwnOuwnO2MgArrsJXrr7zsiJggfCDqsJzrsJztjIAK7J207JiB7Z2sIHwg6riw7ZqN7YyACuygleywrO2drCB8IOqwnOuwnO2MgArtlZzsp4Drr7wgfCDquLDtmo3tjIA="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT * FROM seoul_staff ORDER BY name;"
+  },
+  {
+    "id": "sqlc_t6",
+    "title": "SQL 실무 48. 이름 검색용 인덱스 — CREATE INDEX",
+    "category": "DDL",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "직원 이름으로 검색하는 일이 많아졌어요. employees의 name 열에 idx_emp_name이라는 인덱스를 만드세요.",
+    "constraints": [
+      "`CREATE INDEX 이름 ON 테이블(열)`을 사용하세요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "name | tbl_name\n----------------------------------------\nidx_emp_name | employees"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "bmFtZSB8IHRibF9uYW1lCi0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0KaWR4X2VtcF9uYW1lIHwgZW1wbG95ZWVz"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT name, tbl_name FROM sqlite_master WHERE type = 'index' AND name = 'idx_emp_name';"
+  },
+  {
+    "id": "sqlc_t7",
+    "title": "SQL 실무 49. 주문 기록 테이블 — FOREIGN KEY",
+    "category": "DDL",
+    "difficulty": "intermediate",
+    "type": "coding",
+    "language": "sql",
+    "description": "상품 주문 기록을 남길 order_logs 테이블을 만드세요. product_id는 반드시 products 테이블에 있는 상품이어야 해요.\n\n- id: 정수, 기본키\n- product_id: 정수, products(product_id)를 참조(FOREIGN KEY)\n- qty: 정수, NOT NULL",
+    "constraints": [
+      "`REFERENCES products(product_id)` 또는 `FOREIGN KEY (product_id) REFERENCES products(product_id)`를 쓰세요.",
+      "채점은 참조 관계(어느 열이 어느 표의 어느 열을 가리키는지)로 해요."
+    ],
+    "examples": [
+      {
+        "input": "확인 쿼리 결과",
+        "output": "from | table | to\n----------------------------------------\nproduct_id | products | product_id"
+      }
+    ],
+    "initialCode": "",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "ZnJvbSB8IHRhYmxlIHwgdG8KLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLQpwcm9kdWN0X2lkIHwgcHJvZHVjdHMgfCBwcm9kdWN0X2lk"
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "sqlDataset": "company",
+    "sqlCheck": "SELECT \"from\", \"table\", \"to\" FROM pragma_foreign_key_list('order_logs');"
   }
 ];

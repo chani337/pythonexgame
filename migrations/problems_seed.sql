@@ -1,6 +1,6 @@
 -- GENERATED FILE -- do not edit by hand.
 -- Regenerate with: npm run sync:problems
--- Source: src/data/problems.ts (456 problems)
+-- Source: src/data/problems.ts (505 problems)
 --
 -- Seeds/refreshes public.problems, the reference table that
 -- user_solved_problems.problem_id is validated against. Safe to re-run: it
@@ -474,7 +474,56 @@ WITH incoming (id, language, difficulty, type) AS (
   ('prac_5', 'algorithm', 'advanced', 'coding'),
   ('prac_6', 'algorithm', 'advanced', 'coding'),
   ('prac_7', 'algorithm', 'expert', 'coding'),
-  ('prac_8', 'algorithm', 'expert', 'coding')
+  ('prac_8', 'algorithm', 'expert', 'coding'),
+  ('sqlc_b1', 'sql', 'basic', 'coding'),
+  ('sqlc_b2', 'sql', 'basic', 'coding'),
+  ('sqlc_b3', 'sql', 'basic', 'coding'),
+  ('sqlc_b4', 'sql', 'basic', 'coding'),
+  ('sqlc_b5', 'sql', 'basic', 'coding'),
+  ('sqlc_b6', 'sql', 'basic', 'coding'),
+  ('sqlc_b7', 'sql', 'basic', 'coding'),
+  ('sqlc_b8', 'sql', 'basic', 'coding'),
+  ('sqlc_b9', 'sql', 'basic', 'coding'),
+  ('sqlc_b10', 'sql', 'basic', 'coding'),
+  ('sqlc_b11', 'sql', 'basic', 'coding'),
+  ('sqlc_b12', 'sql', 'basic', 'coding'),
+  ('sqlc_b13', 'sql', 'basic', 'coding'),
+  ('sqlc_b14', 'sql', 'basic', 'coding'),
+  ('sqlc_b15', 'sql', 'basic', 'coding'),
+  ('sqlc_b16', 'sql', 'basic', 'coding'),
+  ('sqlc_b17', 'sql', 'basic', 'coding'),
+  ('sqlc_b18', 'sql', 'basic', 'coding'),
+  ('sqlc_i1', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i2', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i3', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i4', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i5', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i6', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i7', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i8', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i9', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i10', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i11', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i12', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i13', 'sql', 'intermediate', 'coding'),
+  ('sqlc_i14', 'sql', 'intermediate', 'coding'),
+  ('sqlc_d1', 'sql', 'basic', 'coding'),
+  ('sqlc_d2', 'sql', 'basic', 'coding'),
+  ('sqlc_d3', 'sql', 'basic', 'coding'),
+  ('sqlc_d4', 'sql', 'basic', 'coding'),
+  ('sqlc_d5', 'sql', 'intermediate', 'coding'),
+  ('sqlc_d6', 'sql', 'intermediate', 'coding'),
+  ('sqlc_d7', 'sql', 'intermediate', 'coding'),
+  ('sqlc_d8', 'sql', 'intermediate', 'coding'),
+  ('sqlc_d9', 'sql', 'basic', 'coding'),
+  ('sqlc_d10', 'sql', 'intermediate', 'coding'),
+  ('sqlc_t1', 'sql', 'intermediate', 'coding'),
+  ('sqlc_t2', 'sql', 'intermediate', 'coding'),
+  ('sqlc_t3', 'sql', 'intermediate', 'coding'),
+  ('sqlc_t4', 'sql', 'intermediate', 'coding'),
+  ('sqlc_t5', 'sql', 'intermediate', 'coding'),
+  ('sqlc_t6', 'sql', 'intermediate', 'coding'),
+  ('sqlc_t7', 'sql', 'intermediate', 'coding')
 ),
 upserted AS (
   INSERT INTO public.problems (id, language, difficulty, type)

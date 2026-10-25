@@ -11,6 +11,7 @@ import { runWebChecks } from '../utils/webChecks';
 import { testLabel } from '../lib/pythonRuntime';
 import { optionOrder } from '../utils/optionOrder';
 import { pyDatasetById } from '../data/pyDatasets';
+import { SQL_DATASETS, DEFAULT_SQL_DATASET } from '../data/sqlSeed';
 import type { RunResponse, TestResult, PerfSpec } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
 import confetti from 'canvas-confetti';
@@ -27,7 +28,7 @@ interface ProblemWorkspaceProps {
   onPrevProblem?: () => void;
   runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string, perf?: PerfSpec) => Promise<RunResponse>;
   runJsCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
-  runSqlCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
+  runSqlCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string, datasetId?: string, checkSql?: string) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onMarkSolved: (problemId: string) => void;
   isBookmarked?: boolean;
@@ -100,6 +101,8 @@ export default function ProblemWorkspace({
   // " | "-joined text. Grading still compares the text form (useSqlRunner's
   // toStdout), so the 36 stored expected outputs are untouched.
   const [sqlTables, setSqlTables] = useState<SqlResultTable[] | null>(null);
+  // DDL/DML problems: the check query's result, which is what was graded.
+  const [sqlCheckTables, setSqlCheckTables] = useState<SqlResultTable[] | null>(null);
   // Matplotlib figures from the last Python run, as base64 PNGs.
   const [plotImages, setPlotImages] = useState<string[]>([]);
   const [consoleError, setConsoleError] = useState<string | null>(null);
@@ -168,6 +171,7 @@ export default function ProblemWorkspace({
     setConsoleError(null);
     setTestResults([]);
     setPlotImages([]);
+    setSqlCheckTables(null);
     setHasTested(false);
     setWorkspaceSuccess(false);
     setShowExplanation(false);
@@ -238,10 +242,13 @@ export default function ProblemWorkspace({
           : undefined;
         res = perfSpec
           ? await runPythonCode(codeToExecute, decodedTestCases, problem.testRunnerCode, perfSpec)
+          : problemLanguage === 'sql' && runSqlCode
+          ? await runSqlCode(codeToExecute, decodedTestCases, problem.testRunnerCode, problem.sqlDataset, problem.sqlCheck)
           : await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
       }
       // Only present when the SQL runner handled this problem.
       setSqlTables((res as { tables?: SqlResultTable[] }).tables ?? null);
+      setSqlCheckTables((res as { checkTables?: SqlResultTable[] }).checkTables ?? null);
       setPlotImages(res.images ?? []);
 
       setConsoleOutput(res.stdout || (res.success ? '실행 완료 (출력값 없음)' : ''));
@@ -290,6 +297,46 @@ export default function ProblemWorkspace({
   // Ctrl/Cmd+Enter and Shift+Enter inside the editor normally (re-)run the
   // code. Once the problem is already solved, re-running is redundant, so
   // the same shortcut instead advances to the next problem.
+  const renderSqlTable = (table: SqlResultTable, ti: number) => (
+    <div key={ti} style={{ overflowX: 'auto' }}>
+      <table style={{ borderCollapse: 'collapse', fontSize: '0.78rem', fontFamily: 'var(--font-mono)', minWidth: '100%' }}>
+        <thead>
+          <tr style={{ background: '#f4f4f6', borderBottom: '2px solid #1a1a1a' }}>
+            {table.columns.map((col, ci) => (
+              <th key={ci} style={{ padding: '0.4rem 0.75rem', textAlign: 'left', fontWeight: 700, color: '#1a1a1a', whiteSpace: 'nowrap' }}>
+                {col}
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {table.rows.map((row, ri) => (
+            <tr key={ri} style={{ borderBottom: '1px solid var(--border-subtle)', background: ri % 2 === 1 ? '#fafafa' : '#ffffff' }}>
+              {row.map((cell, ci) => (
+                <td
+                  key={ci}
+                  style={{
+                    padding: '0.35rem 0.75rem',
+                    whiteSpace: 'nowrap',
+                    // NULL is a marker, not a value -- dimmed so it
+                    // doesn't read as the literal text "NULL".
+                    color: cell === 'NULL' ? 'var(--text-muted)' : '#1a1a1a',
+                    fontStyle: cell === 'NULL' ? 'italic' : 'normal',
+                  }}
+                >
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
+        {table.rows.length}행
+      </div>
+    </div>
+  );
+
   // The expected-vs-actual table needs more room than the 240px console.
   const correctnessResults = testResults.filter((r) => !r.perf);
   const perfResults = testResults.filter((r) => r.perf);
@@ -528,39 +575,20 @@ export default function ProblemWorkspace({
             </div>
           </div>
 
-          {/* SQL Table Schema Reference -- every SQL problem runs against this
-              same fixed users/orders seed data (see usePyodide.ts), but
-              nothing showed students the columns or rows, so writing a query
-              meant guessing or remembering it from elsewhere. */}
+          {/* SQL table reference: the dataset this problem runs on
+              (src/data/sqlSeed.ts), so the columns and rows shown are exactly
+              the ones the query sees. */}
           {problemLanguage === 'sql' && (
             <div>
               <h3 style={{ fontSize: '0.85rem', fontWeight: '700', marginBottom: '0.5rem', color: '#1a1a1a', letterSpacing: '0.05em' }}>
                 테이블 구조
               </h3>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                {[
-                  {
-                    name: 'users',
-                    columns: 'id, name, age, score, dept',
-                    rows: [
-                      ['1', '김철수', '20', '90', '개발팀'],
-                      ['2', '이영희', '25', '85', '기획팀'],
-                      ['3', '박민수', '22', '100', '개발팀'],
-                      ['4', '최수민', '28', '70', '디자인팀'],
-                      ['5', '정찬희', '24', '95', '개발팀'],
-                    ],
-                  },
-                  {
-                    name: 'orders',
-                    columns: 'order_id, user_id, product, price',
-                    rows: [
-                      ['101', '1', '노트북', '1500000'],
-                      ['102', '1', '마우스', '30000'],
-                      ['103', '3', '키보드', '120000'],
-                      ['104', '5', '모니터', '450000'],
-                    ],
-                  },
-                ].map((table) => (
+                {(SQL_DATASETS[problem.sqlDataset ?? DEFAULT_SQL_DATASET.id] ?? DEFAULT_SQL_DATASET).tables.map((t) => ({
+                  name: t.name,
+                  columns: t.columns.map((c) => c.split(' ')[0]).join(', '),
+                  rows: t.rows.map((r) => r.map((v) => (v === null ? 'NULL' : String(v)))),
+                })).map((table) => (
                   <div key={table.name} style={{ border: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
                     <div style={{ padding: '0.4rem 0.75rem', background: '#f4f4f6', fontSize: '0.75rem', fontWeight: '700', color: '#1a1a1a', fontFamily: 'var(--font-mono)' }}>
                       {table.name} ({table.columns})
@@ -579,7 +607,7 @@ export default function ProblemWorkspace({
                         {table.rows.map((row, i) => (
                           <tr key={i}>
                             {row.map((cell, j) => (
-                              <td key={j} style={{ padding: '0.3rem 0.75rem', color: '#1a1a1a', borderBottom: i === table.rows.length - 1 ? 'none' : '1px solid var(--border-subtle)' }}>
+                              <td key={j} style={{ padding: '0.3rem 0.75rem', color: cell === 'NULL' ? 'var(--text-muted)' : '#1a1a1a', fontStyle: cell === 'NULL' ? 'italic' : 'normal', whiteSpace: 'nowrap', borderBottom: i === table.rows.length - 1 ? 'none' : '1px solid var(--border-subtle)' }}>
                                 {cell}
                               </td>
                             ))}
@@ -945,47 +973,22 @@ export default function ProblemWorkspace({
               {sqlTables && sqlTables.length > 0 && (
                 <div style={{ marginBottom: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
                   {sqlTables.map((table, ti) => (
-                    <div key={ti} style={{ overflowX: 'auto' }}>
-                      <table style={{ borderCollapse: 'collapse', fontSize: '0.78rem', fontFamily: 'var(--font-mono)', minWidth: '100%' }}>
-                        <thead>
-                          <tr style={{ background: '#f4f4f6', borderBottom: '2px solid #1a1a1a' }}>
-                            {table.columns.map((col, ci) => (
-                              <th key={ci} style={{ padding: '0.4rem 0.75rem', textAlign: 'left', fontWeight: 700, color: '#1a1a1a', whiteSpace: 'nowrap' }}>
-                                {col}
-                              </th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {table.rows.map((row, ri) => (
-                            <tr key={ri} style={{ borderBottom: '1px solid var(--border-subtle)', background: ri % 2 === 1 ? '#fafafa' : '#ffffff' }}>
-                              {row.map((cell, ci) => (
-                                <td
-                                  key={ci}
-                                  style={{
-                                    padding: '0.35rem 0.75rem',
-                                    whiteSpace: 'nowrap',
-                                    // NULL is a marker, not a value -- dimmed so it
-                                    // doesn't read as the literal text "NULL".
-                                    color: cell === 'NULL' ? 'var(--text-muted)' : '#1a1a1a',
-                                    fontStyle: cell === 'NULL' ? 'italic' : 'normal',
-                                  }}
-                                >
-                                  {cell}
-                                </td>
-                              ))}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-                        {table.rows.length}행
-                      </div>
-                    </div>
+                    renderSqlTable(table, ti)
                   ))}
                 </div>
               )}
-              {consoleOutput && !sqlTables?.length && (
+              {sqlCheckTables && problem.sqlCheck && (
+                <div style={{ marginBottom: '0.6rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderTop: sqlTables?.length ? '1px solid var(--border-subtle)' : 'none', paddingTop: sqlTables?.length ? '0.6rem' : 0 }}>
+                  <div style={{ fontSize: '0.74rem', color: 'var(--text-secondary)' }}>
+                    <strong style={{ color: '#1a1a1a' }}>확인 쿼리 결과</strong> — 내 코드를 실행한 뒤 이 쿼리로 표를 확인해서 채점해요
+                    <code style={{ display: 'block', marginTop: '0.25rem', fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: '#1a1a1a', whiteSpace: 'pre-wrap' }}>{problem.sqlCheck}</code>
+                  </div>
+                  {sqlCheckTables.length > 0
+                    ? sqlCheckTables.map((table, ti) => renderSqlTable(table, ti))
+                    : <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>결과가 0줄이에요.</div>}
+                </div>
+              )}
+              {consoleOutput && !sqlTables?.length && !sqlCheckTables && (
                 <div className="console-stdout" style={{ fontSize: '0.8rem', color: '#1a1a1a' }}>
                   {consoleOutput.split('\n').map((line, idx) => (
                     <div key={idx}><span className="console-prompt">&gt;</span> {line}</div>
