@@ -145,6 +145,29 @@ for (const f of fails) {
   console.log(`    실제  : ${JSON.stringify(f.actual.slice(0, 180))}`);
 }
 
+// --- 1b. identifier case doesn't matter -----------------------------------
+// SQL names are case-insensitive, so these upper-case answers must pass. DDL
+// checks lower-case the names they read back; header lines are compared
+// case-insensitively (normalizeForGrading in useSqlRunner, mirrored here).
+const normalize = (t) => { const l = t.replace(/\r\n/g, '\n').trim().split('\n'); return l.map((x, i) => (/^-{40}$/.test(l[i + 1] ?? '') ? x.toLowerCase() : x)).join('\n'); };
+const CASE_VARIANTS = [
+  ['sqlc_b2', 'SELECT NAME AS Name, POSITION AS Position FROM EMPLOYEES ORDER BY EMP_ID;'],
+  ['sqlc_t1', 'CREATE TABLE NOTICES (ID INTEGER PRIMARY KEY, TITLE TEXT NOT NULL, CONTENT TEXT, CREATED_AT TEXT);'],
+  ['sqlc_t1', 'create table notices (id int primary key, title varchar(100) not null, content varchar(1000), created_at varchar(20));'],
+  ['sqlc_t3', 'ALTER TABLE EMPLOYEES ADD COLUMN PHONE VARCHAR(20);'],
+  ['sqlc_t6', 'CREATE INDEX IDX_EMP_NAME ON EMPLOYEES(NAME);'],
+  ['sqlc_t7', 'CREATE TABLE ORDER_LOGS (ID INTEGER PRIMARY KEY, PRODUCT_ID INTEGER REFERENCES PRODUCTS(PRODUCT_ID), QTY INTEGER NOT NULL);'],
+];
+console.log('\n=== 대소문자 · 자료형 이름을 다르게 써도 정답 ===');
+let casePass = 0;
+for (const [id, code] of CASE_VARIANTS) {
+  const p = sqlProblems.find((q) => q.id === id);
+  let ok = false, out = '';
+  try { out = run(code, p); ok = normalize(out) === normalize(decodeAnswer(p.testCases[0].expected)); } catch (e) { out = e.message; }
+  if (ok) casePass++;
+  console.log(`  ${ok ? 'OK  ' : '실패'} ${id.padEnd(10)} ${code.slice(0, 60)}${ok ? '' : '\n         → ' + JSON.stringify(out.slice(0, 120))}`);
+}
+
 // --- 2. the Oracle translator still behaves as it did in usePyodide -------
 const ORACLE_CASES = [
   ['NVL -> IFNULL', 'SELECT NVL(dept, 0) FROM users;', /IFNULL\(/],
@@ -194,6 +217,6 @@ for (const [label, sql] of [['문법 오류', 'SELCT * FROM users;'], ['없는 �
 }
 
 if (startPasses.length) console.log(`\n실패: 시작 코드가 이미 통과하는 문제 ${startPasses.join(', ')}`);
-const total = fails.length + startPasses.length + (ORACLE_CASES.length - trPass) + (ROUTING_CASES.length - routePass) + (2 - errOk);
+const total = fails.length + startPasses.length + (CASE_VARIANTS.length - casePass) + (ORACLE_CASES.length - trPass) + (ROUTING_CASES.length - routePass) + (2 - errOk);
 console.log(`\n${total === 0 ? '전부 통과' : total + '건 실패'}`);
 process.exit(total === 0 ? 0 : 1);

@@ -464,7 +464,8 @@ export default function ProblemList({
                       WebkitBoxOrient: 'vertical',
                     }}
                   >
-                    {problem.description}
+                    {/* Card preview: drop the column/value tables some SQL problems spell out. */}
+                    {problem.description.split('\n').filter((l) => !l.trim().startsWith('|')).join(' ').replace(/\s+/g, ' ').trim()}
                   </p>
                 </div>
 

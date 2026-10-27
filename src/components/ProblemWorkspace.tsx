@@ -162,6 +162,48 @@ export default function ProblemWorkspace({
     });
   };
 
+  // Descriptions are plain text with `code` / **bold**, plus markdown-style
+  // tables (consecutive lines starting with "|") -- used to spell out column
+  // names, types and values in the SQL DDL/DML problems.
+  const renderDescription = (text: string) => {
+    const blocks: { table: boolean; lines: string[] }[] = [];
+    for (const line of text.split('\n')) {
+      const table = line.trim().startsWith('|');
+      const last = blocks[blocks.length - 1];
+      if (last && last.table === table) last.lines.push(line);
+      else blocks.push({ table, lines: [line] });
+    }
+    return blocks.map((b, bi) => {
+      if (!b.table) return <Fragment key={bi}>{renderFormattedText(b.lines.join('\n'))}</Fragment>;
+      const rows = b.lines
+        .filter((l) => !/^\s*\|[\s:|-]+\|\s*$/.test(l))
+        .map((l) => l.trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim()));
+      const [head, ...body] = rows;
+      return (
+        <div key={bi} style={{ overflowX: 'auto', margin: '0.4rem 0', whiteSpace: 'normal' }}>
+          <table style={{ borderCollapse: 'collapse', fontSize: '0.8rem', minWidth: '60%' }}>
+            <thead>
+              <tr>
+                {head.map((c, ci) => (
+                  <th key={ci} style={{ textAlign: 'left', padding: '0.35rem 0.75rem', background: '#f4f4f6', borderBottom: '2px solid #1a1a1a', color: '#1a1a1a', fontWeight: 700, whiteSpace: 'nowrap' }}>{renderFormattedText(c)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {body.map((r, ri) => (
+                <tr key={ri}>
+                  {r.map((c, ci) => (
+                    <td key={ci} style={{ padding: '0.3rem 0.75rem', borderBottom: '1px solid var(--border-subtle)', color: '#1a1a1a', fontFamily: ci === 0 ? 'var(--font-mono)' : undefined }}>{renderFormattedText(c)}</td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    });
+  };
+
   // Reset workspace state when problem changes
   useEffect(() => {
     setCode(problem.initialCode || '');
@@ -571,7 +613,7 @@ export default function ProblemWorkspace({
               문제 설명
             </h3>
             <div style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
-              {renderFormattedText(problem.description)}
+              {renderDescription(problem.description)}
             </div>
           </div>
 
@@ -587,6 +629,11 @@ export default function ProblemWorkspace({
                 {(SQL_DATASETS[problem.sqlDataset ?? DEFAULT_SQL_DATASET.id] ?? DEFAULT_SQL_DATASET).tables.map((t) => ({
                   name: t.name,
                   columns: t.columns.map((c) => c.split(' ')[0]).join(', '),
+                  // "emp_id INT PRIMARY KEY" -> type "INT", key "PK"
+                  types: t.columns.map((c) => {
+                    const [, type = '', ...rest] = c.split(' ');
+                    return rest.join(' ').includes('PRIMARY KEY') ? `${type} · PK` : type;
+                  }),
                   rows: t.rows.map((r) => r.map((v) => (v === null ? 'NULL' : String(v)))),
                 })).map((table) => (
                   <div key={table.name} style={{ border: '1px solid var(--border-subtle)', overflowX: 'auto' }}>
@@ -596,9 +643,12 @@ export default function ProblemWorkspace({
                     <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.75rem', fontFamily: 'var(--font-mono)' }}>
                       <thead>
                         <tr>
-                          {table.columns.split(', ').map((col) => (
-                            <th key={col} style={{ textAlign: 'left', padding: '0.35rem 0.75rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-subtle)', fontWeight: '600' }}>
+                          {table.columns.split(', ').map((col, ci) => (
+                            <th key={col} style={{ textAlign: 'left', padding: '0.35rem 0.75rem', color: 'var(--text-muted)', borderBottom: '1px solid var(--border-subtle)', fontWeight: '600', whiteSpace: 'nowrap' }}>
                               {col}
+                              {table.types[ci] && (
+                                <span style={{ display: 'block', fontSize: '0.64rem', fontWeight: 500, color: '#0969da', letterSpacing: '0.02em' }}>{table.types[ci]}</span>
+                              )}
                             </th>
                           ))}
                         </tr>

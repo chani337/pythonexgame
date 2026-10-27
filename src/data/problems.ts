@@ -12142,10 +12142,11 @@ export const problems: Problem[] = [
     "difficulty": "basic",
     "type": "coding",
     "language": "sql",
-    "description": "오늘 새로 입사한 직원을 등록하세요.\n\n- 사번 9, 이름 '강하늘', 개발팀(10), 직급 '사원', 연봉 3600, 입사일 '2026-10-01', 이메일 없음(NULL)",
+    "description": "오늘 새로 입사한 직원을 등록하세요.\n\n| 열 | 자료형 | 넣을 값 |\n|---|---|---|\n| emp_id | INT | 9 |\n| name | TEXT | '강하늘' |\n| dept_id | INT | 10 (개발팀) |\n| position | TEXT | '사원' |\n| salary | INT | 3600 (만 원) |\n| hire_date | TEXT | '2026-10-01' |\n| email | TEXT | 없음 → NULL |",
     "constraints": [
       "`INSERT INTO employees VALUES (...)`를 사용하세요.",
-      "값은 표의 열 순서(emp_id, name, dept_id, position, salary, hire_date, email)대로 넣어요."
+      "값은 표의 열 순서대로 넣어요.",
+      "INT는 따옴표 없이(3600), TEXT는 작은따옴표로('사원') 써요. 값이 없으면 따옴표 없이 NULL이에요."
     ],
     "examples": [
       {
@@ -12171,7 +12172,7 @@ export const problems: Problem[] = [
     "difficulty": "basic",
     "type": "coding",
     "language": "sql",
-    "description": "새 상품을 등록하세요. 실무에서는 표의 열 순서가 바뀌어도 안전하도록 **열 이름을 적어서** 넣어요.\n\n- 상품번호 107, '노이즈캔슬링 헤드셋', 카테고리 '주변기기', 가격 129000, 재고 10",
+    "description": "새 상품을 등록하세요. 실무에서는 표의 열 순서가 바뀌어도 안전하도록 **열 이름을 적어서** 넣어요.\n\n| 열 | 자료형 | 넣을 값 |\n|---|---|---|\n| product_id | INT | 107 |\n| name | TEXT | '노이즈캔슬링 헤드셋' |\n| category | TEXT | '주변기기' |\n| price | INT | 129000 (원) |\n| stock | INT | 10 |",
     "constraints": [
       "`INSERT INTO products (열1, 열2, ...) VALUES (...)` 형태로 쓰세요."
     ],
@@ -12199,7 +12200,7 @@ export const problems: Problem[] = [
     "difficulty": "basic",
     "type": "coding",
     "language": "sql",
-    "description": "조직 개편으로 부서 두 개가 새로 생겼어요. 한 번의 INSERT로 둘 다 추가하세요.\n\n- 50, '마케팅팀', '서울'\n- 60, '영업팀', '대전'",
+    "description": "조직 개편으로 부서 두 개가 새로 생겼어요. 한 번의 INSERT로 둘 다 추가하세요.\n\n| dept_id (INT) | dept_name (TEXT) | location (TEXT) |\n|---|---|---|\n| 50 | '마케팅팀' | '서울' |\n| 60 | '영업팀' | '대전' |",
     "constraints": [
       "`VALUES (...), (...)` 처럼 괄호를 쉼표로 이어 쓰세요."
     ],
@@ -12227,7 +12228,7 @@ export const problems: Problem[] = [
     "difficulty": "basic",
     "type": "coding",
     "language": "sql",
-    "description": "품절이던 '노트북 거치대'(product_id 104)에 30개가 입고됐어요. 재고를 30으로 바꾸세요.",
+    "description": "품절이던 '노트북 거치대'(product_id 104)에 30개가 입고됐어요. 재고(stock, INT)를 30으로 바꾸세요.",
     "constraints": [
       "`UPDATE ... SET ... WHERE`를 사용하세요.",
       "**WHERE를 빠뜨리면 모든 상품의 재고가 바뀌어요.**"
@@ -12256,7 +12257,7 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "박민수 씨(emp_id 3)가 대리로 승진했어요. 직급을 '대리'로, 연봉을 4000으로 한 번에 바꾸세요.",
+    "description": "박민수 씨(emp_id 3)가 대리로 승진했어요. 직급(position, TEXT)을 '대리'로, 연봉(salary, INT)을 4000으로 한 번에 바꾸세요.",
     "constraints": [
       "`SET 열1 = 값1, 열2 = 값2`처럼 쉼표로 이어 쓰세요.",
       "이름이 아니라 사번(emp_id)으로 찾으세요."
@@ -12285,7 +12286,7 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "개발팀(dept_id 10) 전원의 연봉을 200씩 올리세요.",
+    "description": "개발팀(dept_id 10) 전원의 연봉(salary, INT, 단위 만 원)을 200씩 올리세요.",
     "constraints": [
       "기존 값에 더하려면 `salary = salary + 200`처럼 써요."
     ],
@@ -12313,7 +12314,7 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "원자재 가격이 올라서 '주변기기' 카테고리 상품 가격을 10% 올리기로 했어요.",
+    "description": "원자재 가격이 올라서 '주변기기' 카테고리 상품 가격(price, INT, 단위 원)을 10% 올리기로 했어요.",
     "constraints": [
       "가격에 1.1을 곱하세요.",
       "채점할 때는 원 단위 정수로 바꿔서 비교해요."
@@ -12342,7 +12343,7 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "이메일이 없는 직원에게 임시 주소 'temp@company.com'을 넣으세요. 이미 이메일이 있는 직원은 그대로 두어야 해요.",
+    "description": "이메일(email, TEXT)이 없는(NULL) 직원에게 임시 주소 'temp@company.com'을 넣으세요. 이미 이메일이 있는 직원은 그대로 두어야 해요.",
     "constraints": [
       "`WHERE email IS NULL`로 대상을 정하세요."
     ],
@@ -12425,10 +12426,11 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "사내 게시판에 공지사항 기능을 만들려고 해요. notices 테이블을 만드세요.\n\n- id: 정수, 기본키(PRIMARY KEY)\n- title: 문자, 비어 있으면 안 됨(NOT NULL)\n- content: 문자\n- created_at: 문자",
+    "description": "사내 게시판에 공지사항 기능을 만들려고 해요. 아래 구조로 notices 테이블을 만드세요.\n\n| 열 | 자료형 | 규칙 |\n|---|---|---|\n| id | INTEGER | PRIMARY KEY |\n| title | TEXT | NOT NULL |\n| content | TEXT | |\n| created_at | TEXT | ('2026-10-27 09:00' 같은 날짜·시간 문자열) |",
     "constraints": [
       "열 순서는 id, title, content, created_at입니다.",
-      "채점은 열 이름 · NOT NULL 여부 · 기본키 여부로 해요(자료형 이름은 INT/INTEGER, TEXT/VARCHAR 무엇이든 괜찮아요)."
+      "자료형은 위에 적힌 대로 쓰세요. (INT와 INTEGER, TEXT와 VARCHAR처럼 같은 뜻의 다른 이름을 써도 정답으로 처리해요.)",
+      "채점은 열 이름 · NOT NULL 여부 · 기본키 여부로 해요. 대소문자는 구분하지 않아요."
     ],
     "examples": [
       {
@@ -12445,7 +12447,7 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT name, \"notnull\", pk FROM pragma_table_info('notices') ORDER BY cid;"
+    "sqlCheck": "SELECT lower(name) AS name, \"notnull\", pk FROM pragma_table_info('notices') ORDER BY cid;"
   },
   {
     "id": "sqlc_t2",
@@ -12454,9 +12456,10 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "쇼핑몰 회원 테이블 members를 만드세요. 가입하면 등급이 자동으로 'BRONZE'가 되어야 해요.\n\n- id: 정수, 기본키\n- name: 문자, NOT NULL\n- grade: 문자, 기본값 'BRONZE'",
+    "description": "쇼핑몰 회원 테이블 members를 만드세요. 가입하면 등급이 자동으로 'BRONZE'가 되어야 해요.\n\n| 열 | 자료형 | 규칙 |\n|---|---|---|\n| id | INTEGER | PRIMARY KEY |\n| name | TEXT | NOT NULL |\n| grade | TEXT | 기본값 'BRONZE' |",
     "constraints": [
       "`DEFAULT 'BRONZE'`를 사용하세요.",
+      "자료형은 위에 적힌 대로 쓰세요. (INT와 INTEGER, TEXT와 VARCHAR처럼 같은 뜻의 다른 이름을 써도 정답으로 처리해요.)",
       "채점은 열 이름과 기본값으로 해요."
     ],
     "examples": [
@@ -12474,7 +12477,7 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT name, dflt_value FROM pragma_table_info('members') ORDER BY cid;"
+    "sqlCheck": "SELECT lower(name) AS name, dflt_value FROM pragma_table_info('members') ORDER BY cid;"
   },
   {
     "id": "sqlc_t3",
@@ -12483,9 +12486,10 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "직원 비상 연락망을 만들기 위해 employees 테이블에 phone 열(문자)을 추가하세요.",
+    "description": "직원 비상 연락망을 만들기 위해 employees 테이블에 phone 열을 추가하세요.\n\n| 열 | 자료형 |\n|---|---|\n| phone | TEXT ('010-1234-5678' 같은 문자열) |",
     "constraints": [
-      "`ALTER TABLE ... ADD COLUMN`을 사용하세요."
+      "`ALTER TABLE ... ADD COLUMN`을 사용하세요.",
+      "전화번호는 앞자리 0과 하이픈(-)이 있어서 숫자(INTEGER)가 아니라 문자(TEXT)로 저장해요."
     ],
     "examples": [
       {
@@ -12502,7 +12506,7 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT name FROM pragma_table_info('employees') ORDER BY cid;"
+    "sqlCheck": "SELECT lower(name) AS name FROM pragma_table_info('employees') ORDER BY cid;"
   },
   {
     "id": "sqlc_t4",
@@ -12587,7 +12591,7 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT name, tbl_name FROM sqlite_master WHERE type = 'index' AND name = 'idx_emp_name';"
+    "sqlCheck": "SELECT lower(name) AS name, lower(tbl_name) AS tbl_name FROM sqlite_master WHERE type = 'index' AND lower(name) = 'idx_emp_name';"
   },
   {
     "id": "sqlc_t7",
@@ -12596,9 +12600,10 @@ export const problems: Problem[] = [
     "difficulty": "intermediate",
     "type": "coding",
     "language": "sql",
-    "description": "상품 주문 기록을 남길 order_logs 테이블을 만드세요. product_id는 반드시 products 테이블에 있는 상품이어야 해요.\n\n- id: 정수, 기본키\n- product_id: 정수, products(product_id)를 참조(FOREIGN KEY)\n- qty: 정수, NOT NULL",
+    "description": "상품 주문 기록을 남길 order_logs 테이블을 만드세요. product_id는 반드시 products 테이블에 있는 상품이어야 해요.\n\n| 열 | 자료형 | 규칙 |\n|---|---|---|\n| id | INTEGER | PRIMARY KEY |\n| product_id | INTEGER | products(product_id)를 참조 (FOREIGN KEY) |\n| qty | INTEGER | NOT NULL |",
     "constraints": [
       "`REFERENCES products(product_id)` 또는 `FOREIGN KEY (product_id) REFERENCES products(product_id)`를 쓰세요.",
+      "자료형은 위에 적힌 대로 쓰세요. (INT와 INTEGER, TEXT와 VARCHAR처럼 같은 뜻의 다른 이름을 써도 정답으로 처리해요.)",
       "채점은 참조 관계(어느 열이 어느 표의 어느 열을 가리키는지)로 해요."
     ],
     "examples": [
@@ -12616,6 +12621,6 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT \"from\", \"table\", \"to\" FROM pragma_foreign_key_list('order_logs');"
+    "sqlCheck": "SELECT lower(\"from\") AS \"from\", lower(\"table\") AS \"table\", lower(\"to\") AS \"to\" FROM pragma_foreign_key_list('order_logs');"
   }
 ];
