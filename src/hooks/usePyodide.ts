@@ -1,3 +1,4 @@
+import { cleanOutput, stdoutMatches, valueMatches } from '../utils/grading';
 import { useState, useEffect } from 'react';
 import {
   PY_RUNTIME_SETUP, PY_BEFORE_RUN, PY_COLLECT_FIGURES, PY_FONT_SETUP, FIGURE_CHECK_HARNESS,
@@ -383,12 +384,10 @@ import sys
         const userStdout = stdoutLines.join('\n').trim();
         const expected = testCases && testCases[0] ? String(testCases[0].expected) : '';
         
-        const cleanExpected = expected.replace(/^['"]|['"]$/g, '');
-        
-        const cleanActual = userStdout.replace(/\r\n/g, '\n').trim();
-        const cleanExpectedNorm = cleanExpected.replace(/\r\n/g, '\n').trim();
+        const cleanActual = cleanOutput(userStdout);
+        const cleanExpectedNorm = cleanOutput(expected);
 
-        const passed = cleanActual === cleanExpectedNorm;
+        const passed = stdoutMatches(userStdout, expected);
 
         return {
           success: passed,
@@ -446,11 +445,7 @@ import sys
         const actual = (actualOutputs[index] !== undefined ? actualOutputs[index] : '').trim();
         const expected = tc.expected.trim();
 
-        // Standardize quotes or spaces for comparisons
-        const cleanActual = actual.replace(/^['"]|['"]$/g, '').replace(/\s+/g, ' ');
-        const cleanExpected = expected.replace(/^['"]|['"]$/g, '').replace(/\s+/g, ' ');
-
-        const passed = cleanActual === cleanExpected;
+        const passed = valueMatches(actual, expected);
 
         return {
           input: tc.input,

@@ -100,12 +100,14 @@ async function run(code, problem) {
   }
 }
 
-// Same comparison as the app: stdout_match trims; harness strips quotes and
-// collapses whitespace.
+// The app's own comparison functions (src/utils/grading.ts), so this can't
+// approve an answer the app would reject. norm() maps each side to a form
+// that compares equal exactly when the app's matcher does.
+const { cleanOutput, unwrapQuotes } = await load('src/utils/grading.ts', 'grading');
 const norm = (s, runner) =>
   runner === 'stdout_match'
-    ? s.replace(/\r\n/g, '\n').trim()
-    : s.trim().replace(/^['"]|['"]$/g, '').replace(/\s+/g, ' ');
+    ? cleanOutput(s)
+    : unwrapQuotes(s).replace(/\s+/g, ' ');
 
 const lib = problems.filter((p) => LIB_CATEGORIES.has(p.category) && p.type === 'coding');
 const fills = new Map();

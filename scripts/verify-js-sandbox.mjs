@@ -38,6 +38,7 @@ async function loadModule(relPath, name) {
 }
 
 const { WORKER_SOURCE, BLOCKED_WORKER_GLOBALS } = await loadModule('src/hooks/useJsRunner.ts', 'jsrunner');
+const { stdoutMatches } = await loadModule('src/utils/grading.ts', 'grading');
 
 // Records any dangerous capability that actually got invoked.
 const breaches = [];
@@ -205,12 +206,11 @@ for (const problem of jsCoding) {
 
   const { posted } = await runInSandbox(code);
   const msg = posted[0] || {};
-  const expected = problem.testCases?.[0]
-    ? decodeAnswer(problem.testCases[0].expected).replace(/^['"]|['"]$/g, '').replace(/\r\n/g, '\n').trim()
-    : '';
-  const actual = String(msg.stdout || '').replace(/\r\n/g, '\n').trim();
+  const expected = problem.testCases?.[0] ? decodeAnswer(problem.testCases[0].expected) : '';
+  const actual = String(msg.stdout || '');
 
-  if (msg.ok && actual === expected) solved++;
+  // The app's own matcher (src/utils/grading.ts).
+  if (msg.ok && stdoutMatches(actual, expected)) solved++;
   else regressions.push({ id: problem.id, error: msg.error, expected, actual });
 }
 

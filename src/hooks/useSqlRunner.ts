@@ -1,3 +1,4 @@
+import { cleanOutput, sqlOutputMatches } from '../utils/grading';
 import { useCallback, useState } from 'react';
 import type { RunResponse } from './usePyodide';
 import { translateOracleSqlToSqlite } from '../utils/oracleToSqlite';
@@ -177,16 +178,6 @@ function formatValue(value: SqlValue, type: string | undefined): string {
  *
  * The UI renders `tables` instead; this string exists for grading.
  */
-/**
- * Grading form of a result: column-header lines lower-cased. Table and column
- * names are case-insensitive in SQL, so `SELECT Name` or `AS NAME` must not
- * fail a problem that expects `name`. Only header lines (the one above each
- * dashed rule) change; values like '사원' or an email stay exact.
- */
-export function normalizeForGrading(text: string): string {
-  const lines = text.replace(/\r\n/g, '\n').trim().split('\n');
-  return lines.map((line, i) => (/^-{40}$/.test(lines[i + 1] ?? '') ? line.toLowerCase() : line)).join('\n');
-}
 
 function toStdout(tables: SqlResultTable[]): string {
   if (tables.length === 0) return SUCCESS_NO_RESULT;
@@ -274,9 +265,9 @@ export function useSqlRunner() {
 
       if (testRunnerCode === 'stdout_match') {
         const expected = testCases?.[0] ? String(testCases[0].expected) : '';
-        const cleanExpected = expected.replace(/^['"]|['"]$/g, '').replace(/\r\n/g, '\n').trim();
-        const cleanActual = graded.replace(/\r\n/g, '\n').trim();
-        const passed = normalizeForGrading(cleanActual) === normalizeForGrading(cleanExpected);
+        const cleanExpected = cleanOutput(expected);
+        const cleanActual = cleanOutput(graded);
+        const passed = sqlOutputMatches(graded, expected);
         return {
           success: passed,
           stdout,

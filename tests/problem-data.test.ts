@@ -157,6 +157,16 @@ describe('문제 데이터 — type 별 필수 필드', () => {
     expect(bad).toEqual([]);
   });
 
+  it('출력 비교 문제의 기대값이 따옴표로 감싸여 있지 않다', () => {
+    // Whole outputs are compared exactly (src/utils/grading.ts). A stored
+    // expected wrapped in quotes would need a student to print the quotes.
+    const bad = problems
+      .filter((p) => p.testRunnerCode === 'stdout_match')
+      .filter((p) => /^(['"]).*\1$/s.test(decodeAnswer(p.testCases![0].expected).trim()))
+      .map((p) => p.id);
+    expect(bad).toEqual([]);
+  });
+
   it('webChecks 는 html/css 문제에만 있다', () => {
     const bad = problems.filter((p) => p.webChecks && !isWeb(p)).map((p) => p.id);
     expect(bad).toEqual([]);

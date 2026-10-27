@@ -44,6 +44,8 @@ const solutionCode = scMod.solutionCode || scMod.default;
 const { decodeAnswer } = await load('src/utils/answerObfuscation.ts', 'obf');
 const { translateOracleSqlToSqlite, translateOracleOuterJoinToAnsi } = await load('src/utils/oracleToSqlite.ts', 'oracle');
 const { buildSeedSql, DEFAULT_SQL_DATASET, SQL_DATASETS } = await load('src/data/sqlSeed.ts', 'seed');
+// The app's own matcher, so a stored answer the grader would reject fails here.
+const { sqlOutputMatches } = await load('src/utils/grading.ts', 'grading');
 await rm(dir, { recursive: true, force: true });
 
 const initSqlJs = (await import('sql.js')).default;
@@ -108,12 +110,12 @@ for (const p of sqlProblems) {
     continue;
   }
   const expected = decodeAnswer(p.testCases[0].expected).replace(/\r\n/g, '\n').trim();
-  if (actual === expected) pass++;
+  if (sqlOutputMatches(actual, expected)) pass++;
   else fails.push({ id: p.id, code: code.trim(), expected, actual });
   // A problem whose starter code already passes is solved by pressing submit.
   let start;
   try { start = run(p.initialCode ?? '', p).replace(/\r\n/g, '\n').trim(); } catch { start = null; }
-  if (start === expected) startPasses.push(p.id);
+  if (start !== null && sqlOutputMatches(start, expected)) startPasses.push(p.id);
 }
 
 if (WRITE && fills.size) {
@@ -149,7 +151,6 @@ for (const f of fails) {
 // SQL names are case-insensitive, so these upper-case answers must pass. DDL
 // checks lower-case the names they read back; header lines are compared
 // case-insensitively (normalizeForGrading in useSqlRunner, mirrored here).
-const normalize = (t) => { const l = t.replace(/\r\n/g, '\n').trim().split('\n'); return l.map((x, i) => (/^-{40}$/.test(l[i + 1] ?? '') ? x.toLowerCase() : x)).join('\n'); };
 const CASE_VARIANTS = [
   ['sqlc_b2', 'SELECT NAME AS Name, POSITION AS Position FROM EMPLOYEES ORDER BY EMP_ID;'],
   ['sqlc_t1', 'CREATE TABLE NOTICES (ID INTEGER PRIMARY KEY, TITLE TEXT NOT NULL, CONTENT TEXT, CREATED_AT TEXT);'],
@@ -163,7 +164,7 @@ let casePass = 0;
 for (const [id, code] of CASE_VARIANTS) {
   const p = sqlProblems.find((q) => q.id === id);
   let ok = false, out = '';
-  try { out = run(code, p); ok = normalize(out) === normalize(decodeAnswer(p.testCases[0].expected)); } catch (e) { out = e.message; }
+  try { out = run(code, p); ok = sqlOutputMatches(out, decodeAnswer(p.testCases[0].expected)); } catch (e) { out = e.message; }
   if (ok) casePass++;
   console.log(`  ${ok ? 'OK  ' : '실패'} ${id.padEnd(10)} ${code.slice(0, 60)}${ok ? '' : '\n         → ' + JSON.stringify(out.slice(0, 120))}`);
 }

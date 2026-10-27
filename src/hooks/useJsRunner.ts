@@ -1,3 +1,4 @@
+import { cleanOutput, stdoutMatches } from '../utils/grading';
 import type { RunResponse } from './usePyodide';
 
 // Globals removed from the worker before user code runs, and why.
@@ -258,9 +259,9 @@ export function useJsRunner() {
 
         if (testRunnerCode === 'stdout_match') {
           const expected = testCases && testCases[0] ? String(testCases[0].expected) : '';
-          const cleanExpected = expected.replace(/^['"]|['"]$/g, '').replace(/\r\n/g, '\n').trim();
-          const cleanActual = String(stdout || '').replace(/\r\n/g, '\n').trim();
-          const passed = cleanActual === cleanExpected;
+          const cleanExpected = cleanOutput(expected);
+          const cleanActual = cleanOutput(String(stdout || ''));
+          const passed = stdoutMatches(String(stdout || ''), expected);
           finish({
             success: passed,
             stdout,
