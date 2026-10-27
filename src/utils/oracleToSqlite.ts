@@ -59,5 +59,9 @@ export function translateOracleSqlToSqlite(sql: string): string {
   return translateOracleOuterJoinToAnsi(sql)
     .replace(/\bNVL\s*\(/gi, 'IFNULL(')
     .replace(/\bOFFSET\s+(\d+)\s+ROWS\s+FETCH\s+(?:FIRST|NEXT)\s+(\d+)\s+ROWS?\s+ONLY\b/gi, 'LIMIT $2 OFFSET $1')
-    .replace(/\bFETCH\s+(?:FIRST|NEXT)\s+(\d+)\s+ROWS?\s+ONLY\b/gi, 'LIMIT $1');
+    .replace(/\bFETCH\s+(?:FIRST|NEXT)\s+(\d+)\s+ROWS?\s+ONLY\b/gi, 'LIMIT $1')
+    // SQL Server's column-level `col INT FOREIGN KEY REFERENCES t(c)`; SQLite
+    // only takes the bare `REFERENCES` there. The table-level form has
+    // `(col)` between the two keywords, so it isn't matched.
+    .replace(/\bFOREIGN\s+KEY\s+(?=REFERENCES\b)/gi, '');
 }

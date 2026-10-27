@@ -164,6 +164,9 @@ const CASE_VARIANTS = [
   ['sqlc_t7', 'CREATE TABLE ORDER_LOGS (ID INTEGER PRIMARY KEY, PRODUCT_ID INTEGER REFERENCES PRODUCTS(PRODUCT_ID), QTY INTEGER NOT NULL);'],
   // Other correct answers students actually write: an ORDER BY the problem
   // didn't ask for, ANSI joins instead of (+), (+) with odd spacing or no aliases.
+  ['sqlc_t7', 'CREATE TABLE order_logs (id INT PRIMARY KEY, product_id INT FOREIGN KEY REFERENCES products(product_id), qty INT NOT NULL);'],
+  ['sqlc_t7', 'CREATE TABLE order_logs (id INTEGER PRIMARY KEY, product_id INTEGER REFERENCES products, qty INTEGER NOT NULL);'],
+  ['sqlc_t7', 'CREATE TABLE order_logs (id NUMBER PRIMARY KEY, product_id NUMBER, qty NUMBER NOT NULL, CONSTRAINT fk_prod FOREIGN KEY (product_id) REFERENCES products(product_id));'],
   ['sql_q1', 'SELECT name, dept FROM users ORDER BY name;'],
   ['sql_q2', 'SELECT name, score FROM users WHERE score >= 90 ORDER BY score DESC;'],
   ['sql_q7', "SELECT name, dept FROM users WHERE dept = '개발팀' OR dept = '기획팀' ORDER BY dept;"],
@@ -195,6 +198,8 @@ const ORACLE_CASES = [
   ['(+) = 주변 공백 없음', 'select u.name from users u, orders o where u.id=o.user_id(+);', /LEFT JOIN/],
   ['(+) 왼쪽에', 'SELECT u.name FROM users u, orders o WHERE o.user_id(+) = u.id;', /users u LEFT JOIN orders o/],
   ['(+) 별칭 없음', 'SELECT users.name FROM users, orders WHERE users.id = orders.user_id(+);', /users LEFT JOIN orders ON/],
+  ['열 단위 FOREIGN KEY REFERENCES', 'CREATE TABLE t (a INT FOREIGN KEY REFERENCES p(id));', /a INT REFERENCES p\(id\)/],
+  ['표 단위 FOREIGN KEY 는 그대로', 'CREATE TABLE t (a INT, FOREIGN KEY (a) REFERENCES p(id));', /FOREIGN KEY \(a\) REFERENCES/],
   ['(+) 없으면 무변경', 'SELECT name FROM users;', /^SELECT name FROM users;$/],
 ];
 console.log('\n=== Oracle 번역기 동작 고정 ===');

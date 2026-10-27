@@ -12621,6 +12621,6 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT lower(\"from\") AS \"from\", lower(\"table\") AS \"table\", lower(\"to\") AS \"to\" FROM pragma_foreign_key_list('order_logs');"
+    "sqlCheck": "SELECT lower(fk.\"from\") AS \"from\", lower(fk.\"table\") AS \"table\", lower(COALESCE(fk.\"to\", (SELECT name FROM pragma_table_info(fk.\"table\") WHERE pk = 1))) AS \"to\" FROM pragma_foreign_key_list('order_logs') AS fk;"
   }
 ];
