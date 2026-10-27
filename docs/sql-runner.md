@@ -143,6 +143,11 @@ npm run verify:sql         # 4. 36문제 재현 확인
 | `OFFSET n ROWS FETCH NEXT m` → `LIMIT m OFFSET n` | OK |
 | `(+)` → `LEFT JOIN` | OK |
 | `(+)` 없으면 무변경 | OK |
+| `(+)` 공백 · 왼쪽 · 별칭 없음 | OK |
+| `ROWNUM <= n` (문장 끝) → `LIMIT n` · `TO_DATE` · `TO_CHAR` · `FROM dual` · `MINUS` · `SYSDATE` | OK |
+| `CREATE OR REPLACE VIEW` · `ALTER TABLE t ADD (...)` · `CREATE TABLE t AS (SELECT ...)` · `DELETE t WHERE` · `INSERT ALL` | OK |
+| 열 단위 `FOREIGN KEY REFERENCES` (SQL Server 식) | OK |
+| 다른 방식의 정답 171개 · 흔한 오답 29개 (`scripts/fixtures/sql-answer-variants.json`) | 기대대로 채점 |
 | 주석으로 시작하는 쿼리 | OK (기존엔 SyntaxError) |
 | 선행 개행/공백 | OK |
 | 소문자 `with` | OK |
@@ -151,9 +156,9 @@ npm run verify:sql         # 4. 36문제 재현 확인
 | 문법 오류 | 에러 메시지로 표면화 |
 | 없는 테이블 | 에러 메시지로 표면화 |
 
-### expert 6문제 — 자동 검증 불가
+### expert 6문제
 
-`sql_expert_recursive_cte`, `sql_expert_rank_window`, `sql_expert_correlated_subquery`, `sql_expert_join_having`, `sql_expert_top_n_per_group`, `sql_expert_lag_window` 는 **`solutionCode.ts` 에 정답이 없습니다.** 기존 Pyodide 경로로도 자동 검증이 불가능했던 **기존 빈틈**입니다 (2번 작업의 JS 6문제와 같은 상황이고, 11번 데이터 검증 테스트에서 함께 잡아야 합니다).
+처음에는 `solutionCode.ts` 에 정답이 없어 자동 검증이 불가능했습니다. 정답을 추가해서 지금은 85문제 전부 대조합니다.
 
 대신 그 문제들이 요구하는 기능이 sql.js 에서 되는지 확인했습니다.
 

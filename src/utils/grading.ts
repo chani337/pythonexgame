@@ -60,10 +60,24 @@ function sortResultRows(text: string): string {
   return out.join('\n');
 }
 
-/** SQL comparison: stdout_match plus case-insensitive headers, and row order only when it matters. */
+/**
+ * A whole-number REAL prints as `88.0`, an INTEGER as `88`. Which one a query
+ * returns depends on how it was written (AVG vs SUM/COUNT, ROUND vs CAST), not
+ * on whether it's right, so value cells compare `88.0` equal to `88`.
+ * `516.7` and header lines are untouched.
+ */
+function normalizeSqlNumbers(text: string): string {
+  const lines = text.split('\n');
+  return lines.map((line, i) => {
+    if (/^-{40}$/.test(line) || /^-{40}$/.test(lines[i + 1] ?? '')) return line;
+    return line.split(' | ').map((cell) => cell.replace(/^(-?\d+)\.0+$/, '$1')).join(' | ');
+  }).join('\n');
+}
+
+/** SQL comparison: stdout_match plus case-insensitive headers, `88` = `88.0`, and row order only when it matters. */
 export const sqlOutputMatches = (actual: string, expected: string, ignoreRowOrder = false) => {
-  const a = normalizeSqlHeaders(actual);
-  const e = normalizeSqlHeaders(expected);
+  const a = normalizeSqlNumbers(normalizeSqlHeaders(actual));
+  const e = normalizeSqlNumbers(normalizeSqlHeaders(expected));
   return ignoreRowOrder ? sortResultRows(a) === sortResultRows(e) : a === e;
 };
 

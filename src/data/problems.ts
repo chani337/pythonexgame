@@ -12163,7 +12163,7 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT * FROM employees WHERE emp_id >= 8 ORDER BY emp_id;"
+    "sqlCheck": "SELECT emp_id, name, dept_id, position, salary, hire_date, quote(email) AS email FROM employees WHERE emp_id >= 8 ORDER BY emp_id;"
   },
   {
     "id": "sqlc_d2",
@@ -12447,7 +12447,7 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT lower(name) AS name, \"notnull\", pk FROM pragma_table_info('notices') ORDER BY cid;"
+    "sqlCheck": "SELECT lower(name) AS name, CASE WHEN pk > 0 THEN 0 ELSE \"notnull\" END AS \"notnull\", pk FROM pragma_table_info('notices') ORDER BY cid;"
   },
   {
     "id": "sqlc_t2",
@@ -12477,7 +12477,7 @@ export const problems: Problem[] = [
     ],
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
-    "sqlCheck": "SELECT lower(name) AS name, dflt_value FROM pragma_table_info('members') ORDER BY cid;"
+    "sqlCheck": "SELECT lower(name) AS name, replace(dflt_value, '\"', '''') AS dflt_value FROM pragma_table_info('members') ORDER BY cid;"
   },
   {
     "id": "sqlc_t3",

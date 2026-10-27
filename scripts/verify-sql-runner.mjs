@@ -188,6 +188,27 @@ for (const [id, code] of CASE_VARIANTS) {
   console.log(`  ${ok ? 'OK  ' : '실패'} ${id.padEnd(10)} ${code.slice(0, 60)}${ok ? '' : '\n         → ' + JSON.stringify(out.slice(0, 120))}`);
 }
 
+// --- 1c. answers written other ways ---------------------------------------
+// fixtures/sql-answer-variants.json: other correct answers students write
+// (Oracle/MySQL syntax, ANSI vs (+) joins, aliases, types) must pass, and
+// common mistakes (missing WHERE, wrong sort, 'NULL' as text) must still fail.
+const { readFile: readVariants } = await import('node:fs/promises');
+const variants = JSON.parse(await readVariants(join(ROOT, 'scripts/fixtures/sql-answer-variants.json'), 'utf8'));
+let variantBad = 0;
+console.log(`\n=== 다른 방식의 정답 ${variants.correct.length}개 · 흔한 오답 ${variants.wrong.length}개 ===`);
+for (const [shouldPass, list] of [[true, variants.correct], [false, variants.wrong]]) {
+  for (const [id, code, note] of list) {
+    const p = sqlProblems.find((q) => q.id === id);
+    let out, ok = false;
+    try { out = run(code, p); ok = matches(out, decodeAnswer(p.testCases[0].expected), p); } catch (e) { out = 'ERROR ' + e.message; }
+    if (ok !== shouldPass) {
+      variantBad++;
+      console.log(`  실패 ${id.padEnd(10)} [${note}] ${shouldPass ? '정답인데 오답 처리' : '오답인데 정답 처리'}\n         ${code.replace(/\n/g, ' ').slice(0, 100)}\n         → ${JSON.stringify(String(out).slice(0, 140))}`);
+    }
+  }
+}
+if (!variantBad) console.log('  OK   전부 기대대로 채점됨');
+
 // --- 2. the Oracle translator still behaves as it did in usePyodide -------
 const ORACLE_CASES = [
   ['NVL -> IFNULL', 'SELECT NVL(dept, 0) FROM users;', /IFNULL\(/],
@@ -243,6 +264,6 @@ for (const [label, sql] of [['문법 오류', 'SELCT * FROM users;'], ['없는 �
 }
 
 if (startPasses.length) console.log(`\n실패: 시작 코드가 이미 통과하는 문제 ${startPasses.join(', ')}`);
-const total = fails.length + startPasses.length + (CASE_VARIANTS.length - casePass) + (ORACLE_CASES.length - trPass) + (ROUTING_CASES.length - routePass) + (2 - errOk);
+const total = fails.length + startPasses.length + variantBad + (CASE_VARIANTS.length - casePass) + (ORACLE_CASES.length - trPass) + (ROUTING_CASES.length - routePass) + (2 - errOk);
 console.log(`\n${total === 0 ? '전부 통과' : total + '건 실패'}`);
 process.exit(total === 0 ? 0 : 1);

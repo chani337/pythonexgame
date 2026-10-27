@@ -43,6 +43,13 @@ describe('채점 비교 규칙', () => {
     expect(sqlOrderMatters(undefined)).toBe(true);
   });
 
+  it('SQL: 값 칸의 88과 88.0은 같다', () => {
+    const rule = '-'.repeat(40);
+    expect(sqlOutputMatches(`avg_score\n${rule}\n88`, `avg_score\n${rule}\n88.0`)).toBe(true);
+    expect(sqlOutputMatches(`a | b\n${rule}\n-5 | 94833`, `a | b\n${rule}\n-5.0 | 94833.0`)).toBe(true);
+    expect(sqlOutputMatches(`월급\n${rule}\n516`, `월급\n${rule}\n516.7`)).toBe(false);
+  });
+
   it('함수 결과: 따옴표 한 쌍과 공백 차이 무시', () => {
     expect(valueMatches("'abc'", 'abc')).toBe(true);
     expect(valueMatches('[1,  2]', '[1, 2]')).toBe(true);

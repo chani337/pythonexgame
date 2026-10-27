@@ -55,13 +55,71 @@ export function translateOracleOuterJoinToAnsi(sql: string): string {
 // syntax -- so Oracle syntax that problems teach ((+), FETCH FIRST, NVL) is
 // translated to its sqlite3 equivalent right before execution. The user
 // always sees and writes Oracle syntax; only the engine input differs.
+// Oracle date-format tokens -> strftime. Longest first so HH24 isn't read
+// as HH, and MI (minutes) isn't confused with MM (month).
+const DATE_TOKENS: [RegExp, string][] = [
+  [/YYYY/g, '%Y'], [/HH24/g, '%H'], [/MI/g, '%M'], [/SS/g, '%S'], [/MM/g, '%m'], [/DD/g, '%d'],
+];
+const toStrftime = (fmt: string) => DATE_TOKENS.reduce((f, [re, to]) => f.replace(re, to), fmt.toUpperCase());
+
+// `INSERT ALL INTO t VALUES (...) INTO t VALUES (...) SELECT * FROM dual`
+// -> one INSERT per INTO.
+function translateInsertAll(sql: string): string {
+  return sql.replace(/\bINSERT\s+ALL\s+([\s\S]*?)\s*SELECT\s+[\w*]+\s+FROM\s+dual\s*;?/gi, (_, body: string) =>
+    body.split(/\bINTO\b/i).map((t) => t.trim()).filter(Boolean).map((t) => `INSERT INTO ${t};`).join('\n'));
+}
+
+// Oracle `ALTER TABLE t ADD (col type[, col type])` -> one SQLite
+// `ALTER TABLE t ADD COLUMN col type` per column.
+function translateAlterAdd(sql: string): string {
+  return sql.replace(/\bALTER\s+TABLE\s+(\w+)\s+ADD\s*\(([^;]*)\)\s*(?=;|$)/gi, (whole, table: string, body: string) => {
+    const cols: string[] = [];
+    let depth = 0, cur = '';
+    for (const ch of body) {
+      if (ch === '(') depth++;
+      if (ch === ')') depth--;
+      if (ch === ',' && depth === 0) { cols.push(cur); cur = ''; } else cur += ch;
+    }
+    cols.push(cur);
+    if (depth !== 0) return whole;
+    return cols.map((c) => `ALTER TABLE ${table} ADD COLUMN ${c.trim()}`).join(';\n');
+  });
+}
+
+// `... WHERE ROWNUM <= n` at the very end of a statement (the usual
+// "sort in a subquery, then cut" shape) -> LIMIT n. Left alone when an
+// ORDER BY follows: there Oracle numbers rows *before* sorting, so LIMIT
+// would quietly turn a wrong answer into a right one.
+function translateRownum(sql: string): string {
+  // `WHERE ROWNUM <= 3` and `WHERE x AND ROWNUM <= 3` both just lose the
+  // ROWNUM condition and gain the LIMIT.
+  return sql.replace(/\s+(?:WHERE|AND)\s+ROWNUM\s*(<=|<)\s*(\d+)\s*(?=;|$)/gi, (_, op: string, n: string) =>
+    ` LIMIT ${op === '<' ? Number(n) - 1 : Number(n)}`);
+}
+
+// The in-browser SQL engine is sqlite3, which doesn't understand Oracle-only
+// syntax -- so Oracle syntax that problems teach ((+), FETCH FIRST, NVL) is
+// translated to its sqlite3 equivalent right before execution. The user
+// always sees and writes Oracle syntax; only the engine input differs.
 export function translateOracleSqlToSqlite(sql: string): string {
-  return translateOracleOuterJoinToAnsi(sql)
+  return translateRownum(translateAlterAdd(translateInsertAll(translateOracleOuterJoinToAnsi(sql))))
     .replace(/\bNVL\s*\(/gi, 'IFNULL(')
     .replace(/\bOFFSET\s+(\d+)\s+ROWS\s+FETCH\s+(?:FIRST|NEXT)\s+(\d+)\s+ROWS?\s+ONLY\b/gi, 'LIMIT $2 OFFSET $1')
     .replace(/\bFETCH\s+(?:FIRST|NEXT)\s+(\d+)\s+ROWS?\s+ONLY\b/gi, 'LIMIT $1')
     // SQL Server's column-level `col INT FOREIGN KEY REFERENCES t(c)`; SQLite
     // only takes the bare `REFERENCES` there. The table-level form has
     // `(col)` between the two keywords, so it isn't matched.
-    .replace(/\bFOREIGN\s+KEY\s+(?=REFERENCES\b)/gi, '');
+    .replace(/\bFOREIGN\s+KEY\s+(?=REFERENCES\b)/gi, '')
+    // Dates are stored as 'YYYY-MM-DD' text, so a TO_DATE of such a literal
+    // is the literal itself.
+    .replace(/\bTO_DATE\s*\(\s*('[^']*')\s*(?:,\s*'[^']*'\s*)?\)/gi, '$1')
+    .replace(/\bTO_CHAR\s*\(\s*([\w.]+)\s*,\s*'([^']*)'\s*\)/gi, (_, col: string, fmt: string) => `strftime('${toStrftime(fmt)}', ${col})`)
+    .replace(/\bSYSDATE\b/gi, "DATE('now')")
+    .replace(/\s+FROM\s+dual\b/gi, '')
+    .replace(/\bMINUS\b/gi, 'EXCEPT')
+    .replace(/\bCREATE\s+OR\s+REPLACE\s+VIEW\b/gi, 'CREATE VIEW')
+    // Oracle: `DELETE t WHERE ...` (FROM optional).
+    .replace(/\bDELETE\s+(?!FROM\b)(?=\w+\s+WHERE\b|\w+\s*(?:;|$))/gi, 'DELETE FROM ')
+    // Oracle: `CREATE TABLE t AS (SELECT ...)`.
+    .replace(/(\bCREATE\s+TABLE\s+\w+\s+AS)\s*\(\s*(SELECT\b[^;]*?)\)\s*(?=;|$)/gi, '$1 $2');
 }
