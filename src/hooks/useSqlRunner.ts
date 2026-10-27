@@ -209,7 +209,9 @@ export function useSqlRunner() {
     // DDL/DML problems produce no rows of their own, so they are graded on
     // the state they leave behind: this query runs after the student's code
     // on the same database, and its output is what gets compared.
-    checkSql?: string
+    checkSql?: string,
+    // See sqlOrderMatters in src/utils/grading.ts.
+    ignoreRowOrder = false
   ): Promise<SqlRunResult> => {
     let engine: SqlJsStatic;
     try {
@@ -267,7 +269,7 @@ export function useSqlRunner() {
         const expected = testCases?.[0] ? String(testCases[0].expected) : '';
         const cleanExpected = cleanOutput(expected);
         const cleanActual = cleanOutput(graded);
-        const passed = sqlOutputMatches(graded, expected);
+        const passed = sqlOutputMatches(graded, expected, ignoreRowOrder);
         return {
           success: passed,
           stdout,

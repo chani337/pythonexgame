@@ -35,9 +35,37 @@ export function normalizeSqlHeaders(text: string): string {
   return lines.map((line, i) => (/^-{40}$/.test(lines[i + 1] ?? '') ? line.toLowerCase() : line)).join('\n');
 }
 
-/** SQL comparison: stdout_match plus case-insensitive headers. */
-export const sqlOutputMatches = (actual: string, expected: string) =>
-  normalizeSqlHeaders(actual) === normalizeSqlHeaders(expected);
+/**
+ * Whether a SQL problem's row order is part of the answer: only when its
+ * reference solution sorts. A problem that never asks for an order used to be
+ * graded against whatever order SQLite produced, so a correct answer with a
+ * tidy `ORDER BY name` added was marked wrong. Problems without a reference
+ * solution keep strict order (their descriptions state one).
+ */
+export const sqlOrderMatters = (solution: string | undefined) =>
+  !solution || /\border\s+by\b/i.test(solution);
+
+// Rows of each result block sorted; header and dashed rule stay in place.
+function sortResultRows(text: string): string {
+  const lines = text.split('\n');
+  const out: string[] = [];
+  let rows: string[] = [];
+  const flush = () => { out.push(...rows.sort()); rows = []; };
+  lines.forEach((line, i) => {
+    const isHeader = /^-{40}$/.test(lines[i + 1] ?? '');
+    if (isHeader || /^-{40}$/.test(line)) { flush(); out.push(line); }
+    else rows.push(line);
+  });
+  flush();
+  return out.join('\n');
+}
+
+/** SQL comparison: stdout_match plus case-insensitive headers, and row order only when it matters. */
+export const sqlOutputMatches = (actual: string, expected: string, ignoreRowOrder = false) => {
+  const a = normalizeSqlHeaders(actual);
+  const e = normalizeSqlHeaders(expected);
+  return ignoreRowOrder ? sortResultRows(a) === sortResultRows(e) : a === e;
+};
 
 /** Per-call (function harness) comparison: quotes unwrapped, whitespace collapsed. */
 export const valueMatches = (actual: string, expected: string) =>

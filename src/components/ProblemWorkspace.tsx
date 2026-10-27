@@ -10,6 +10,7 @@ import { explainError } from '../utils/explainError';
 import { runWebChecks } from '../utils/webChecks';
 import { testLabel } from '../lib/pythonRuntime';
 import { optionOrder } from '../utils/optionOrder';
+import { sqlOrderMatters } from '../utils/grading';
 import { pyDatasetById } from '../data/pyDatasets';
 import { SQL_DATASETS, DEFAULT_SQL_DATASET } from '../data/sqlSeed';
 import type { RunResponse, TestResult, PerfSpec } from '../hooks/usePyodide';
@@ -28,7 +29,7 @@ interface ProblemWorkspaceProps {
   onPrevProblem?: () => void;
   runPythonCode: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string, perf?: PerfSpec) => Promise<RunResponse>;
   runJsCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string) => Promise<RunResponse>;
-  runSqlCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string, datasetId?: string, checkSql?: string) => Promise<RunResponse>;
+  runSqlCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string, datasetId?: string, checkSql?: string, ignoreRowOrder?: boolean) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onMarkSolved: (problemId: string) => void;
   isBookmarked?: boolean;
@@ -285,7 +286,8 @@ export default function ProblemWorkspace({
         res = perfSpec
           ? await runPythonCode(codeToExecute, decodedTestCases, problem.testRunnerCode, perfSpec)
           : problemLanguage === 'sql' && runSqlCode
-          ? await runSqlCode(codeToExecute, decodedTestCases, problem.testRunnerCode, problem.sqlDataset, problem.sqlCheck)
+          ? await runSqlCode(codeToExecute, decodedTestCases, problem.testRunnerCode, problem.sqlDataset, problem.sqlCheck,
+              !problem.sqlCheck && !sqlOrderMatters(solutionCode[problem.id]))
           : await executeCode(codeToExecute, decodedTestCases, problem.testRunnerCode);
       }
       // Only present when the SQL runner handled this problem.

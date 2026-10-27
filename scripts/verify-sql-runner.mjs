@@ -45,7 +45,11 @@ const { decodeAnswer } = await load('src/utils/answerObfuscation.ts', 'obf');
 const { translateOracleSqlToSqlite, translateOracleOuterJoinToAnsi } = await load('src/utils/oracleToSqlite.ts', 'oracle');
 const { buildSeedSql, DEFAULT_SQL_DATASET, SQL_DATASETS } = await load('src/data/sqlSeed.ts', 'seed');
 // The app's own matcher, so a stored answer the grader would reject fails here.
-const { sqlOutputMatches } = await load('src/utils/grading.ts', 'grading');
+const { sqlOutputMatches, sqlOrderMatters } = await load('src/utils/grading.ts', 'grading');
+// Same rule as ProblemWorkspace: row order only counts when the reference
+// solution sorts (or the problem is graded on a check query).
+const matches = (actual, expected, p) =>
+  sqlOutputMatches(actual, expected, !p.sqlCheck && !sqlOrderMatters(solutionCode[p.id]));
 await rm(dir, { recursive: true, force: true });
 
 const initSqlJs = (await import('sql.js')).default;
@@ -110,12 +114,12 @@ for (const p of sqlProblems) {
     continue;
   }
   const expected = decodeAnswer(p.testCases[0].expected).replace(/\r\n/g, '\n').trim();
-  if (sqlOutputMatches(actual, expected)) pass++;
+  if (matches(actual, expected, p)) pass++;
   else fails.push({ id: p.id, code: code.trim(), expected, actual });
   // A problem whose starter code already passes is solved by pressing submit.
   let start;
   try { start = run(p.initialCode ?? '', p).replace(/\r\n/g, '\n').trim(); } catch { start = null; }
-  if (start !== null && sqlOutputMatches(start, expected)) startPasses.push(p.id);
+  if (start !== null && matches(start, expected, p)) startPasses.push(p.id);
 }
 
 if (WRITE && fills.size) {
@@ -158,13 +162,25 @@ const CASE_VARIANTS = [
   ['sqlc_t3', 'ALTER TABLE EMPLOYEES ADD COLUMN PHONE VARCHAR(20);'],
   ['sqlc_t6', 'CREATE INDEX IDX_EMP_NAME ON EMPLOYEES(NAME);'],
   ['sqlc_t7', 'CREATE TABLE ORDER_LOGS (ID INTEGER PRIMARY KEY, PRODUCT_ID INTEGER REFERENCES PRODUCTS(PRODUCT_ID), QTY INTEGER NOT NULL);'],
+  // Other correct answers students actually write: an ORDER BY the problem
+  // didn't ask for, ANSI joins instead of (+), (+) with odd spacing or no aliases.
+  ['sql_q1', 'SELECT name, dept FROM users ORDER BY name;'],
+  ['sql_q2', 'SELECT name, score FROM users WHERE score >= 90 ORDER BY score DESC;'],
+  ['sql_q7', "SELECT name, dept FROM users WHERE dept = '개발팀' OR dept = '기획팀' ORDER BY dept;"],
+  ['sql_q13', 'SELECT dept, COUNT(*) AS cnt FROM users GROUP BY dept ORDER BY cnt DESC;'],
+  ['sql_q19', 'SELECT name, score FROM users WHERE score > (SELECT AVG(score) FROM users) ORDER BY score;'],
+  ['sql_q17', 'SELECT u.name, o.product FROM users u LEFT JOIN orders o ON u.id = o.user_id;'],
+  ['sql_q17', 'SELECT u.name, o.product FROM users u, orders o WHERE u.id=o.user_id (+);'],
+  ['sql_q17', 'select users.name, orders.product from users, orders where users.id = orders.user_id(+);'],
+  ['sql_q27', 'SELECT u.name FROM users u, orders o WHERE o.user_id(+) = u.id AND o.order_id IS NULL;'],
+  ['sql_q28', "SELECT u.name, NVL(o.product, '주문없음') AS product FROM users u, orders o WHERE u.id = o.user_id (+);"],
 ];
-console.log('\n=== 대소문자 · 자료형 이름을 다르게 써도 정답 ===');
+console.log('\n=== 다르게 쓴 정답도 통과 (대소문자 · 자료형 · 정렬 · 조인) ===');
 let casePass = 0;
 for (const [id, code] of CASE_VARIANTS) {
   const p = sqlProblems.find((q) => q.id === id);
   let ok = false, out = '';
-  try { out = run(code, p); ok = sqlOutputMatches(out, decodeAnswer(p.testCases[0].expected)); } catch (e) { out = e.message; }
+  try { out = run(code, p); ok = matches(out, decodeAnswer(p.testCases[0].expected), p); } catch (e) { out = e.message; }
   if (ok) casePass++;
   console.log(`  ${ok ? 'OK  ' : '실패'} ${id.padEnd(10)} ${code.slice(0, 60)}${ok ? '' : '\n         → ' + JSON.stringify(out.slice(0, 120))}`);
 }
@@ -175,6 +191,10 @@ const ORACLE_CASES = [
   ['FETCH FIRST -> LIMIT', 'SELECT name FROM users ORDER BY score DESC FETCH FIRST 3 ROWS ONLY;', /LIMIT 3/],
   ['OFFSET+FETCH -> LIMIT/OFFSET', 'SELECT name FROM users OFFSET 2 ROWS FETCH NEXT 3 ROWS ONLY;', /LIMIT 3 OFFSET 2/],
   ['(+) -> LEFT JOIN', 'SELECT u.name FROM users u, orders o WHERE u.id = o.user_id(+);', /LEFT JOIN/],
+  ['(+) 앞 공백', 'SELECT u.name FROM users u, orders o WHERE u.id = o.user_id (+);', /LEFT JOIN orders o ON u\.id = o\.user_id/],
+  ['(+) = 주변 공백 없음', 'select u.name from users u, orders o where u.id=o.user_id(+);', /LEFT JOIN/],
+  ['(+) 왼쪽에', 'SELECT u.name FROM users u, orders o WHERE o.user_id(+) = u.id;', /users u LEFT JOIN orders o/],
+  ['(+) 별칭 없음', 'SELECT users.name FROM users, orders WHERE users.id = orders.user_id(+);', /users LEFT JOIN orders ON/],
   ['(+) 없으면 무변경', 'SELECT name FROM users;', /^SELECT name FROM users;$/],
 ];
 console.log('\n=== Oracle 번역기 동작 고정 ===');

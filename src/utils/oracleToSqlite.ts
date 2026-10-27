@@ -16,24 +16,36 @@
 // supported -- this is a targeted rewrite, not a general SQL parser.
 export function translateOracleOuterJoinToAnsi(sql: string): string {
   if (!sql.includes('(+)')) return sql;
-  const m = sql.match(/FROM\s+(\S+)\s+(\S+)\s*,\s*(\S+)\s+(\S+)\s+WHERE\s+([\s\S]*?)(;?\s*)$/i);
+  // FROM t1 [[AS] a1], t2 [[AS] a2] WHERE ... -- aliases optional; without
+  // one, the table name is what the conditions qualify columns with.
+  const m = sql.match(/FROM\s+(\w+)(?:\s+(?:AS\s+)?(\w+))?\s*,\s*(\w+)(?:\s+(?:AS\s+)?(\w+))?\s+WHERE\s+([\s\S]*?)(;?\s*)$/i);
   if (!m) return sql;
-  const [, table1, alias1, table2, alias2, whereBody] = m;
+  const [, table1, a1, table2, a2, whereBody] = m;
+  const alias1 = a1 ?? table1;
+  const alias2 = a2 ?? table2;
   const conditions = whereBody.split(/\s+AND\s+/i);
   const joinIdx = conditions.findIndex((c) => c.includes('(+)'));
   if (joinIdx === -1) return sql;
-  const joinCond = conditions[joinIdx].replace(/\(\+\)/, '').trim();
-  const plusToken = conditions[joinIdx].match(/(\S+)\(\+\)/)?.[1] ?? '';
-  const optionalIsAlias2 = plusToken.startsWith(`${alias2}.`);
+  // The (+) marks the side that may be missing. Find which operand carries
+  // it, however it is spaced: `o.user_id(+)`, `o.user_id (+)`, or written
+  // first (`o.user_id(+) = u.id`). Matching on the text right before "(+)"
+  // broke on `u.id=o.user_id(+)` (no spaces) and turned the join around.
+  const cond = conditions[joinIdx];
+  const sides = cond.split('=');
+  const optionalSide = sides.find((side) => side.includes('(+)')) ?? '';
+  const optionalQualifier = optionalSide.replace(/\(\+\)/, '').trim().split('.')[0].toLowerCase();
+  const optionalIsAlias2 = optionalQualifier === alias2.toLowerCase();
+  const joinCond = cond.replace(/\s*\(\+\)/, '').trim();
   const drivingTable = optionalIsAlias2 ? table1 : table2;
   const drivingAlias = optionalIsAlias2 ? alias1 : alias2;
   const optionalTable = optionalIsAlias2 ? table2 : table1;
   const optionalAlias = optionalIsAlias2 ? alias2 : alias1;
   const remaining = conditions.filter((_, i) => i !== joinIdx).join(' AND ');
   const prefix = sql.slice(0, m.index);
+  const as = (table: string, alias: string) => (alias === table ? table : `${table} ${alias}`);
   return (
     prefix +
-    `FROM ${drivingTable} ${drivingAlias} LEFT JOIN ${optionalTable} ${optionalAlias} ON ${joinCond}` +
+    `FROM ${as(drivingTable, drivingAlias)} LEFT JOIN ${as(optionalTable, optionalAlias)} ON ${joinCond}` +
     (remaining ? ` WHERE ${remaining}` : '') +
     ';'
   );

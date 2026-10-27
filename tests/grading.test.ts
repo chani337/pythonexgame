@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { unwrapQuotes, stdoutMatches, sqlOutputMatches, valueMatches } from '../src/utils/grading';
+import { unwrapQuotes, stdoutMatches, sqlOutputMatches, sqlOrderMatters, valueMatches } from '../src/utils/grading';
 
 describe('채점 비교 규칙', () => {
   it('전체를 감싼 따옴표 한 쌍만 벗긴다', () => {
@@ -26,6 +26,21 @@ describe('채점 비교 규칙', () => {
     const rule = '-'.repeat(40);
     expect(sqlOutputMatches(`NAME | Position\n${rule}\n김철수 | 팀장`, `name | position\n${rule}\n김철수 | 팀장`)).toBe(true);
     expect(sqlOutputMatches(`name\n${rule}\nTEMP@company.com`, `name\n${rule}\ntemp@company.com`)).toBe(false);
+  });
+
+  it('SQL: 정렬을 요구하지 않는 문제는 행 순서 무시', () => {
+    const rule = '-'.repeat(40);
+    const a = `name | score\n${rule}\n김철수 | 90\n이영희 | 95`;
+    const b = `name | score\n${rule}\n이영희 | 95\n김철수 | 90`;
+    expect(sqlOutputMatches(a, b, true)).toBe(true);
+    expect(sqlOutputMatches(a, b)).toBe(false);
+    // Rows are still compared as a multiset: a missing or extra row fails.
+    expect(sqlOutputMatches(a, `name | score\n${rule}\n김철수 | 90\n김철수 | 90`, true)).toBe(false);
+    // The header stays on top -- it's not sorted in with the rows.
+    expect(sqlOutputMatches(`score | name\n${rule}\n90 | 김철수`, `name | score\n${rule}\n90 | 김철수`, true)).toBe(false);
+    expect(sqlOrderMatters('SELECT name FROM users;')).toBe(false);
+    expect(sqlOrderMatters('select name from users order  by name;')).toBe(true);
+    expect(sqlOrderMatters(undefined)).toBe(true);
   });
 
   it('함수 결과: 따옴표 한 쌍과 공백 차이 무시', () => {

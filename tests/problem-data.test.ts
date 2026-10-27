@@ -14,6 +14,7 @@ import { solutionCode } from '../src/data/solutionCode';
 import { PY_DATASETS } from '../src/data/pyDatasets';
 import { SQL_DATASETS } from '../src/data/sqlSeed';
 import { changelogEntries, recentProblemIds } from '../src/data/changelog';
+import { sqlOrderMatters } from '../src/utils/grading';
 
 const LANGUAGES: ProblemLanguage[] = ['python', 'sql', 'java', 'js', 'algorithm', 'c', 'html', 'css'];
 const DIFFICULTIES = ['basic', 'intermediate', 'advanced', 'expert'] as const;
@@ -304,29 +305,21 @@ describe('문제 데이터 — 정답 코드', () => {
 });
 
 describe('문제 데이터 — SQL 채점의 행 순서 의존', () => {
-  it('ORDER BY 없이 여러 행을 비교하는 문제를 보고한다', () => {
-    // stdout_match compares the result table line by line, so a query
-    // returning more than one row and no ORDER BY is graded against whatever
-    // order SQLite happens to produce. It is stable in practice for a
-    // table this small -- verify:sql runs all 36 and they pass -- but it is
-    // not guaranteed, and a SQLite version bump or an added index can change
-    // it. A correct answer would then be marked wrong.
-    //
-    // Pinned rather than fixed: the fix is either adding ORDER BY to 25
-    // problems' constraints or regenerating their expected output, and both
-    // are content decisions. This stops the count from growing unnoticed.
-    const sqlProblems = problems.filter((p) => p.language === 'sql');
-    const risky = sqlProblems.filter((p) => {
-      const expected = decodeAnswer(p.testCases![0].expected);
-      const rows = expected.split('\n').filter((l) => l.trim() && !/^-+$/.test(l)).length - 1;
-      if (rows <= 1) return false;
-      // DDL/DML problems are graded on their check query, not the answer.
-      return !/order\s+by/i.test(p.sqlCheck ?? solutionCode[p.id] ?? '');
-    }).map((p) => p.id);
-
-    console.log(`\n  행 순서에 의존하는 SQL 문제: ${risky.length}개 / ${sqlProblems.length}개`);
-    if (risky.length) console.log('   ', risky.join(', '), '\n');
-    expect(risky.length).toBeLessThanOrEqual(25);
+  it('정렬을 요구하는 SQL 문제는 설명에 순서가 적혀 있다', () => {
+    // Row order is graded only when the reference solution sorts (see
+    // sqlOrderMatters); otherwise rows are compared as a set. So a problem
+    // whose answer sorts must say how, or a student who omits the sort --
+    // having been told nothing about it -- is marked wrong.
+    const ORDER_WORDS = /순으로|순서|정렬|ORDER BY|높은|낮은|오름차순|내림차순|최근|상위|하위|가장|TOP|큰|작은|비싼|1위|부터/i;
+    const silent = problems
+      .filter((p) => p.language === 'sql' && !p.sqlCheck && solutionCode[p.id])
+      .filter((p) => sqlOrderMatters(solutionCode[p.id]))
+      .filter((p) => {
+        const rows = decodeAnswer(p.testCases![0].expected).split('\n').filter((l) => l.trim() && !/^-+$/.test(l)).length - 1;
+        return rows > 1 && !ORDER_WORDS.test(`${p.description} ${(p.constraints ?? []).join(' ')}`);
+      })
+      .map((p) => p.id);
+    expect(silent).toEqual([]);
   });
 });
 
