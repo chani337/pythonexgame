@@ -767,3 +767,59 @@ html.dark-mode .snowflake {
     padding-right: 1rem !important;
   }
 }
+
+/* ---- Snowball fight (SnowballFight.tsx) -------------------------------------- */
+
+.snowball-game {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: rgba(15, 25, 45, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.snowball-game-panel {
+  width: 100%;
+  max-width: 860px;
+  background: #ffffff;
+  border: 1px solid #1a1a1a;
+  padding: 1rem;
+  max-height: 100%;
+  overflow: auto;
+}
+
+.snowball-game-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.9rem;
+  padding: 1rem;
+  background: rgba(20, 35, 65, 0.72);
+  color: #ffffff;
+}
+
+/* The canvas draws real colors; undo the page-wide dark-mode inversion. */
+html.dark-mode .snowball-game-stage {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+@media (max-width: 640px) {
+  .snowball-game {
+    padding: 0.5rem;
+  }
+
+  .snowball-game-panel {
+    padding: 0.6rem;
+  }
+
+  .snowball-game-overlay {
+    font-size: 0.85em;
+    gap: 0.5rem;
+  }
+}

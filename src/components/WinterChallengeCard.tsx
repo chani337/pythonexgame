@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { Suspense, useEffect, useMemo, useState } from 'react';
 import { Gift, MessageCircle, Snowflake } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
+import { lazyWithReload } from '../lib/lazyWithReload';
 import {
   challengeYear,
   currentDecemberRun,
@@ -17,6 +18,9 @@ import {
   SOLVE_DAYS_CHANGE_EVENT,
   WINTER_BADGES,
 } from '../utils/winterEvent';
+
+// Its own chunk: only people who open the game download it.
+const SnowballFight = lazyWithReload(() => import('./SnowballFight'));
 
 const RED = '#c0262d';
 const GREEN = '#1a6b3c';
@@ -61,6 +65,7 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
   const [localDays, setLocalDays] = useState<string[]>(() => readSolveDays(accountKey));
   const [serverDays, setServerDays] = useState<string[]>([]);
   const [snowOn, setSnowOn] = useState(isSnowEnabled);
+  const [gameOpen, setGameOpen] = useState(false);
 
   useEffect(() => {
     const sync = () => setLocalDays(readSolveDays(accountKey));
@@ -154,6 +159,25 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
           </p>
         </div>
         {decorSeason && (
+          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+          <button
+            onClick={() => setGameOpen(true)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.4rem',
+              background: RED,
+              border: `1px solid ${RED}`,
+              borderRadius: '0px',
+              padding: '0.5rem 0.8rem',
+              fontSize: '0.78rem',
+              fontWeight: 700,
+              color: '#ffffff',
+              cursor: 'pointer',
+            }}
+          >
+            ⛄ 눈싸움 하기
+          </button>
           <button
             onClick={() => setSnowEnabled(!snowOn)}
             style={{
@@ -173,6 +197,7 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
             <Snowflake size={14} color={snowOn ? '#3b7cc4' : '#9a9a9a'} />
             {snowOn ? '눈 내리기 끄기' : '눈 내리기 켜기'}
           </button>
+          </div>
         )}
       </div>
 
@@ -306,6 +331,11 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
           )}
         </div>
       </div>
+      {gameOpen && (
+        <Suspense fallback={null}>
+          <SnowballFight onClose={() => setGameOpen(false)} />
+        </Suspense>
+      )}
     </div>
   );
 }

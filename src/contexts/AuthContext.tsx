@@ -100,6 +100,7 @@ const SCOPED_KEY_PREFIXES = [
   'pyquests_docs_quiz_answers_',
   'pyquests_display_name_',
   'pyquests_solve_days_',
+  'pyquests_snowball_best_',
 ];
 
 // On a shared/public computer, whoever logged in before us (or forgot to
