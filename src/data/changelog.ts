@@ -25,6 +25,15 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-11-21',
+    title: 'NumPy · Pandas · Matplotlib 문제가 Python Lib 탭으로 나뉘었어요',
+    items: [
+      '문제 목록에 Python Lib 탭이 생겼어요. NumPy · Pandas · Matplotlib 문제 37개를 여기서 모아 볼 수 있고, Python 탭에는 파이썬 문법 문제만 남았어요.',
+      '랭킹에도 Python Lib 탭이 생겼어요. Python 랭킹은 이제 파이썬 문법 문제만 세요.',
+      '이미 푼 문제와 뱃지는 그대로예요.',
+    ],
+  },
+  {
     date: '2026-11-20',
     title: '🎄 겨울 이벤트: 12월 연속 학습 챌린지',
     items: [
