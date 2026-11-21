@@ -759,4 +759,11 @@ html.dark-mode .snowflake {
   .winter-calendar {
     grid-template-columns: repeat(8, minmax(0, 1fr));
   }
+
+  /* Inline padding is for desktop; this wins with !important so the badge
+     grid gets room for two columns on a phone. */
+  .winter-card-pad {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 }

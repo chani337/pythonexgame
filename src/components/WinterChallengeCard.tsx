@@ -128,6 +128,7 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
     >
       {/* Header */}
       <div
+        className="winter-card-pad"
         style={{
           padding: '1.75rem 2rem 1.5rem',
           background: 'linear-gradient(180deg, #fdf0f1 0%, #ffffff 100%)',
@@ -175,7 +176,7 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
         )}
       </div>
 
-      <div style={{ padding: '1.5rem 2rem 2rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
+      <div className="winter-card-pad" style={{ padding: '1.5rem 2rem 2rem', display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
         {/* Numbers */}
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: '2.5rem', flexWrap: 'wrap' }}>
           <div>
@@ -217,7 +218,7 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
         </div>
 
         {/* Badges */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.75rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '0.6rem' }}>
           {WINTER_BADGES.map((badge) => {
             const progress = badge.id === 'winter_santa' ? fromFirst : best;
             const earned = progress >= badge.days;

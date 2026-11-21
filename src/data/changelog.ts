@@ -26,6 +26,14 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-11-21',
+    title: '대시보드를 홈 · 내 성장 · 랭킹으로 나눴어요',
+    items: [
+      '한 화면에 길게 이어지던 대시보드를 탭 세 개로 정리했어요. 홈에서는 다음에 풀 문제와 내 현황을 바로 볼 수 있어요.',
+      '등급 · 칭호 · 성취도 · 로드맵 · 뱃지는 내 성장 탭에, 랭킹은 랭킹 탭에 있어요. 마지막에 본 탭이 다음에도 열려요.',
+    ],
+  },
+  {
+    date: '2026-11-21',
     title: '칭호와 이름 색을 고를 수 있어요',
     items: [
       'XP가 쌓이면 칭호(🌱 새싹 코더부터 👑 그랜드 마스터까지 10개)와 이름 색(숲 초록부터 오로라까지 6가지)이 열려요.',
