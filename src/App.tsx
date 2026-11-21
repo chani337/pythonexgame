@@ -4,6 +4,7 @@ import Sidebar from './components/Sidebar';
 import AuthModal from './components/AuthModal';
 import ViewErrorBoundary from './components/ViewErrorBoundary';
 import UpdatePrompt from './components/UpdatePrompt';
+import SeasonalSnow from './components/SeasonalSnow';
 import { lazyWithReload } from './lib/lazyWithReload';
 
 // Lazily loaded so each view's code (and, for DocsViewer, the large docs.ts
@@ -20,6 +21,7 @@ const Changelog = lazyWithReload(() => import('./components/Changelog'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import type { GuestMergeResult } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
+import { recordSolveDay } from './utils/winterEvent';
 import { problems, filterProblems } from './data/problems';
 import type { Problem } from './data/problems';
 import { parsePath, routeForState, nextHistoryAction } from './lib/routes';
@@ -265,6 +267,7 @@ print("변환 리스트:", result)
     if (!solvedIds.includes(problemId)) {
       const newSolvedIds = [...solvedIds, problemId];
       setSolvedIds(newSolvedIds);
+      recordSolveDay(user ? user.id : 'guest');
 
       if (!lastSolvedDate) {
         newStreak = 1;
@@ -440,6 +443,9 @@ print("변환 리스트:", result)
       {/* Auth Login/Signup Modal */}
       <AuthModal />
 
+      {/* Winter event snowfall (renders nothing outside the season) */}
+      <SeasonalSnow />
+
       {/* Navigation Sidebar */}
       <Sidebar
         currentView={selectedProblem ? 'problems' : currentView}
@@ -492,6 +498,7 @@ print("변환 리스트:", result)
             sandboxRunCount={sandboxRunCount}
             onUnlockAll={handleUnlockAllProblems}
             onNavigateToChangelog={() => setCurrentView('changelog')}
+            onNavigateToBoard={() => setCurrentView('board')}
           />
         ) : currentView === 'problems' ? (
           <ProblemList

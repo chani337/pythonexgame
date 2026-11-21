@@ -15,7 +15,7 @@ import { pyDatasetById } from '../data/pyDatasets';
 import { SQL_DATASETS, DEFAULT_SQL_DATASET } from '../data/sqlSeed';
 import type { RunResponse, TestResult, PerfSpec } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
-import confetti from 'canvas-confetti';
+import { celebrate } from '../utils/celebrate';
 import CodeEditor from './CodeEditor';
 import type { EditorLanguage } from './CodeEditor';
 import WebPreview from './WebPreview';
@@ -320,11 +320,7 @@ export default function ProblemWorkspace({
             if (!viewedAnswer) {
               onMarkSolved(problem.id);
             }
-            confetti({
-              particleCount: 100,
-              spread: 70,
-              origin: { y: 0.6 }
-            });
+            celebrate(100, 70);
           }
         } else {
           onWrongAttempt?.(problem.id);
@@ -405,11 +401,7 @@ export default function ProblemWorkspace({
       setConsoleOutput('정답입니다! 올바른 이론적 추론입니다. 🎉');
       setConsoleError(null);
       onMarkSolved(problem.id);
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.6 }
-      });
+      celebrate(80, 60);
     } else {
       setWorkspaceSuccess(false);
       setConsoleError('오답입니다. 다시 한번 생각해 보세요!');
@@ -430,11 +422,7 @@ export default function ProblemWorkspace({
       setConsoleOutput(`정답입니다! 빈칸에 들어갈 코드는 '${decodedAnswerText}' 입니다. 🎉`);
       setConsoleError(null);
       onMarkSolved(problem.id);
-      confetti({
-        particleCount: 80,
-        spread: 60,
-        origin: { y: 0.6 }
-      });
+      celebrate(80, 60);
     } else {
       setWorkspaceSuccess(false);
       setConsoleError(`오답입니다. '${fillText}'은(는) 올바른 식별자가 아닙니다. 제약 조건을 확인하세요.`);

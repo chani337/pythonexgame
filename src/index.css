@@ -143,6 +143,17 @@ h1, h2, h3, h4, h5, h6 {
   transform: none; /* Avoid float animations, keep it flat and solid */
 }
 
+/* Solved problems: the whole card turns green instead of a CLEAR stamp */
+.glass-card.problem-card-solved {
+  background: #eef8f0;
+  border-color: #b7e0c2;
+}
+
+.glass-card.problem-card-solved:hover {
+  background: #e6f4e9;
+  border-color: #1a7f37;
+}
+
 .glass-input {
   background: #ffffff;
   border: 1px solid #d9d9d9;
@@ -649,3 +660,104 @@ code, pre, .console-container, .glass-input {
   }
 }
 
+
+/* ---- Winter event ---------------------------------------------------------- */
+
+/* Falling snow. Sits above the page but never takes a click. */
+.snow-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 900;
+}
+
+.snowflake {
+  position: absolute;
+  top: -12px;
+  border-radius: 50%;
+  /* Pale blue rather than white so it still shows on the white page */
+  background: #b9d4ee;
+  box-shadow: 0 0 4px rgba(120, 160, 205, 0.45);
+  animation-name: snow-fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  will-change: transform;
+}
+
+@keyframes snow-fall {
+  0% {
+    transform: translate(0, 0);
+  }
+  25% {
+    transform: translate(var(--snow-drift, 20px), 26vh);
+  }
+  50% {
+    transform: translate(0, 52vh);
+  }
+  75% {
+    transform: translate(calc(var(--snow-drift, 20px) * -1), 78vh);
+  }
+  100% {
+    transform: translate(0, 105vh);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snow-layer {
+    display: none;
+  }
+}
+
+/* Dark mode inverts the whole page (see html.dark-mode above); invert these
+   back so the snow stays snow-colored and the hat stays red. */
+html.dark-mode .snow-layer,
+html.dark-mode .santa-hat {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+html.dark-mode .snowflake {
+  background: #e8f1fa;
+}
+
+/* December calendar on the dashboard challenge card */
+.winter-calendar {
+  display: grid;
+  grid-template-columns: repeat(16, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 680px;
+}
+
+.winter-calendar-day {
+  aspect-ratio: 1 / 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #9a9a9a;
+  background: #f6f6f7;
+  border: 1px solid #ececee;
+  box-sizing: border-box;
+}
+
+.winter-calendar-day.is-solved {
+  background: #1a6b3c;
+  border-color: #1a6b3c;
+  color: #ffffff;
+}
+
+.winter-calendar-day.is-christmas {
+  background: #fde8ea;
+  border-color: #f5c6cb;
+}
+
+.winter-calendar-day.is-today {
+  border: 2px solid #c0262d;
+}
+
+@media (max-width: 640px) {
+  .winter-calendar {
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+  }
+}
