@@ -21,7 +21,7 @@ const Changelog = lazyWithReload(() => import('./components/Changelog'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import type { GuestMergeResult } from './contexts/AuthContext';
 import { supabase } from './lib/supabase';
-import { recordSolveDay } from './utils/winterEvent';
+import { kstDate, recordSolveDay } from './utils/winterEvent';
 import { problems, filterProblems } from './data/problems';
 import type { Problem } from './data/problems';
 import { parsePath, routeForState, nextHistoryAction } from './lib/routes';
@@ -262,7 +262,9 @@ print("변환 리스트:", result)
   // Mark a problem as solved and compute the streak
   const handleMarkSolved = (problemId: string) => {
     let newStreak = streak;
-    const today = new Date().toISOString().split('T')[0];
+    // Korean date, like the server's streak (Asia/Seoul): UTC flipped the
+    // day at 9 a.m. here, so a morning solve landed on the previous day.
+    const today = kstDate();
 
     if (!solvedIds.includes(problemId)) {
       const newSolvedIds = [...solvedIds, problemId];
