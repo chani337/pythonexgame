@@ -30,6 +30,10 @@ export interface UserProfile {
   // list of test-account UUIDs that sat in a public repository.
   hidden?: boolean;
   is_admin?: boolean;
+  // Equipped title and name color (src/utils/cosmetics.ts). The client may
+  // write these, but a trigger refuses any the user's XP hasn't unlocked.
+  title_id?: string | null;
+  name_color?: string | null;
 }
 
 export interface LeaderboardUser {
@@ -44,6 +48,8 @@ export interface LeaderboardUser {
   xp?: number;
   // Total XP, for the tier beside the name, when xp is only a slice of it.
   tier_xp?: number;
+  title_id?: string | null;
+  name_color?: string | null;
 }
 
 export interface ActivityEvent {
@@ -216,6 +222,8 @@ interface AuthContextType {
   syncQuizAnswerToSupabase: (chapterId: string, questionIndex: number, answerIndex: number) => Promise<void>;
   fetchUserQuizAnswers: () => Promise<Record<string, number>>;
   updateDisplayName: (newDisplayName: string) => Promise<{ error?: any }>;
+  // Equip a title / name color (null to take it off). Logged-in users only.
+  updateCosmetics: (changes: { title_id?: string | null; name_color?: string | null }) => Promise<{ error?: string }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -585,7 +593,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // row per profile, so it can never be truncated like that.
         const { data: profData, error: profErr } = await supabase
           .from('leaderboard_public')
-          .select('id, display_name, streak, solved_count, xp');
+          .select('id, display_name, streak, solved_count, xp, title_id, name_color');
 
         if (!profErr && profData) {
           profData.forEach((item: any) => {
@@ -596,6 +604,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               streak: item.streak || 0,
               solved_count: item.solved_count || 0,
               xp: item.xp || 0,
+              title_id: item.title_id,
+              name_color: item.name_color,
             };
           });
         } else if (profErr) {
@@ -647,6 +657,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             streak: userStreak,
             solved_count: localSolvedCount,
             xp: localXp,
+            title_id: profile?.title_id,
+            name_color: profile?.name_color,
           });
         }
       }
@@ -1082,6 +1094,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const updateCosmetics = async (changes: { title_id?: string | null; name_color?: string | null }) => {
+    if (!user || !isSupabaseConfigured) {
+      return { error: '로그인한 회원만 칭호와 이름 색을 고를 수 있어요.' };
+    }
+    const { error } = await supabase.from('profiles').update(changes).eq('id', user.id);
+    if (error) {
+      console.error('Cosmetics update failed:', error);
+      // The trigger's pyquests_locked_cosmetic: XP on this screen was ahead of the server's.
+      return {
+        error: error.message?.includes('pyquests_locked_cosmetic')
+          ? '아직 열리지 않았어요. XP가 서버에 반영되면 다시 시도해 주세요.'
+          : '저장하지 못했어요. 잠시 후 다시 시도해 주세요.',
+      };
+    }
+    setProfile((prev) => (prev ? { ...prev, ...changes } : prev));
+    refreshLeaderboard();
+    return {};
+  };
+
   const updateDisplayName = async (newDisplayName: string) => {
     if (!user) {
       setAuthModalOpen(true);
@@ -1207,6 +1238,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         syncQuizAnswerToSupabase,
         fetchUserQuizAnswers,
         updateDisplayName,
+        updateCosmetics,
       }}
     >
       {children}

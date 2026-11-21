@@ -26,6 +26,14 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-11-21',
+    title: '칭호와 이름 색을 고를 수 있어요',
+    items: [
+      'XP가 쌓이면 칭호(🌱 새싹 코더부터 👑 그랜드 마스터까지 10개)와 이름 색(숲 초록부터 오로라까지 6가지)이 열려요.',
+      '대시보드 등급 카드에서 골라 달면 랭킹의 내 이름에 바로 보여요. 로그인한 회원만 고를 수 있어요.',
+    ],
+  },
+  {
+    date: '2026-11-21',
     title: '레벨과 등급이 생겼어요',
     items: [
       '문제를 풀면 XP를 받아요. 코딩 문제는 기초 10 · 중급 20 · 고급 40 · 챌린지 80, 퀴즈와 빈칸은 5예요. 이미 푼 문제도 모두 계산돼요.',

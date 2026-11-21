@@ -9,6 +9,7 @@ import LearningRoadmap from './LearningRoadmap';
 import WinterChallengeCard from './WinterChallengeCard';
 import LevelCard from './LevelCard';
 import { tierFor } from '../utils/levels';
+import { nameStyle, titleById } from '../utils/cosmetics';
 import { triviaItems } from '../data/trivia';
 import { changelogEntries } from '../data/changelog';
 
@@ -50,10 +51,10 @@ async function fetchFilteredLeaderboard(mode: RankingMode): Promise<LeaderboardU
     mode === 'week'
       ? supabase
           .from('weekly_leaderboard_public')
-          .select('id, display_name, streak, solved_count, xp, total_xp')
+          .select('id, display_name, streak, solved_count, xp, total_xp, title_id, name_color')
       : supabase
           .from('language_leaderboard_public')
-          .select('id, display_name, streak, solved_count, xp, total_xp')
+          .select('id, display_name, streak, solved_count, xp, total_xp, title_id, name_color')
           .eq('language', mode);
 
   const { data, error } = await query
@@ -72,6 +73,8 @@ async function fetchFilteredLeaderboard(mode: RankingMode): Promise<LeaderboardU
     solved_count: row.solved_count || 0,
     xp: row.xp || 0,
     tier_xp: row.total_xp || 0,
+    title_id: row.title_id,
+    name_color: row.name_color,
   }));
 }
 
@@ -1180,6 +1183,7 @@ function LeaderboardWidget() {
           {displayList.map((item, index) => {
             const isSelf = isSelfUser(item);
             const tier = tierFor(item.tier_xp ?? item.xp ?? 0);
+            const title = titleById(item.title_id);
             return (
               <div
                 key={item.id || index}
@@ -1204,11 +1208,17 @@ function LeaderboardWidget() {
                   >
                     #{index + 1}
                   </span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <span title={`${tier.name} 등급`} style={{ fontSize: '0.95rem' }}>{tier.icon}</span>
-                    <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#1a1a1a' }}>
-                      {item.display_name} {isSelf && <span style={{ fontSize: '0.7rem', color: '#0969da' }}>(나)</span>}
+                    {title && (
+                      <span style={{ fontSize: '0.66rem', fontWeight: 700, color: '#57606a', background: '#f4f4f6', border: '1px solid var(--border-subtle)', padding: '0.1rem 0.35rem', whiteSpace: 'nowrap' }}>
+                        {title.icon} {title.name}
+                      </span>
+                    )}
+                    <span style={{ fontSize: '0.82rem', fontWeight: '800', ...nameStyle(item.name_color) }}>
+                      {item.display_name}
                     </span>
+                    {isSelf && <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#0969da' }}>(나)</span>}
                     {isSelf && (
                       <button
                         onClick={() => setProfileEditOpen(true)}
