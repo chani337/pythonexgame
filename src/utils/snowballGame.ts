@@ -13,15 +13,29 @@ export interface Difficulty {
   respawn: number;
 }
 
-// Gentle for the first half minute, then ramps until about two minutes in.
+// Two snowmen from the first second, five by a minute and a half. (The
+// first version eased in with one at a time for half a minute, and that
+// half minute was the boring part.)
+const RAMP_SECONDS = 90;
+
 export function difficultyAt(seconds: number): Difficulty {
-  const t = Math.min(Math.max(seconds, 0), 120) / 120; // 0 → 1
+  const t = Math.min(Math.max(seconds, 0), RAMP_SECONDS) / RAMP_SECONDS; // 0 → 1
   return {
-    windup: 1.1 - 0.6 * t,
-    ballSpeed: 230 + 200 * t,
-    maxUp: 1 + Math.floor(t * 3.5),
-    respawn: 1.6 - 1.0 * t,
+    windup: 1.0 - 0.55 * t,
+    ballSpeed: 240 + 220 * t,
+    maxUp: 2 + Math.floor(t * 3),
+    respawn: 1.0 - 0.6 * t,
   };
+}
+
+/** Boss HP: the first has 12, each later one 5 more. */
+export function bossHp(bossNumber: number): number {
+  return 12 + 5 * (bossNumber - 1);
+}
+
+/** Points for knocking a boss down. */
+export function bossScore(bossNumber: number): number {
+  return 300 * bossNumber;
 }
 
 export const HIT_POINTS = 10;

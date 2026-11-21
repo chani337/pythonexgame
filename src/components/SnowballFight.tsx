@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
-import { X } from 'lucide-react';
+import { Volume2, VolumeX, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { difficultyAt, hitScore, readBestScore, recordScore } from '../utils/snowballGame';
+import { bossHp, bossScore, difficultyAt, hitScore, readBestScore, recordScore } from '../utils/snowballGame';
 
 // 눈싸움: snowmen pop up from the snow mounds at the back and throw; the
 // player moves along the front, hides behind three snow walls and throws
-// back. Drawn on one canvas in an 800×500 field scaled to fit; React state
-// only holds the phase and the final score, everything per-frame is in refs.
+// back. Gift boxes drop power-ups, and every so often the 눈사람 대장 (boss)
+// shows up. Drawn on one canvas in an 800×500 field scaled to fit; React
+// state only holds the phase and the result, everything per-frame is in refs.
 
 const W = 800;
 const H = 500;
@@ -18,14 +19,27 @@ const PLAYER_Y = 452;
 const SLOTS = [110, 250, 400, 550, 690];
 const FORTS = [180, 400, 620];
 const FORT_W = 104;
-const FORT_HP = 6;
+const FORT_HP = 10;
 const MAX_AMMO = 5;
-const AMMO_REGEN = 0.45;
-const PLAYER_SPEED = 430;
-const PLAYER_BALL_SPEED = 760;
-const LIVES = 3;
+const AMMO_REGEN = 0.4;
+const PLAYER_SPEED = 440;
+const PLAYER_BALL_SPEED = 780;
+const START_LIVES = 3;
+const MAX_LIVES = 5;
+const RAPID_INTERVAL = 0.09;
+const FIRST_BOSS_AT = 35;
+const BOSS_GAP = 45;
+const POWER_SECONDS = 8;
 
 type Phase = 'ready' | 'playing' | 'over';
+type GiftKind = 'triple' | 'rapid' | 'repair' | 'heart';
+
+const GIFT_INFO: Record<GiftKind, { icon: string; label: string }> = {
+  triple: { icon: '✨', label: '3방향 던지기!' },
+  rapid: { icon: '🔥', label: '연사! 누르고 있으면 계속 던져요' },
+  repair: { icon: '🧱', label: '눈 벽 수리!' },
+  heart: { icon: '❤️', label: '하트 +1' },
+};
 
 interface Enemy {
   x: number;
@@ -36,12 +50,32 @@ interface Enemy {
   golden: boolean;
 }
 
+interface Boss {
+  number: number;
+  hp: number;
+  maxHp: number;
+  x: number;
+  dir: number;
+  rise: number;
+  state: 'entering' | 'fighting' | 'down';
+  timer: number;
+  flash: number;
+}
+
 interface Ball {
   x: number;
   y: number;
   vx: number;
   vy: number;
-  left: number; // player balls: distance to the aimed point
+  left: number; // player balls: distance left to the aimed point
+  big?: boolean;
+}
+
+interface Gift {
+  x: number;
+  y: number;
+  t: number;
+  kind: GiftKind;
 }
 
 interface Puff {
@@ -50,12 +84,15 @@ interface Puff {
   vx: number;
   vy: number;
   life: number;
+  color: string;
 }
 
 interface Game {
   time: number;
   score: number;
   combo: number;
+  bestCombo: number;
+  hits: number;
   lives: number;
   invulnerable: number;
   ammo: number;
@@ -63,85 +100,173 @@ interface Game {
   px: number;
   moveTo: number;
   keys: { left: boolean; right: boolean };
+  firing: boolean;
+  aim: { x: number; y: number };
+  fireTimer: number;
   throwAnim: number;
+  triple: number;
+  rapid: number;
   enemies: Enemy[];
+  boss: Boss | null;
+  bossCount: number;
+  nextBossAt: number;
   forts: number[];
   mine: Ball[];
   theirs: Ball[];
+  gifts: Gift[];
+  giftTimer: number;
   puffs: Puff[];
-  popups: { x: number; y: number; text: string; life: number }[];
+  popups: { x: number; y: number; text: string; life: number; color: string; size: number }[];
+  banner: { text: string; life: number } | null;
+  shake: number;
+  flash: number;
+  hitStop: number;
+  sounds: SoundName[];
 }
+
+const rand = (a: number, b: number) => a + Math.random() * (b - a);
 
 function newGame(): Game {
   return {
     time: 0,
     score: 0,
     combo: 0,
-    lives: LIVES,
+    bestCombo: 0,
+    hits: 0,
+    lives: START_LIVES,
     invulnerable: 0,
     ammo: MAX_AMMO,
     regen: 0,
     px: W / 2,
     moveTo: W / 2,
     keys: { left: false, right: false },
+    firing: false,
+    aim: { x: W / 2, y: MOUND_Y - 30 },
+    fireTimer: 0,
     throwAnim: 0,
-    enemies: SLOTS.map((x, i) => ({ x, state: 'hidden', rise: 0, timer: 0.6 + i * 0.35, thrown: false, golden: false })),
+    triple: 0,
+    rapid: 0,
+    enemies: SLOTS.map((x, i) => ({ x, state: 'hidden', rise: 0, timer: 0.3 + (i % 3) * 0.4, thrown: false, golden: false })),
+    boss: null,
+    bossCount: 0,
+    nextBossAt: FIRST_BOSS_AT,
     forts: FORTS.map(() => FORT_HP),
     mine: [],
     theirs: [],
+    gifts: [],
+    giftTimer: rand(7, 10),
     puffs: [],
     popups: [],
+    banner: null,
+    shake: 0,
+    flash: 0,
+    hitStop: 0,
+    sounds: [],
   };
 }
 
-const rand = (a: number, b: number) => a + Math.random() * (b - a);
-
-function burst(g: Game, x: number, y: number, n = 10) {
+function burst(g: Game, x: number, y: number, n = 10, color = '#ffffff') {
   for (let i = 0; i < n; i++) {
     const a = rand(0, Math.PI * 2);
-    const s = rand(40, 170);
-    g.puffs.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 40, life: rand(0.35, 0.7) });
+    const s = rand(50, 200);
+    g.puffs.push({ x, y, vx: Math.cos(a) * s, vy: Math.sin(a) * s - 50, life: rand(0.35, 0.75), color });
   }
 }
 
-function enemyHead(e: Enemy) {
-  return { x: e.x, y: MOUND_Y - 34 * e.rise, r: 24 };
+function popup(g: Game, x: number, y: number, text: string, color = '#c0262d', size = 16) {
+  g.popups.push({ x, y, text, life: 0.9, color, size });
+}
+
+/** Where a snowman can be hit: head and upper body. */
+function enemyTarget(e: Enemy) {
+  return { x: e.x, y: MOUND_Y - 30 * e.rise, r: 30 };
+}
+
+function bossTarget(b: Boss) {
+  return { x: b.x, y: MOUND_Y - 70 * b.rise, r: 52 };
+}
+
+function spawnBall(g: Game, sx: number, sy: number, tx: number, ty: number, big = false) {
+  const dx = tx - sx;
+  const dy = ty - sy;
+  const d = Math.hypot(dx, dy) || 1;
+  g.mine.push({ x: sx, y: sy, vx: (dx / d) * PLAYER_BALL_SPEED, vy: (dy / d) * PLAYER_BALL_SPEED, left: d + 40, big });
 }
 
 function throwAt(g: Game, tx: number, ty: number) {
-  if (g.ammo < 1) return;
-  g.ammo -= 1;
-  g.throwAnim = 0.18;
+  const free = g.rapid > 0;
+  if (!free && g.ammo < 1) return;
+  if (!free) g.ammo -= 1;
+  g.throwAnim = 0.15;
   const sx = g.px + 12;
   const sy = PLAYER_Y - 30;
   const ay = Math.min(ty, FORT_Y - 40);
-  const dx = tx - sx;
-  const dy = ay - sy;
-  const d = Math.hypot(dx, dy) || 1;
-  g.mine.push({ x: sx, y: sy, vx: (dx / d) * PLAYER_BALL_SPEED, vy: (dy / d) * PLAYER_BALL_SPEED, left: d });
+  spawnBall(g, sx, sy, tx, ay);
+  if (g.triple > 0) {
+    // Same distance, fanned out
+    const a = Math.atan2(ay - sy, tx - sx);
+    const d = Math.hypot(tx - sx, ay - sy);
+    for (const off of [-0.2, 0.2]) spawnBall(g, sx, sy, sx + Math.cos(a + off) * d, sy + Math.sin(a + off) * d);
+  }
+  g.sounds.push('throw');
 }
 
-/** Space bar: aim at the nearest enemy that is up, or straight ahead. */
-function autoThrow(g: Game) {
-  let best: Enemy | null = null;
-  for (const e of g.enemies) {
-    if ((e.state === 'up' || e.state === 'rising') && (!best || Math.abs(e.x - g.px) < Math.abs(best.x - g.px))) best = e;
-  }
-  if (best) {
-    const h = enemyHead({ ...best, rise: 1 });
-    throwAt(g, h.x, h.y);
-  } else {
-    throwAt(g, g.px, MOUND_Y - 30);
-  }
+function scoreHit(g: Game, x: number, y: number, golden: boolean) {
+  const pts = hitScore(g.combo, golden);
+  g.score += pts;
+  g.combo += 1;
+  g.hits += 1;
+  g.bestCombo = Math.max(g.bestCombo, g.combo);
+  popup(g, x, y - 34, `+${pts}`, golden ? '#b8860b' : '#c0262d', golden ? 22 : 17);
+  const milestone: Record<number, string> = { 5: '나이스!', 10: '그레이트!', 20: '엄청나요!', 30: '눈싸움의 신!' };
+  if (milestone[g.combo]) g.banner = { text: `${milestone[g.combo]} ${g.combo}연속`, life: 1.1 };
+  g.hitStop = 0.05;
+  g.sounds.push(golden ? 'golden' : 'hit');
+}
+
+function applyGift(g: Game, kind: GiftKind, x: number, y: number) {
+  if (kind === 'triple') g.triple = POWER_SECONDS;
+  if (kind === 'rapid') g.rapid = POWER_SECONDS;
+  if (kind === 'repair') g.forts = FORTS.map(() => FORT_HP);
+  if (kind === 'heart') g.lives = Math.min(MAX_LIVES, g.lives + 1);
+  g.banner = { text: `${GIFT_INFO[kind].icon} ${GIFT_INFO[kind].label}`, life: 1.4 };
+  burst(g, x, y, 18, '#ffe27a');
+  g.sounds.push('power');
+}
+
+function pickGift(g: Game): GiftKind {
+  const pool: GiftKind[] = ['triple', 'triple', 'rapid', 'rapid', 'repair'];
+  if (g.forts.every((hp) => hp === FORT_HP)) pool.pop();
+  if (g.lives < MAX_LIVES) pool.push('heart', 'heart');
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function enemyThrow(g: Game, sx: number, sy: number, tx: number, speed: number) {
+  const dx = tx - sx;
+  const dy = PLAYER_Y - sy;
+  const d = Math.hypot(dx, dy);
+  g.theirs.push({ x: sx, y: sy, vx: (dx / d) * speed, vy: (dy / d) * speed, left: 0 });
 }
 
 function step(g: Game, dt: number): boolean {
+  // Timers that run even during hit-stop
+  g.shake = Math.max(0, g.shake - dt);
+  g.flash = Math.max(0, g.flash - dt);
+  if (g.banner) {
+    g.banner.life -= dt;
+    if (g.banner.life <= 0) g.banner = null;
+  }
+  if (g.hitStop > 0) {
+    g.hitStop -= dt;
+    return true;
+  }
+
   g.time += dt;
   const diff = difficultyAt(g.time);
 
   // Player
   if (g.keys.left || g.keys.right) {
-    g.px += (g.keys.right ? 1 : 0) * PLAYER_SPEED * dt - (g.keys.left ? 1 : 0) * PLAYER_SPEED * dt;
+    g.px += ((g.keys.right ? 1 : 0) - (g.keys.left ? 1 : 0)) * PLAYER_SPEED * dt;
     g.moveTo = g.px;
   } else {
     const d = g.moveTo - g.px;
@@ -150,6 +275,8 @@ function step(g: Game, dt: number): boolean {
   g.px = Math.max(30, Math.min(W - 30, g.px));
   g.invulnerable = Math.max(0, g.invulnerable - dt);
   g.throwAnim = Math.max(0, g.throwAnim - dt);
+  g.triple = Math.max(0, g.triple - dt);
+  g.rapid = Math.max(0, g.rapid - dt);
   if (g.ammo < MAX_AMMO) {
     g.regen += dt;
     if (g.regen >= AMMO_REGEN) {
@@ -159,38 +286,78 @@ function step(g: Game, dt: number): boolean {
   } else {
     g.regen = 0;
   }
+  if (g.firing && g.rapid > 0) {
+    g.fireTimer -= dt;
+    if (g.fireTimer <= 0) {
+      g.fireTimer = RAPID_INTERVAL;
+      throwAt(g, g.aim.x, g.aim.y);
+    }
+  }
 
-  // Enemies
+  // Boss arrival: the regular snowmen duck out of the way
+  if (!g.boss && g.time >= g.nextBossAt) {
+    g.bossCount += 1;
+    const hp = bossHp(g.bossCount);
+    g.boss = { number: g.bossCount, hp, maxHp: hp, x: W / 2, dir: 1, rise: 0, state: 'entering', timer: 1.4, flash: 0 };
+    g.banner = { text: '⚠️ 눈사람 대장 등장!', life: 1.6 };
+    g.sounds.push('boss');
+    for (const e of g.enemies) if (e.state !== 'hidden' && e.state !== 'hit') e.state = 'ducking';
+  }
+  const boss = g.boss;
+  if (boss) {
+    boss.flash = Math.max(0, boss.flash - dt);
+    boss.timer -= dt;
+    if (boss.state === 'entering') {
+      boss.rise = Math.min(1, boss.rise + dt * 1.2);
+      if (boss.rise >= 1) {
+        boss.state = 'fighting';
+        boss.timer = 1.0;
+      }
+    } else if (boss.state === 'fighting') {
+      boss.x += boss.dir * (70 + 15 * boss.number) * dt;
+      if (boss.x < 200 || boss.x > 600) boss.dir *= -1;
+      if (boss.timer <= 0) {
+        // A fan of three at the player
+        const spread = 70;
+        for (const off of [-spread, 0, spread]) enemyThrow(g, boss.x, MOUND_Y - 80, g.px + off, diff.ballSpeed * 0.85);
+        boss.timer = Math.max(0.8, 1.6 - 0.15 * boss.number);
+        g.sounds.push('bossThrow');
+      }
+    } else {
+      boss.rise = Math.max(0, boss.rise - dt * 0.9);
+      if (boss.rise <= 0) {
+        g.boss = null;
+        g.nextBossAt = g.time + BOSS_GAP;
+      }
+    }
+  }
+
+  // Snowmen
   const up = g.enemies.filter((e) => e.state !== 'hidden').length;
+  const maxUp = g.boss ? 0 : diff.maxUp;
   for (const e of g.enemies) {
     e.timer -= dt;
     switch (e.state) {
       case 'hidden':
-        if (e.timer <= 0 && up < diff.maxUp) {
+        if (e.timer <= 0 && up < maxUp) {
           e.state = 'rising';
           e.thrown = false;
           e.golden = Math.random() < 0.08;
         }
         break;
       case 'rising':
-        e.rise = Math.min(1, e.rise + dt * 4);
+        e.rise = Math.min(1, e.rise + dt * 5);
         if (e.rise >= 1) {
           e.state = 'up';
-          e.timer = e.golden ? 1.3 : diff.windup + rand(0, 0.4);
+          e.timer = e.golden ? 1.1 : diff.windup + rand(0, 0.35);
         }
         break;
       case 'up':
         if (e.timer <= 0) {
           if (!e.golden && !e.thrown) {
             e.thrown = true;
-            const sx = e.x;
-            const sy = MOUND_Y - 40;
-            const tx = g.px + rand(-28, 28);
-            const dx = tx - sx;
-            const dy = PLAYER_Y - sy;
-            const d = Math.hypot(dx, dy);
-            g.theirs.push({ x: sx, y: sy, vx: (dx / d) * diff.ballSpeed, vy: (dy / d) * diff.ballSpeed, left: 0 });
-            e.timer = 0.45;
+            enemyThrow(g, e.x, MOUND_Y - 40, g.px + rand(-26, 26), diff.ballSpeed);
+            e.timer = 0.4;
           } else {
             e.state = 'ducking';
           }
@@ -198,14 +365,27 @@ function step(g: Game, dt: number): boolean {
         break;
       case 'ducking':
       case 'hit':
-        e.rise = Math.max(0, e.rise - dt * (e.state === 'hit' ? 3 : 4));
+        e.rise = Math.max(0, e.rise - dt * (e.state === 'hit' ? 2.2 : 4.5));
         if (e.rise <= 0) {
-          e.timer = (e.state === 'hit' ? diff.respawn + 0.6 : diff.respawn) + rand(0, 1.2);
+          e.timer = (e.state === 'hit' ? diff.respawn + 0.5 : diff.respawn) + rand(0, 0.9);
           e.state = 'hidden';
         }
         break;
     }
   }
+
+  // Gifts float down from the back; hit one with a snowball to open it
+  g.giftTimer -= dt;
+  if (g.giftTimer <= 0) {
+    g.giftTimer = rand(9, 14);
+    g.gifts.push({ x: rand(140, W - 140), y: HORIZON + 10, t: 0, kind: pickGift(g) });
+  }
+  g.gifts = g.gifts.filter((gift) => {
+    gift.t += dt;
+    gift.y += 42 * dt;
+    gift.x += Math.sin(gift.t * 2.4) * 30 * dt;
+    return gift.y < FORT_Y - 30;
+  });
 
   // My snowballs
   g.mine = g.mine.filter((b) => {
@@ -214,22 +394,48 @@ function step(g: Game, dt: number): boolean {
     b.x += mx;
     b.y += my;
     b.left -= Math.hypot(mx, my);
+    for (let i = 0; i < g.gifts.length; i++) {
+      const gift = g.gifts[i];
+      if (Math.hypot(b.x - gift.x, b.y - gift.y) < 26) {
+        applyGift(g, gift.kind, gift.x, gift.y);
+        g.gifts.splice(i, 1);
+        return false;
+      }
+    }
+    if (g.boss && g.boss.state === 'fighting') {
+      const t = bossTarget(g.boss);
+      if (Math.hypot(b.x - t.x, b.y - t.y) < t.r) {
+        g.boss.hp -= 1;
+        g.boss.flash = 0.12;
+        g.score += 5;
+        burst(g, b.x, b.y, 8);
+        g.sounds.push('hit');
+        if (g.boss.hp <= 0) {
+          const pts = bossScore(g.boss.number);
+          g.score += pts;
+          g.boss.state = 'down';
+          g.banner = { text: `🏆 대장 격파! +${pts}`, life: 1.8 };
+          burst(g, t.x, t.y, 40, '#ffe27a');
+          g.gifts.push({ x: t.x, y: t.y, t: 0, kind: pickGift(g) });
+          g.hitStop = 0.25;
+          g.sounds.push('bossDown');
+        }
+        return false;
+      }
+    }
     for (const e of g.enemies) {
-      if (e.rise < 0.5 || e.state === 'hit' || e.state === 'hidden') continue;
-      const h = enemyHead(e);
-      if (Math.hypot(b.x - h.x, b.y - h.y) < h.r + 6) {
-        const pts = hitScore(g.combo, e.golden);
-        g.score += pts;
-        g.combo += 1;
-        g.popups.push({ x: h.x, y: h.y - 30, text: `+${pts}`, life: 0.8 });
+      if (e.rise < 0.45 || e.state === 'hit' || e.state === 'hidden') continue;
+      const t = enemyTarget(e);
+      if (Math.hypot(b.x - t.x, b.y - t.y) < t.r) {
+        scoreHit(g, t.x, t.y, e.golden);
         e.state = 'hit';
-        burst(g, h.x, h.y, e.golden ? 22 : 12);
+        burst(g, t.x, t.y, e.golden ? 24 : 14, e.golden ? '#ffe27a' : '#ffffff');
         return false;
       }
     }
     if (b.left <= 0) {
       g.combo = 0;
-      burst(g, b.x, b.y, 6);
+      burst(g, b.x, b.y, 5);
       return false;
     }
     return true;
@@ -243,17 +449,21 @@ function step(g: Game, dt: number): boolean {
       for (let i = 0; i < FORTS.length; i++) {
         if (g.forts[i] > 0 && Math.abs(b.x - FORTS[i]) < FORT_W / 2) {
           g.forts[i] -= 1;
-          burst(g, b.x, FORT_Y - 6, 8);
+          burst(g, b.x, FORT_Y - 6, 9);
+          g.sounds.push('thud');
           return false;
         }
       }
     }
-    if (b.y >= PLAYER_Y - 26 && b.y <= PLAYER_Y + 10 && Math.abs(b.x - g.px) < 22) {
+    if (b.y >= PLAYER_Y - 28 && b.y <= PLAYER_Y + 12 && Math.abs(b.x - g.px) < 22) {
       if (g.invulnerable <= 0) {
         g.lives -= 1;
         g.combo = 0;
-        g.invulnerable = 1.2;
-        burst(g, g.px, PLAYER_Y - 20, 16);
+        g.invulnerable = 1.3;
+        g.shake = 0.35;
+        g.flash = 0.3;
+        burst(g, g.px, PLAYER_Y - 20, 18);
+        g.sounds.push('hurt');
       }
       return false;
     }
@@ -263,12 +473,12 @@ function step(g: Game, dt: number): boolean {
   g.puffs = g.puffs.filter((p) => {
     p.x += p.vx * dt;
     p.y += p.vy * dt;
-    p.vy += 380 * dt;
+    p.vy += 420 * dt;
     p.life -= dt;
     return p.life > 0;
   });
   g.popups = g.popups.filter((p) => {
-    p.y -= 40 * dt;
+    p.y -= 46 * dt;
     p.life -= dt;
     return p.life > 0;
   });
@@ -276,7 +486,87 @@ function step(g: Game, dt: number): boolean {
   return g.lives > 0;
 }
 
-// ---- Drawing -----------------------------------------------------------------
+// ---- Sound ------------------------------------------------------------------------
+// A few synthesized blips; no audio files to download.
+
+type SoundName = 'throw' | 'hit' | 'golden' | 'hurt' | 'thud' | 'power' | 'boss' | 'bossThrow' | 'bossDown' | 'over';
+
+const MUTE_KEY = 'pyquests_snowball_muted';
+
+function readMuted(): boolean {
+  try {
+    return localStorage.getItem(MUTE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+
+class Sfx {
+  private ctx: AudioContext | null = null;
+
+  /** Must run inside a user gesture (the start button) or browsers keep it silent. */
+  unlock() {
+    if (!this.ctx) {
+      const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+      if (!Ctor) return;
+      this.ctx = new Ctor();
+    }
+    void this.ctx.resume();
+  }
+
+  close() {
+    void this.ctx?.close();
+    this.ctx = null;
+  }
+
+  private tone(type: OscillatorType, from: number, to: number, dur: number, vol: number, delay = 0) {
+    const ctx = this.ctx;
+    if (!ctx) return;
+    const t0 = ctx.currentTime + delay;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = type;
+    osc.frequency.setValueAtTime(from, t0);
+    osc.frequency.exponentialRampToValueAtTime(Math.max(to, 1), t0 + dur);
+    gain.gain.setValueAtTime(vol, t0);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain).connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+
+  play(name: SoundName) {
+    switch (name) {
+      case 'throw':
+        return this.tone('triangle', 520, 260, 0.07, 0.05);
+      case 'hit':
+        return this.tone('square', 340, 110, 0.1, 0.07);
+      case 'golden':
+        this.tone('triangle', 880, 880, 0.08, 0.08);
+        return this.tone('triangle', 1320, 1320, 0.12, 0.08, 0.08);
+      case 'hurt':
+        return this.tone('sawtooth', 200, 55, 0.28, 0.1);
+      case 'thud':
+        return this.tone('sine', 140, 70, 0.08, 0.08);
+      case 'power':
+        [660, 830, 990, 1320].forEach((f, i) => this.tone('triangle', f, f, 0.09, 0.07, i * 0.07));
+        return;
+      case 'boss':
+        this.tone('sawtooth', 110, 90, 0.45, 0.09);
+        return this.tone('sawtooth', 82, 70, 0.6, 0.09, 0.4);
+      case 'bossThrow':
+        return this.tone('square', 180, 120, 0.12, 0.05);
+      case 'bossDown':
+        [523, 659, 784, 1046].forEach((f, i) => this.tone('square', f, f, 0.14, 0.07, i * 0.11));
+        return;
+      case 'over':
+        [392, 330, 262].forEach((f, i) => this.tone('triangle', f, f * 0.98, 0.22, 0.08, i * 0.2));
+        return;
+    }
+  }
+}
+
+// ---- Drawing -----------------------------------------------------------------------
 
 function circle(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, fill: string) {
   ctx.beginPath();
@@ -291,7 +581,6 @@ function drawScene(ctx: CanvasRenderingContext2D) {
   sky.addColorStop(1, '#4a6fa5');
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, W, HORIZON);
-  // Far hills and pines
   ctx.fillStyle = '#dfe9f3';
   ctx.beginPath();
   ctx.moveTo(0, HORIZON);
@@ -319,53 +608,112 @@ function drawScene(ctx: CanvasRenderingContext2D) {
   ctx.fillRect(0, HORIZON, W, H - HORIZON);
 }
 
+interface SnowmanLook {
+  golden?: boolean;
+  dazed?: boolean;
+  windingUp?: boolean;
+  flash?: boolean;
+  angry?: boolean;
+}
+
+/** A snowman whose body centre is (x, y), drawn at `s` scale. */
+function drawSnowman(ctx: CanvasRenderingContext2D, x: number, y: number, s: number, look: SnowmanLook) {
+  const body = look.flash ? '#ffd1d1' : look.golden ? '#ffe27a' : '#ffffff';
+  const edge = look.golden ? '#d4a017' : '#a9c2dc';
+  circle(ctx, x, y + 22 * s, 27 * s, edge);
+  circle(ctx, x, y + 22 * s, 25 * s, body);
+  circle(ctx, x, y - 10 * s, 20 * s, edge);
+  circle(ctx, x, y - 10 * s, 18 * s, body);
+  // Buttons
+  circle(ctx, x, y + 14 * s, 2.4 * s, '#2b2b2b');
+  circle(ctx, x, y + 26 * s, 2.4 * s, '#2b2b2b');
+  // Eyes
+  if (look.dazed) {
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineWidth = 2 * s;
+    for (const ex of [-6, 6]) {
+      ctx.beginPath();
+      ctx.moveTo(x + (ex - 3) * s, y - 16 * s);
+      ctx.lineTo(x + (ex + 3) * s, y - 10 * s);
+      ctx.moveTo(x + (ex + 3) * s, y - 16 * s);
+      ctx.lineTo(x + (ex - 3) * s, y - 10 * s);
+      ctx.stroke();
+    }
+  } else {
+    circle(ctx, x - 6 * s, y - 13 * s, 2.4 * s, '#1a1a1a');
+    circle(ctx, x + 6 * s, y - 13 * s, 2.4 * s, '#1a1a1a');
+    if (look.angry) {
+      ctx.strokeStyle = '#1a1a1a';
+      ctx.lineWidth = 2 * s;
+      ctx.beginPath();
+      ctx.moveTo(x - 10 * s, y - 20 * s);
+      ctx.lineTo(x - 3 * s, y - 17 * s);
+      ctx.moveTo(x + 10 * s, y - 20 * s);
+      ctx.lineTo(x + 3 * s, y - 17 * s);
+      ctx.stroke();
+    }
+  }
+  // Carrot nose
+  ctx.fillStyle = '#f08a24';
+  ctx.beginPath();
+  ctx.moveTo(x, y - 8 * s);
+  ctx.lineTo(x + 13 * s, y - 5 * s);
+  ctx.lineTo(x, y - 3 * s);
+  ctx.fill();
+  // Hat
+  ctx.fillStyle = look.golden ? '#b8860b' : '#2b2b2b';
+  ctx.fillRect(x - 16 * s, y - 29 * s, 32 * s, 4 * s);
+  ctx.fillRect(x - 11 * s, y - 46 * s, 22 * s, 18 * s);
+  ctx.fillStyle = '#c0262d';
+  ctx.fillRect(x - 11 * s, y - 33 * s, 22 * s, 4 * s);
+  // Stick arm, raised with a snowball while winding up
+  ctx.strokeStyle = '#6b4a2b';
+  ctx.lineWidth = 3 * s;
+  ctx.beginPath();
+  ctx.moveTo(x + 22 * s, y + 14 * s);
+  if (look.windingUp) {
+    ctx.lineTo(x + 38 * s, y - 14 * s);
+    ctx.stroke();
+    circle(ctx, x + 40 * s, y - 18 * s, 7 * s, '#ffffff');
+  } else {
+    ctx.lineTo(x + 40 * s, y + 24 * s);
+    ctx.stroke();
+  }
+}
+
 function drawEnemy(ctx: CanvasRenderingContext2D, e: Enemy) {
   if (e.rise <= 0) return;
   ctx.save();
-  // Clip at the mound top so the snowman rises out of it.
   ctx.beginPath();
-  ctx.rect(e.x - 50, 0, 100, MOUND_Y + 2);
+  ctx.rect(e.x - 60, 0, 120, MOUND_Y + 2);
   ctx.clip();
-  const by = MOUND_Y + 30 - 64 * e.rise;
-  const body = e.golden ? '#ffe27a' : '#ffffff';
-  const edge = e.golden ? '#d4a017' : '#b9cde2';
-  circle(ctx, e.x, by + 22, 26, edge);
-  circle(ctx, e.x, by + 22, 24, body);
-  circle(ctx, e.x, by - 8, 19, edge);
-  circle(ctx, e.x, by - 8, 17, body);
-  // Face
-  const stunned = e.state === 'hit';
-  ctx.fillStyle = '#1a1a1a';
-  if (stunned) {
-    ctx.font = 'bold 10px sans-serif';
-    ctx.textAlign = 'center';
-    ctx.fillText('x  x', e.x, by - 8);
-  } else {
-    circle(ctx, e.x - 6, by - 11, 2.2, '#1a1a1a');
-    circle(ctx, e.x + 6, by - 11, 2.2, '#1a1a1a');
+  const y = MOUND_Y + 34 - 74 * e.rise;
+  if (e.state === 'hit') {
+    // Knocked over backwards
+    ctx.translate(e.x, y + 30);
+    ctx.rotate(-(1 - e.rise) * 1.4);
+    ctx.translate(-e.x, -(y + 30));
   }
-  ctx.fillStyle = '#f08a24';
+  drawSnowman(ctx, e.x, y, 1, {
+    golden: e.golden,
+    dazed: e.state === 'hit',
+    windingUp: e.state === 'up' && !e.golden && !e.thrown && e.timer < 0.35,
+  });
+  ctx.restore();
+}
+
+function drawBoss(ctx: CanvasRenderingContext2D, b: Boss) {
+  ctx.save();
   ctx.beginPath();
-  ctx.moveTo(e.x, by - 6);
-  ctx.lineTo(e.x + 12, by - 3);
-  ctx.lineTo(e.x, by - 1);
-  ctx.fill();
-  // Hat
-  ctx.fillStyle = e.golden ? '#b8860b' : '#2b2b2b';
-  ctx.fillRect(e.x - 15, by - 26, 30, 4);
-  ctx.fillRect(e.x - 10, by - 42, 20, 17);
-  ctx.fillStyle = '#c0262d';
-  ctx.fillRect(e.x - 10, by - 30, 20, 4);
-  // Arm up while about to throw
-  if (e.state === 'up' && !e.golden && !e.thrown && e.timer < 0.35) {
-    ctx.strokeStyle = '#6b4a2b';
-    ctx.lineWidth = 3;
-    ctx.beginPath();
-    ctx.moveTo(e.x + 20, by + 12);
-    ctx.lineTo(e.x + 36, by - 14);
-    ctx.stroke();
-    circle(ctx, e.x + 38, by - 18, 6, '#ffffff');
+  ctx.rect(0, 0, W, MOUND_Y + 2);
+  ctx.clip();
+  const y = MOUND_Y + 90 - 160 * b.rise;
+  if (b.state === 'down') {
+    ctx.translate(b.x, y + 60);
+    ctx.rotate(-(1 - b.rise) * 1.2);
+    ctx.translate(-b.x, -(y + 60));
   }
+  drawSnowman(ctx, b.x, y, 2, { dazed: b.state === 'down', flash: b.flash > 0, angry: true, windingUp: b.state === 'fighting' && b.timer < 0.3 });
   ctx.restore();
 }
 
@@ -386,7 +734,7 @@ function drawMound(ctx: CanvasRenderingContext2D, x: number) {
 
 function drawFort(ctx: CanvasRenderingContext2D, x: number, hp: number) {
   if (hp <= 0) {
-    ctx.fillStyle = '#e3edf7';
+    ctx.fillStyle = '#d6e4f2';
     ctx.beginPath();
     ctx.ellipse(x, FORT_Y + 18, FORT_W / 2, 7, 0, 0, Math.PI * 2);
     ctx.fill();
@@ -408,13 +756,37 @@ function drawFort(ctx: CanvasRenderingContext2D, x: number, hp: number) {
     ctx.lineTo(x + FORT_W / 2, row);
     ctx.stroke();
   }
-  // Crumbled bite out of the top as it takes hits
   if (hp < FORT_HP) {
     ctx.fillStyle = '#f1f6fb';
     ctx.beginPath();
-    ctx.arc(x - 18 + (hp % 3) * 14, top - 2, 9 + (FORT_HP - hp) * 2, 0, Math.PI);
+    ctx.arc(x - 18 + (hp % 3) * 14, top - 2, 9 + ((FORT_HP - hp) / FORT_HP) * 12, 0, Math.PI);
     ctx.fill();
   }
+}
+
+function drawGift(ctx: CanvasRenderingContext2D, gift: Gift) {
+  const { x, y } = gift;
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.rotate(Math.sin(gift.t * 3) * 0.15);
+  // Glow so it reads as "shoot me"
+  ctx.fillStyle = 'rgba(255, 226, 122, 0.35)';
+  ctx.beginPath();
+  ctx.arc(0, 0, 24 + Math.sin(gift.t * 6) * 3, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = '#c0262d';
+  ctx.fillRect(-14, -12, 28, 24);
+  ctx.fillStyle = '#ffe27a';
+  ctx.fillRect(-3, -12, 6, 24);
+  ctx.fillRect(-14, -3, 28, 6);
+  ctx.beginPath();
+  ctx.ellipse(-6, -15, 6, 4, -0.4, 0, Math.PI * 2);
+  ctx.ellipse(6, -15, 6, 4, 0.4, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.restore();
+  ctx.font = '14px sans-serif';
+  ctx.textAlign = 'center';
+  ctx.fillText(GIFT_INFO[gift.kind].icon, x, y - 26);
 }
 
 function drawPlayer(ctx: CanvasRenderingContext2D, g: Game) {
@@ -425,12 +797,16 @@ function drawPlayer(ctx: CanvasRenderingContext2D, g: Game) {
   ctx.beginPath();
   ctx.ellipse(x, y + 22, 24, 6, 0, 0, Math.PI * 2);
   ctx.fill();
-  // Coat (seen from behind)
+  if (g.triple > 0 || g.rapid > 0) {
+    ctx.fillStyle = g.rapid > 0 ? 'rgba(255, 140, 60, 0.25)' : 'rgba(255, 226, 122, 0.35)';
+    ctx.beginPath();
+    ctx.arc(x, y, 34, 0, Math.PI * 2);
+    ctx.fill();
+  }
   ctx.fillStyle = '#2f6fb3';
   ctx.beginPath();
   ctx.ellipse(x, y + 6, 20, 18, 0, 0, Math.PI * 2);
   ctx.fill();
-  // Throwing arm
   ctx.strokeStyle = '#2f6fb3';
   ctx.lineWidth = 7;
   ctx.lineCap = 'round';
@@ -439,7 +815,6 @@ function drawPlayer(ctx: CanvasRenderingContext2D, g: Game) {
   if (g.throwAnim > 0) ctx.lineTo(x + 24, y - 30);
   else ctx.lineTo(x + 22, y + 12);
   ctx.stroke();
-  // Head, beanie, scarf
   circle(ctx, x, y - 20, 13, '#f2c9a0');
   ctx.fillStyle = '#c0262d';
   ctx.beginPath();
@@ -456,69 +831,130 @@ function drawPlayer(ctx: CanvasRenderingContext2D, g: Game) {
 function drawHud(ctx: CanvasRenderingContext2D, g: Game, best: number) {
   ctx.textAlign = 'left';
   ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 22px Pretendard, sans-serif';
-  ctx.fillText(`${g.score}`, 16, 34);
+  ctx.font = 'bold 24px Pretendard, sans-serif';
+  ctx.fillText(`${g.score.toLocaleString()}`, 16, 36);
   ctx.font = '600 12px Pretendard, sans-serif';
   ctx.fillStyle = 'rgba(255,255,255,0.8)';
-  ctx.fillText(`최고 ${Math.max(best, g.score)}`, 16, 52);
+  ctx.fillText(`최고 ${Math.max(best, g.score).toLocaleString()}`, 16, 54);
+  let line = 74;
   if (g.combo >= 3) {
     ctx.fillStyle = '#ffe27a';
     ctx.font = 'bold 13px Pretendard, sans-serif';
-    ctx.fillText(`콤보 ×${Math.min(1 + Math.floor(g.combo / 3), 5)}`, 16, 70);
+    ctx.fillText(`🔥 ${g.combo}연속 · ×${Math.min(1 + Math.floor(g.combo / 3), 5)}`, 16, line);
+    line += 20;
+  }
+  // Power-up timers
+  for (const [on, icon] of [[g.triple, '✨'], [g.rapid, '🔥']] as const) {
+    if (on <= 0) continue;
+    ctx.font = '14px sans-serif';
+    ctx.fillText(icon, 16, line);
+    ctx.fillStyle = 'rgba(255,255,255,0.3)';
+    ctx.fillRect(36, line - 9, 70, 6);
+    ctx.fillStyle = '#ffe27a';
+    ctx.fillRect(36, line - 9, 70 * (on / POWER_SECONDS), 6);
+    line += 18;
   }
   ctx.textAlign = 'right';
   ctx.font = '20px sans-serif';
-  ctx.fillText('❤️'.repeat(g.lives) + '🤍'.repeat(LIVES - g.lives), W - 14, 34);
-  // Ammo in the sky, under the hearts, clear of the player
+  ctx.fillText('❤️'.repeat(g.lives) + '🤍'.repeat(Math.max(0, START_LIVES - g.lives)), W - 14, 34);
   for (let i = 0; i < MAX_AMMO; i++) {
     const cx = W - 22 - i * 18;
-    circle(ctx, cx, 54, 6.5, i < g.ammo ? '#ffffff' : 'rgba(255,255,255,0.25)');
+    const full = g.rapid > 0 || i < g.ammo;
+    circle(ctx, cx, 54, 6.5, full ? (g.rapid > 0 ? '#ffb36b' : '#ffffff') : 'rgba(255,255,255,0.25)');
+  }
+  // Boss HP bar
+  if (g.boss && g.boss.state !== 'down') {
+    const bw = 300;
+    const bx = (W - bw) / 2;
+    ctx.fillStyle = 'rgba(0,0,0,0.35)';
+    ctx.fillRect(bx - 2, 14, bw + 4, 14);
+    ctx.fillStyle = '#c0262d';
+    ctx.fillRect(bx, 16, bw * (g.boss.hp / g.boss.maxHp), 10);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 11px Pretendard, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText(`눈사람 대장 ${g.boss.number > 1 ? `Lv.${g.boss.number}` : ''}`, W / 2, 44);
   }
 }
 
+function drawBall(ctx: CanvasRenderingContext2D, b: Ball, grow: number) {
+  const r = 4 + grow * Math.max(0, (b.y - MOUND_Y) / (PLAYER_Y - MOUND_Y));
+  circle(ctx, b.x, b.y, r + 1, '#aac3dc');
+  circle(ctx, b.x, b.y, r, '#ffffff');
+}
+
 function draw(ctx: CanvasRenderingContext2D, g: Game, best: number) {
+  ctx.save();
+  if (g.shake > 0) ctx.translate(rand(-1, 1) * 22 * g.shake, rand(-1, 1) * 22 * g.shake);
   drawScene(ctx);
+  if (g.boss) drawBoss(ctx, g.boss);
   for (const e of g.enemies) {
     drawEnemy(ctx, e);
     drawMound(ctx, e.x);
   }
+  for (const gift of g.gifts) drawGift(ctx, gift);
   for (const b of g.theirs) {
-    // Bigger as it comes closer
     const r = 4 + 7 * Math.max(0, (b.y - MOUND_Y) / (PLAYER_Y - MOUND_Y));
     ctx.fillStyle = 'rgba(30, 60, 100, 0.1)';
     ctx.beginPath();
     ctx.ellipse(b.x, b.y + r + 8, r, r * 0.35, 0, 0, Math.PI * 2);
     ctx.fill();
-    circle(ctx, b.x, b.y, r + 1, '#aac3dc');
-    circle(ctx, b.x, b.y, r, '#ffffff');
+    drawBall(ctx, b, 7);
   }
   FORTS.forEach((x, i) => drawFort(ctx, x, g.forts[i]));
   drawPlayer(ctx, g);
-  for (const b of g.mine) {
-    const r = 4 + 5 * Math.max(0, (b.y - MOUND_Y) / (PLAYER_Y - MOUND_Y));
-    circle(ctx, b.x, b.y, r + 1, '#aac3dc');
-    circle(ctx, b.x, b.y, r, '#ffffff');
-  }
+  for (const b of g.mine) drawBall(ctx, b, 5);
   for (const p of g.puffs) {
     ctx.globalAlpha = Math.max(0, p.life * 1.6);
-    circle(ctx, p.x, p.y, 3, '#ffffff');
+    circle(ctx, p.x, p.y, 3.2, p.color);
   }
   ctx.globalAlpha = 1;
   ctx.textAlign = 'center';
-  ctx.font = 'bold 16px Pretendard, sans-serif';
   for (const p of g.popups) {
     ctx.globalAlpha = Math.min(1, p.life * 2);
-    ctx.fillStyle = '#c0262d';
+    ctx.font = `900 ${p.size}px Pretendard, sans-serif`;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = '#ffffff';
+    ctx.strokeText(p.text, p.x, p.y);
+    ctx.fillStyle = p.color;
     ctx.fillText(p.text, p.x, p.y);
   }
   ctx.globalAlpha = 1;
+  ctx.restore();
+
+  if (g.flash > 0) {
+    ctx.fillStyle = `rgba(192, 38, 45, ${g.flash * 0.9})`;
+    ctx.fillRect(0, 0, W, H);
+  }
+  if (g.banner) {
+    const a = Math.min(1, g.banner.life * 2.5);
+    const scale = 1 + Math.max(0, g.banner.life - 1) * 0.6;
+    ctx.globalAlpha = a;
+    ctx.textAlign = 'center';
+    ctx.font = `900 ${Math.round(30 * scale)}px Pretendard, sans-serif`;
+    ctx.lineWidth = 6;
+    ctx.strokeStyle = '#1d2b4f';
+    ctx.strokeText(g.banner.text, W / 2, 280);
+    ctx.fillStyle = '#ffe27a';
+    ctx.fillText(g.banner.text, W / 2, 280);
+    ctx.globalAlpha = 1;
+  }
   drawHud(ctx, g, best);
 }
 
-// ---- Component -----------------------------------------------------------------
+// ---- Component ---------------------------------------------------------------------
 
 interface SnowballFightProps {
   onClose: () => void;
+}
+
+interface Result {
+  score: number;
+  record: boolean;
+  hits: number;
+  bestCombo: number;
+  bosses: number;
+  seconds: number;
 }
 
 export default function SnowballFight({ onClose }: SnowballFightProps) {
@@ -530,16 +966,32 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
   const [phase, setPhase] = useState<Phase>('ready');
   const [best, setBest] = useState(() => readBestScore(accountKey));
   const bestRef = useRef(best);
-  const [result, setResult] = useState<{ score: number; record: boolean } | null>(null);
+  const [result, setResult] = useState<Result | null>(null);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  const [muted, setMuted] = useState(readMuted);
+  const mutedRef = useRef(muted);
+  const sfxRef = useRef<Sfx | null>(null);
+  if (!sfxRef.current) sfxRef.current = new Sfx();
 
   const setPausedBoth = (p: boolean) => {
     pausedRef.current = p;
     setPaused(p);
   };
 
+  const toggleMute = useCallback(() => {
+    const next = !mutedRef.current;
+    mutedRef.current = next;
+    setMuted(next);
+    try {
+      localStorage.setItem(MUTE_KEY, next ? '1' : '0');
+    } catch {
+      // Storage blocked: muted for this game only.
+    }
+  }, []);
+
   const start = useCallback(() => {
+    sfxRef.current?.unlock();
     gameRef.current = newGame();
     phaseRef.current = 'playing';
     pausedRef.current = false;
@@ -547,6 +999,8 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
     setResult(null);
     setPhase('playing');
   }, []);
+
+  useEffect(() => () => sfxRef.current?.close(), []);
 
   // Main loop: runs for the life of the modal; only steps while playing.
   useEffect(() => {
@@ -568,12 +1022,28 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
         const alive = step(g, dt);
         if (!alive) {
           phaseRef.current = 'over';
+          g.sounds.push('over');
+          g.banner = null;
           const newBest = recordScore(accountKey, g.score);
-          setResult({ score: g.score, record: g.score > bestRef.current });
+          setResult({
+            score: g.score,
+            record: g.score > bestRef.current,
+            hits: g.hits,
+            bestCombo: g.bestCombo,
+            bosses: g.bossCount - (g.boss && g.boss.state !== 'down' ? 1 : 0),
+            seconds: Math.floor(g.time),
+          });
           bestRef.current = newBest;
           setBest(newBest);
           setPhase('over');
         }
+      }
+      if (g.sounds.length) {
+        if (!mutedRef.current) {
+          // Dedupe within a frame so a triple throw isn't three times as loud.
+          for (const s of new Set(g.sounds)) sfxRef.current?.play(s);
+        }
+        g.sounds.length = 0;
       }
       draw(ctx, g, bestRef.current);
       raf = requestAnimationFrame(frame);
@@ -582,12 +1052,16 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
     return () => cancelAnimationFrame(raf);
   }, [accountKey]);
 
-  // Keyboard: move, throw, pause, close.
+  // Keyboard: move, throw, pause, mute, close.
   useEffect(() => {
     const onKey = (e: KeyboardEvent, down: boolean) => {
       const g = gameRef.current;
       if (e.key === 'Escape' && down) {
         onClose();
+        return;
+      }
+      if ((e.key === 'm' || e.key === 'M') && down) {
+        toggleMute();
         return;
       }
       if (phaseRef.current !== 'playing') {
@@ -599,9 +1073,12 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
       }
       if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') g.keys.left = down;
       else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') g.keys.right = down;
-      else if (e.key === ' ' && down) {
+      else if (e.key === ' ') {
         e.preventDefault();
-        if (!pausedRef.current && !e.repeat) autoThrow(g);
+        // Straight ahead: with the keyboard, where you stand is your aim.
+        g.aim = { x: g.px, y: MOUND_Y - 30 };
+        if (down && !pausedRef.current && !e.repeat) throwAt(g, g.aim.x, g.aim.y);
+        g.firing = down;
       } else if ((e.key === 'p' || e.key === 'P') && down) setPausedBoth(!pausedRef.current);
       else return;
       e.preventDefault();
@@ -614,9 +1091,9 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
       window.removeEventListener('keydown', kd);
       window.removeEventListener('keyup', ku);
     };
-  }, [onClose, start]);
+  }, [onClose, start, toggleMute]);
 
-  // Leaving the tab pauses instead of letting snowmen win in the background.
+  // Leaving the tab pauses instead of letting the snowmen win in the background.
   useEffect(() => {
     const onVis = () => {
       if (document.hidden && phaseRef.current === 'playing') setPausedBoth(true);
@@ -630,23 +1107,38 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
     return { x: ((e.clientX - rect.left) / rect.width) * W, y: ((e.clientY - rect.top) / rect.height) * H };
   };
 
-  // Mouse: the player follows the pointer sideways and a click throws at it.
-  // Touch: the strip along the bottom moves the player, a tap above throws.
+  // Moving and aiming are separate, so you can stay behind a wall and still
+  // throw at a snowman across the field: the snow strip along the bottom
+  // moves the player (click or drag, mouse or finger; A/D and ←→ also
+  // move), anywhere above throws at that point -- held down with 🔥, it
+  // keeps throwing. (The first version walked the player to the mouse, which
+  // dragged you out of cover every time you aimed.)
+  const touchMoving = useRef(false);
   const onPointerDown = (e: ReactPointerEvent<HTMLCanvasElement>) => {
     if (phaseRef.current !== 'playing' || pausedRef.current) return;
     const g = gameRef.current;
     const { x, y } = toField(e);
-    if (e.pointerType === 'touch' && y > FORT_Y - 10) {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    if (y > FORT_Y - 10) {
+      touchMoving.current = true;
       g.moveTo = x;
-      e.currentTarget.setPointerCapture(e.pointerId);
       return;
     }
+    g.aim = { x, y };
+    g.firing = true;
+    g.fireTimer = RAPID_INTERVAL;
     throwAt(g, x, y);
   };
   const onPointerMove = (e: ReactPointerEvent<HTMLCanvasElement>) => {
     if (phaseRef.current !== 'playing') return;
+    const g = gameRef.current;
     const { x, y } = toField(e);
-    if (e.pointerType === 'mouse' || (e.buttons > 0 && y > FORT_Y - 60)) gameRef.current.moveTo = x;
+    if (touchMoving.current) g.moveTo = x;
+    if (g.firing) g.aim = { x, y };
+  };
+  const onPointerUp = () => {
+    touchMoving.current = false;
+    gameRef.current.firing = false;
   };
 
   return (
@@ -663,6 +1155,9 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
                 {paused ? '계속하기' : '일시정지'}
               </button>
             )}
+            <button onClick={toggleMute} aria-label={muted ? '소리 켜기' : '소리 끄기'} title={muted ? '소리 켜기 (M)' : '소리 끄기 (M)'} style={{ background: 'transparent', border: '1px solid var(--border-subtle)', padding: '0.35rem', cursor: 'pointer', display: 'flex' }}>
+              {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+            </button>
             <button onClick={onClose} aria-label="닫기" style={{ background: 'transparent', border: '1px solid var(--border-subtle)', padding: '0.35rem', cursor: 'pointer', display: 'flex' }}>
               <X size={16} />
             </button>
@@ -674,19 +1169,23 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
             ref={canvasRef}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
             style={{ width: '100%', height: '100%', display: 'block', touchAction: 'none', cursor: phase === 'playing' ? 'crosshair' : 'default' }}
           />
           {(phase !== 'playing' || paused) && (
             <div className="snowball-game-overlay">
               {phase === 'ready' && (
                 <>
-                  <div style={{ fontSize: '1.5rem', fontWeight: 800 }}>⛄ 눈싸움</div>
+                  <div style={{ fontSize: '1.6rem', fontWeight: 900 }}>⛄ 눈싸움</div>
                   <div style={{ fontSize: '0.85rem', lineHeight: 1.7, textAlign: 'center' }}>
-                    눈사람이 튀어나오면 맞혀요! 눈 벽 뒤에 숨어서 피할 수 있어요.
+                    튀어나오는 눈사람을 맞히고, 날아오는 눈덩이는 눈 벽 뒤에서 피하세요.
                     <br />
-                    <b>마우스</b> 움직여서 이동 · 클릭해서 던지기 &nbsp;|&nbsp; <b>키보드</b> ←→ 이동 · 스페이스 던지기
+                    🎁 선물을 맞히면 아이템! · ⚠️ 가끔 <b>눈사람 대장</b>이 나타나요.
                     <br />
-                    <b>휴대폰</b> 아래쪽을 끌어서 이동 · 위쪽을 탭해서 던지기
+                    <span style={{ opacity: 0.85 }}>
+                      이동: A·D 또는 ←→, 아래쪽 눈밭을 끌기 &nbsp;|&nbsp; 던지기: 위쪽을 클릭·탭 (스페이스는 바로 앞으로)
+                    </span>
                   </div>
                   <button className="btn-primary" onClick={start}>시작하기</button>
                 </>
@@ -700,7 +1199,13 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
               {phase === 'over' && result && (
                 <>
                   <div style={{ fontSize: '1.3rem', fontWeight: 800 }}>{result.record ? '🎉 새 최고 점수!' : '게임 끝!'}</div>
-                  <div style={{ fontSize: '2.2rem', fontWeight: 900 }}>{result.score.toLocaleString()}점</div>
+                  <div style={{ fontSize: '2.4rem', fontWeight: 900 }}>{result.score.toLocaleString()}점</div>
+                  <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.8rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <span>⏱ {result.seconds}초 버팀</span>
+                    <span>🎯 {result.hits}명 맞힘</span>
+                    <span>🔥 최고 {result.bestCombo}연속</span>
+                    {result.bosses > 0 && <span>🏆 대장 {result.bosses}번 격파</span>}
+                  </div>
                   <button className="btn-primary" onClick={start}>다시 하기</button>
                 </>
               )}
@@ -708,7 +1213,7 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
           )}
         </div>
         <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '0.5rem' }}>
-          황금 눈사람은 +50점 · 연속으로 맞히면 점수가 최대 5배 · P 일시정지 · Esc 닫기
+          황금 눈사람 +50 · 연속으로 맞히면 최대 5배 · 🎁 ✨3방향 🔥연사 🧱벽 수리 ❤️하트 · P 일시정지 · M 소리 · Esc 닫기
         </div>
       </div>
     </div>
