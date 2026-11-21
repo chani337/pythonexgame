@@ -342,7 +342,7 @@ export default function ProblemList({
             // Set left border color based on difficulty
             let diffBorderColor = 'var(--border-subtle)';
             if (isSolved) {
-              diffBorderColor = '#1a1a1a';
+              diffBorderColor = '#1a7f37';
             } else {
               if (problem.difficulty === 'basic') diffBorderColor = '#0f766e';
               else if (problem.difficulty === 'intermediate') diffBorderColor = '#a66908';
@@ -353,7 +353,7 @@ export default function ProblemList({
             return (
               <div
                 key={problem.id}
-                className="glass-card"
+                className={isSolved ? 'glass-card problem-card-solved' : 'glass-card'}
                 style={{
                   padding: '1.5rem',
                   display: 'flex',
@@ -365,7 +365,7 @@ export default function ProblemList({
                   borderLeft: `4px solid ${diffBorderColor}`,
                 }}
               >
-                {/* Top-right badges: review star + solved stamp */}
+                {/* Top-right badges: review star + solved check */}
                 <div style={{ position: 'absolute', right: '1.5rem', top: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                   {onToggleReview && (
                     <button
@@ -390,24 +390,9 @@ export default function ProblemList({
                     </button>
                   )}
                   {isSolved && (
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.25rem',
-                        fontSize: '0.7rem',
-                        color: '#1a1a1a',
-                        fontWeight: '700',
-                        background: '#f4f4f6',
-                        border: '1px solid #1a1a1a',
-                        padding: '0.25rem 0.5rem',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.05em',
-                      }}
-                    >
-                      <CheckCircle2 size={12} />
-                      Clear
-                    </div>
+                    <span title="해결한 문제" style={{ display: 'flex' }}>
+                      <CheckCircle2 size={18} color="#1a7f37" />
+                    </span>
                   )}
                 </div>
 
@@ -445,7 +430,7 @@ export default function ProblemList({
                       fontWeight: '700',
                       color: '#1a1a1a',
                       marginBottom: '0.5rem',
-                      paddingRight: isSolved ? '4.5rem' : '0px',
+                      paddingRight: isSolved ? '2rem' : '0px',
                       lineHeight: '1.4',
                     }}
                   >

@@ -25,6 +25,16 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-11-20',
+    title: '🎄 겨울 이벤트: 12월 연속 학습 챌린지',
+    items: [
+      '12월 한 달 동안 매일 새 문제를 풀면 연속 기록에 따라 겨울 한정 뱃지(❄️ 첫눈 · ☃️ 눈사람 코더 · 🦌 루돌프의 코 · 🎅 산타의 조수)를 받아요. 대시보드에서 달력과 진행 상황을 볼 수 있어요.',
+      '7일 연속을 달성하면 이찬희 연구원 또는 고객센터에 과정명과 이름을 말씀해 주세요. 소정의 선물을 드려요!',
+      '12월 31일까지 화면에 눈이 내리고, 문제를 맞히면 눈송이가 터져요. 눈은 대시보드 이벤트 카드에서 끌 수 있어요.',
+      '푼 문제는 목록에서 카드 색이 초록색으로 바뀌어 한눈에 보여요.',
+    ],
+  },
+  {
     date: '2026-10-25',
     title: 'SQL 실무 문제 49개가 생겼어요',
     items: [

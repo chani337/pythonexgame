@@ -6,6 +6,7 @@ import type { LeaderboardUser } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
 import LearningRoadmap from './LearningRoadmap';
+import WinterChallengeCard from './WinterChallengeCard';
 import { triviaItems } from '../data/trivia';
 import { changelogEntries } from '../data/changelog';
 
@@ -109,6 +110,7 @@ interface DashboardProps {
   sandboxRunCount: number;
   onUnlockAll?: () => void;
   onNavigateToChangelog?: () => void;
+  onNavigateToBoard?: () => void;
 }
 
 // The public intro page. A separate Vercel project, so this is a plain
@@ -235,6 +237,7 @@ export default function Dashboard({
   sandboxRunCount,
   onUnlockAll,
   onNavigateToChangelog,
+  onNavigateToBoard,
 }: DashboardProps) {
   const { user, profile, recentActivity } = useAuth();
   // UI convenience only; the admin stats come from a view anyone may read,
@@ -597,6 +600,9 @@ export default function Dashboard({
           </button>
         </div>
       </div>
+
+      {/* Winter event: 12월 연속 학습 챌린지 (hidden outside the event window) */}
+      <WinterChallengeCard onNavigateToBoard={onNavigateToBoard} />
 
       {/* Admin Stats (관리자 전용) */}
       {isMasterAdmin && (

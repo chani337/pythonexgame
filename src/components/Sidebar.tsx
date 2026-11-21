@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
+import { isWinterDecorSeason } from '../utils/winterEvent';
 
 // 관리자에게만 보이는, 답변 대기 중인 고객센터 문의 수 배지.
 function NotificationBadge({ count }: { count: number }) {
@@ -132,9 +133,24 @@ export default function Sidebar({
                   alignItems: 'center',
                   justifyContent: 'center',
                   flexShrink: 0,
+                  position: 'relative',
                 }}
               >
                 <span style={{ fontSize: '0.85rem', color: '#ffffff', fontWeight: '800', fontFamily: 'var(--font-mono)' }}>Py</span>
+                {isWinterDecorSeason() && (
+                  <svg
+                    className="santa-hat"
+                    width="30"
+                    height="26"
+                    viewBox="0 0 30 26"
+                    aria-hidden="true"
+                    style={{ position: 'absolute', top: '-15px', right: '-12px', transform: 'rotate(18deg)', pointerEvents: 'none' }}
+                  >
+                    <path d="M3 20 C6 9 13 3 21 4 C24 5 26 8 26 12 L22 11 C19 11 14 14 12 20 Z" fill="#c0262d" />
+                    <rect x="1" y="18" width="16" height="6" rx="3" fill="#ffffff" stroke="#e5e5e5" strokeWidth="0.6" />
+                    <circle cx="25.5" cy="13" r="3.2" fill="#ffffff" stroke="#e5e5e5" strokeWidth="0.6" />
+                  </svg>
+                )}
               </div>
               {!isCollapsed && (
                 <div>
