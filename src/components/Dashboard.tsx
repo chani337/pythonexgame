@@ -7,6 +7,8 @@ import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
 import LearningRoadmap from './LearningRoadmap';
 import WinterChallengeCard from './WinterChallengeCard';
+import LevelCard from './LevelCard';
+import { tierFor } from '../utils/levels';
 import { triviaItems } from '../data/trivia';
 import { changelogEntries } from '../data/changelog';
 
@@ -48,13 +50,14 @@ async function fetchFilteredLeaderboard(mode: RankingMode): Promise<LeaderboardU
     mode === 'week'
       ? supabase
           .from('weekly_leaderboard_public')
-          .select('id, display_name, streak, solved_count')
+          .select('id, display_name, streak, solved_count, xp, total_xp')
       : supabase
           .from('language_leaderboard_public')
-          .select('id, display_name, streak, solved_count')
+          .select('id, display_name, streak, solved_count, xp, total_xp')
           .eq('language', mode);
 
   const { data, error } = await query
+    .order('xp', { ascending: false })
     .order('solved_count', { ascending: false })
     .order('streak', { ascending: false })
     .limit(10);
@@ -67,6 +70,8 @@ async function fetchFilteredLeaderboard(mode: RankingMode): Promise<LeaderboardU
     email: '',
     streak: row.streak || 0,
     solved_count: row.solved_count || 0,
+    xp: row.xp || 0,
+    tier_xp: row.total_xp || 0,
   }));
 }
 
@@ -781,6 +786,9 @@ export default function Dashboard({
         </p>
       </div>
 
+      {/* XP, level and tier */}
+      <LevelCard problems={problems} solvedIds={solvedIds} />
+
       {/* Stats Cards Grid */}
       <div
         style={{
@@ -1171,6 +1179,7 @@ function LeaderboardWidget() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
           {displayList.map((item, index) => {
             const isSelf = isSelfUser(item);
+            const tier = tierFor(item.tier_xp ?? item.xp ?? 0);
             return (
               <div
                 key={item.id || index}
@@ -1196,6 +1205,7 @@ function LeaderboardWidget() {
                     #{index + 1}
                   </span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                    <span title={`${tier.name} 등급`} style={{ fontSize: '0.95rem' }}>{tier.icon}</span>
                     <span style={{ fontSize: '0.82rem', fontWeight: '700', color: '#1a1a1a' }}>
                       {item.display_name} {isSelf && <span style={{ fontSize: '0.7rem', color: '#0969da' }}>(나)</span>}
                     </span>
@@ -1219,9 +1229,10 @@ function LeaderboardWidget() {
                   </div>
                 </div>
 
-                <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.78rem' }}>
+                <div style={{ display: 'flex', gap: '1.25rem', fontSize: '0.78rem', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
                   <span style={{ color: '#a66908', fontWeight: '600' }}>🔥 {item.streak}일 연속</span>
-                  <span style={{ color: '#1a1a1a', fontWeight: '700' }}>{item.solved_count}문제 클리어</span>
+                  <span style={{ color: 'var(--text-secondary)', fontWeight: '600' }}>{item.solved_count}문제</span>
+                  <span style={{ color: '#1a1a1a', fontWeight: '800', minWidth: '4.5rem', textAlign: 'right' }}>{(item.xp ?? 0).toLocaleString()} XP</span>
                 </div>
               </div>
             );

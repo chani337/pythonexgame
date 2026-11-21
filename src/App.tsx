@@ -481,6 +481,7 @@ print("변환 리스트:", result)
             runSqlCode={runSqlCode}
             isPyodideLoading={isPyodideLoading}
             onMarkSolved={handleMarkSolved}
+            isSolved={solvedIds.includes(selectedProblem.id)}
             isBookmarked={reviewIds.includes(selectedProblem.id)}
             onToggleReview={handleToggleReview}
             onWrongAttempt={handleWrongAttempt}

@@ -26,6 +26,15 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-11-21',
+    title: '레벨과 등급이 생겼어요',
+    items: [
+      '문제를 풀면 XP를 받아요. 코딩 문제는 기초 10 · 중급 20 · 고급 40 · 챌린지 80, 퀴즈와 빈칸은 5예요. 이미 푼 문제도 모두 계산돼요.',
+      'XP가 쌓이면 레벨이 오르고 🥉 브론즈부터 👑 마스터까지 등급이 바뀌어요. 대시보드에서 내 등급과 다음 등급까지 남은 XP를 볼 수 있어요.',
+      '랭킹이 이제 XP 순이에요. 어려운 문제를 풀수록 더 높이 올라가요. 이름 옆에는 등급이 표시돼요.',
+    ],
+  },
+  {
+    date: '2026-11-21',
     title: 'NumPy · Pandas · Matplotlib 문제가 Python Lib 탭으로 나뉘었어요',
     items: [
       '문제 목록에 Python Lib 탭이 생겼어요. NumPy · Pandas · Matplotlib 문제 37개를 여기서 모아 볼 수 있고, Python 탭에는 파이썬 문법 문제만 남았어요.',

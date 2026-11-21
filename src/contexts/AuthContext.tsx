@@ -12,6 +12,7 @@ import { useIdleLogout, clearIdleTimer, IDLE_LIMIT_MS } from '../hooks/useIdleLo
 import type { User, Session } from '@supabase/supabase-js';
 import { isProfaneOrForbidden } from '../utils/profanityFilter';
 import { problems } from '../data/problems';
+import { totalXp } from '../utils/levels';
 
 export interface UserProfile {
   id: string;
@@ -37,6 +38,12 @@ export interface LeaderboardUser {
   email: string;
   streak: number;
   solved_count: number;
+  // What the row is ranked by: total XP on the overall tab, that language's
+  // or week's XP on the others. Optional because the cached leaderboard from
+  // before XP existed has none.
+  xp?: number;
+  // Total XP, for the tier beside the name, when xp is only a slice of it.
+  tier_xp?: number;
 }
 
 export interface ActivityEvent {
@@ -578,7 +585,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // row per profile, so it can never be truncated like that.
         const { data: profData, error: profErr } = await supabase
           .from('leaderboard_public')
-          .select('id, display_name, streak, solved_count');
+          .select('id, display_name, streak, solved_count, xp');
 
         if (!profErr && profData) {
           profData.forEach((item: any) => {
@@ -588,6 +595,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               email: '',
               streak: item.streak || 0,
               solved_count: item.solved_count || 0,
+              xp: item.xp || 0,
             };
           });
         } else if (profErr) {
@@ -611,7 +619,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       const userKey = `pyquests_solved_ids_${activeUserId}`;
       const savedLocal = localStorage.getItem(userKey);
-      const localSolvedCount = savedLocal ? JSON.parse(savedLocal).length : 0;
+      const localSolvedIds: string[] = savedLocal ? JSON.parse(savedLocal) : [];
+      const localSolvedCount = localSolvedIds.length;
+      const localXp = totalXp(problems, localSolvedIds);
       const userStreak = profile?.streak || parseInt(localStorage.getItem(`pyquests_streak_${activeUserId}`) || '0', 10);
 
       if (!isActiveUserExcluded) {
@@ -626,6 +636,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           // guests who have no DB row at all (handled below).
           if (!user) {
             formatted[existingIndex].solved_count = Math.max(formatted[existingIndex].solved_count || 0, localSolvedCount);
+            formatted[existingIndex].xp = Math.max(formatted[existingIndex].xp || 0, localXp);
             formatted[existingIndex].streak = Math.max(formatted[existingIndex].streak || 0, userStreak);
           }
         } else if (localSolvedCount > 0 || userStreak > 0 || user) {
@@ -635,12 +646,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             email: activeUserEmail,
             streak: userStreak,
             solved_count: localSolvedCount,
+            xp: localXp,
           });
         }
       }
 
-      // Sort real DB & active local solvers by solved_count DESC, then streak DESC
-      formatted.sort((a, b) => (b.solved_count - a.solved_count) || (b.streak - a.streak));
+      // Ranked by XP, so harder problems count for more; ties by solved_count, then streak
+      formatted.sort((a, b) => ((b.xp ?? 0) - (a.xp ?? 0)) || (b.solved_count - a.solved_count) || (b.streak - a.streak));
 
       // Show ONLY Top 10 real registered users from database / session
       const combined = formatted;

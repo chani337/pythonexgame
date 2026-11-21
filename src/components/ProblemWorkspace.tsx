@@ -16,6 +16,7 @@ import { SQL_DATASETS, DEFAULT_SQL_DATASET } from '../data/sqlSeed';
 import type { RunResponse, TestResult, PerfSpec } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
 import { celebrate } from '../utils/celebrate';
+import { problemXp } from '../utils/levels';
 import CodeEditor from './CodeEditor';
 import type { EditorLanguage } from './CodeEditor';
 import WebPreview from './WebPreview';
@@ -32,6 +33,8 @@ interface ProblemWorkspaceProps {
   runSqlCode?: (code: string, testCases?: { input: string; expected: string }[], testRunnerCode?: string, datasetId?: string, checkSql?: string, ignoreRowOrder?: boolean) => Promise<RunResponse>;
   isPyodideLoading: boolean;
   onMarkSolved: (problemId: string) => void;
+  // Solved before this attempt: a re-solve earns no XP.
+  isSolved?: boolean;
   isBookmarked?: boolean;
   onToggleReview?: (problemId: string) => void;
   onWrongAttempt?: (problemId: string) => void;
@@ -48,6 +51,7 @@ export default function ProblemWorkspace({
   runSqlCode,
   isPyodideLoading,
   onMarkSolved,
+  isSolved = false,
   isBookmarked,
   onToggleReview,
   onWrongAttempt,
@@ -119,6 +123,9 @@ export default function ProblemWorkspace({
   // afterward should still work as practice but not credit progress.
   const [viewedAnswer, setViewedAnswer] = useState<boolean>(false);
   const [keywordWarning, setKeywordWarning] = useState<string | null>(null);
+  // XP this success earned, for the toast. Set at the moment of success,
+  // while isSolved still says whether it was solved before.
+  const [xpGained, setXpGained] = useState(0);
 
   // Auto-scroll the console to the bottom whenever a run finishes, so the
   // error explanation (rendered last) is visible without the user having to
@@ -317,6 +324,7 @@ export default function ProblemWorkspace({
             setKeywordWarning(`출력은 맞았지만, 조건에 명시된 방식을 사용하지 않아서 해결로 인정되지 않았어요. ${bits.join(' ')}`);
           } else {
             setWorkspaceSuccess(true);
+            setXpGained(!viewedAnswer && !isSolved ? problemXp(problem) : 0);
             if (!viewedAnswer) {
               onMarkSolved(problem.id);
             }
@@ -400,6 +408,7 @@ export default function ProblemWorkspace({
       setWorkspaceSuccess(true);
       setConsoleOutput('정답입니다! 올바른 이론적 추론입니다. 🎉');
       setConsoleError(null);
+      setXpGained(isSolved ? 0 : problemXp(problem));
       onMarkSolved(problem.id);
       celebrate(80, 60);
     } else {
@@ -421,6 +430,7 @@ export default function ProblemWorkspace({
       setWorkspaceSuccess(true);
       setConsoleOutput(`정답입니다! 빈칸에 들어갈 코드는 '${decodedAnswerText}' 입니다. 🎉`);
       setConsoleError(null);
+      setXpGained(isSolved ? 0 : problemXp(problem));
       onMarkSolved(problem.id);
       celebrate(80, 60);
     } else {
@@ -1287,7 +1297,14 @@ export default function ProblemWorkspace({
         <div className="slide-up-toast">
           <span style={{ fontSize: '1.25rem' }}>✨</span>
           <div style={{ color: '#1a1a1a' }}>
-            <strong style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '0.02em', textTransform: 'uppercase' }}>Congratulations! Clear!</strong>
+            <strong style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+              Congratulations! Clear!
+              {xpGained > 0 && (
+                <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 800, color: '#ffffff', background: '#1a7f37', padding: '0.1rem 0.4rem', textTransform: 'none' }}>
+                  +{xpGained} XP
+                </span>
+              )}
+            </strong>
             <span style={{ fontSize: '0.75rem', opacity: 0.8, color: 'var(--text-secondary)' }}>
               {viewedAnswer
                 ? '정답 코드를 확인한 문제라 해결 기록에는 반영되지 않아요.'
