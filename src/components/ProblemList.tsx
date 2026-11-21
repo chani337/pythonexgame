@@ -1,7 +1,7 @@
 import { useLayoutEffect, useEffect, useMemo, useState } from 'react';
 import { Search, CheckCircle2, ChevronRight, FileCode, CheckSquare, HelpCircle, ArrowUp, Star, Sparkles } from 'lucide-react';
 import type { Problem } from '../data/problems';
-import { filterProblems } from '../data/problems';
+import { filterProblems, problemTrack } from '../data/problems';
 import { recentProblemIds, NEW_BADGE_DAYS } from '../data/changelog';
 
 interface ProblemListProps {
@@ -117,6 +117,8 @@ export default function ProblemList({
         return { text: 'HTML', color: '#c2410c', bg: '#ffedd5' };
       case 'css':
         return { text: 'CSS', color: '#1d4ed8', bg: '#dbeafe' };
+      case 'pylib':
+        return { text: 'Python Lib', color: '#0e7490', bg: '#cffafe' };
       default:
         return { text: 'Python', color: '#1a7f37', bg: '#dafbe1' };
     }
@@ -154,6 +156,7 @@ export default function ProblemList({
             {[
               { id: 'all', name: '전체 언어' },
               { id: 'python', name: 'Python' },
+              { id: 'pylib', name: 'Python Lib', title: 'NumPy · Pandas · Matplotlib' },
               { id: 'sql', name: 'SQL' },
               { id: 'java', name: 'Java' },
               { id: 'c', name: 'C' },
@@ -161,9 +164,10 @@ export default function ProblemList({
               { id: 'css', name: 'CSS' },
               { id: 'js', name: 'JS' },
               { id: 'algorithm', name: '알고리즘' },
-            ].map((lang) => (
+            ].map((lang: { id: string; name: string; title?: string }) => (
               <button
                 key={lang.id}
+                title={lang.title}
                 onClick={() => setSelectedLanguage(lang.id)}
                 style={{
                   padding: '0.4rem 0.85rem',
@@ -337,7 +341,7 @@ export default function ProblemList({
             const isReview = reviewIds.includes(problem.id);
             const typeInfo = getProblemTypeLabel(problem.type);
             const TypeIcon = typeInfo.icon;
-            const langInfo = getLanguageLabel(problem.language);
+            const langInfo = getLanguageLabel(problemTrack(problem));
 
             // Set left border color based on difficulty
             let diffBorderColor = 'var(--border-subtle)';

@@ -35,7 +35,7 @@ async function loadProblems() {
     if (!Array.isArray(mod.problems)) {
       throw new Error('problems.ts did not export a `problems` array');
     }
-    return mod.problems;
+    return { problems: mod.problems, problemTrack: mod.problemTrack };
   } finally {
     await rm(dir, { recursive: true, force: true });
   }
@@ -45,12 +45,13 @@ function sqlQuote(value) {
   return `'${String(value).replace(/'/g, "''")}'`;
 }
 
-function buildSeedSql(problems) {
+function buildSeedSql(problems, problemTrack) {
   const rows = problems
     .map((p) => {
-      // language is optional in the type; the python problems predate the
-      // field and an absent value means python (same rule the client uses).
-      const language = p.language ?? 'python';
+      // The column holds the problem's track, not its runtime language: it
+      // only feeds language_leaderboard_public, whose tabs follow the problem
+      // list's (problemTrack -- NumPy/Pandas/Matplotlib are 'pylib').
+      const language = problemTrack(p);
       return `  (${sqlQuote(p.id)}, ${sqlQuote(language)}, ${sqlQuote(p.difficulty)}, ${sqlQuote(p.type)})`;
     })
     .join(',\n');
@@ -107,7 +108,7 @@ SELECT
 `;
 }
 
-const problems = await loadProblems();
+const { problems, problemTrack } = await loadProblems();
 
 const ids = problems.map((p) => p.id);
 const duplicates = ids.filter((id, i) => ids.indexOf(id) !== i);
@@ -123,7 +124,7 @@ const tally = (key, fallback) =>
     return acc;
   }, {});
 
-const sql = buildSeedSql(problems);
+const sql = buildSeedSql(problems, problemTrack);
 const checkOnly = process.argv.includes('--check');
 
 if (checkOnly) {

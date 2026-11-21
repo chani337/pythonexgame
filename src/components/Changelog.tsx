@@ -1,14 +1,14 @@
 import { useState } from 'react';
 import { Megaphone, ChevronDown, ChevronRight } from 'lucide-react';
 import { changelogEntries } from '../data/changelog';
-import { problems } from '../data/problems';
+import { problems, problemTrack } from '../data/problems';
 import type { Problem } from '../data/problems';
 
 const LANG_LABEL: Record<string, string> = {
-  python: 'Python', algorithm: '알고리즘', sql: 'SQL', java: 'Java', c: 'C', js: 'JS', html: 'HTML', css: 'CSS',
+  python: 'Python', pylib: 'Python Lib', algorithm: '알고리즘', sql: 'SQL', java: 'Java', c: 'C', js: 'JS', html: 'HTML', css: 'CSS',
 };
 
-// "HTML · 목록", "Python · NumPy", "알고리즘 · 실전" -- the same grouping a
+// "HTML · 목록", "Python Lib · NumPy", "알고리즘 · 실전" -- the same grouping a
 // student would filter by, in the order the release added them.
 function groupProblems(ids: string[]) {
   const byId = new Map(problems.map((p) => [p.id, p]));
@@ -16,7 +16,8 @@ function groupProblems(ids: string[]) {
   for (const id of ids) {
     const p = byId.get(id);
     if (!p) continue;
-    const key = `${LANG_LABEL[p.language ?? 'python'] ?? p.language} · ${p.category}`;
+    const track = problemTrack(p);
+    const key = `${LANG_LABEL[track] ?? track} · ${p.category}`;
     if (!groups.has(key)) groups.set(key, []);
     groups.get(key)!.push(p);
   }

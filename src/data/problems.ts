@@ -10,6 +10,16 @@ export interface TestCase {
 
 export type ProblemType = 'coding' | 'quiz' | 'fill';
 export type ProblemLanguage = 'python' | 'sql' | 'java' | 'js' | 'algorithm' | 'c' | 'html' | 'css';
+// What the problem list's language tabs and the ranking tabs group by. The
+// same as language, except NumPy / Pandas / Matplotlib problems: they still
+// run as Python (language stays 'python' for the runner and editor) but get
+// their own "Python Lib" tab and ranking.
+export type ProblemTrack = ProblemLanguage | 'pylib';
+export const PY_LIB_CATEGORIES = ['NumPy', 'Pandas', 'Matplotlib'];
+export function problemTrack(problem: Pick<Problem, 'language' | 'category'>): ProblemTrack {
+  const language = problem.language || 'python';
+  return language === 'python' && PY_LIB_CATEGORIES.includes(problem.category) ? 'pylib' : language;
+}
 
 export interface Problem {
   id: string;
@@ -66,8 +76,7 @@ export function filterProblems(list: Problem[], filters: ProblemFilters): Proble
   const { language = 'all', difficulty = 'all', type = 'all', search = '' } = filters;
   const searchLower = search.toLowerCase();
   return list.filter((problem) => {
-    const problemLanguage = problem.language || 'python';
-    const matchesLanguage = language === 'all' || problemLanguage === language;
+    const matchesLanguage = language === 'all' || problemTrack(problem) === language;
     const matchesDifficulty = difficulty === 'all' || problem.difficulty === difficulty;
     const matchesType = type === 'all' || problem.type === type;
     const matchesSearch =

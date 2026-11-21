@@ -10,12 +10,13 @@ import WinterChallengeCard from './WinterChallengeCard';
 import { triviaItems } from '../data/trivia';
 import { changelogEntries } from '../data/changelog';
 
-type RankingMode = 'all' | 'week' | 'python' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css' | 'algorithm';
+type RankingMode = 'all' | 'week' | 'python' | 'pylib' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css' | 'algorithm';
 
 const RANKING_TABS: { id: RankingMode; label: string }[] = [
   { id: 'all', label: '전체' },
   { id: 'week', label: '이번 주' },
   { id: 'python', label: 'Python' },
+  { id: 'pylib', label: 'Python Lib' },
   { id: 'sql', label: 'SQL' },
   { id: 'java', label: 'Java' },
   { id: 'c', label: 'C' },

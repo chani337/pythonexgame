@@ -1,5 +1,6 @@
 import { CheckCircle2, ChevronRight, Circle } from 'lucide-react';
 import type { Problem } from '../data/problems';
+import { problemTrack } from '../data/problems';
 
 interface LearningRoadmapProps {
   problems: Problem[];
@@ -18,7 +19,8 @@ interface RoadmapStage {
 
 function countSolved(problems: Problem[], solvedIds: string[], language?: string, difficulty?: string) {
   return problems.filter((p) => {
-    const lang = p.language || 'python';
+    // By track, like the problem tab it links to: Python stages leave out Python Lib.
+    const lang = problemTrack(p);
     const matchesLang = !language || lang === language || (language === 'java_js_c' && (lang === 'java' || lang === 'js' || lang === 'c'));
     const matchesDiff = !difficulty || p.difficulty === difficulty;
     return matchesLang && matchesDiff && solvedIds.includes(p.id);

@@ -7,7 +7,7 @@
 // options marks every answer wrong; a testCase whose `expected` isn't valid
 // base64 throws inside the grader. Both ship silently.
 import { describe, it, expect } from 'vitest';
-import { problems, filterProblems } from '../src/data/problems';
+import { problems, filterProblems, problemTrack, PY_LIB_CATEGORIES } from '../src/data/problems';
 import type { Problem, ProblemLanguage } from '../src/data/problems';
 import { decodeAnswer } from '../src/utils/answerObfuscation';
 import { solutionCode } from '../src/data/solutionCode';
@@ -333,15 +333,27 @@ describe('filterProblems', () => {
   it('language 미지정 문제를 python 으로 취급한다', () => {
     // 99 of the 140 Python problems have no explicit `language`, so a filter
     // that didn't default would hide most of the Python catalogue.
-    const unset = problems.filter((p) => p.language === undefined);
+    const unset = problems.filter((p) => p.language === undefined && problemTrack(p) === 'python');
     expect(unset.length).toBeGreaterThan(0);
     const pythonFiltered = filterProblems(problems, { language: 'python' });
     for (const p of unset) expect(pythonFiltered).toContain(p);
   });
 
   it('언어별 합이 전체와 같다', () => {
-    const sum = LANGUAGES.reduce((a, l) => a + filterProblems(problems, { language: l }).length, 0);
+    const sum = [...LANGUAGES, 'pylib'].reduce((a, l) => a + filterProblems(problems, { language: l }).length, 0);
     expect(sum).toBe(problems.length);
+  });
+
+  it('NumPy · Pandas · Matplotlib 문제는 Python 이 아니라 Python Lib 탭에 있다', () => {
+    const lib = filterProblems(problems, { language: 'pylib' });
+    expect(lib.length).toBeGreaterThan(0);
+    for (const p of lib) {
+      expect(PY_LIB_CATEGORIES).toContain(p.category);
+      // Still runs as Python.
+      expect(p.language ?? 'python').toBe('python');
+    }
+    const python = filterProblems(problems, { language: 'python' });
+    expect(python.filter((p) => PY_LIB_CATEGORIES.includes(p.category))).toEqual([]);
   });
 
   it('difficulty 와 type 을 함께 적용한다 (AND)', () => {
