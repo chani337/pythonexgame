@@ -150,9 +150,9 @@ export default function ProblemList({
         }}
       >
         {/* Left Side: Buttons Filters */}
-        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', minWidth: 0, maxWidth: '100%' }}>
           {/* Language Group */}
-          <div style={{ display: 'flex', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
+          <div className="filter-group" style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '100%', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
             {[
               { id: 'all', name: '전체 언어' },
               { id: 'python', name: 'Python' },
@@ -173,6 +173,7 @@ export default function ProblemList({
                   padding: '0.4rem 0.85rem',
                   fontSize: '0.8rem',
                   fontWeight: '600',
+                  whiteSpace: 'nowrap',
                   borderRadius: '0px',
                   border: 'none',
                   cursor: 'pointer',
@@ -187,7 +188,7 @@ export default function ProblemList({
           </div>
 
           {/* Difficulty Group */}
-          <div style={{ display: 'flex', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
+          <div className="filter-group" style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '100%', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
             {[
               { id: 'all', name: '전체 난이도' },
               { id: 'basic', name: '기초' },
@@ -202,6 +203,7 @@ export default function ProblemList({
                   padding: '0.4rem 0.85rem',
                   fontSize: '0.8rem',
                   fontWeight: '600',
+                  whiteSpace: 'nowrap',
                   borderRadius: '0px',
                   border: 'none',
                   cursor: 'pointer',
@@ -216,7 +218,7 @@ export default function ProblemList({
           </div>
 
           {/* Type Group */}
-          <div style={{ display: 'flex', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
+          <div className="filter-group" style={{ display: 'flex', flexWrap: 'wrap', maxWidth: '100%', background: '#f4f4f6', padding: '3px', borderRadius: '0px', border: '1px solid var(--border-subtle)' }}>
             {[
               { id: 'all', name: '전체 형태' },
               { id: 'coding', name: '코딩 실습' },
@@ -230,6 +232,7 @@ export default function ProblemList({
                   padding: '0.4rem 0.85rem',
                   fontSize: '0.8rem',
                   fontWeight: '600',
+                  whiteSpace: 'nowrap',
                   borderRadius: '0px',
                   border: 'none',
                   cursor: 'pointer',
@@ -292,7 +295,7 @@ export default function ProblemList({
         </div>
 
         {/* Right Side: Search Input */}
-        <div style={{ position: 'relative', width: '280px' }}>
+        <div style={{ position: 'relative', width: '280px', maxWidth: '100%' }}>
           <Search
             size={15}
             style={{

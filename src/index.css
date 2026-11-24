@@ -451,6 +451,48 @@ code, pre, .console-container, .glass-input {
   }
 }
 
+/* Shown only below 768px (see the mobile block). */
+.mobile-only {
+  display: none;
+}
+
+/* Dashboard tab row: account buttons on phones */
+.dash-account-buttons {
+  margin-left: auto;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.dash-account-name {
+  margin-left: auto;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 7.5rem;
+  min-width: 0;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.dash-auth-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  border: 1px solid #1a1a1a;
+  background: #ffffff;
+  color: #1a1a1a;
+  cursor: pointer;
+}
+
+.dash-auth-btn-primary {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
 /* Sidebar Desktop/Mobile visibility toggle */
 .sidebar-desktop {
   display: flex;
@@ -481,6 +523,33 @@ code, pre, .console-container, .glass-input {
 
   .sidebar-mobile {
     display: block !important;
+  }
+
+  .mobile-only {
+    display: flex !important;
+  }
+
+  /* Tighter tabs so 홈 / 내 성장 / 랭킹 and the account buttons share one row. */
+  .dash-tab {
+    padding: 0.7rem 0.6rem !important;
+    font-size: 0.85rem !important;
+    white-space: nowrap;
+  }
+
+  .dash-tab svg,
+  .dash-auth-btn svg {
+    display: none;
+  }
+
+  /* Problem filters: each group takes a full row and its chips stretch to
+     fill it, so a wrapped row doesn't leave one lonely chip behind. */
+  .filter-group {
+    width: 100%;
+  }
+
+  .filter-group > button {
+    flex: 1 0 auto;
+    padding: 0.4rem 0.5rem !important;
   }
 
   /* Switch from horizontal to vertical layout */

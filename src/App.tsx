@@ -5,6 +5,7 @@ import AuthModal from './components/AuthModal';
 import ViewErrorBoundary from './components/ViewErrorBoundary';
 import UpdatePrompt from './components/UpdatePrompt';
 import SeasonalSnow from './components/SeasonalSnow';
+import InstallGuideModal from './components/InstallGuideModal';
 import { lazyWithReload } from './lib/lazyWithReload';
 
 // Lazily loaded so each view's code (and, for DocsViewer, the large docs.ts
@@ -444,6 +445,9 @@ print("변환 리스트:", result)
     <div className="app-container">
       {/* Auth Login/Signup Modal */}
       <AuthModal />
+
+      {/* 앱 설치 방법 (PWA install guide) */}
+      <InstallGuideModal />
 
       {/* Winter event snowfall (renders nothing outside the season) */}
       <SeasonalSnow />

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Home, Trophy, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone, Users, Activity, ExternalLink, Copy, Check } from 'lucide-react';
+import { Home, Trophy, TrendingUp, BookOpen, ChevronRight, Edit3, Shuffle, Lightbulb, Megaphone, Users, Activity, ExternalLink, Copy, Check, LogIn, UserPlus, UserCheck, Smartphone, X } from 'lucide-react';
 import type { Problem } from '../data/problems';
 import { useAuth } from '../contexts/AuthContext';
 import type { LeaderboardUser } from '../contexts/AuthContext';
@@ -12,6 +12,7 @@ import { levelFor, nextTier, tierFor, totalXp } from '../utils/levels';
 import { nameStyle, titleById } from '../utils/cosmetics';
 import { triviaItems } from '../data/trivia';
 import { changelogEntries } from '../data/changelog';
+import { isRunningAsApp, openInstallGuide } from '../utils/installApp';
 
 type RankingMode = 'all' | 'week' | 'python' | 'pylib' | 'sql' | 'java' | 'js' | 'c' | 'html' | 'css' | 'algorithm';
 
@@ -152,15 +153,100 @@ function readDashboardTab(): DashboardTab {
   return 'home';
 }
 
+// Phones have no sidebar, so the account controls sit at the right end of
+// the tab row there (hidden on desktop, where the sidebar has them).
+function MobileAccountButtons() {
+  const { user, profile, openAuthModal } = useAuth();
+  if (user) {
+    return (
+      <span className="mobile-only dash-account-name" title="로그인됨">
+        <UserCheck size={14} color="#0969da" style={{ flexShrink: 0 }} />
+        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {profile?.display_name || user.email?.split('@')[0]}
+        </span>
+      </span>
+    );
+  }
+  return (
+    <div className="mobile-only dash-account-buttons">
+      <button type="button" className="dash-auth-btn" onClick={() => openAuthModal('login')}>
+        <LogIn size={13} />
+        로그인
+      </button>
+      <button type="button" className="dash-auth-btn dash-auth-btn-primary" onClick={() => openAuthModal('signup')}>
+        <UserPlus size={13} />
+        회원가입
+      </button>
+    </div>
+  );
+}
+
+const INSTALL_BANNER_KEY = 'pyquests_install_banner_closed';
+
+// One-line nudge on 홈 for people still using the site in a browser tab.
+function InstallAppBanner() {
+  const [hidden, setHidden] = useState<boolean>(() => {
+    if (isRunningAsApp()) return true;
+    try {
+      return localStorage.getItem(INSTALL_BANNER_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
+  if (hidden) return null;
+  const close = () => {
+    setHidden(true);
+    try {
+      localStorage.setItem(INSTALL_BANNER_KEY, '1');
+    } catch {
+      // Storage blocked: it just comes back next visit.
+    }
+  };
+  return (
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.6rem',
+        padding: '0.65rem 0.85rem',
+        border: '1px solid var(--border-subtle)',
+        background: '#ffffff',
+      }}
+    >
+      <Smartphone size={16} style={{ color: '#0969da', flexShrink: 0 }} />
+      <span style={{ fontSize: '0.8rem', color: '#1a1a1a', flex: 1, minWidth: 0, lineHeight: 1.5 }}>
+        <b>앱으로 설치</b>하면 홈 화면에서 바로 열 수 있어요.
+      </span>
+      <button
+        type="button"
+        onClick={openInstallGuide}
+        style={{ fontSize: '0.78rem', fontWeight: 700, color: '#0969da', background: 'transparent', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', padding: '0.2rem' }}
+      >
+        설치 방법 보기 →
+      </button>
+      <button
+        type="button"
+        onClick={close}
+        aria-label="설치 안내 닫기"
+        style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', display: 'flex', padding: '0.2rem' }}
+      >
+        <X size={15} />
+      </button>
+    </div>
+  );
+}
+
 function DashboardTabBar({ tab, onChange }: { tab: DashboardTab; onChange: (tab: DashboardTab) => void }) {
   return (
-    <div role="tablist" style={{ display: 'flex', borderBottom: '1px solid var(--border-subtle)', gap: '0.25rem' }}>
+    <div style={{ display: 'flex', alignItems: 'center', borderBottom: '1px solid var(--border-subtle)', gap: '0.5rem' }}>
+    <div role="tablist" style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
       {DASHBOARD_TABS.map(({ id, label, icon: Icon }) => {
         const active = id === tab;
         return (
           <button
             key={id}
             role="tab"
+            className="dash-tab"
             aria-selected={active}
             onClick={() => onChange(id)}
             style={{
@@ -183,6 +269,8 @@ function DashboardTabBar({ tab, onChange }: { tab: DashboardTab; onChange: (tab:
           </button>
         );
       })}
+    </div>
+    <MobileAccountButtons />
     </div>
   );
 }
@@ -623,6 +711,8 @@ export default function Dashboard({
 
       {tab === 'home' && (
         <>
+          <InstallAppBanner />
+
           {/* Changelog Callout -- first thing on the dashboard so users landing
               on the home screen know an update log exists at all, not just
               people who happen to open the 더보기 panel. */}
