@@ -198,6 +198,10 @@ interface AuthContextType {
   isConfigured: boolean;
   authModalOpen: boolean;
   setAuthModalOpen: (open: boolean) => void;
+  /** Which form the login modal opens on. */
+  authModalMode: 'login' | 'signup';
+  /** Open the login modal on the login or the sign-up form. */
+  openAuthModal: (mode: 'login' | 'signup') => void;
   leaderboard: LeaderboardUser[];
   refreshLeaderboard: () => Promise<void>;
   recentActivity: ActivityEvent[];
@@ -235,6 +239,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [authModalOpen, setAuthModalOpen] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'signup'>('login');
+  const openAuthModal = (mode: 'login' | 'signup') => {
+    setAuthModalMode(mode);
+    setAuthModalOpen(true);
+  };
   const [recentActivity, setRecentActivity] = useState<ActivityEvent[]>([]);
   const lastSeenSolvedAtRef = useRef<string>(new Date().toISOString());
 
@@ -1217,6 +1226,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isConfigured: isSupabaseConfigured,
         authModalOpen,
         setAuthModalOpen,
+        authModalMode,
+        openAuthModal,
         leaderboard,
         refreshLeaderboard,
         recentActivity,

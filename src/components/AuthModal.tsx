@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, LogIn, UserPlus, Lock, Mail, User, AlertCircle, Database, MonitorSmartphone } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function AuthModal() {
-  const { authModalOpen, setAuthModalOpen, signIn, signUp, signInWithGoogle, isConfigured } = useAuth();
+  const { authModalOpen, setAuthModalOpen, authModalMode, signIn, signUp, signInWithGoogle, isConfigured } = useAuth();
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -14,6 +14,15 @@ export default function AuthModal() {
   // the tab ends it. Default off -- the common case is a personal device, and
   // defaulting on would silently log everyone out whenever they close a tab.
   const [sharedComputer, setSharedComputer] = useState<boolean>(false);
+
+  // Each time the modal opens, start on the form the caller asked for
+  // (the mobile 로그인 / 회원가입 buttons open different ones).
+  useEffect(() => {
+    if (authModalOpen) {
+      setIsSignUp(authModalMode === 'signup');
+      setErrorMsg(null);
+    }
+  }, [authModalOpen, authModalMode]);
 
   if (!authModalOpen) return null;
 

@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Megaphone, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Megaphone, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon, Smartphone, UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useDarkMode } from '../hooks/useDarkMode';
+import { openInstallGuide } from '../utils/installApp';
 import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
 import { isWinterDecorSeason } from '../utils/winterEvent';
@@ -62,7 +63,7 @@ export default function Sidebar({
     localStorage.setItem('pyquests_sidebar_collapsed', JSON.stringify(isCollapsed));
   }, [isCollapsed]);
 
-  const { user, profile, setAuthModalOpen, signOut } = useAuth();
+  const { user, profile, setAuthModalOpen, openAuthModal, signOut } = useAuth();
   // UI convenience only; board_posts RLS is what actually enforces this.
   const isAdmin = profile?.is_admin === true;
 
@@ -92,6 +93,8 @@ export default function Sidebar({
     { id: 'docs', name: '학습 가이드', icon: GraduationCap },
     { id: 'board', name: '고객센터', icon: MessageCircle },
     { id: 'changelog', name: '업데이트', icon: Megaphone },
+    // Not a view: opens the install guide over whatever page is showing.
+    { id: 'install', name: '앱 설치 방법', icon: Smartphone },
   ];
 
   return (
@@ -224,7 +227,7 @@ export default function Sidebar({
               return (
                 <button
                   key={item.id}
-                  onClick={() => onViewChange(item.id)}
+                  onClick={() => (item.id === 'install' ? openInstallGuide() : onViewChange(item.id))}
                   title={isCollapsed ? item.name : undefined}
                   style={{
                     display: 'flex',
@@ -476,7 +479,7 @@ export default function Sidebar({
           {/* 고객센터/업데이트 live in the 더보기 panel instead of the primary
               row -- with icon/text sizes bumped up, a 5th+ destination here
               made every label wrap to two lines. */}
-          {menuItems.filter((item) => item.id !== 'board' && item.id !== 'changelog').map((item) => {
+          {menuItems.filter((item) => item.id !== 'board' && item.id !== 'changelog' && item.id !== 'install').map((item) => {
             const IconComponent = item.icon;
             const isActive = currentView === item.id;
             return (
@@ -596,27 +599,54 @@ export default function Sidebar({
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setAuthModalOpen(true);
-                }}
-                style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  background: 'transparent',
-                  border: '1px solid var(--border-subtle)',
-                  padding: '0.6rem 0.75rem',
-                  fontSize: '0.8rem',
-                  fontWeight: '600',
-                  color: '#1a1a1a',
-                  cursor: 'pointer',
-                }}
-              >
-                <LogIn size={16} />
-                로그인 / 회원가입
-              </button>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openAuthModal('login');
+                  }}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.4rem',
+                    background: '#ffffff',
+                    border: '1px solid #1a1a1a',
+                    padding: '0.6rem 0.75rem',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: '#1a1a1a',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <LogIn size={16} />
+                  로그인
+                </button>
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    openAuthModal('signup');
+                  }}
+                  style={{
+                    flex: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '0.4rem',
+                    background: '#1a1a1a',
+                    border: '1px solid #1a1a1a',
+                    padding: '0.6rem 0.75rem',
+                    fontSize: '0.8rem',
+                    fontWeight: '700',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                  }}
+                >
+                  <UserPlus size={16} />
+                  회원가입
+                </button>
+              </div>
             )}
             <button
               onClick={() => {
@@ -662,6 +692,27 @@ export default function Sidebar({
             >
               <Megaphone size={16} />
               업데이트
+            </button>
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openInstallGuide();
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.5rem',
+                background: 'transparent',
+                border: '1px solid var(--border-subtle)',
+                padding: '0.6rem 0.75rem',
+                fontSize: '0.8rem',
+                fontWeight: '600',
+                color: '#1a1a1a',
+                cursor: 'pointer',
+              }}
+            >
+              <Smartphone size={16} />
+              앱 설치 방법
             </button>
             <button
               onClick={toggleDark}

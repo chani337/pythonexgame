@@ -25,6 +25,15 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-11-24',
+    title: '📱 앱 설치 방법 안내와 모바일 화면 정리',
+    items: [
+      '메뉴의 「앱 설치 방법」에서 아이폰 · 안드로이드 · PC별로 홈 화면에 설치하는 순서를 볼 수 있어요. 크롬 · 엣지에서는 「지금 바로 설치하기」 버튼 하나로 설치돼요.',
+      '휴대폰에서 대시보드 탭 오른쪽에 로그인 · 회원가입 버튼이 생겼어요. 회원가입 버튼을 누르면 바로 가입 화면이 열려요.',
+      '휴대폰과 설치한 앱에서 문제 학습 화면의 언어 · 난이도 버튼이 화면 밖으로 넘치던 문제를 고쳤어요.',
+    ],
+  },
+  {
     date: '2026-11-21',
     title: '⛄ 눈싸움 게임이 생겼어요',
     items: [
