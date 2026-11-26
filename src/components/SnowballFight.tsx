@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { Volume2, VolumeX, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { bossHp, bossScore, difficultyAt, hitScore, readBestScore, recordScore } from '../utils/snowballGame';
+import { bossHp, bossScore, difficultyAt, gameLockedUntil, hitScore, readBestScore, recordScore } from '../utils/snowballGame';
 
 // 눈싸움: snowmen pop up from the snow mounds at the back and throw; the
 // player moves along the front, hides behind three snow walls and throws
@@ -969,6 +969,9 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
   const [result, setResult] = useState<Result | null>(null);
   const [paused, setPaused] = useState(false);
   const pausedRef = useRef(false);
+  // Class hours: set while locked, to the time it unlocks.
+  const [lockedUntil, setLockedUntil] = useState<string | null>(() => gameLockedUntil());
+  const lockedRef = useRef(lockedUntil);
   const [muted, setMuted] = useState(readMuted);
   const mutedRef = useRef(muted);
   const sfxRef = useRef<Sfx | null>(null);
@@ -991,6 +994,7 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
   }, []);
 
   const start = useCallback(() => {
+    if (gameLockedUntil()) return;
     sfxRef.current?.unlock();
     gameRef.current = newGame();
     phaseRef.current = 'playing';
@@ -1014,10 +1018,27 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
 
     let raf = 0;
     let last = performance.now();
+    let lockCheck = 0;
     const frame = (now: number) => {
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
       const g = gameRef.current;
+      // Once a second: has a class started (or ended)? A game in progress
+      // pauses where it is and can carry on once the lock lifts.
+      lockCheck -= dt;
+      if (lockCheck <= 0) {
+        lockCheck = 1;
+        const until = gameLockedUntil();
+        if (until !== lockedRef.current) {
+          lockedRef.current = until;
+          setLockedUntil(until);
+        }
+        if (until && phaseRef.current === 'playing' && !pausedRef.current) {
+          pausedRef.current = true;
+          setPaused(true);
+          g.firing = false;
+        }
+      }
       if (phaseRef.current === 'playing' && !pausedRef.current) {
         const alive = step(g, dt);
         if (!alive) {
@@ -1079,7 +1100,9 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
         g.aim = { x: g.px, y: MOUND_Y - 30 };
         if (down && !pausedRef.current && !e.repeat) throwAt(g, g.aim.x, g.aim.y);
         g.firing = down;
-      } else if ((e.key === 'p' || e.key === 'P') && down) setPausedBoth(!pausedRef.current);
+      } else if ((e.key === 'p' || e.key === 'P') && down) {
+        if (!lockedRef.current) setPausedBoth(!pausedRef.current);
+      }
       else return;
       e.preventDefault();
     };
@@ -1150,7 +1173,7 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
             <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', fontWeight: 600 }}>최고 점수 {best.toLocaleString()}</span>
           </div>
           <div style={{ display: 'flex', gap: '0.4rem' }}>
-            {phase === 'playing' && (
+            {phase === 'playing' && !lockedUntil && (
               <button className="btn-secondary" onClick={() => setPausedBoth(!paused)} style={{ padding: '0.35rem 0.7rem', fontSize: '0.75rem' }}>
                 {paused ? '계속하기' : '일시정지'}
               </button>
@@ -1173,8 +1196,19 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
             onPointerCancel={onPointerUp}
             style={{ width: '100%', height: '100%', display: 'block', touchAction: 'none', cursor: phase === 'playing' ? 'crosshair' : 'default' }}
           />
-          {(phase !== 'playing' || paused) && (
+          {(phase !== 'playing' || paused || lockedUntil) && (
             <div className="snowball-game-overlay">
+              {lockedUntil ? (
+                <>
+                  <div style={{ fontSize: '1.4rem', fontWeight: 900 }}>📚 지금은 수업 시간이에요</div>
+                  <div style={{ fontSize: '0.9rem', textAlign: 'center', lineHeight: 1.7 }}>
+                    눈싸움은 <b>{lockedUntil}</b>부터 다시 할 수 있어요.
+                    {phase === 'playing' && <><br />하던 게임은 그때 이어서 할 수 있어요.</>}
+                  </div>
+                  <button className="btn-primary" onClick={onClose}>닫기</button>
+                </>
+              ) : (
+              <>
               {phase === 'ready' && (
                 <>
                   <div style={{ fontSize: '1.6rem', fontWeight: 900 }}>⛄ 눈싸움</div>
@@ -1208,6 +1242,8 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
                   </div>
                   <button className="btn-primary" onClick={start}>다시 하기</button>
                 </>
+              )}
+              </>
               )}
             </div>
           )}

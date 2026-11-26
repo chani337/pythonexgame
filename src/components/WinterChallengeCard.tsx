@@ -3,6 +3,7 @@ import { Gift, MessageCircle, Snowflake } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase, isSupabaseConfigured } from '../lib/supabase';
 import { lazyWithReload } from '../lib/lazyWithReload';
+import { gameLockedUntil } from '../utils/snowballGame';
 import {
   challengeYear,
   currentDecemberRun,
@@ -66,6 +67,12 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
   const [serverDays, setServerDays] = useState<string[]>([]);
   const [snowOn, setSnowOn] = useState(isSnowEnabled);
   const [gameOpen, setGameOpen] = useState(false);
+  // Class hours lock the game; re-checked every 30s so the button opens on time.
+  const [gameLock, setGameLock] = useState(() => gameLockedUntil());
+  useEffect(() => {
+    const id = window.setInterval(() => setGameLock(gameLockedUntil()), 30_000);
+    return () => window.clearInterval(id);
+  }, []);
 
   useEffect(() => {
     const sync = () => setLocalDays(readSolveDays(accountKey));
@@ -162,21 +169,23 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
           <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
           <button
             onClick={() => setGameOpen(true)}
+            disabled={gameLock !== null}
+            title={gameLock ? `수업 시간(09:00~12:50, 14:10~17:51)에는 쉬어요. ${gameLock}에 열려요.` : undefined}
             style={{
               display: 'flex',
               alignItems: 'center',
               gap: '0.4rem',
-              background: RED,
-              border: `1px solid ${RED}`,
+              background: gameLock ? '#f4f4f6' : RED,
+              border: `1px solid ${gameLock ? 'var(--border-subtle)' : RED}`,
               borderRadius: '0px',
               padding: '0.5rem 0.8rem',
               fontSize: '0.78rem',
               fontWeight: 700,
-              color: '#ffffff',
-              cursor: 'pointer',
+              color: gameLock ? 'var(--text-secondary)' : '#ffffff',
+              cursor: gameLock ? 'not-allowed' : 'pointer',
             }}
           >
-            ⛄ 눈싸움 하기
+            {gameLock ? `🔒 눈싸움 · ${gameLock}에 열려요` : '⛄ 눈싸움 하기'}
           </button>
           <button
             onClick={() => setSnowEnabled(!snowOn)}

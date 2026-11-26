@@ -18,6 +18,12 @@ function kstParts(d: Date): KstParts {
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
+/** Minutes since Korean midnight (0–1439). */
+export function kstMinuteOfDay(d: Date = new Date()): number {
+  const shifted = new Date(d.getTime() + KST_OFFSET_MS);
+  return shifted.getUTCHours() * 60 + shifted.getUTCMinutes();
+}
+
 /** Korean date as 'YYYY-MM-DD'. */
 export function kstDate(d: Date = new Date()): string {
   const { year, month, day } = kstParts(d);

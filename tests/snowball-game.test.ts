@@ -1,7 +1,7 @@
 // The snowball fight's rules that aren't drawing: the difficulty ramp and
 // the score for a hit.
 import { describe, it, expect } from 'vitest';
-import { bossHp, bossScore, difficultyAt, hitScore, GOLDEN_POINTS, HIT_POINTS, MAX_COMBO_MULTIPLIER } from '../src/utils/snowballGame';
+import { bossHp, bossScore, difficultyAt, gameLockedUntil, hitScore, GOLDEN_POINTS, HIT_POINTS, MAX_COMBO_MULTIPLIER } from '../src/utils/snowballGame';
 
 describe('difficultyAt', () => {
   it('처음부터 두 명', () => {
@@ -41,5 +41,28 @@ describe('hitScore', () => {
 
   it('황금 눈사람은 50점부터', () => {
     expect(hitScore(0, true)).toBe(GOLDEN_POINTS);
+  });
+});
+
+describe('수업 시간 잠금 (한국 시간)', () => {
+  const kst = (hhmm: string) => new Date(`2026-12-01T${hhmm}:00+09:00`);
+
+  it('오전 수업: 09:00 부터 12:50 전까지', () => {
+    expect(gameLockedUntil(kst('08:59'))).toBeNull();
+    expect(gameLockedUntil(kst('09:00'))).toBe('12:50');
+    expect(gameLockedUntil(kst('12:49'))).toBe('12:50');
+    expect(gameLockedUntil(kst('12:50'))).toBeNull();
+  });
+
+  it('오후 수업: 14:10 부터 17:51 전까지', () => {
+    expect(gameLockedUntil(kst('14:09'))).toBeNull();
+    expect(gameLockedUntil(kst('14:10'))).toBe('17:51');
+    expect(gameLockedUntil(kst('17:50'))).toBe('17:51');
+    expect(gameLockedUntil(kst('17:51'))).toBeNull();
+  });
+
+  it('브라우저 시간대와 상관없이 한국 시간으로 본다', () => {
+    // 00:30 UTC = 09:30 KST
+    expect(gameLockedUntil(new Date('2026-12-01T00:30:00Z'))).toBe('12:50');
   });
 });
