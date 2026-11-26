@@ -122,6 +122,9 @@ export default function ProblemWorkspace({
   // attempt from counting toward solved/streak/leaderboard, so passing
   // afterward should still work as practice but not credit progress.
   const [viewedAnswer, setViewedAnswer] = useState<boolean>(false);
+  // Passed, but after looking at the answer: tell them plainly it didn't count.
+  // (Already solved before means it counted back then, so nothing to warn about.)
+  const notCounted = viewedAnswer && !isSolved;
   const [keywordWarning, setKeywordWarning] = useState<string | null>(null);
   // XP this success earned, for the toast. Set at the moment of success,
   // while isSolved still says whether it was solved before.
@@ -328,7 +331,9 @@ export default function ProblemWorkspace({
             if (!viewedAnswer) {
               onMarkSolved(problem.id);
             }
-            celebrate(100, 70);
+            // No party for a pass that won't count: the confetti is what
+            // students read as "solved", not the toast's fine print.
+            if (!viewedAnswer || isSolved) celebrate(100, 70);
           }
         } else {
           onWrongAttempt?.(problem.id);
@@ -1233,6 +1238,15 @@ export default function ProblemWorkspace({
                   {solutionCode[problem.id] && (
                     <button
                       onClick={() => {
+                        // Ask before the first look at an unsolved problem: seeing the
+                        // answer is what stops the pass from counting, and students
+                        // kept finding that out only after they'd passed.
+                        if (!showAnswer && !viewedAnswer && !isSolved && !workspaceSuccess) {
+                          const ok = window.confirm(
+                            '정답 코드를 보면, 이번에 이 문제를 맞혀도 해결 기록에 반영되지 않아요.\n\n(목록으로 나갔다가 다시 들어와서 정답을 보지 않고 풀면 인정돼요.)\n\n그래도 정답 코드를 볼까요?'
+                          );
+                          if (!ok) return;
+                        }
                         setShowAnswer((prev) => !prev);
                         setViewedAnswer(true);
                       }}
@@ -1294,23 +1308,37 @@ export default function ProblemWorkspace({
 
       {/* Success Modal / Banner */}
       {workspaceSuccess && (
-        <div className="slide-up-toast">
-          <span style={{ fontSize: '1.25rem' }}>✨</span>
-          <div style={{ color: '#1a1a1a' }}>
-            <strong style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
-              Congratulations! Clear!
-              {xpGained > 0 && (
-                <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 800, color: '#ffffff', background: '#1a7f37', padding: '0.1rem 0.4rem', textTransform: 'none' }}>
-                  +{xpGained} XP
+        <div className={notCounted ? 'slide-up-toast slide-up-toast-warn' : 'slide-up-toast'}>
+          {notCounted ? (
+            <>
+              <span style={{ fontSize: '1.6rem' }}>⚠️</span>
+              <div style={{ color: '#1a1a1a', maxWidth: '460px' }}>
+                <strong style={{ display: 'block', fontSize: '1rem', fontWeight: 800, color: '#9a3412', marginBottom: '0.2rem' }}>
+                  정답이지만, 해결 기록에는 들어가지 않았어요
+                </strong>
+                <span style={{ fontSize: '0.84rem', lineHeight: 1.5 }}>
+                  정답 코드를 본 뒤에 풀어서 인정되지 않아요. <b>목록으로 나갔다가 이 문제를 다시 열고, 정답을 보지 않고 풀면</b> 인정돼요.
                 </span>
-              )}
-            </strong>
-            <span style={{ fontSize: '0.75rem', opacity: 0.8, color: 'var(--text-secondary)' }}>
-              {viewedAnswer
-                ? '정답 코드를 확인한 문제라 해결 기록에는 반영되지 않아요.'
-                : '해당 문제가 성공적으로 해결되었습니다.'}
-            </span>
-          </div>
+              </div>
+            </>
+          ) : (
+            <>
+              <span style={{ fontSize: '1.25rem' }}>✨</span>
+              <div style={{ color: '#1a1a1a' }}>
+                <strong style={{ display: 'block', fontSize: '0.85rem', fontWeight: '700', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                  Congratulations! Clear!
+                  {xpGained > 0 && (
+                    <span style={{ marginLeft: '0.5rem', fontSize: '0.75rem', fontWeight: 800, color: '#ffffff', background: '#1a7f37', padding: '0.1rem 0.4rem', textTransform: 'none' }}>
+                      +{xpGained} XP
+                    </span>
+                  )}
+                </strong>
+                <span style={{ fontSize: '0.75rem', opacity: 0.8, color: 'var(--text-secondary)' }}>
+                  해당 문제가 성공적으로 해결되었습니다.
+                </span>
+              </div>
+            </>
+          )}
           <div style={{ display: 'flex', gap: '0.5rem' }}>
             {onNextProblem && (
               <button

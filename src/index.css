@@ -431,6 +431,28 @@ code, pre, .console-container, .glass-input {
   background: #333333;
 }
 
+/* The buttons keep their size; the message wraps instead */
+.slide-up-toast button {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* A pass that didn't count (answer viewed first): amber, not celebratory */
+.slide-up-toast.slide-up-toast-warn {
+  background: #fffbeb;
+  border-color: #d97706;
+}
+
+/* Desktop: left: 50% halves the room an absolute box shrinks into, which
+   squeezed this longer message into a narrow column. (Phones get the full
+   width from the max-width: 768px rule.) */
+@media (min-width: 769px) {
+  .slide-up-toast.slide-up-toast-warn {
+    width: max-content;
+    max-width: calc(100% - 2rem);
+  }
+}
+
 @keyframes scrollTopBtnIn {
   from {
     opacity: 0;
@@ -707,6 +729,11 @@ code, pre, .console-container, .glass-input {
     bottom: 5rem;
     transform: none;
     width: auto;
+  }
+
+  /* Buttons drop below the message instead of running off the screen */
+  .slide-up-toast {
+    flex-wrap: wrap;
   }
 
   /* Scroll-to-top button: clear the bottom tab bar */

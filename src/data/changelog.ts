@@ -25,6 +25,15 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-11-26',
+    title: '정답 코드를 본 문제는 왜 인정이 안 되는지 크게 알려 드려요',
+    items: [
+      '정답 코드를 본 뒤에 맞힌 문제는 해결 기록에 들어가지 않아요. 이제 그럴 때 축하 대신 노란 안내가 크게 떠요.',
+      '다시 인정받으려면 목록으로 나갔다가 그 문제를 다시 열고, 정답을 보지 않고 풀면 돼요.',
+      '아직 안 푼 문제에서 정답 코드 보기를 누르면 먼저 한 번 물어봐요.',
+    ],
+  },
+  {
     date: '2026-11-24',
     title: '📱 앱 설치 방법 안내와 모바일 화면 정리',
     items: [
