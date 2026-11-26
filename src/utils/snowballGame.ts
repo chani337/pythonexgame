@@ -1,10 +1,10 @@
 // The pure parts of the snowball fight (src/components/SnowballFight.tsx):
 // difficulty over time, scoring, the best-score record and class-time
 // locking. Kept out of the component so they can be tested without a canvas.
-import { kstMinuteOfDay } from './winterEvent';
+import { kstDayOfWeek, kstMinuteOfDay } from './winterEvent';
 
-// Class hours, Korean time: the game is locked from `from` up to (not
-// including) `to`, every day.
+// Class hours, Korean time: on weekdays the game is locked from `from` up
+// to (not including) `to`. Weekends are open all day.
 export const GAME_LOCKS: { from: string; to: string }[] = [
   { from: '09:00', to: '12:50' },
   { from: '14:10', to: '17:51' },
@@ -14,6 +14,8 @@ const toMinutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.
 
 /** If the game is locked at `now`, the 'HH:MM' it unlocks at; otherwise null. */
 export function gameLockedUntil(now: Date = new Date()): string | null {
+  const day = kstDayOfWeek(now);
+  if (day === 0 || day === 6) return null;
   const m = kstMinuteOfDay(now);
   const lock = GAME_LOCKS.find((l) => m >= toMinutes(l.from) && m < toMinutes(l.to));
   return lock ? lock.to : null;

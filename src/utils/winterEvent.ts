@@ -18,6 +18,11 @@ function kstParts(d: Date): KstParts {
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
+/** Korean day of the week, 0 = Sunday … 6 = Saturday. */
+export function kstDayOfWeek(d: Date = new Date()): number {
+  return new Date(d.getTime() + KST_OFFSET_MS).getUTCDay();
+}
+
 /** Minutes since Korean midnight (0–1439). */
 export function kstMinuteOfDay(d: Date = new Date()): number {
   const shifted = new Date(d.getTime() + KST_OFFSET_MS);

@@ -170,7 +170,7 @@ export default function WinterChallengeCard({ onNavigateToBoard }: WinterChallen
           <button
             onClick={() => setGameOpen(true)}
             disabled={gameLock !== null}
-            title={gameLock ? `수업 시간(09:00~12:50, 14:10~17:51)에는 쉬어요. ${gameLock}에 열려요.` : undefined}
+            title={gameLock ? `평일 수업 시간(09:00~12:50, 14:10~17:51)에는 쉬어요. ${gameLock}에 열려요.` : undefined}
             style={{
               display: 'flex',
               alignItems: 'center',
