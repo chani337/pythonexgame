@@ -16,8 +16,7 @@ import {
   outcomeAtTime,
   playerHit,
   throwToward,
-  WALL_XS,
-  WALL_Y,
+  WALLS,
   wallHit,
 } from '../src/utils/snowballDuel';
 
@@ -32,8 +31,8 @@ describe('좌표 뒤집기', () => {
   });
 
   it('친구가 위로 던진 공은 내 화면에서 아래로 날아온다', () => {
-    const b = mirrorBall({ id: 'a', x: 400, y: 420, vx: 10, vy: -600 });
-    expect(b).toEqual({ id: 'a', x: 400, y: 80, vx: -10, vy: 600 });
+    const b = mirrorBall({ id: 'a', x: 400, y: 900, vx: 10, vy: -600 });
+    expect(b).toEqual({ id: 'a', x: DUEL_W - 400, y: DUEL_H - 900, vx: -10, vy: 600 });
   });
 
   it('양쪽이 같은 공을 같은 자리에서 본다', () => {
@@ -66,21 +65,30 @@ describe('던지기', () => {
 });
 
 describe('맞힘 판정', () => {
-  it('눈 벽', () => {
-    expect(wallHit({ x: WALL_XS[1], y: WALL_Y }, [6, 6, 6])).toBe(1);
-    expect(wallHit({ x: WALL_XS[1], y: WALL_Y }, [6, 0, 6])).toBe(-1);
-    expect(wallHit({ x: 295, y: WALL_Y }, [6, 6, 6])).toBe(-1);
-    expect(wallHit({ x: WALL_XS[0], y: WALL_Y + 60 }, [6, 6, 6])).toBe(-1);
+  it('눈 벽 (두 줄)', () => {
+    const all = WALLS.map(() => 6);
+    expect(wallHit(WALLS[1], all)).toBe(1);
+    expect(wallHit(WALLS[3], all)).toBe(3);
+    expect(wallHit(WALLS[1], all.map((hp, i) => (i === 1 ? 0 : hp)))).toBe(-1);
+    expect(wallHit({ x: (WALLS[0].x + WALLS[1].x) / 2, y: WALLS[0].y }, all)).toBe(-1);
+    expect(wallHit({ x: WALLS[0].x, y: WALLS[0].y + 60 }, all)).toBe(-1);
   });
 
-  it('사람은 발이 아니라 몸통', () => {
-    expect(playerHit({ x: 400, y: 428 }, { x: 400, y: 450 })).toBe(true);
-    expect(playerHit({ x: 440, y: 428 }, { x: 400, y: 450 })).toBe(false);
+  it('벽은 모두 내 진영 안에 있다', () => {
+    for (const w of WALLS) {
+      expect(w.y).toBeGreaterThanOrEqual(HALF_TOP);
+      expect(w.y).toBeLessThanOrEqual(HALF_BOTTOM);
+    }
+  });
+
+  it('사람에게 가까이 와야 맞는다', () => {
+    expect(playerHit({ x: 410, y: 450 }, { x: 400, y: 450 })).toBe(true);
+    expect(playerHit({ x: 440, y: 450 }, { x: 400, y: 450 })).toBe(false);
   });
 
   it('내 진영 밖으로는 못 나간다', () => {
-    expect(clampToHalf({ x: -50, y: 100 })).toEqual({ x: 28, y: HALF_TOP });
-    expect(clampToHalf({ x: 900, y: 900 })).toEqual({ x: DUEL_W - 28, y: HALF_BOTTOM });
+    expect(clampToHalf({ x: -50, y: 100 })).toEqual({ x: 40, y: HALF_TOP });
+    expect(clampToHalf({ x: 9000, y: 9000 })).toEqual({ x: DUEL_W - 40, y: HALF_BOTTOM });
   });
 });
 

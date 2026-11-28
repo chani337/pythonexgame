@@ -1,10 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Suspense, useCallback, useEffect, useRef, useState } from 'react';
 import type { PointerEvent as ReactPointerEvent } from 'react';
 import { Volume2, VolumeX, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { bossHp, bossScore, difficultyAt, gameLockedUntil, hitScore, readBestScore, recordScore } from '../utils/snowballGame';
 import { MUTE_KEY, readMuted, Sfx } from '../utils/snowballSfx';
-import SnowballDuel from './SnowballDuel';
+import { lazyWithReload } from '../lib/lazyWithReload';
+
+// Its own chunk: three.js only downloads for people who open 대결.
+const SnowballDuel = lazyWithReload(() => import('./SnowballDuel'));
 import type { SoundName } from '../utils/snowballSfx';
 
 // 눈싸움: snowmen pop up from the snow mounds at the back and throw; the
@@ -887,7 +890,13 @@ interface Result {
 // Solo against the snowmen, or 친구랑 대결 (SnowballDuel) from the start screen.
 export default function SnowballFight({ onClose }: SnowballFightProps) {
   const [duel, setDuel] = useState(false);
-  if (duel) return <SnowballDuel onBack={() => setDuel(false)} onClose={onClose} />;
+  if (duel) {
+    return (
+      <Suspense fallback={<div className="snowball-game"><div className="snowball-game-panel" style={{ textAlign: 'center', padding: '3rem' }}>3D 눈밭을 불러오는 중…</div></div>}>
+        <SnowballDuel onBack={() => setDuel(false)} onClose={onClose} />
+      </Suspense>
+    );
+  }
   return <SoloFight onClose={onClose} onDuel={() => setDuel(true)} />;
 }
 

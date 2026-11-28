@@ -46,13 +46,15 @@
     "qrcode-generator": "^1.4.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
-    "sql.js": "^1.14.2"
+    "sql.js": "^1.14.2",
+    "three": "^0.170.0"
   },
   "devDependencies": {
     "@types/canvas-confetti": "^1.9.0",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.17",
     "@types/react-dom": "^19.2.3",
+    "@types/three": "^0.170.0",
     "@vitejs/plugin-react": "^5.2.0",
     "@vitejs/plugin-react-swc": "^4.3.3",
     "oxlint": "^1.75.0",

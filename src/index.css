@@ -599,6 +599,10 @@ html.dark-mode .code-screen {
 }
 
 @media (max-width: 768px) {
+  /* Phones: a taller stage, so the field isn't a thin strip. */
+  .snowball-duel-stage {
+    aspect-ratio: 4 / 5;
+  }
   .contest-board {
     padding: 1rem !important;
   }
@@ -977,6 +981,73 @@ html.dark-mode .snowflake {
 }
 
 /* The canvas draws real colors; undo the page-wide dark-mode inversion. */
+/* 눈싸움 대결 (3D): a wider panel, a 16:10 stage, HTML HUD over the canvas. */
+.snowball-duel-panel {
+  max-width: 1040px !important;
+}
+.snowball-duel-stage {
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+}
+.duel-hud {
+  position: absolute;
+  left: 0.6rem;
+  right: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  pointer-events: none;
+  font-weight: 800;
+  font-size: 0.85rem;
+}
+.duel-hud > span:first-child {
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.2rem 0.55rem;
+}
+.duel-hud-top {
+  top: 0.6rem;
+}
+.duel-hud-bottom {
+  bottom: 0.6rem;
+}
+.duel-hud-bottom > span:last-child {
+  margin-left: auto;
+  color: #3d7fc4;
+  letter-spacing: 0.1em;
+  font-size: 1.1rem;
+}
+.duel-hud-time {
+  margin-left: auto;
+  background: rgba(255, 255, 255, 0.85);
+  padding: 0.15rem 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+}
+.duel-countdown {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6rem;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+  pointer-events: none;
+}
+.duel-lobby-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.duel-lobby-row > span {
+  font-weight: 800;
+  font-size: 0.85rem;
+  min-width: 5.5rem;
+}
+
 html.dark-mode .snowball-game-stage {
   filter: invert(1) hue-rotate(180deg);
 }
