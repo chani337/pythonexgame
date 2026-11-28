@@ -131,21 +131,39 @@ function MainApp() {
   });
 
   // Fetch solved problem IDs from Supabase when user logs in. Supabase is
-  // the source of truth once logged in -- local storage is just a mirror of
-  // it, overwritten on every login, never merged. Merging (local ∪ remote)
-  // meant a bad id that once leaked into a browser's local cache could never
-  // be cleared even by deleting the row server-side, since a union can only
-  // grow. (First-time guest progress still makes it into the account via
-  // AuthContext's mergeLocalStorageProgress, which pushes local -> Supabase
-  // on login -- this just stops the read side from re-inflating past that.)
+  // the source of truth once logged in; local storage mirrors it. A local
+  // solve the server is missing is pushed up rather than dropped (below).
+  // Only ids of problems that exist are kept, so a bad id that once leaked
+  // into a browser's cache can't pin itself in the list -- that was why
+  // this used to overwrite instead of merge.
   useEffect(() => {
     if (user) {
       localStorage.setItem('pyquests_last_user_id', user.id);
       const localKey = `pyquests_solved_ids_${user.id}`;
 
+      // Solves this browser saved but the server doesn't have -- live saves
+      // used to fail (see syncSolvedToSupabase) and this used to overwrite
+      // them with the server's list, which is how students lost a day's
+      // work. Push them up instead, then show both. Unknown ids are dropped,
+      // so a stale id still can't pin itself in the list forever.
+      let localSolved: string[] = [];
+      try {
+        const parsed: unknown = JSON.parse(localStorage.getItem(localKey) || '[]');
+        if (Array.isArray(parsed)) localSolved = parsed.filter((id): id is string => typeof id === 'string' && PROBLEM_BY_ID.has(id));
+      } catch {
+        // Corrupt entry: the server's list stands.
+      }
       fetchUserSolvedIds().then((remoteSolvedIds) => {
-        setSolvedIds(remoteSolvedIds || []);
-        localStorage.setItem(localKey, JSON.stringify(remoteSolvedIds || []));
+        const remote = remoteSolvedIds || [];
+        const missing = localSolved.filter((id) => !remote.includes(id));
+        const all = [...remote, ...missing];
+        setSolvedIds(all);
+        localStorage.setItem(localKey, JSON.stringify(all));
+        if (missing.length > 0) {
+          supabase.rpc('merge_guest_progress', { p_problem_ids: missing }).then(({ error }) => {
+            if (error) console.error('re-saving local solves failed:', error);
+          });
+        }
       });
 
       const localReviewKey = `pyquests_review_ids_${user.id}`;

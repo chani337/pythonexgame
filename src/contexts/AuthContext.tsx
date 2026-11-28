@@ -513,7 +513,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (reviewIds.length > 0) {
         const { error } = await supabase.from('user_review_problems').upsert(
           reviewIds.map((pid) => ({ user_id: userId, problem_id: pid })),
-          { onConflict: 'user_id,problem_id' }
+          { onConflict: 'user_id,problem_id', ignoreDuplicates: true }
         );
         if (error) console.error('user_review_problems merge failed:', error);
       }
@@ -524,7 +524,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (chapterIds.length > 0) {
         const { error } = await supabase.from('user_read_chapters').upsert(
           chapterIds.map((cid) => ({ user_id: userId, chapter_id: cid })),
-          { onConflict: 'user_id,chapter_id' }
+          { onConflict: 'user_id,chapter_id', ignoreDuplicates: true }
         );
         if (error) console.error('user_read_chapters merge failed:', error);
       }
@@ -989,9 +989,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!isSupabaseConfigured || !user) return;
     try {
       await ensureProfileExists(user.id, user.email || '');
+      // ignoreDuplicates = INSERT … ON CONFLICT DO NOTHING. The plain upsert
+      // is ON CONFLICT DO UPDATE, which needs UPDATE on the table -- and
+      // authenticated has only SELECT and INSERT here (migration 001), so
+      // every live save was refused and a solve only reached the server if
+      // the next page load's guest merge happened to push it.
       const { error: upsertError } = await supabase.from('user_solved_problems').upsert(
         { user_id: user.id, problem_id: problemId },
-        { onConflict: 'user_id,problem_id' }
+        { onConflict: 'user_id,problem_id', ignoreDuplicates: true }
       );
       if (upsertError) {
         console.error('user_solved_problems upsert failed:', upsertError);
@@ -1037,7 +1042,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await ensureProfileExists(user.id, user.email || '');
         await supabase.from('user_read_chapters').upsert(
           { user_id: user.id, chapter_id: chapterId },
-          { onConflict: 'user_id,chapter_id' }
+          { onConflict: 'user_id,chapter_id', ignoreDuplicates: true }
         );
       } else {
         await supabase.from('user_read_chapters')
@@ -1057,7 +1062,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await ensureProfileExists(user.id, user.email || '');
         await supabase.from('user_review_problems').upsert(
           { user_id: user.id, problem_id: problemId },
-          { onConflict: 'user_id,problem_id' }
+          { onConflict: 'user_id,problem_id', ignoreDuplicates: true }
         );
       } else {
         await supabase.from('user_review_problems')

@@ -268,6 +268,11 @@ const INTENTIONAL_KEEPS = {
   pyquests_docs_toc_open: '학습가이드 UI 상태, 개인정보 아님',
   pyquests_update_dismissed: '업데이트 안내 "나중에" 표시 (sessionStorage), 개인정보 아님',
   pyquests_chunk_reload_at: '배포 직후 새로고침 루프 방지용 타임스탬프 (sessionStorage), 개인정보 아님',
+  pyquests_dashboard_tab: '대시보드에서 마지막으로 연 탭, UI 상태, 개인정보 아님',
+  pyquests_install_banner_closed: '앱 설치 안내를 닫았는지, 기기 설정, 개인정보 아님',
+  // Not a storage key: the prefix of the error the cosmetics trigger raises.
+  pyquests_locked_cosmetic: '저장 키가 아님 — 칭호 잠금 오류 메시지 접두사',
+  pyquests_join_code: '대항전 /join 코드 (sessionStorage, 탭이 닫히면 사라짐), 참가하면 지움',
 };
 
 const rows = [];
