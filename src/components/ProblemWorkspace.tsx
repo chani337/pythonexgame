@@ -125,6 +125,11 @@ export default function ProblemWorkspace({
   // Passed, but after looking at the answer: tell them plainly it didn't count.
   // (Already solved before means it counted back then, so nothing to warn about.)
   const notCounted = viewedAnswer && !isSolved;
+  // Advanced and challenge problems don't offer the answer code: at that level
+  // it was being read instead of worked out. The explanation stays.
+  const shownAnswer = problem.difficulty === 'advanced' || problem.difficulty === 'expert'
+    ? undefined
+    : solutionCode[problem.id];
   const [keywordWarning, setKeywordWarning] = useState<string | null>(null);
   // XP this success earned, for the toast. Set at the moment of success,
   // while isSolved still says whether it was solved before.
@@ -1213,7 +1218,7 @@ export default function ProblemWorkspace({
               <OutputComparison results={correctnessResults} />
             )}
 
-            {(solutionExplanations[problem.id] || solutionCode[problem.id]) && (
+            {(solutionExplanations[problem.id] || shownAnswer) && (
               <div style={{ borderTop: '1px solid var(--border-subtle)', paddingTop: '0.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                   {solutionExplanations[problem.id] && (
@@ -1235,7 +1240,7 @@ export default function ProblemWorkspace({
                       💡 {showExplanation ? '해설 접기' : '해설 보기'}
                     </button>
                   )}
-                  {solutionCode[problem.id] && (
+                  {shownAnswer && (
                     <button
                       onClick={() => {
                         // Ask before the first look at an unsolved problem: seeing the
@@ -1282,7 +1287,7 @@ export default function ProblemWorkspace({
                     {solutionExplanations[problem.id]}
                   </div>
                 )}
-                {showAnswer && solutionCode[problem.id] && (
+                {showAnswer && shownAnswer && (
                   <pre
                     style={{
                       margin: 0,
@@ -1297,7 +1302,7 @@ export default function ProblemWorkspace({
                       whiteSpace: 'pre',
                     }}
                   >
-                    {solutionCode[problem.id]}
+                    {shownAnswer}
                   </pre>
                 )}
               </div>

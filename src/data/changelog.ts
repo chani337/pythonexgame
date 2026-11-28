@@ -25,6 +25,14 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 // there's no admin UI for this, it's just a static list like trivia.ts.
 export const changelogEntries: ChangelogEntry[] = [
   {
+    date: '2026-11-28',
+    title: '고급 · 챌린지 문제는 정답 코드를 보여 주지 않아요',
+    items: [
+      '고급과 챌린지 난이도 문제에서는 "정답 코드 보기"가 없어졌어요. 직접 끝까지 풀어 보는 단계예요.',
+      '막힐 때는 지금처럼 "해설 보기"로 풀이 방향을 볼 수 있어요.',
+    ],
+  },
+  {
     date: '2026-11-26',
     title: '정답 코드를 본 문제는 왜 인정이 안 되는지 크게 알려 드려요',
     items: [
