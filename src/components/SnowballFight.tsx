@@ -3,6 +3,9 @@ import type { PointerEvent as ReactPointerEvent } from 'react';
 import { Volume2, VolumeX, X } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { bossHp, bossScore, difficultyAt, gameLockedUntil, hitScore, readBestScore, recordScore } from '../utils/snowballGame';
+import { MUTE_KEY, readMuted, Sfx } from '../utils/snowballSfx';
+import SnowballDuel from './SnowballDuel';
+import type { SoundName } from '../utils/snowballSfx';
 
 // 눈싸움: snowmen pop up from the snow mounds at the back and throw; the
 // player moves along the front, hides behind three snow walls and throws
@@ -489,82 +492,6 @@ function step(g: Game, dt: number): boolean {
 // ---- Sound ------------------------------------------------------------------------
 // A few synthesized blips; no audio files to download.
 
-type SoundName = 'throw' | 'hit' | 'golden' | 'hurt' | 'thud' | 'power' | 'boss' | 'bossThrow' | 'bossDown' | 'over';
-
-const MUTE_KEY = 'pyquests_snowball_muted';
-
-function readMuted(): boolean {
-  try {
-    return localStorage.getItem(MUTE_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-class Sfx {
-  private ctx: AudioContext | null = null;
-
-  /** Must run inside a user gesture (the start button) or browsers keep it silent. */
-  unlock() {
-    if (!this.ctx) {
-      const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      if (!Ctor) return;
-      this.ctx = new Ctor();
-    }
-    void this.ctx.resume();
-  }
-
-  close() {
-    void this.ctx?.close();
-    this.ctx = null;
-  }
-
-  private tone(type: OscillatorType, from: number, to: number, dur: number, vol: number, delay = 0) {
-    const ctx = this.ctx;
-    if (!ctx) return;
-    const t0 = ctx.currentTime + delay;
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = type;
-    osc.frequency.setValueAtTime(from, t0);
-    osc.frequency.exponentialRampToValueAtTime(Math.max(to, 1), t0 + dur);
-    gain.gain.setValueAtTime(vol, t0);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t0);
-    osc.stop(t0 + dur + 0.02);
-  }
-
-  play(name: SoundName) {
-    switch (name) {
-      case 'throw':
-        return this.tone('triangle', 520, 260, 0.07, 0.05);
-      case 'hit':
-        return this.tone('square', 340, 110, 0.1, 0.07);
-      case 'golden':
-        this.tone('triangle', 880, 880, 0.08, 0.08);
-        return this.tone('triangle', 1320, 1320, 0.12, 0.08, 0.08);
-      case 'hurt':
-        return this.tone('sawtooth', 200, 55, 0.28, 0.1);
-      case 'thud':
-        return this.tone('sine', 140, 70, 0.08, 0.08);
-      case 'power':
-        [660, 830, 990, 1320].forEach((f, i) => this.tone('triangle', f, f, 0.09, 0.07, i * 0.07));
-        return;
-      case 'boss':
-        this.tone('sawtooth', 110, 90, 0.45, 0.09);
-        return this.tone('sawtooth', 82, 70, 0.6, 0.09, 0.4);
-      case 'bossThrow':
-        return this.tone('square', 180, 120, 0.12, 0.05);
-      case 'bossDown':
-        [523, 659, 784, 1046].forEach((f, i) => this.tone('square', f, f, 0.14, 0.07, i * 0.11));
-        return;
-      case 'over':
-        [392, 330, 262].forEach((f, i) => this.tone('triangle', f, f * 0.98, 0.22, 0.08, i * 0.2));
-        return;
-    }
-  }
-}
 
 // ---- Drawing -----------------------------------------------------------------------
 
@@ -957,7 +884,14 @@ interface Result {
   seconds: number;
 }
 
+// Solo against the snowmen, or 친구랑 대결 (SnowballDuel) from the start screen.
 export default function SnowballFight({ onClose }: SnowballFightProps) {
+  const [duel, setDuel] = useState(false);
+  if (duel) return <SnowballDuel onBack={() => setDuel(false)} onClose={onClose} />;
+  return <SoloFight onClose={onClose} onDuel={() => setDuel(true)} />;
+}
+
+function SoloFight({ onClose, onDuel }: SnowballFightProps & { onDuel: () => void }) {
   const { user } = useAuth();
   const accountKey = user ? user.id : 'guest';
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1073,7 +1007,9 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
     return () => cancelAnimationFrame(raf);
   }, [accountKey]);
 
-  // Keyboard: move, throw, pause, mute, close.
+  // Keyboard: move, throw, pause, mute, close. Letters are read from
+  // e.code (the physical key): with the Korean IME on, e.key for A is 'ㅁ',
+  // which is why WASD "didn't work" for most students.
   useEffect(() => {
     const onKey = (e: KeyboardEvent, down: boolean) => {
       const g = gameRef.current;
@@ -1081,26 +1017,25 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
         onClose();
         return;
       }
-      if ((e.key === 'm' || e.key === 'M') && down) {
+      if (e.code === 'KeyM' && down) {
         toggleMute();
         return;
       }
       if (phaseRef.current !== 'playing') {
-        if (down && (e.key === ' ' || e.key === 'Enter')) {
+        if (down && (e.code === 'Space' || e.key === 'Enter')) {
           e.preventDefault();
           start();
         }
         return;
       }
-      if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') g.keys.left = down;
-      else if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') g.keys.right = down;
-      else if (e.key === ' ') {
-        e.preventDefault();
+      if (e.code === 'ArrowLeft' || e.code === 'KeyA') g.keys.left = down;
+      else if (e.code === 'ArrowRight' || e.code === 'KeyD') g.keys.right = down;
+      else if (e.code === 'Space' || e.code === 'KeyW' || e.code === 'ArrowUp') {
         // Straight ahead: with the keyboard, where you stand is your aim.
         g.aim = { x: g.px, y: MOUND_Y - 30 };
         if (down && !pausedRef.current && !e.repeat) throwAt(g, g.aim.x, g.aim.y);
         g.firing = down;
-      } else if ((e.key === 'p' || e.key === 'P') && down) {
+      } else if (e.code === 'KeyP' && down) {
         if (!lockedRef.current) setPausedBoth(!pausedRef.current);
       }
       else return;
@@ -1218,10 +1153,13 @@ export default function SnowballFight({ onClose }: SnowballFightProps) {
                     🎁 선물을 맞히면 아이템! · ⚠️ 가끔 <b>눈사람 대장</b>이 나타나요.
                     <br />
                     <span style={{ opacity: 0.85 }}>
-                      이동: A·D 또는 ←→, 아래쪽 눈밭을 끌기 &nbsp;|&nbsp; 던지기: 위쪽을 클릭·탭 (스페이스는 바로 앞으로)
+                      이동: A·D 또는 ←→, 아래쪽 눈밭을 끌기 &nbsp;|&nbsp; 던지기: 위쪽을 클릭·탭 (W·스페이스는 바로 앞으로)
                     </span>
                   </div>
-                  <button className="btn-primary" onClick={start}>시작하기</button>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+                    <button className="btn-primary" onClick={start}>혼자 하기</button>
+                    <button className="btn-secondary" onClick={onDuel}>👥 친구랑 대결</button>
+                  </div>
                 </>
               )}
               {phase === 'playing' && paused && (
