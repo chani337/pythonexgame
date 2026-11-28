@@ -7,6 +7,8 @@ import { supabase } from '../lib/supabase';
 import ProfileEditModal from './ProfileEditModal';
 import LearningRoadmap from './LearningRoadmap';
 import WinterChallengeCard from './WinterChallengeCard';
+import ContestBoard from './ContestBoard';
+import ChristmasTree from './ChristmasTree';
 import LevelCard from './LevelCard';
 import { levelFor, nextTier, tierFor, totalXp } from '../utils/levels';
 import { nameStyle, titleById } from '../utils/cosmetics';
@@ -121,6 +123,7 @@ interface DashboardProps {
   onUnlockAll?: () => void;
   onNavigateToChangelog?: () => void;
   onNavigateToBoard?: () => void;
+  onNavigateToContest?: () => void;
 }
 
 // The public intro page. A separate Vercel project, so this is a plain
@@ -453,6 +456,7 @@ export default function Dashboard({
   onUnlockAll,
   onNavigateToChangelog,
   onNavigateToBoard,
+  onNavigateToContest,
 }: DashboardProps) {
   const { user, profile, recentActivity } = useAuth();
   const [tab, setTab] = useState<DashboardTab>(readDashboardTab);
@@ -711,6 +715,12 @@ export default function Dashboard({
 
       {tab === 'home' && (
         <>
+          {/* 과정 대항전: open to everyone, at the very top while one is on. */}
+          <ContestBoard onOpenClassView={() => onNavigateToContest?.()} />
+
+          {/* 모두의 트리, Dec 21–25 only */}
+          <ChristmasTree solvedIds={solvedIds} onSelectProblem={onSelectProblem} onNavigateToProblems={() => onNavigateToProblems()} />
+
           <InstallAppBanner />
 
           {/* Changelog Callout -- first thing on the dashboard so users landing

@@ -11,7 +11,7 @@
 // routing table something tests can assert on directly.
 import type { DocCategory } from '../data/docs';
 
-export type ViewName = 'dashboard' | 'problems' | 'sandbox' | 'docs' | 'board' | 'changelog';
+export type ViewName = 'dashboard' | 'problems' | 'sandbox' | 'docs' | 'board' | 'changelog' | 'contest';
 
 export interface Route {
   view: ViewName;
@@ -19,6 +19,8 @@ export interface Route {
   problemId?: string;
   /** Set when the guide is open on a specific language: /docs/<category>. */
   docCategory?: DocCategory;
+  /** Set by /join/<code>: the dashboard, with the 대항전 sign-up opened on that code. */
+  joinCode?: string;
 }
 
 // The segment that maps to each view. 'dashboard' is the root and has no
@@ -29,7 +31,12 @@ const VIEW_SEGMENTS: Record<Exclude<ViewName, 'dashboard'>, true> = {
   docs: true,
   board: true,
   changelog: true,
+  // 우리 반 현황 (teachers) and 대회 관리 (admin). Not in the sitemap.
+  contest: true,
 };
+
+// App paths with nothing for a search engine: they need a login and a role.
+const UNLISTED: ViewName[] = ['contest'];
 
 const DOC_CATEGORIES: DocCategory[] = ['python', 'sql', 'java', 'js', 'c', 'html', 'css'];
 
@@ -63,6 +70,9 @@ export function parsePath(pathname: string): Route {
   if (segments.length === 0) return { view: 'dashboard' };
 
   const [first, second] = segments;
+  // /join/<code> is a link handed out in class (QR, group chat). It opens on
+  // the dashboard; App replaces the address with '/' once the code is read.
+  if (first === 'join' && second) return { view: 'dashboard', joinCode: second };
   if (!isViewSegment(first)) return { view: 'dashboard' };
 
   if (first === 'problems' && second) {
@@ -92,7 +102,9 @@ export function buildPath(route: Route): string {
 export function staticPaths(): string[] {
   return [
     '/',
-    ...Object.keys(VIEW_SEGMENTS).map((v) => `/${v}`),
+    ...Object.keys(VIEW_SEGMENTS)
+      .filter((v) => !UNLISTED.includes(v as ViewName))
+      .map((v) => `/${v}`),
     ...DOC_CATEGORIES.map((c) => `/docs/${c}`),
   ];
 }

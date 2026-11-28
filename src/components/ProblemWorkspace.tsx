@@ -17,6 +17,7 @@ import type { RunResponse, TestResult, PerfSpec } from '../hooks/usePyodide';
 import type { SqlResultTable } from '../hooks/useSqlRunner';
 import { celebrate } from '../utils/celebrate';
 import { problemXp } from '../utils/levels';
+import { useAuth } from '../contexts/AuthContext';
 import CodeEditor from './CodeEditor';
 import type { EditorLanguage } from './CodeEditor';
 import WebPreview from './WebPreview';
@@ -125,6 +126,7 @@ export default function ProblemWorkspace({
   // Passed, but after looking at the answer: tell them plainly it didn't count.
   // (Already solved before means it counted back then, so nothing to warn about.)
   const notCounted = viewedAnswer && !isSolved;
+  const { logQuizMiss, logAnswerView } = useAuth();
   // Advanced and challenge problems don't offer the answer code: at that level
   // it was being read instead of worked out. The explanation stays.
   const shownAnswer = problem.difficulty === 'advanced' || problem.difficulty === 'expert'
@@ -425,6 +427,8 @@ export default function ProblemWorkspace({
       setWorkspaceSuccess(false);
       setConsoleError('오답입니다. 다시 한번 생각해 보세요!');
       onWrongAttempt?.(problem.id);
+      // 대항전: a quiz only counts when the first pick was right.
+      if (!isSolved) logQuizMiss(problem.id);
     }
   };
 
@@ -1253,6 +1257,7 @@ export default function ProblemWorkspace({
                           if (!ok) return;
                         }
                         setShowAnswer((prev) => !prev);
+                        if (!viewedAnswer && !isSolved) logAnswerView(problem.id);
                         setViewedAnswer(true);
                       }}
                       style={{

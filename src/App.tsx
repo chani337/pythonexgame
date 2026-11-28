@@ -6,6 +6,7 @@ import ViewErrorBoundary from './components/ViewErrorBoundary';
 import UpdatePrompt from './components/UpdatePrompt';
 import SeasonalSnow from './components/SeasonalSnow';
 import InstallGuideModal from './components/InstallGuideModal';
+import ContestJoinModal from './components/ContestJoinModal';
 import { lazyWithReload } from './lib/lazyWithReload';
 
 // Lazily loaded so each view's code (and, for DocsViewer, the large docs.ts
@@ -19,11 +20,13 @@ const Sandbox = lazyWithReload(() => import('./components/Sandbox'));
 const DocsViewer = lazyWithReload(() => import('./components/DocsViewer'));
 const Board = lazyWithReload(() => import('./components/Board'));
 const Changelog = lazyWithReload(() => import('./components/Changelog'));
+const ContestManage = lazyWithReload(() => import('./components/ContestManage'));
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import type { GuestMergeResult } from './contexts/AuthContext';
+import { ContestProvider } from './contexts/ContestContext';
 import { supabase } from './lib/supabase';
 import { kstDate, recordSolveDay } from './utils/winterEvent';
-import { problems, filterProblems } from './data/problems';
+import { problems, filterProblems, isProblemOpen } from './data/problems';
 import type { Problem } from './data/problems';
 import { parsePath, routeForState, nextHistoryAction } from './lib/routes';
 import type { ViewName } from './lib/routes';
@@ -449,6 +452,9 @@ print("변환 리스트:", result)
       {/* 앱 설치 방법 (PWA install guide) */}
       <InstallGuideModal />
 
+      {/* 과정 대항전 참가 (code → class check → real name) */}
+      <ContestJoinModal onOpenClassView={() => { setSelectedProblem(null); setCurrentView('contest'); }} />
+
       {/* Winter event snowfall (renders nothing outside the season) */}
       <SeasonalSnow />
 
@@ -474,7 +480,9 @@ print("변환 리스트:", result)
             </div>
           }
         >
-        {selectedProblem ? (
+        {selectedProblem && !isProblemOpen(selectedProblem) ? (
+          <LockedProblem opensOn={selectedProblem.opensOn!} onBack={handleBackToProblems} />
+        ) : selectedProblem ? (
           <ProblemWorkspace
             problem={selectedProblem}
             onBack={handleBackToProblems}
@@ -506,6 +514,7 @@ print("변환 리스트:", result)
             onUnlockAll={handleUnlockAllProblems}
             onNavigateToChangelog={() => setCurrentView('changelog')}
             onNavigateToBoard={() => setCurrentView('board')}
+            onNavigateToContest={() => setCurrentView('contest')}
           />
         ) : currentView === 'problems' ? (
           <ProblemList
@@ -571,6 +580,8 @@ print("변환 리스트:", result)
           )
         ) : currentView === 'changelog' ? (
           <Changelog onSelectProblem={handleSelectProblem} />
+        ) : currentView === 'contest' ? (
+          <ContestManage />
         ) : (
           <div style={{ padding: '2rem', textAlign: 'center' }}>404 Not Found</div>
         )}
@@ -601,6 +612,20 @@ print("변환 리스트:", result)
       {pyodideStatus && <RuntimeStatusPill message={pyodideStatus} />}
 
       <UpdatePrompt />
+    </div>
+  );
+}
+
+// A gift problem opened (by link, or next/prev) before its day.
+function LockedProblem({ opensOn, onBack }: { opensOn: string; onBack: () => void }) {
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '1rem', padding: '4rem 2rem', textAlign: 'center', minHeight: '50vh' }}>
+      <div style={{ fontSize: '2.5rem' }}>🎁</div>
+      <h2 style={{ fontSize: '1.3rem', fontWeight: 800, color: '#1a1a1a' }}>
+        {Number(opensOn.slice(5, 7))}월 {Number(opensOn.slice(8, 10))}일에 열리는 선물 문제예요
+      </h2>
+      <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>그날 다시 와서 풀어 보세요.</p>
+      <button onClick={onBack} className="btn-primary" style={{ padding: '0.75rem 1.75rem' }}>목록으로 돌아가기</button>
     </div>
   );
 }
@@ -779,7 +804,9 @@ function RuntimeStatusPill({ message }: { message: string }) {
 export default function App() {
   return (
     <AuthProvider>
-      <MainApp />
+      <ContestProvider initialJoinCode={INITIAL_ROUTE.joinCode}>
+        <MainApp />
+      </ContestProvider>
     </AuthProvider>
   );
 }

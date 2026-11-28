@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Megaphone, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon, Smartphone, UserPlus } from 'lucide-react';
+import { ClipboardList, LayoutDashboard, BookOpen, Terminal, GraduationCap, MessageCircle, Megaphone, Menu, X, UserCheck, LogIn, LogOut, PanelLeftClose, PanelLeftOpen, Edit3, Sun, Moon, Smartphone, UserPlus } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useContest } from '../contexts/ContestContext';
 import { useDarkMode } from '../hooks/useDarkMode';
 import { openInstallGuide } from '../utils/installApp';
 import { supabase } from '../lib/supabase';
@@ -86,11 +87,21 @@ export default function Sidebar({
     };
   }, [isAdmin, currentView]);
 
+  // 우리 반 현황 for a class's teachers, 대회 관리 for the admin. The roster
+  // functions check the caller themselves; this only decides the menu.
+  const { board } = useContest();
+  const contestMenu = isAdmin
+    ? { id: 'contest', name: '대회 관리', icon: ClipboardList }
+    : (board?.mine?.teacher_class_ids.length ?? 0) > 0
+      ? { id: 'contest', name: '우리 반 현황', icon: ClipboardList }
+      : null;
+
   const menuItems = [
     { id: 'dashboard', name: '대시보드', icon: LayoutDashboard },
     { id: 'problems', name: '문제 학습', icon: BookOpen },
     { id: 'sandbox', name: '샌드박스', icon: Terminal },
     { id: 'docs', name: '학습 가이드', icon: GraduationCap },
+    ...(contestMenu ? [contestMenu] : []),
     { id: 'board', name: '고객센터', icon: MessageCircle },
     { id: 'changelog', name: '업데이트', icon: Megaphone },
     // Not a view: opens the install guide over whatever page is showing.
@@ -479,7 +490,7 @@ export default function Sidebar({
           {/* 고객센터/업데이트 live in the 더보기 panel instead of the primary
               row -- with icon/text sizes bumped up, a 5th+ destination here
               made every label wrap to two lines. */}
-          {menuItems.filter((item) => item.id !== 'board' && item.id !== 'changelog' && item.id !== 'install').map((item) => {
+          {menuItems.filter((item) => item.id !== 'board' && item.id !== 'changelog' && item.id !== 'install' && item.id !== 'contest').map((item) => {
             const IconComponent = item.icon;
             const isActive = currentView === item.id;
             return (
@@ -647,6 +658,29 @@ export default function Sidebar({
                   회원가입
                 </button>
               </div>
+            )}
+            {contestMenu && (
+              <button
+                onClick={() => {
+                  onViewChange('contest');
+                  setMobileMenuOpen(false);
+                }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  background: currentView === 'contest' ? '#1a1a1a' : 'transparent',
+                  border: '1px solid var(--border-subtle)',
+                  padding: '0.6rem 0.75rem',
+                  fontSize: '0.8rem',
+                  fontWeight: '600',
+                  color: currentView === 'contest' ? '#ffffff' : '#1a1a1a',
+                  cursor: 'pointer',
+                }}
+              >
+                <ClipboardList size={16} />
+                {contestMenu.name}
+              </button>
             )}
             <button
               onClick={() => {

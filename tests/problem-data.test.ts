@@ -7,7 +7,7 @@
 // options marks every answer wrong; a testCase whose `expected` isn't valid
 // base64 throws inside the grader. Both ship silently.
 import { describe, it, expect } from 'vitest';
-import { problems, filterProblems, problemTrack, PY_LIB_CATEGORIES } from '../src/data/problems';
+import { problems, filterProblems, problemTrack, PY_LIB_CATEGORIES, isProblemOpen } from '../src/data/problems';
 import type { Problem, ProblemLanguage } from '../src/data/problems';
 import { decodeAnswer } from '../src/utils/answerObfuscation';
 import { solutionCode } from '../src/data/solutionCode';
@@ -324,16 +324,19 @@ describe('문제 데이터 — SQL 채점의 행 순서 의존', () => {
 });
 
 describe('filterProblems', () => {
-  it('기본값은 전부 통과시킨다', () => {
-    expect(filterProblems(problems, {}).length).toBe(problems.length);
+  // Gift problems stay out of the list until their day (opensOn).
+  const openProblems = problems.filter((p) => isProblemOpen(p));
+
+  it('기본값은 (열린 문제를) 전부 통과시킨다', () => {
+    expect(filterProblems(problems, {}).length).toBe(openProblems.length);
     expect(filterProblems(problems, { language: 'all', difficulty: 'all', type: 'all', search: '' }).length)
-      .toBe(problems.length);
+      .toBe(openProblems.length);
   });
 
   it('language 미지정 문제를 python 으로 취급한다', () => {
     // 99 of the 140 Python problems have no explicit `language`, so a filter
     // that didn't default would hide most of the Python catalogue.
-    const unset = problems.filter((p) => p.language === undefined && problemTrack(p) === 'python');
+    const unset = openProblems.filter((p) => p.language === undefined && problemTrack(p) === 'python');
     expect(unset.length).toBeGreaterThan(0);
     const pythonFiltered = filterProblems(problems, { language: 'python' });
     for (const p of unset) expect(pythonFiltered).toContain(p);
@@ -341,7 +344,7 @@ describe('filterProblems', () => {
 
   it('언어별 합이 전체와 같다', () => {
     const sum = [...LANGUAGES, 'pylib'].reduce((a, l) => a + filterProblems(problems, { language: l }).length, 0);
-    expect(sum).toBe(problems.length);
+    expect(sum).toBe(openProblems.length);
   });
 
   it('NumPy · Pandas · Matplotlib 문제는 Python 이 아니라 Python Lib 탭에 있다', () => {

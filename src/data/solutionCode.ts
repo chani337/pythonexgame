@@ -4,6 +4,8 @@
 // verified to actually pass that problem's own grading harness (stdout_match
 // or the eval-based test runner) before being added.
 export const solutionCode: Record<string, string> = {
+  "xmas_2026_gift1": "gifts = [\"양말\", \"장갑\", \"목도리\"]\n\nfor i, gift in enumerate(gifts, 1):\n    print(f\"{i}. {gift}\")\n",
+  "xmas_2026_gift2": "day = 20\n\nif day == 25:\n    print(\"메리 크리스마스!\")\nelse:\n    left = 25 - day\n    print(f\"크리스마스까지 {left}일 남았어요!\")\n",
   "basic_part1_q1": "name = \"김철수\"\nprint(name)\n",
   "basic_part1_q2": "age = 20\nprint(age)\n",
   "basic_part1_q3": "name = \"김철수\"\nage = 20\nfood = \"치킨\"\nprint(name)\nprint(age)\nprint(food)\n",

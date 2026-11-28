@@ -61,6 +61,17 @@ export interface Problem {
   // base64-encoded, same reason as correctAnswerIndex above.
   correctAnswerText?: string;
   placeholderText?: string;
+  // Hidden from the list and locked until this Korean date (YYYY-MM-DD):
+  // the Christmas gift problems. It still has to be in the seed beforehand,
+  // or the first solve on the day would be refused.
+  opensOn?: string;
+}
+
+/** Whether a problem's opensOn day (Korean time) has come. */
+export function isProblemOpen(problem: Pick<Problem, 'opensOn'>, now: Date = new Date()): boolean {
+  if (!problem.opensOn) return true;
+  const today = new Date(now.getTime() + 9 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  return today >= problem.opensOn;
 }
 
 export interface ProblemFilters {
@@ -76,6 +87,7 @@ export function filterProblems(list: Problem[], filters: ProblemFilters): Proble
   const { language = 'all', difficulty = 'all', type = 'all', search = '' } = filters;
   const searchLower = search.toLowerCase();
   return list.filter((problem) => {
+    if (!isProblemOpen(problem)) return false;
     const matchesLanguage = language === 'all' || problemTrack(problem) === language;
     const matchesDifficulty = difficulty === 'all' || problem.difficulty === difficulty;
     const matchesType = type === 'all' || problem.type === type;
@@ -12631,5 +12643,65 @@ export const problems: Problem[] = [
     "testRunnerCode": "stdout_match",
     "sqlDataset": "company",
     "sqlCheck": "SELECT lower(fk.\"from\") AS \"from\", lower(fk.\"table\") AS \"table\", lower(COALESCE(fk.\"to\", (SELECT name FROM pragma_table_info(fk.\"table\") WHERE pk = 1))) AS \"to\" FROM pragma_foreign_key_list('order_logs') AS fk;"
+  },
+  {
+    "id": "xmas_2026_gift1",
+    "title": "🎁 크리스마스 선물 1. 산타의 선물 목록",
+    "category": "크리스마스",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "산타가 오늘 밤 나눠 줄 선물 목록이에요. 리스트에 담긴 선물을 번호를 붙여 한 줄에 하나씩 출력하세요.",
+    "constraints": [
+      "리스트 이름은 `gifts`로 하고 `[\"양말\", \"장갑\", \"목도리\"]`를 저장하세요.",
+      "`for` 반복문으로 출력하세요.",
+      "번호는 1부터 시작해요. 번호 뒤에는 점과 빈칸 하나(`1. `)를 붙이세요."
+    ],
+    "examples": [
+      {
+        "input": "코드 출력 예시",
+        "output": "1. 양말\n2. 장갑\n3. 목도리"
+      }
+    ],
+    "initialCode": "gifts = [\"양말\", \"장갑\", \"목도리\"]\n\n# 번호를 붙여 출력하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "MS4g7JaR66eQCjIuIOyepeqwkQozLiDrqqnrj4Trpqw="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "opensOn": "2026-12-24"
+  },
+  {
+    "id": "xmas_2026_gift2",
+    "title": "🎁 크리스마스 선물 2. 크리스마스까지 며칠?",
+    "category": "크리스마스",
+    "difficulty": "basic",
+    "type": "coding",
+    "description": "12월 `day`일에 크리스마스(25일)까지 며칠 남았는지 계산해서 알려 주세요. 오늘이 크리스마스면 축하 인사를 출력하세요.",
+    "constraints": [
+      "변수 `day`에 `20`을 저장하세요.",
+      "`if`로 `day`가 25인지 확인하세요. 25이면 `메리 크리스마스!`를 출력해요.",
+      "아니면 `25 - day`로 계산해서 `크리스마스까지 5일 남았어요!`처럼 출력하세요."
+    ],
+    "examples": [
+      {
+        "input": "day = 20",
+        "output": "크리스마스까지 5일 남았어요!"
+      },
+      {
+        "input": "day = 25",
+        "output": "메리 크리스마스!"
+      }
+    ],
+    "initialCode": "day = 20\n\n# 코드를 작성하세요\n",
+    "testCases": [
+      {
+        "input": "코드 실행",
+        "expected": "7YGs66as7Iqk66eI7Iqk6rmM7KeAIDXsnbwg64Ko7JWY7Ja07JqUIQ=="
+      }
+    ],
+    "testRunnerCode": "stdout_match",
+    "opensOn": "2026-12-25"
   }
 ];

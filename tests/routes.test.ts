@@ -6,7 +6,7 @@ import { parsePath, buildPath, staticPaths, routeForState, nextHistoryAction } f
 import type { Route, ViewName } from '../src/lib/routes';
 import { problems } from '../src/data/problems';
 
-const VIEWS: ViewName[] = ['dashboard', 'problems', 'sandbox', 'docs', 'board', 'changelog'];
+const VIEWS: ViewName[] = ['dashboard', 'problems', 'sandbox', 'docs', 'board', 'changelog', 'contest'];
 
 describe('parsePath', () => {
   it('루트는 대시보드다', () => {
@@ -125,7 +125,26 @@ describe('parsePath ∘ buildPath', () => {
   });
 });
 
+describe('/join/<code>', () => {
+  it('대시보드로 열리고 코드를 넘긴다', () => {
+    expect(parsePath('/join/PY7K2A')).toEqual({ view: 'dashboard', joinCode: 'PY7K2A' });
+    expect(parsePath('/join/py-7k2a/')).toEqual({ view: 'dashboard', joinCode: 'py-7k2a' });
+  });
+
+  it('코드가 없으면 그냥 대시보드다', () => {
+    expect(parsePath('/join')).toEqual({ view: 'dashboard' });
+  });
+
+  it('주소는 / 로 정리된다', () => {
+    expect(buildPath({ view: 'dashboard', joinCode: 'PY7K2A' })).toBe('/');
+  });
+});
+
 describe('staticPaths', () => {
+  it('로그인과 역할이 필요한 /contest 는 사이트맵에 없다', () => {
+    expect(staticPaths()).not.toContain('/contest');
+  });
+
   it('중복이 없고 모두 parsePath 로 해석된다', () => {
     const paths = staticPaths();
     expect(new Set(paths).size).toBe(paths.length);

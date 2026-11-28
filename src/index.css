@@ -530,7 +530,82 @@ code, pre, .console-container, .glass-input {
 /* ============================================
    MOBILE RESPONSIVE DESIGN (≤ 768px)
    ============================================ */
+/* ---- 모두의 트리 ---- */
+.xmas-ornament {
+  animation: xmas-twinkle 2.4s ease-in-out infinite;
+}
+.xmas-star-lit {
+  filter: drop-shadow(0 0 6px rgba(232, 185, 35, 0.9));
+}
+@keyframes xmas-twinkle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.65; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .xmas-ornament { animation: none; }
+}
+
+/* ---- 과정 대항전 ---- */
+.contest-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+}
+.contest-table th,
+.contest-table td {
+  border: 1px solid var(--border-subtle);
+  padding: 0.45rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+}
+.contest-table th {
+  background: #f6f8fa;
+  font-weight: 800;
+  white-space: nowrap;
+}
+.roster-table td:not(:first-child) {
+  white-space: nowrap;
+}
+.matrix-table td,
+.matrix-table th {
+  padding: 0.3rem 0.4rem;
+}
+.matrix-table .matrix-name {
+  writing-mode: vertical-rl;
+  font-size: 0.72rem;
+  font-weight: 700;
+  max-height: 7rem;
+  overflow: hidden;
+}
+.admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+.link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  color: #0969da;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+/* The projector screen keeps real colors in dark mode so the QR scans. */
+html.dark-mode .code-screen {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 @media (max-width: 768px) {
+  .contest-board {
+    padding: 1rem !important;
+  }
+  .contest-class-grid {
+    gap: 0.5rem !important;
+  }
+
   :root {
     --sidebar-width: 100%;
   }
@@ -807,7 +882,8 @@ code, pre, .console-container, .glass-input {
 /* Dark mode inverts the whole page (see html.dark-mode above); invert these
    back so the snow stays snow-colored and the hat stays red. */
 html.dark-mode .snow-layer,
-html.dark-mode .santa-hat {
+html.dark-mode .santa-hat,
+html.dark-mode .xmas-tree-art {
   filter: invert(1) hue-rotate(180deg);
 }
 

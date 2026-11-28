@@ -2,6 +2,8 @@
 // text (only needed once a problem's workspace is open) isn't part of the
 // eagerly-loaded main bundle.
 export const solutionExplanations: Record<string, string> = {
+  "xmas_2026_gift1": "for 반복문은 리스트의 선물을 하나씩 꺼내 줍니다. 번호가 필요하면 enumerate(gifts, 1)처럼 시작 번호를 1로 주면 (번호, 선물) 쌍을 함께 받을 수 있어요. 번호 변수를 따로 두고 반복할 때마다 1씩 더해도 됩니다.",
+  "xmas_2026_gift2": "먼저 if day == 25로 크리스마스 당일인지 확인하고, 아니면 else에서 25 - day로 남은 날을 계산합니다. f-문자열 안에 {left}를 넣으면 계산한 숫자가 문장 속에 들어가요.",
   "basic_part1_q1": "변수는 값에 이름을 붙여 저장하는 공간입니다. name = \"값\"처럼 = 기호로 오른쪽 값을 왼쪽 변수에 저장하고, print()로 그 값을 출력할 수 있습니다.",
   "basic_part1_q2": "문자열뿐 아니라 숫자도 변수에 그대로 저장할 수 있습니다. age = 20처럼 따옴표 없이 쓰면 정수(int)로 저장됩니다.",
   "basic_part1_q3": "여러 정보를 각각 다른 변수에 저장해두면, 필요할 때 원하는 변수만 따로 출력하거나 계산에 활용할 수 있습니다.",

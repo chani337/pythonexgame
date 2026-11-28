@@ -6,6 +6,8 @@
 // unambiguous code keyword/call -- most problems only constrain variable
 // names or literal values, which this intentionally leaves unchecked.
 export const requiredKeywords: Record<string, string[]> = {
+  "xmas_2026_gift1": ["for"],
+  "xmas_2026_gift2": ["if", "-"],
   "basic_part2_q4": ["len("],
   "basic_part2_q8": ["upper("],
   "basic_part2_q9": ["replace("],

@@ -229,7 +229,16 @@ interface AuthContextType {
   updateDisplayName: (newDisplayName: string) => Promise<{ error?: any }>;
   // Equip a title / name color (null to take it off). Logged-in users only.
   updateCosmetics: (changes: { title_id?: string | null; name_color?: string | null }) => Promise<{ error?: string }>;
+  // First wrong pick on a quiz problem: in the 대항전 only a quiz answered
+  // right first time counts. Logged-in users only; repeats are ignored.
+  logQuizMiss: (problemId: string) => void;
+  // First look at a problem's answer code, for the teacher's roster.
+  logAnswerView: (problemId: string) => void;
 }
+
+// Fired after a solve is saved, so anything showing server totals (the
+// 대항전 board) can refetch.
+export const SOLVED_SAVED_EVENT = 'pyquests-solved-saved';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -987,6 +996,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (upsertError) {
         console.error('user_solved_problems upsert failed:', upsertError);
       }
+      window.dispatchEvent(new Event(SOLVED_SAVED_EVENT));
 
       const { error: updateError } = await supabase.from('profiles').update({
         updated_at: new Date().toISOString(),
@@ -1005,6 +1015,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Sync solved error:', err);
     }
   };
+
+  // Insert-or-ignore: only the first miss / view per problem is kept, and the
+  // tables refuse UPDATE, so the time can't be moved after the fact.
+  const logFirstEvent = (table: 'user_quiz_misses' | 'user_answer_views', problemId: string) => {
+    if (!isSupabaseConfigured || !user) return;
+    supabase
+      .from(table)
+      .upsert({ user_id: user.id, problem_id: problemId }, { onConflict: 'user_id,problem_id', ignoreDuplicates: true })
+      .then(({ error }) => {
+        if (error) console.error(`${table} insert failed:`, error);
+      });
+  };
+  const logQuizMiss = (problemId: string) => logFirstEvent('user_quiz_misses', problemId);
+  const logAnswerView = (problemId: string) => logFirstEvent('user_answer_views', problemId);
 
   const syncReadChapterToSupabase = async (chapterId: string, isRead: boolean) => {
     if (!isSupabaseConfigured || !user) return;
@@ -1251,6 +1275,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         fetchUserQuizAnswers,
         updateDisplayName,
         updateCosmetics,
+        logQuizMiss,
+        logAnswerView,
       }}
     >
       {children}

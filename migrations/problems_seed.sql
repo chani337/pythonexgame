@@ -1,6 +1,6 @@
 -- GENERATED FILE -- do not edit by hand.
 -- Regenerate with: npm run sync:problems
--- Source: src/data/problems.ts (505 problems)
+-- Source: src/data/problems.ts (507 problems)
 --
 -- Seeds/refreshes public.problems, the reference table that
 -- user_solved_problems.problem_id is validated against. Safe to re-run: it
@@ -523,7 +523,9 @@ WITH incoming (id, language, difficulty, type) AS (
   ('sqlc_t4', 'sql', 'intermediate', 'coding'),
   ('sqlc_t5', 'sql', 'intermediate', 'coding'),
   ('sqlc_t6', 'sql', 'intermediate', 'coding'),
-  ('sqlc_t7', 'sql', 'intermediate', 'coding')
+  ('sqlc_t7', 'sql', 'intermediate', 'coding'),
+  ('xmas_2026_gift1', 'python', 'basic', 'coding'),
+  ('xmas_2026_gift2', 'python', 'basic', 'coding')
 ),
 upserted AS (
   INSERT INTO public.problems (id, language, difficulty, type)
