@@ -26,6 +26,13 @@ export function recentProblemIds(now: Date = new Date()): Set<string> {
 export const changelogEntries: ChangelogEntry[] = [
   {
     date: '2026-11-28',
+    title: '크리스마스와 신정에는 눈싸움이 하루 종일 열려요',
+    items: [
+      '평일이어도 공휴일(12/25 크리스마스, 1/1 신정 등)에는 수업이 없으니 눈싸움 게임을 언제든 할 수 있어요.',
+    ],
+  },
+  {
+    date: '2026-11-28',
     title: '고급 · 챌린지 문제는 정답 코드를 보여 주지 않아요',
     items: [
       '고급과 챌린지 난이도 문제에서는 "정답 코드 보기"가 없어졌어요. 직접 끝까지 풀어 보는 단계예요.',

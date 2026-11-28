@@ -67,6 +67,14 @@ describe('수업 시간 잠금 (한국 시간)', () => {
     expect(gameLockedUntil(new Date('2026-12-07T10:00:00+09:00'))).toBe('12:50'); // 월
   });
 
+  it('공휴일에는 평일이어도 열려 있다', () => {
+    expect(gameLockedUntil(new Date('2026-12-25T10:00:00+09:00'))).toBeNull(); // 크리스마스 (금)
+    expect(gameLockedUntil(new Date('2027-01-01T15:00:00+09:00'))).toBeNull(); // 신정 (금)
+    expect(gameLockedUntil(new Date('2026-12-24T10:00:00+09:00'))).toBe('12:50'); // 전날은 잠김
+    // 12/25 00:30 KST = 12/24 15:30 UTC -- 날짜도 한국 시간으로 본다
+    expect(gameLockedUntil(new Date('2026-12-24T15:30:00Z'))).toBeNull();
+  });
+
   it('요일도 한국 시간으로 본다', () => {
     // 2026-12-07 01:00 UTC = 월 10:00 KST -- 잠김
     expect(gameLockedUntil(new Date('2026-12-07T01:00:00Z'))).toBe('12:50');

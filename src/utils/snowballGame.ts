@@ -1,21 +1,33 @@
 // The pure parts of the snowball fight (src/components/SnowballFight.tsx):
 // difficulty over time, scoring, the best-score record and class-time
 // locking. Kept out of the component so they can be tested without a canvas.
-import { kstDayOfWeek, kstMinuteOfDay } from './winterEvent';
+import { kstDate, kstDayOfWeek, kstMinuteOfDay } from './winterEvent';
 
 // Class hours, Korean time: on weekdays the game is locked from `from` up
-// to (not including) `to`. Weekends are open all day.
+// to (not including) `to`. Weekends and public holidays are open all day.
 export const GAME_LOCKS: { from: string; to: string }[] = [
   { from: '09:00', to: '12:50' },
   { from: '14:10', to: '17:51' },
 ];
+
+// Korean public holidays on fixed solar dates ('MM-DD'). The lunar ones
+// (설날, 추석, 부처님오신날) and substitute holidays move every year, so they
+// aren't here -- add a full date to EXTRA_HOLIDAYS when one falls on a weekday.
+const SOLAR_HOLIDAYS = ['01-01', '03-01', '05-05', '06-06', '08-15', '10-03', '10-09', '12-25'];
+const EXTRA_HOLIDAYS: string[] = []; // 'YYYY-MM-DD'
+
+/** Whether `now` falls on a Korean public holiday the game knows about. */
+export function isKstHoliday(now: Date = new Date()): boolean {
+  const date = kstDate(now);
+  return SOLAR_HOLIDAYS.includes(date.slice(5)) || EXTRA_HOLIDAYS.includes(date);
+}
 
 const toMinutes = (hhmm: string) => Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
 
 /** If the game is locked at `now`, the 'HH:MM' it unlocks at; otherwise null. */
 export function gameLockedUntil(now: Date = new Date()): string | null {
   const day = kstDayOfWeek(now);
-  if (day === 0 || day === 6) return null;
+  if (day === 0 || day === 6 || isKstHoliday(now)) return null;
   const m = kstMinuteOfDay(now);
   const lock = GAME_LOCKS.find((l) => m >= toMinutes(l.from) && m < toMinutes(l.to));
   return lock ? lock.to : null;
