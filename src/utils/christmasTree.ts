@@ -4,8 +4,8 @@ import { kstDate } from './winterEvent';
 
 export const TREE_DAYS = ['21', '22', '23', '24', '25'];
 
-// Solvers in a day that light the star. About what a weekday brings now.
-export const TREE_GOAL = 10;
+// Solvers in a day that light the star. A weekday brings 3–6 (Nov 2026).
+export const TREE_GOAL = 5;
 
 // The two gift problems (src/data/problems.ts), opening on the 24th and 25th.
 export const GIFT_PROBLEM_IDS = ['xmas_2026_gift1', 'xmas_2026_gift2'];
